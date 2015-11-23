@@ -37,14 +37,9 @@ public class PauseDialog extends Dialog {
 				break;
 			case "menu":
 				game.setScreen(game.getMenuScreen());
-				break;
 		}
+		gameScreen.setPaused(false);
+		gameScreen.setPauseClosed(true);
 	}
 
-	/*
-	@Override
-	public Dialog show(Stage stage) {
-		return this;
-	}
-	*/
 }

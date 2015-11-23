@@ -27,6 +27,9 @@ public class GameScreen implements Screen {
 	private Player player;
 	private OrthographicCamera camera;
 
+	private boolean paused;
+	private boolean pauseClosed;
+
 	public GameScreen(Level level, Player player, OrthographicCamera camera, final MyGame game) {
 		this.level = level;
 		this.player = player;
@@ -78,18 +81,26 @@ public class GameScreen implements Screen {
 	}
 
 	public void process() {
-		if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-			player.move(0, 1);
-		} else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-			player.move(0, -1);
-		} else if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-			player.move(-1, 0);
-		} else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-			player.move(1, 0);
-		} else if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-			resetLevel();
-		} else if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-			pauseDialog.show(stage);
+		if (pauseClosed) {
+			pauseClosed = false;
+			return;
+		}
+
+		if (!paused) {
+			if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+				player.move(0, 1);
+			} else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+				player.move(0, -1);
+			} else if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+				player.move(-1, 0);
+			} else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+				player.move(1, 0);
+			} else if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+				resetLevel();
+			} else if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+				paused = true;
+				pauseDialog.show(stage);
+			}
 		}
 	}
 
@@ -169,5 +180,13 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void resume() {}
+
+	public void setPaused(boolean paused) {
+		this.paused = paused;
+	}
+
+	public void setPauseClosed(boolean pauseClosed) {
+		this.pauseClosed = pauseClosed;
+	}
 
 }
