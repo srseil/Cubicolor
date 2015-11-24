@@ -42,7 +42,8 @@ public class MenuScreen implements Screen {
 
 		//Table playContent = new Table();
 		LevelMenu levelMenu = new LevelMenu(skin, game);
-		Table settingsContent = new Table();
+		//Table settingsContent = new Table();
+		SettingsMenu settingsMenu = new SettingsMenu(skin, game);
 		//Table menuItems = new Table();
 		VerticalGroup menuItems = new VerticalGroup();
 		//menuItems.setWidth(100.0f);
@@ -59,7 +60,7 @@ public class MenuScreen implements Screen {
 		playButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				rootTable.removeActor(settingsContent);
+				rootTable.removeActor(settingsMenu);
 				rootTable.add(levelMenu);
 			}
 		});
@@ -70,7 +71,7 @@ public class MenuScreen implements Screen {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				rootTable.removeActor(levelMenu);
-				rootTable.add(settingsContent);
+				rootTable.add(settingsMenu);
 			}
 		});
 
@@ -118,70 +119,9 @@ public class MenuScreen implements Screen {
 		// Add to screen:
 		//rootTable.add(playContent).left().padLeft(50.0f);
 
-		// Settings content table.
-		/* Resolution, full/windowed screen, language, (reset progress), brightness, (vsync),
-			Music, SFX, Controls!, (colorblind? -> reddit), Tutorial
-		 */
-
-		settingsContent.add(new Label("Game", skin)).left();
-		settingsContent.row();
-		settingsContent.add(new Label("Language", skin)).left();
-		settingsContent.row();
-		SelectBox<String> languageDropdown = new SelectBox<>(skin);
-		languageDropdown.setItems("English", "Deutsch", "Espanol", "Russian");
-		settingsContent.add(languageDropdown).left();
-		TextButton resetButton = new TextButton("Reset progress", skin);
-		settingsContent.add(resetButton).left().padLeft(20.0f);
-		settingsContent.row();
-
-		Label audioLabel = new Label("Audio", skin);
-		settingsContent.add(audioLabel).left().padTop(20.0f);
-		settingsContent.row();
-
-		settingsContent.add(new Label("Music Volume", skin)).left();
-		settingsContent.add(new Label("Sound Volume", skin)).left().padLeft(20.0f);
-		settingsContent.row();
-
-		Slider musicSlider = new Slider(0.0f, 100.0f, 5.0f, false, skin);
-		settingsContent.add(musicSlider);
-		Slider soundSlider = new Slider(0.0f, 100.0f, 5.0f, false, skin);
-		settingsContent.add(soundSlider).padLeft(20.0f);
-		settingsContent.row();
-
-		Table musicTable = new Table();
-		musicTable.debug();
-		musicTable.add(new CheckBox("Mute", skin)).expandX().left();
-		musicTable.add(new Label("100", skin)).right();
-		Table soundTable = new Table();
-		soundTable.debug();
-		soundTable.add(new CheckBox("Mute", skin)).expandX().left().padLeft(20.0f);
-		soundTable.add(new Label("100", skin)).right();
-		settingsContent.add(musicTable).fillX();
-		settingsContent.add(soundTable).fillX();
-		settingsContent.row();
-
-		settingsContent.add(new Label("Video", skin)).left().padTop(20.0f);
-		settingsContent.row();
-		settingsContent.add(new Label("Resolution", skin)).left();
-		settingsContent.row();
-		SelectBox<String> resolutionDropdown = new SelectBox<>(skin);
-		resolutionDropdown.setItems("resolution 1", "resolution 2", "less text");
-		settingsContent.add(resolutionDropdown).left();
-		settingsContent.add(new CheckBox("Fullscreen", skin)).left().padLeft(20.0f);
-		settingsContent.row();
-
-		settingsContent.add(new Label("Brightness", skin)).left();
-		settingsContent.add(new Label("Contrast", skin)).left().padLeft(20.0f);
-		settingsContent.row();
-		settingsContent.add(new Slider(0.0f, 100.0f, 5.0f, false, skin));
-		settingsContent.add(new Slider(0.0f, 100.0f, 5.0f, false, skin)).padLeft(20.0f);
-		settingsContent.row();
-
-		settingsContent.add(new CheckBox("VSync", skin)).left();
-		settingsContent.add(new CheckBox("Colorblind mode", skin)).left().padLeft(20.0f);
 
 
-		rootTable.add(settingsContent).left().padLeft(50.0f);
+		rootTable.add(levelMenu).left().padLeft(50.0f);
 
 		//Gdx.graphics.setDisplayMode(800, 600, true);
 		//Gdx.graphics.setVSync(true);
