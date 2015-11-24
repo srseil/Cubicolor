@@ -62,8 +62,17 @@ public class MenuScreen implements Screen {
 				rootTable.add(playContent);
 			}
 		});
+
 		TextButton settingsButton = new TextButton("Settings", skin);
 		settingsButton.setWidth(100.0f);
+		settingsButton.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				rootTable.removeActor(playContent);
+				rootTable.add(settingsContent);
+			}
+		});
+
 		TextButton quitButton = new TextButton("Quit", skin);
 		quitButton.setWidth(100.0f);
 
@@ -80,8 +89,8 @@ public class MenuScreen implements Screen {
 			}
 		};
 		quitDialog.text("Are you sure you want to quit?");
-		quitDialog.button("Yes", true);
-		quitDialog.button("No", false);
+		quitDialog.button("Quit", true);
+		quitDialog.button("Cancel", false);
 		quitDialog.key(Input.Keys.ENTER, true);
 		quitDialog.key(Input.Keys.ESCAPE, false);
 

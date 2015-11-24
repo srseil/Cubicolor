@@ -72,12 +72,6 @@ public class GameScreen implements Screen {
 		//table.add(steps);
 		//table.bottom().right();
 		pauseDialog = new PauseDialog(skin, this, game);
-
-		Dialog dial = new Dialog("", skin);
-		dial.button(new TextButton("Resume", skin));
-		dial.button(new TextButton("Restart", skin));
-		dial.button(new TextButton("Main Menu", skin));
-		rootTable.add(dial);
 	}
 
 	public void process() {
