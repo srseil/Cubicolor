@@ -40,7 +40,8 @@ public class MenuScreen implements Screen {
 
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
 
-		Table playContent = new Table();
+		//Table playContent = new Table();
+		LevelMenu levelMenu = new LevelMenu(skin, game);
 		Table settingsContent = new Table();
 		//Table menuItems = new Table();
 		VerticalGroup menuItems = new VerticalGroup();
@@ -59,7 +60,7 @@ public class MenuScreen implements Screen {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				rootTable.removeActor(settingsContent);
-				rootTable.add(playContent);
+				rootTable.add(levelMenu);
 			}
 		});
 
@@ -68,7 +69,7 @@ public class MenuScreen implements Screen {
 		settingsButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				rootTable.removeActor(playContent);
+				rootTable.removeActor(levelMenu);
 				rootTable.add(settingsContent);
 			}
 		});
@@ -114,9 +115,6 @@ public class MenuScreen implements Screen {
 		});
 		TextButton normalButton = new TextButton("Normal", skin);
 		TextButton hardButton = new TextButton("Hard", skin);
-		playContent.add(easyButton);
-		playContent.add(normalButton);
-		playContent.add(hardButton);
 		// Add to screen:
 		//rootTable.add(playContent).left().padLeft(50.0f);
 
@@ -188,6 +186,7 @@ public class MenuScreen implements Screen {
 		//Gdx.graphics.setDisplayMode(800, 600, true);
 		//Gdx.graphics.setVSync(true);
 
+		//rootTable.add(new LevelMenu(skin, game)).left().padLeft(50.0f);
 	}
 
 

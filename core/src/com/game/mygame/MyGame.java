@@ -15,6 +15,8 @@ public class MyGame extends Game {
 	private ShapeRenderer shapeRenderer;
 	private BitmapFont font;
 
+	private LevelLoader levelLoader;
+
 	private MenuScreen menuScreen;
 	private GameScreen gameScreen;
 
@@ -26,12 +28,12 @@ public class MyGame extends Game {
 		shapeRenderer = new ShapeRenderer();
 		font = new BitmapFont();
 
-		LevelLoader loader = new LevelLoader();
+		levelLoader = new LevelLoader();
 		Level level;
 		Player player;
 
 		try {
-			level = loader.load("level.xml");
+			level = levelLoader.load("level1.xml");
 			player = new Player(level, gameScreen);
 			gameScreen = new GameScreen(level, player, camera, this);
 			menuScreen = new MenuScreen(camera, this);
@@ -70,6 +72,20 @@ public class MyGame extends Game {
 		batch.dispose();
 		shapeRenderer.dispose();
 		font.dispose();
+	}
+
+	public void openLevel(String difficulty, int n) {
+		Level level;
+		Player player;
+		try {
+			level = levelLoader.load("level" + Integer.toString(n) + ".xml");
+			player = new Player(level, gameScreen);
+			gameScreen = new GameScreen(level, player, camera, this);
+			this.setScreen(gameScreen);
+		} catch (IOException exception) {
+			System.out.println("Error while loading level.");
+			exception.printStackTrace();
+		}
 	}
 
 	public void toGameScreen() {
