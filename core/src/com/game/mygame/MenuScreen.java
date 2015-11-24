@@ -20,17 +20,14 @@ public class MenuScreen implements Screen {
 
 	private OrthographicCamera camera;
 	private Stage stage;
-	private Table rootTable;
 	private Skin skin;
+	private Table rootTable;
 
 	public MenuScreen(OrthographicCamera camera, MyGame game) {
 		this.game = game;
-
-		//camera = new OrthographicCamera();
 		this.camera = camera;
-		//camera.setToOrtho(false);
 		stage = new Stage(new ExtendViewport(800, 600, camera));
-		//Gdx.input.setInputProcessor(stage);
+		skin = new Skin(Gdx.files.internal("uiskin.json"));
 
 		rootTable = new Table();
 		rootTable.setFillParent(true);
@@ -38,51 +35,10 @@ public class MenuScreen implements Screen {
 		rootTable.left();
 		stage.addActor(rootTable);
 
-		skin = new Skin(Gdx.files.internal("uiskin.json"));
-
-		//Table playContent = new Table();
 		LevelMenu levelMenu = new LevelMenu(skin, game);
-		//Table settingsContent = new Table();
 		SettingsMenu settingsMenu = new SettingsMenu(skin, game);
-		//Table menuItems = new Table();
-		VerticalGroup menuItems = new VerticalGroup();
-		//menuItems.setWidth(100.0f);
-		menuItems.fill();
-		Table menuContent = new Table();
-		rootTable.add(menuItems).expandY().padLeft(50.0f);
-		//rootTable.add(menuContent).expandY().padLeft(50.0f);
 
-		Label label = new Label("This is a list of menu items.", skin);
-		menuItems.addActor(label);
-
-		TextButton playButton = new TextButton("Play", skin);
-		playButton.setWidth(100.0f);
-		playButton.addListener(new ChangeListener() {
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				rootTable.removeActor(settingsMenu);
-				rootTable.add(levelMenu);
-			}
-		});
-
-		TextButton settingsButton = new TextButton("Settings", skin);
-		settingsButton.setWidth(100.0f);
-		settingsButton.addListener(new ChangeListener() {
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				rootTable.removeActor(levelMenu);
-				rootTable.add(settingsMenu);
-			}
-		});
-
-		TextButton quitButton = new TextButton("Quit", skin);
-		quitButton.setWidth(100.0f);
-
-		menuItems.addActor(playButton);
-		menuItems.addActor(settingsButton);
-		menuItems.addActor(quitButton);
-
-		// Quit dialog.
+		// Quit dialog, comes up when Quit button is clicked.
 		// !!! Exit <-> Quit
 		Dialog quitDialog = new Dialog("Quit", skin) {
 			protected void result(Object object) {
@@ -96,37 +52,44 @@ public class MenuScreen implements Screen {
 		quitDialog.key(Input.Keys.ENTER, true);
 		quitDialog.key(Input.Keys.ESCAPE, false);
 
-		// Quit button action.
+		// Menu buttons.
+		VerticalGroup menuItems = new VerticalGroup();
+		menuItems.fill();
+		// Play button.
+		TextButton playButton = new TextButton("Play", skin);
+		playButton.setWidth(100.0f);
+		playButton.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				rootTable.removeActor(settingsMenu);
+				rootTable.add(levelMenu);
+			}
+		});
+		menuItems.addActor(playButton);
+		// Settings button.
+		TextButton settingsButton = new TextButton("Settings", skin);
+		settingsButton.setWidth(100.0f);
+		settingsButton.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				rootTable.removeActor(levelMenu);
+				rootTable.add(settingsMenu);
+			}
+		});
+		menuItems.addActor(settingsButton);
+		// Quit button.
+		TextButton quitButton = new TextButton("Quit", skin);
+		quitButton.setWidth(100.0f);
 		quitButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				quitDialog.show(stage);
 			}
 		});
+		menuItems.addActor(quitButton);
 
-
-		// Play content table (level screen).
-		TextButton easyButton = new TextButton("Easy", skin);
-		easyButton.addListener(new ChangeListener() {
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				game.setScreen(game.getGameScreen());
-				System.out.println("To Game Screen...");
-			}
-		});
-		TextButton normalButton = new TextButton("Normal", skin);
-		TextButton hardButton = new TextButton("Hard", skin);
-		// Add to screen:
-		//rootTable.add(playContent).left().padLeft(50.0f);
-
-
-
+		rootTable.add(menuItems).expandY().padLeft(50.0f);
 		rootTable.add(levelMenu).left().padLeft(50.0f);
-
-		//Gdx.graphics.setDisplayMode(800, 600, true);
-		//Gdx.graphics.setVSync(true);
-
-		//rootTable.add(new LevelMenu(skin, game)).left().padLeft(50.0f);
 	}
 
 
