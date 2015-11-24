@@ -32,7 +32,7 @@ public class MyGame extends Game {
 
 		try {
 			level = loader.load("level.xml");
-			player = new Player(level);
+			player = new Player(level, gameScreen);
 			gameScreen = new GameScreen(level, player, camera, this);
 			menuScreen = new MenuScreen(camera, this);
 			this.setScreen(menuScreen);
