@@ -4,8 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.XmlWriter;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public class SaveState {
 
@@ -48,6 +52,36 @@ public class SaveState {
 		}
 	}
 
+	// Saves a save state to disk.
+	public void save() throws IOException {
+		File saveFile = Gdx.files.internal("savestate.xml").file();
+		PrintWriter printWriter = new PrintWriter(saveFile);
+		printWriter.write("<?xml version=\"1.1\" encoding=\"UTF-8\"?>\n");
+		XmlWriter xmlWriter = new XmlWriter(printWriter);
+
+		xmlWriter.element("savestate");
+		for (int i = 0; i < levels.length; i++) {
+			switch (i) {
+				case 0: xmlWriter.element("normal"); break;
+				case 1:	xmlWriter.element("smart"); break;
+				case 2:	xmlWriter.element("genius");
+			}
+			for (int j = 0; j < levels[i].length; j++) {
+				xmlWriter.element("level" + Integer.toString(j+1));
+				switch (levels[i][j]) {
+					case UNSOLVED: xmlWriter.text("unsolved"); break;
+					case SOLVED: xmlWriter.text("solved"); break;
+					case OPTIMAL: xmlWriter.text("optimal");
+				}
+				xmlWriter.pop();
+			}
+			xmlWriter.pop();
+		}
+		xmlWriter.pop();
+		xmlWriter.close();
+		printWriter.close();
+	}
+
 	// Updates the save state with the corresponding completed level.
 	public void update(String difficulty, int number, boolean optimal) {
 		SolveState state;
@@ -60,7 +94,11 @@ public class SaveState {
 
 	// Resets a save state to no completed levels.
 	public void reset() {
-
+		for (int i = 0; i < levels.length; i++) {
+			for (int j = 0; j < levels[i].length; j++) {
+				levels[i][j] = SolveState.UNSOLVED;
+			}
+		}
 	}
 
 	public SolveState getSolveState(String difficulty, int number) {

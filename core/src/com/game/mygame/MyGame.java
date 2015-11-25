@@ -42,6 +42,7 @@ public class MyGame extends Game {
 			saveState.load();
 			menuScreen = new MenuScreen(camera, this);
 			this.setScreen(menuScreen);
+			saveState.save();
 		} catch (IOException exception) {
 			System.out.println("Error while loading level.");
 			exception.printStackTrace();
@@ -50,6 +51,8 @@ public class MyGame extends Game {
 		System.out.println(saveState.getSolveState("normal", 1));
 		System.out.println(saveState.getSolveState("normal", 2));
 		System.out.println(saveState.getSolveState("normal", 3));
+
+
 		/*
 		Level level = new Level("");
 		level.rows = 6;
