@@ -22,8 +22,8 @@ public class GameScreen implements Screen {
 	private Table rootTable;
 	private Label steps;
 	private PauseDialog pauseDialog;
-	private WinDialog winDialogNormal;
-	private WinDialog winDialogOptimal;
+	private WinDialog completeDialogNormal;
+	private WinDialog completeDialogOptimal;
 
 	private Level level;
 	private Player player;
@@ -31,14 +31,15 @@ public class GameScreen implements Screen {
 
 	private boolean paused;
 	private boolean pauseClosed;
-	private boolean won;
+	private boolean completed;
 
-	public GameScreen(Level level, Player player, OrthographicCamera camera, final MyGame game) {
+	public GameScreen(Level level, OrthographicCamera camera, final MyGame game) {
 		this.level = level;
-		this.player = player;
+		this.camera = camera;
 		this.game = game;
 
-		this.camera = camera;
+		player = new Player(level, this);
+
 		//camera.setToOrtho(false, 800, 600);
 		stage = new Stage(new ExtendViewport(800, 600));
 		//Gdx.input.setInputProcessor(stage);
@@ -76,8 +77,8 @@ public class GameScreen implements Screen {
 		//table.bottom().right();
 		pauseDialog = new PauseDialog(skin, this, game);
 
-		winDialogNormal = new WinDialog(false, skin, this, game);
-		winDialogOptimal = new WinDialog(true, skin, this, game);
+		completeDialogNormal = new WinDialog(false, skin, this, game);
+		completeDialogOptimal = new WinDialog(true, skin, this, game);
 	}
 
 	public void process() {
@@ -86,7 +87,7 @@ public class GameScreen implements Screen {
 			return;
 		}
 
-		if (!paused && !won) {
+		if (!paused && !completed) {
 			if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
 				player.move(0, 1);
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
@@ -107,12 +108,12 @@ public class GameScreen implements Screen {
 	public void resetLevel() {
 		level.reset();
 		player.reset();
-		won = false;
+		completed = false;
 	}
 
-	public void win() {
-		won = true;
-		winDialogNormal.show(stage);
+	public void completeLevel() {
+		completed = true;
+		completeDialogNormal.show(stage);
 	}
 
 	// The render() method is being used as a hook into the game loop.
@@ -157,9 +158,9 @@ public class GameScreen implements Screen {
 
 		game.getShapeRenderer().end();
 
-		if (!won && player.hasWon()) {
-			won = true;
-			winDialogOptimal.show(stage);
+		if (!completed && player.hasCompleted()) {
+			completed = true;
+			completeDialogOptimal.show(stage);
 		}
 
 		// Process game logic and input.

@@ -35,7 +35,7 @@ public class MyGame extends Game {
 		try {
 			level = levelLoader.load("level1.xml");
 			player = new Player(level, gameScreen);
-			gameScreen = new GameScreen(level, player, camera, this);
+			gameScreen = new GameScreen(level, camera, this);
 			menuScreen = new MenuScreen(camera, this);
 			this.setScreen(menuScreen);
 		} catch (IOException exception) {
@@ -75,12 +75,9 @@ public class MyGame extends Game {
 	}
 
 	public void openLevel(String difficulty, int n) {
-		Level level;
-		Player player;
 		try {
-			level = levelLoader.load("level" + Integer.toString(n) + ".xml");
-			player = new Player(level, gameScreen);
-			gameScreen = new GameScreen(level, player, camera, this);
+			Level level = levelLoader.load("level" + Integer.toString(n) + ".xml");
+			gameScreen = new GameScreen(level, camera, this);
 			this.setScreen(gameScreen);
 		} catch (IOException exception) {
 			System.out.println("Error while loading level.");

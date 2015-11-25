@@ -10,7 +10,7 @@ public class Player {
     private int steps;
     private TileColor key;
 	private GameScreen gameScreen;
-	private boolean won;
+	private boolean completed;
 
     public Player(Level level, GameScreen gameScreen) {
         this.level = level;
@@ -19,7 +19,7 @@ public class Player {
         y = level.getStartRow();
         steps = 0;
         key = null;
-		won = false;
+		completed = false;
     }
 
     public void move(int x, int y) {
@@ -58,7 +58,8 @@ public class Player {
                 removeKey();
             }
         } else if (tile instanceof ExitTile) {
-			won = true;
+            gameScreen.completeLevel();
+			completed = true;
         }
     }
 
@@ -67,7 +68,7 @@ public class Player {
         y = level.getStartRow();
         steps = 0;
         key = null;
-		won = false;
+		completed = false;
     }
 
     public void draw(float baseX, float baseY, ShapeRenderer renderer) {
@@ -114,8 +115,8 @@ public class Player {
         return steps;
     }
 
-	public boolean hasWon() {
-		return won;
+public boolean hasCompleted() {
+		return completed;
 	}
 
 }
