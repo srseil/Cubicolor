@@ -16,8 +16,9 @@ public class LevelLoader {
         reader = new XmlReader();
     }
 
-    public Level load(String filename) throws IOException {
-        FileHandle handle = Gdx.files.internal("levels/" + filename);
+    public Level load(String difficult, int number) throws IOException {
+        String filename = "levels/level" + Integer.toString(number) + ".xml";
+        FileHandle handle = Gdx.files.internal(filename);
         XmlReader.Element root = reader.parse(handle);
 
         String difficulty;
@@ -64,8 +65,8 @@ public class LevelLoader {
             throw new IOException();
         }
 
-        return new Level(difficulty, optimal, startRow,
-                startColumn, exitRequirements, matrix);
+        return new Level(difficulty, number, optimal,
+				startRow, startColumn, exitRequirements, matrix);
     }
 
 

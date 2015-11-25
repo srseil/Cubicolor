@@ -19,6 +19,7 @@ public class MyGame extends Game {
 
 	private MenuScreen menuScreen;
 	private GameScreen gameScreen;
+	private SaveState saveState;
 
 	public void create() {
 		camera = new OrthographicCamera(800, 600);
@@ -32,10 +33,13 @@ public class MyGame extends Game {
 		Level level;
 		Player player;
 
+		saveState = new SaveState();
+
 		try {
-			level = levelLoader.load("level1.xml");
-			player = new Player(level, gameScreen);
-			gameScreen = new GameScreen(level, camera, this);
+			//level = levelLoader.load("level1.xml");
+			//player = new Player(level, gameScreen);
+			//gameScreen = new GameScreen(level, camera, this);
+			saveState.load();
 			menuScreen = new MenuScreen(camera, this);
 			this.setScreen(menuScreen);
 		} catch (IOException exception) {
@@ -43,6 +47,9 @@ public class MyGame extends Game {
 			exception.printStackTrace();
 		}
 
+		System.out.println(saveState.getSolveState("normal", 1));
+		System.out.println(saveState.getSolveState("normal", 2));
+		System.out.println(saveState.getSolveState("normal", 3));
 		/*
 		Level level = new Level("");
 		level.rows = 6;
@@ -76,7 +83,7 @@ public class MyGame extends Game {
 
 	public void openLevel(String difficulty, int n) {
 		try {
-			Level level = levelLoader.load("level" + Integer.toString(n) + ".xml");
+			Level level = levelLoader.load(difficulty, n);
 			gameScreen = new GameScreen(level, camera, this);
 			this.setScreen(gameScreen);
 		} catch (IOException exception) {
@@ -109,4 +116,7 @@ public class MyGame extends Game {
 		return gameScreen;
 	}
 
+	public SaveState getSaveState() {
+		return saveState;
+	}
 }

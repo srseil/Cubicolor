@@ -32,6 +32,7 @@ public class GameScreen implements Screen {
 	private boolean paused;
 	private boolean pauseClosed;
 	private boolean completed;
+	// !!! -> eher solved als completed?
 
 	public GameScreen(Level level, OrthographicCamera camera, final MyGame game) {
 		this.level = level;
@@ -111,9 +112,13 @@ public class GameScreen implements Screen {
 		completed = false;
 	}
 
-	public void completeLevel() {
+	public void completeLevel(boolean optimal) {
 		completed = true;
 		completeDialogNormal.show(stage);
+		game.getSaveState().update(
+				level.getDifficulty(), level.getNumber(), optimal);
+
+		System.out.println(game.getSaveState().getSolveState(level.getDifficulty(), level.getNumber()));
 	}
 
 	// The render() method is being used as a hook into the game loop.

@@ -6,6 +6,7 @@ public class Level {
 
     // Properties of level file.
     private String difficulty;
+	private int number;
     private int optimal;
     private int startRow, startColumn;
     private EnumSet<TileColor> exitRequirements;
@@ -14,9 +15,11 @@ public class Level {
     public Tile[][] matrix;
     private ExitTile exit;
 
-    public Level(String difficulty, int optimal, int startRow, int startColumn,
-                 EnumSet<TileColor> exitRequirements, Tile[][] matrix) {
+    public Level(String difficulty, int number, int optimal,
+				 int startRow, int startColumn,
+				 EnumSet<TileColor> exitRequirements, Tile[][] matrix) {
         this.difficulty = difficulty;
+		this.number = number;
         this.optimal = optimal;
         this.startRow = startRow;
         this.startColumn = startColumn;
@@ -67,6 +70,18 @@ public class Level {
             return false;
         }
     }
+
+    public String getDifficulty() {
+		return difficulty;
+	}
+
+	public int getNumber() {
+		return number;
+	}
+
+	public int getOptimalSteps() {
+		return optimal;
+	}
 
     public int getRows() {
         return rows;
