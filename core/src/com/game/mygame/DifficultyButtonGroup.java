@@ -18,17 +18,24 @@ public class DifficultyButtonGroup extends ButtonGroup<TextButton> {
 
 		if (getChecked() != null) {
 			System.out.println(this.getChecked().getLabel());
-			levelMenu.switchToOverview(this.getChecked().getLabel().getText().toString());
+			Difficulty difficulty;
+			switch (this.getChecked().getLabel().getText().toString()) {
+				case "Normal": difficulty = Difficulty.NORMAL; break;
+				case "Smart": difficulty = Difficulty.SMART; break;
+				case "Genius": difficulty = Difficulty.GENIUS; break;
+				default: difficulty = Difficulty.NORMAL;
+			}
+			levelMenu.switchToOverview(difficulty);
 		}
 
 		return ret;
 	}
 
 	public String getCheckedLabel() {
-		if (getChecked() != null)
+		//if (getChecked() != null)
 			return getChecked().getLabel().toString();
-		else
-			return "Normal";
+		//else
+		//	return "Normal";
 	}
 
 }

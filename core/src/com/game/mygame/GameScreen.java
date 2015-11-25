@@ -118,6 +118,8 @@ public class GameScreen implements Screen {
 		game.getSaveState().update(
 				level.getDifficulty(), level.getNumber(), optimal);
 
+		//game.getSaveState().save();
+
 		System.out.println(game.getSaveState().getSolveState(level.getDifficulty(), level.getNumber()));
 	}
 

@@ -18,7 +18,7 @@ public class SaveState {
 
 	public SaveState() {
 		reader = new XmlReader();
-		levels = new SolveState[1][3];
+		levels = new SolveState[3][3];
 	}
 
 	// Loads a save state from disk.
@@ -30,20 +30,29 @@ public class SaveState {
 			XmlReader.Element normal = root.getChildByName("normal");
 			XmlReader.Element smart = root.getChildByName("smart");
 			XmlReader.Element genius = root.getChildByName("genius");
+			XmlReader.Element diffElement = null;
 
-			for (int i = 0; i < levels[0].length; i++) {
-				switch (normal.get("level" + Integer.toString(i+1))) {
-					case "unsolved":
-						levels[0][i] = SolveState.UNSOLVED;
-						break;
-					case "solved":
-						levels[0][i] = SolveState.SOLVED;
-						break;
-					case "optimal":
-						levels[0][i] = SolveState.OPTIMAL;
-						break;
-					default:
-						throw new IOException();
+			for (int i = 0; i < levels.length; i++) {
+				switch (i) {
+					case 0: diffElement = root.getChildByName("normal"); break;
+					case 1: diffElement = root.getChildByName("smart"); break;
+					case 2: diffElement = root.getChildByName("genius"); break;
+					//default: root.getChildByName("normal");
+				}
+				for (int j = 0; j < levels[i].length; j++) {
+					switch (diffElement.get("level" + Integer.toString(i+1))) {
+						case "unsolved":
+							levels[i][j] = SolveState.UNSOLVED;
+							break;
+						case "solved":
+							levels[i][j] = SolveState.SOLVED;
+							break;
+						case "optimal":
+							levels[i][j] = SolveState.OPTIMAL;
+							break;
+						default:
+							throw new IOException();
+					}
 				}
 			}
 		} catch (GdxRuntimeException exception) {
@@ -83,13 +92,19 @@ public class SaveState {
 	}
 
 	// Updates the save state with the corresponding completed level.
-	public void update(String difficulty, int number, boolean optimal) {
+	public void update(Difficulty difficulty, int number, boolean optimal) {
 		SolveState state;
 		if (optimal)
 			state = SolveState.OPTIMAL;
 		else
 			state = SolveState.SOLVED;
-		levels[0][number-1] = state;
+
+		switch (difficulty) {
+			case NORMAL: levels[0][number-1] = state;
+			case SMART: levels[1][number-1] = state;
+			case GENIUS: levels[2][number-1] = state;
+			default: levels[0][number-1] = state;
+		}
 	}
 
 	// Resets a save state to no completed levels.
@@ -101,7 +116,12 @@ public class SaveState {
 		}
 	}
 
-	public SolveState getSolveState(String difficulty, int number) {
-		return levels[0][number-1];
+	public SolveState getSolveState(Difficulty difficulty, int number) {
+		switch (difficulty) {
+			case NORMAL: return levels[0][number-1];
+			case SMART: return levels[1][number-1];
+			case GENIUS: return levels[2][number-1];
+			default: return levels[0][number-1];
+		}
 	}
 }

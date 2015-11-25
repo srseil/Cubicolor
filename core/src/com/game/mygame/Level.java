@@ -5,7 +5,7 @@ import java.util.EnumSet;
 public class Level {
 
     // Properties of level file.
-    private String difficulty;
+    private Difficulty difficulty;
 	private int number;
     private int optimal;
     private int startRow, startColumn;
@@ -15,7 +15,7 @@ public class Level {
     public Tile[][] matrix;
     private ExitTile exit;
 
-    public Level(String difficulty, int number, int optimal,
+    public Level(Difficulty difficulty, int number, int optimal,
 				 int startRow, int startColumn,
 				 EnumSet<TileColor> exitRequirements, Tile[][] matrix) {
         this.difficulty = difficulty;
@@ -71,7 +71,7 @@ public class Level {
         }
     }
 
-    public String getDifficulty() {
+    public Difficulty getDifficulty() {
 		return difficulty;
 	}
 

@@ -48,9 +48,9 @@ public class MyGame extends Game {
 			exception.printStackTrace();
 		}
 
-		System.out.println(saveState.getSolveState("normal", 1));
-		System.out.println(saveState.getSolveState("normal", 2));
-		System.out.println(saveState.getSolveState("normal", 3));
+		System.out.println(saveState.getSolveState(Difficulty.NORMAL, 1));
+		System.out.println(saveState.getSolveState(Difficulty.NORMAL, 2));
+		System.out.println(saveState.getSolveState(Difficulty.NORMAL, 3));
 
 
 		/*

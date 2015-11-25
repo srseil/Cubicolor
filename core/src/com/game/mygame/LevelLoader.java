@@ -21,13 +21,19 @@ public class LevelLoader {
         FileHandle handle = Gdx.files.internal(filename);
         XmlReader.Element root = reader.parse(handle);
 
-        String difficulty;
+        Difficulty difficulty;
         int optimal, startRow, startColumn;
         EnumSet<TileColor> exitRequirements;
         Tile[][] matrix;
 
         try {
-            difficulty = root.get("difficulty");
+            String diff = root.get("difficulty");
+			switch (diff) {
+				case "Normal": difficulty = Difficulty.NORMAL; break;
+				case "Smart": difficulty = Difficulty.SMART; break;
+				case "Genius": difficulty = Difficulty.GENIUS; break;
+				default: difficulty = Difficulty.NORMAL;
+			}
             optimal = Integer.parseInt(root.get("optimal"));
 
             String[] parts = root.get("start").split(",");
