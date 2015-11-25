@@ -1,13 +1,45 @@
 package com.game.mygame;
 
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+
+import java.io.IOException;
 
 public class SettingsMenu extends Table {
 
-	public SettingsMenu(Skin skin, MyGame game) {
+	public SettingsMenu(Skin skin, MenuScreen menuScreen, MyGame game) {
 		/* Resolution, full/windowed screen, language, (reset progress), brightness, (vsync),
 			Music, SFX, Controls!, (colorblind? -> reddit), Tutorial
 		 */
+
+		// Confirmation dialog for resetting progress
+		Dialog confirmationDialog = new Dialog("Progress reset", skin);
+		confirmationDialog.button("OK", null);
+		confirmationDialog.key(Input.Keys.ENTER, null);
+		confirmationDialog.key(Input.Keys.ESCAPE, null);
+
+		// Dialog for "Reset progress" button
+		Dialog resetDialog = new Dialog("Reset progress", skin) {
+			protected void result(Object object) {
+				if ((Boolean) object) {
+					game.getSaveState().reset();
+					try {
+						game.getSaveState().save();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					confirmationDialog.show(menuScreen.getStage());
+				}
+			}
+		};
+		resetDialog.text("This will reset all your level progress and lock " +
+			"all the levels you have unlocked to far!");
+		resetDialog.button("Reset", true);
+		resetDialog.button("Cancel", false);
+		resetDialog.key(Input.Keys.ESCAPE, false);
+
 		// Game Section
 		add(new Label("Game", skin)).left();
 		row();
@@ -19,6 +51,12 @@ public class SettingsMenu extends Table {
 		add(languageDropdown).left();
 		// Reset progress button
 		TextButton resetButton = new TextButton("Reset progress", skin);
+		resetButton.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				resetDialog.show(menuScreen.getStage());
+			}
+		});
 		add(resetButton).left().padLeft(20.0f);
 		row();
 

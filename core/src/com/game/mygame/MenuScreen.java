@@ -36,7 +36,7 @@ public class MenuScreen implements Screen {
 		stage.addActor(rootTable);
 
 		LevelMenu levelMenu = new LevelMenu(skin, game);
-		SettingsMenu settingsMenu = new SettingsMenu(skin, game);
+		SettingsMenu settingsMenu = new SettingsMenu(skin, this, game);
 
 		// Quit dialog, comes up when Quit button is clicked.
 		// !!! Exit <-> Quit
@@ -142,4 +142,9 @@ public class MenuScreen implements Screen {
 		stage.dispose();
 		skin.dispose();
 	}
+
+	public Stage getStage() {
+		return stage;
+	}
+
 }
