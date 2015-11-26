@@ -22,6 +22,7 @@ public class MenuScreen implements Screen {
 	private Stage stage;
 	private Skin skin;
 	private Table rootTable;
+	private Table currentMenu;
 
 	public MenuScreen(OrthographicCamera camera, MyGame game) {
 		this.game = game;
@@ -61,8 +62,9 @@ public class MenuScreen implements Screen {
 		playButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				rootTable.removeActor(settingsMenu);
+				rootTable.removeActor(currentMenu);
 				rootTable.add(levelMenu);
+				currentMenu = levelMenu;
 			}
 		});
 		menuItems.addActor(playButton);
@@ -72,8 +74,9 @@ public class MenuScreen implements Screen {
 		settingsButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				rootTable.removeActor(levelMenu);
+				rootTable.removeActor(currentMenu);
 				rootTable.add(settingsMenu);
+				currentMenu = settingsMenu;
 			}
 		});
 		menuItems.addActor(settingsButton);
@@ -90,6 +93,7 @@ public class MenuScreen implements Screen {
 
 		rootTable.add(menuItems).expandY().padLeft(50.0f);
 		rootTable.add(levelMenu).left().padLeft(50.0f);
+		currentMenu = levelMenu;
 	}
 
 
