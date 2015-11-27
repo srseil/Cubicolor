@@ -11,6 +11,7 @@ public class DesktopLauncher {
 		cfg.title = "MyGame";
 		cfg.width = 800;
 		cfg.height = 600;
+		cfg.samples = 4;
 
 		new LwjglApplication(new MyGame(), cfg);
 	}

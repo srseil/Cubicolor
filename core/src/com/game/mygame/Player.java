@@ -8,7 +8,7 @@ public class Player {
     private Level level;
     private int x, y;
     private int steps;
-    private TileColor key;
+    private TileAttributes.TColor key;
 	private GameScreen gameScreen;
 	private boolean completed;
 
@@ -76,7 +76,7 @@ public class Player {
 
     public void draw(float baseX, float baseY, ShapeRenderer renderer) {
         if (key != null) {
-            renderer.setColor(getColor(key));
+            renderer.setColor(TileAttributes.getGDXColor(key));
             renderer.rect(baseX + 50*x, baseY + 50*y, 50, 50);
             renderer.end();
             renderer.begin(ShapeRenderer.ShapeType.Line);
@@ -90,7 +90,7 @@ public class Player {
         }
     }
 
-    private void addKey(TileColor color) {
+    private void addKey(TileAttributes.TColor color) {
         key = color;
     }
 
@@ -99,6 +99,7 @@ public class Player {
         // Trigger animation.
     }
 
+    /*
     private Color getColor(TileColor tileColor) {
         switch (tileColor) {
             case RED:
@@ -113,6 +114,7 @@ public class Player {
                 return new Color(0, 0, 0, 1);
         }
     }
+    */
 
     public int getSteps() {
         return steps;

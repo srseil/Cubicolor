@@ -33,7 +33,8 @@ public class GameScreen implements Screen {
 	private Level level;
 	private Player player;
 	private OrthographicCamera camera;
-	private PerspectiveCamera pcam;
+	//private PerspectiveCamera pcam;
+	private OrthographicCamera pcam;
 
 	private boolean paused;
 	private boolean pauseClosed;
@@ -46,9 +47,12 @@ public class GameScreen implements Screen {
 		this.game = game;
 
 		//--
-		pcam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		pcam.position.set(20.0f, 20.0f, 20.0f);
-		pcam.lookAt(0, 0, 0);
+		//pcam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		pcam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		//pcam.lookAt(0, 0, 0);
+		pcam.rotate(-60.0f, 1.0f, 0.0f, 0.0f);
+		pcam.rotate(20.0f, 0.0f, 1.0f, 0.0f);
+		//pcam.zoom = 0.06f;
 		pcam.near = 1f;
 		pcam.far = 300f;
 		pcam.update();

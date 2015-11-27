@@ -20,42 +20,39 @@ public class GameBoard extends Actor {
 	private Environment environment;
 	private Model model;
 	private ModelInstance modelInstance;
+	private ModelInstance[][] matrix;
 	private float width, height;
 
-	private PerspectiveCamera camera;
+	//private PerspectiveCamera camera;
+	private OrthographicCamera camera;
 	private ShapeRenderer shapeRenderer;
 
-	public GameBoard(Level level, Player player, PerspectiveCamera camera, MyGame game, ShapeRenderer shapeRenderer) {
+	public GameBoard(Level level, Player player, OrthographicCamera camera, MyGame game, ShapeRenderer shapeRenderer) {
+		this.level = level;
+		this.player = player;
 		this.game = game;
+		this.camera = camera;
+
+		this.shapeRenderer = shapeRenderer;
+
+		width = (float) level.getColumns() * 10;
+		height = (float) level.getRows() * 10;
+
+		matrix = parseMatrix(level.getMatrix());
+
+		camera.position.set(0, 25.0f, height/2);
+		camera.zoom = 0.12f;
+		camera.update();
 
 		environment = new Environment();
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, .4f, .4f, .4f, 1f));
-		environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+		environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -0.5f, -1f, 1f));
 
-		this.camera = camera;
-		/*
-		this.camera = camera;
-		camera.position.set(20.0f, 20.0f, 20.0f);
-		camera.lookAt(0, 0, 0);
-		camera.near = 1f;
-		camera.far = 300f;
-		camera.update();
-		*/
-
-		model = game.getModelBuilder().createBox(5f, 5f, 5f,
+		model = game.getModelBuilder().createBox(10f, 5f, 10f,
 				new Material(ColorAttribute.createDiffuse(Color.BLUE)),
 				VertexAttributes.Usage.Position
 				| VertexAttributes.Usage.Normal);
 		modelInstance = new ModelInstance(model);
-
-
-
-		this.level = level;
-		this.player = player;
-		this.shapeRenderer = shapeRenderer;
-
-		width = (float) level.getColumns() * 73;
-		height = (float) level.getRows() * 61;
 	}
 
 	@Override
@@ -92,14 +89,55 @@ public class GameBoard extends Actor {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
 		game.getModelBatch().begin(camera);
-		game.getModelBatch().render(modelInstance);
+		//game.getModelBatch().render(modelInstance);
+
+		for (int i = 0; i < level.getRows(); i++) {
+			for (int j = 0; j < level.getColumns(); j++) {
+				if (!level.getMatrix()[i][j].isDead()) {
+					/*
+					ModelInstance tileInstance = new ModelInstance(model,
+							-(width/2) + j*10.0f, 0, (height/2) - i*10.0f);
+					game.getModelBatch().render(tileInstance, environment);
+					*/
+					game.getModelBatch().render(matrix[i][j], environment);
+				}
+			}
+		}
 		game.getModelBatch().end();
 
-
-		player.draw(getX() - width/2, getY() - height/2, shapeRenderer);
+		//player.draw(getX() - width/2, getY() - height/2, shapeRenderer);
 		shapeRenderer.end();
 		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 		batch.begin();
+	}
+
+	private ModelInstance[][] parseMatrix(Tile[][] tileMatrix) {
+		ModelInstance[][] modelMatrix =
+				new ModelInstance[tileMatrix.length][tileMatrix[0].length];
+
+		for (int i = 0; i < tileMatrix.length; i++) {
+			for (int j = 0; j < tileMatrix[0].length; j++) {
+				if (tileMatrix[i][j] instanceof KeyTile) {
+					KeyTile keyTile = (KeyTile) tileMatrix[i][j];
+					modelMatrix[i][j] = new ModelInstance(
+							game.getKeyTileModel(keyTile.getColor()));
+				} else if (tileMatrix[i][j] instanceof LockTile) {
+					LockTile lockTile = (LockTile) tileMatrix[i][j];
+					modelMatrix[i][j] = new ModelInstance(
+							game.getLockTileModel(lockTile.getColor()));
+				} else if (tileMatrix[i][j] instanceof ExitTile) {
+					modelMatrix[i][j] = new ModelInstance(
+							game.getExitTileModel());
+				} else {
+					modelMatrix[i][j] = new ModelInstance(
+							game.getTileModel());
+				}
+				modelMatrix[i][j].transform.setToTranslation(
+						-width/2 + j*10.0f, 0, height/2 - i*10.0f);
+			}
+		}
+
+		return modelMatrix;
 	}
 
 }

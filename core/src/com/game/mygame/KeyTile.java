@@ -2,16 +2,13 @@ package com.game.mygame;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-/**
- * Created by stefan on 20.11.15.
- */
 public class KeyTile extends Tile {
 
-    private TileColor color;
+    private TileAttributes.TColor color;
     private boolean key;
     //private Circle paint;
 
-    public KeyTile(TileColor color) {
+    public KeyTile(TileAttributes.TColor color) {
         super();
         this.color = color;
         key = true;
@@ -50,7 +47,7 @@ public class KeyTile extends Tile {
         renderer.circle(x + 25.0f, y + 25.0f, 12.5f);
     }
 
-    public TileColor getColor() {
+    public TileAttributes.TColor getColor() {
         return color;
     }
 

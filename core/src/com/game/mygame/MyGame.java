@@ -1,10 +1,15 @@
 package com.game.mygame;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -27,9 +32,49 @@ public class MyGame extends Game {
 	private GameScreen gameScreen;
 	private SaveState saveState;
 
+	private Model tileModel;
+	private Model keyTileRedModel;
+	private Model keyTileGreenModel;
+	private Model keyTileBlueModel;
+	private Model keyTileYellowModel;
+	private Model lockTileRedModel;
+	private Model lockTileGreenModel;
+	private Model lockTileBlueModel;
+	private Model lockTileYellowModel;
+	private Model exitTileModel;
+
+	private Model playerModel;
+
 	public void create() {
 		modelBatch = new ModelBatch(new DefaultShaderProvider());
 		modelBuilder = new ModelBuilder();
+
+
+		tileModel = createTileModel(TileAttributes.TKind.NORMAL, null);
+		keyTileRedModel = createTileModel(TileAttributes.TKind.KEY,
+				TileAttributes.TColor.RED);
+		keyTileGreenModel = createTileModel(TileAttributes.TKind.KEY,
+				TileAttributes.TColor.GREEN);
+		keyTileBlueModel = createTileModel(TileAttributes.TKind.KEY,
+				TileAttributes.TColor.BLUE);
+		keyTileYellowModel = createTileModel(TileAttributes.TKind.KEY,
+				TileAttributes.TColor.YELLOW);
+		lockTileRedModel = createTileModel(TileAttributes.TKind.LOCK,
+				TileAttributes.TColor.RED);
+		lockTileGreenModel = createTileModel(TileAttributes.TKind.LOCK,
+				TileAttributes.TColor.GREEN);
+		lockTileBlueModel = createTileModel(TileAttributes.TKind.LOCK,
+				TileAttributes.TColor.BLUE);
+		lockTileYellowModel = createTileModel(TileAttributes.TKind.LOCK,
+				TileAttributes.TColor.YELLOW);
+		exitTileModel = createTileModel(TileAttributes.TKind.EXIT, null);
+
+		playerModel = getModelBuilder().createBox(10.0f, 5.0f, 10.0f,
+				new Material(ColorAttribute.createDiffuse(Color.DARK_GRAY)),
+				VertexAttributes.Usage.Position
+				| VertexAttributes.Usage.Normal);
+
+
 
 		camera = new OrthographicCamera(800, 600);
 		camera.setToOrtho(false);
@@ -62,27 +107,6 @@ public class MyGame extends Game {
 		System.out.println(saveState.getSolveState(Difficulty.NORMAL, 1));
 		System.out.println(saveState.getSolveState(Difficulty.NORMAL, 2));
 		System.out.println(saveState.getSolveState(Difficulty.NORMAL, 3));
-
-
-		/*
-		Level level = new Level("");
-		level.rows = 6;
-		level.columns = 2;
-		level.matrix = new Tile[6][2];
-		level.matrix[0][0] = new Tile();
-		level.matrix[0][1] = new EmptyTile();
-		level.matrix[1][0] = new LockTile(TileColor.RED);
-		level.matrix[1][1] = new KeyTile(TileColor.RED);
-		level.matrix[2][0] = new LockTile(TileColor.GREEN);
-		level.matrix[2][1] = new KeyTile(TileColor.GREEN);
-		level.matrix[3][0] = new LockTile(TileColor.BLUE);
-		level.matrix[3][1] = new KeyTile(TileColor.BLUE);
-		level.matrix[4][0] = new LockTile(TileColor.YELLOW);
-		level.matrix[4][1] = new KeyTile(TileColor.YELLOW);
-		level.matrix[5][0] = new EmptyTile();
-		level.matrix[5][1] = new ExitTile(4);
-		*/
-
 	}
 
 	public void render() {
@@ -108,6 +132,26 @@ public class MyGame extends Game {
 
 	public void toGameScreen() {
 		this.setScreen(gameScreen);
+	}
+
+	private Model createTileModel(TileAttributes.TKind kind,
+								  TileAttributes.TColor color) {
+		Material material = new Material();
+		if (color != null) {
+			material.set(ColorAttribute.createDiffuse(
+					TileAttributes.getGDXColor(color)));
+		} else {
+			material.set(ColorAttribute.createDiffuse(Color.WHITE));
+		}
+		Model model = getModelBuilder().createBox(10.0f, 5.0f, 10.0f, material,
+				VertexAttributes.Usage.Position
+				| VertexAttributes.Usage.Normal);
+		/*
+		switch (kind) {
+			case NORMAL:
+		}
+		*/
+		return model;
 	}
 
 	public SpriteBatch getSpriteBatch() {
@@ -141,4 +185,37 @@ public class MyGame extends Game {
 	public ModelBatch getModelBatch() {
 		return modelBatch;
 	}
+
+	public Model getTileModel() {
+		return tileModel;
+	}
+
+	public Model getKeyTileModel(TileAttributes.TColor color) {
+		switch (color) {
+			case RED: return keyTileRedModel;
+			case GREEN: return keyTileGreenModel;
+			case BLUE: return keyTileBlueModel;
+			case YELLOW: return keyTileYellowModel;
+			default: return tileModel;
+		}
+	}
+
+	public Model getLockTileModel(TileAttributes.TColor color) {
+		switch (color) {
+			case RED: return lockTileRedModel;
+			case GREEN: return lockTileGreenModel;
+			case BLUE: return lockTileBlueModel;
+			case YELLOW: return lockTileYellowModel;
+			default: return tileModel;
+		}
+	}
+
+	public Model getExitTileModel() {
+		return exitTileModel;
+	}
+
+	public Model getPlayerModel() {
+		return playerModel;
+	}
+
 }

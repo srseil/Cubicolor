@@ -4,10 +4,10 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class LockTile extends Tile {
 
-    private TileColor color;
+    private TileAttributes.TColor color;
     //private Circle paint;
 
-    public LockTile(TileColor color) {
+    public LockTile(TileAttributes.TColor color) {
         super();
         this.color = color;
     }
@@ -41,7 +41,7 @@ public class LockTile extends Tile {
         renderer.rect(x, y, 50, 50);
     }
 
-    public TileColor getColor() {
+    public TileAttributes.TColor getColor() {
         return color;
     }
 
