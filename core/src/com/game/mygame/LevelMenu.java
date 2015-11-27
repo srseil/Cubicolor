@@ -1,8 +1,6 @@
 package com.game.mygame;
 
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -14,6 +12,12 @@ public class LevelMenu extends Table {
 	private Table levelOverview;
 	private TextButton[] levelButtons;
 	private DifficultyButtonGroup difficultyButtons;
+
+	/*
+	Bug: in switchToOverview(), wenn setText() aufgerufen wird, wird das
+	Layout der gesamten Hierarchie zerschossen. (SettingsMenu wird in neue
+	Zeile verschoben).
+	 */
 
 	public LevelMenu(Skin skin, MyGame game) {
 		super();
@@ -62,8 +66,7 @@ public class LevelMenu extends Table {
 	}
 
 	public void switchToOverview(Difficulty difficulty) {
-		//String identifier = difficulty.substring(0, 1);
-		levelButtons[0].setText(Integer.toString(1) + difficulty);
+		levelButtons[0].setText(Integer.toString(1));
 
 		// Set lock of first smart and genius level.
 		if (difficulty == Difficulty.SMART) {
@@ -83,6 +86,7 @@ public class LevelMenu extends Table {
 			levelButtons[0].setDisabled(false);
 			System.out.println("normal false");
 		}
+
 
 		// Set lock for all other levels.
 		for (int i = 1; i < levelButtons.length; i++) {

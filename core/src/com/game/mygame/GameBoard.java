@@ -1,29 +1,61 @@
 package com.game.mygame;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
-public class GameBoard extends Actor implements Drawable {
+public class GameBoard extends Actor {
 
+	private MyGame game;
 	private Level level;
 	private Player player;
-	private ShapeRenderer shapeRenderer;
+	private Environment environment;
+	private Model model;
+	private ModelInstance modelInstance;
 	private float width, height;
 
-	private Texture texure;
+	private PerspectiveCamera camera;
+	private ShapeRenderer shapeRenderer;
 
-	public GameBoard(Level level, Player player, ShapeRenderer shapeRenderer) {
+	public GameBoard(Level level, Player player, PerspectiveCamera camera, MyGame game, ShapeRenderer shapeRenderer) {
+		this.game = game;
+
+		environment = new Environment();
+		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, .4f, .4f, .4f, 1f));
+		environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+
+		this.camera = camera;
+		/*
+		this.camera = camera;
+		camera.position.set(20.0f, 20.0f, 20.0f);
+		camera.lookAt(0, 0, 0);
+		camera.near = 1f;
+		camera.far = 300f;
+		camera.update();
+		*/
+
+		model = game.getModelBuilder().createBox(5f, 5f, 5f,
+				new Material(ColorAttribute.createDiffuse(Color.BLUE)),
+				VertexAttributes.Usage.Position
+				| VertexAttributes.Usage.Normal);
+		modelInstance = new ModelInstance(model);
+
+
+
 		this.level = level;
 		this.player = player;
 		this.shapeRenderer = shapeRenderer;
-		width = (float) level.getColumns() * 50;
-		height = (float) level.getRows() * 50;
 
-		texure = new Texture(Gdx.files.internal("avatar.png"));
+		width = (float) level.getColumns() * 73;
+		height = (float) level.getRows() * 61;
 	}
 
 	@Override
@@ -36,14 +68,33 @@ public class GameBoard extends Actor implements Drawable {
 		shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
 		//shapeRenderer.rect(getX(), getY(), 50, 50);
 
+		/*
 		for (int i = 0; i < level.getRows(); i++) {
 			for (int j = 0; j < level.getColumns(); j++) {
 				if (!level.getMatrix()[i][j].isDead()) {
-					level.getMatrix()[i][j].draw(getX() - width/2 + j*50.0f,
-							getY() - height/2 + i*50.0f, shapeRenderer);
+					//level.getMatrix()[i][j].draw(getX() - width/2 + j*50.0f,
+					//		getY() - height/2 + i*50.0f, shapeRenderer);
+					*/
+
+		/*
+		for (int i = level.getRows() - 1; i >= 0; i--) {
+			for (int j = 0; j < level.getColumns(); j++) {
+				if (!level.getMatrix()[i][j].isDead()) {
+					spriteBatch.draw(texure, getX() - width/2 + j*72.0f + i*26.0f, getY() - height/2 + i*61.0f - j*22.0f);
 				}
 			}
 		}
+		*/
+
+
+
+		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
+		game.getModelBatch().begin(camera);
+		game.getModelBatch().render(modelInstance);
+		game.getModelBatch().end();
+
 
 		player.draw(getX() - width/2, getY() - height/2, shapeRenderer);
 		shapeRenderer.end();
@@ -51,85 +102,4 @@ public class GameBoard extends Actor implements Drawable {
 		batch.begin();
 	}
 
-	@Override
-	public void draw(Batch batch, float x, float y, float width, float height) {
-		shapeRenderer.end();
-		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-		shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-		shapeRenderer.setTransformMatrix(batch.getTransformMatrix());
-		shapeRenderer.setColor(0.2f, 0.4f, 0.1f, 1.0f);
-		shapeRenderer.rect(getX(), getY(), 50, 50);
-/*
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < columns; j++) {
-				if (!matrix[i][j].isDead()) {
-					//matrix[i][j].draw(200f + j*50f, 100f + i*50f, shapeRenderer);
-					matrix[i][j].draw(j*50f, i*50f, shapeRenderer);
-				}
-			}
-		}
-*/
-		shapeRenderer.end();
-		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-	}
-
-	@Override
-	public float getLeftWidth() {
-		return 0;
-	}
-
-	@Override
-	public void setLeftWidth(float leftWidth) {
-
-	}
-
-	@Override
-	public float getRightWidth() {
-		return 0;
-	}
-
-	@Override
-	public void setRightWidth(float rightWidth) {
-
-	}
-
-	@Override
-	public float getTopHeight() {
-		return 0;
-	}
-
-	@Override
-	public void setTopHeight(float topHeight) {
-
-	}
-
-	@Override
-	public float getBottomHeight() {
-		return 0;
-	}
-
-	@Override
-	public void setBottomHeight(float bottomHeight) {
-
-	}
-
-	@Override
-	public float getMinWidth() {
-		return 0;
-	}
-
-	@Override
-	public void setMinWidth(float minWidth) {
-
-	}
-
-	@Override
-	public float getMinHeight() {
-		return 0;
-	}
-
-	@Override
-	public void setMinHeight(float minHeight) {
-
-	}
 }

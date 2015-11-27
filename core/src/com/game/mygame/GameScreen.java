@@ -3,8 +3,13 @@ package com.game.mygame;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -28,6 +33,7 @@ public class GameScreen implements Screen {
 	private Level level;
 	private Player player;
 	private OrthographicCamera camera;
+	private PerspectiveCamera pcam;
 
 	private boolean paused;
 	private boolean pauseClosed;
@@ -39,13 +45,22 @@ public class GameScreen implements Screen {
 		this.camera = camera;
 		this.game = game;
 
+		//--
+		pcam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		pcam.position.set(20.0f, 20.0f, 20.0f);
+		pcam.lookAt(0, 0, 0);
+		pcam.near = 1f;
+		pcam.far = 300f;
+		pcam.update();
+		//--
+
 		player = new Player(level, this);
 
 		//camera.setToOrtho(false, 800, 600);
 		stage = new Stage(new ExtendViewport(800, 600));
 		//Gdx.input.setInputProcessor(stage);
 
-		gameBoard = new GameBoard(level, player, game.getShapeRenderer());
+		gameBoard = new GameBoard(level, player, pcam, game, game.getShapeRenderer());
 
 		rootTable = new Table();
 		rootTable.setFillParent(true);
@@ -126,6 +141,7 @@ public class GameScreen implements Screen {
 	// The render() method is being used as a hook into the game loop.
 	@Override
 	public void render(float delta) {
+		/*
 		camera.update();
 		game.getShapeRenderer().setProjectionMatrix(camera.combined);
 		game.getSpriteBatch().setProjectionMatrix(camera.combined);
@@ -135,10 +151,10 @@ public class GameScreen implements Screen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		game.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
-		stage.act(delta);
-		stage.draw();
+
 
 		steps.setText("number of steps: " + player.getSteps());
+		*/
 
 		/*
 		game.getSpriteBatch().begin();
@@ -147,6 +163,24 @@ public class GameScreen implements Screen {
 				Integer.toString(player.getSteps()), 770, 20);
 		game.getSpriteBatch().end();
 		*/
+
+
+		// Set background color.
+		Gdx.gl.glClearColor(0.85f, 0.8f, 0.7f, 1);
+
+		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+		/*
+		game.getModelBatch().begin(pcam);
+		game.getModelBatch().render(modelInstance, environment);
+		game.getModelBatch().end();
+		*/
+
+		steps.setText("number of steps: " + player.getSteps());
+
+		stage.getBatch().setProjectionMatrix(pcam.combined);
+		stage.act(delta);
+		stage.draw();
 
 
 		/*
@@ -163,7 +197,10 @@ public class GameScreen implements Screen {
 
 		// Render player.
 
+		/*
 		game.getShapeRenderer().end();
+
+		*/
 
 		if (!completed && player.hasCompleted()) {
 			completed = true;
@@ -176,8 +213,11 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void show() {
-		stage.getViewport().setCamera(camera);
-		camera.update();
+		//stage.getViewport().setCamera(camera);
+		//camera.update();
+		//stage.getViewport().setCamera(pcam);
+		//pcam.update();
+		// Stage hat eigene Kamera?
 		Gdx.input.setInputProcessor(stage);
 	}
 

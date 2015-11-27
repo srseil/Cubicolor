@@ -77,6 +77,7 @@ public class MenuScreen implements Screen {
 				rootTable.removeActor(currentMenu);
 				rootTable.add(settingsMenu);
 				currentMenu = settingsMenu;
+				System.out.println(rootTable.getRows());
 			}
 		});
 		menuItems.addActor(settingsButton);
@@ -92,8 +93,9 @@ public class MenuScreen implements Screen {
 		menuItems.addActor(quitButton);
 
 		rootTable.add(menuItems).expandY().padLeft(50.0f);
-		rootTable.add(levelMenu).left().padLeft(50.0f);
+		rootTable.add(levelMenu).expandY().padLeft(50.0f);
 		currentMenu = levelMenu;
+		//stage.addActor(currentMenu);
 	}
 
 

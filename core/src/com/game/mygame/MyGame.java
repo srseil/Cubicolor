@@ -4,6 +4,9 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import java.io.IOException;
@@ -15,6 +18,9 @@ public class MyGame extends Game {
 	private ShapeRenderer shapeRenderer;
 	private BitmapFont font;
 
+	private ModelBuilder modelBuilder;
+	private ModelBatch modelBatch;
+
 	private LevelLoader levelLoader;
 
 	private MenuScreen menuScreen;
@@ -22,6 +28,9 @@ public class MyGame extends Game {
 	private SaveState saveState;
 
 	public void create() {
+		modelBatch = new ModelBatch(new DefaultShaderProvider());
+		modelBuilder = new ModelBuilder();
+
 		camera = new OrthographicCamera(800, 600);
 		camera.setToOrtho(false);
 
@@ -41,8 +50,10 @@ public class MyGame extends Game {
 			//gameScreen = new GameScreen(level, camera, this);
 			saveState.load();
 			menuScreen = new MenuScreen(camera, this);
-			this.setScreen(menuScreen);
+			//this.setScreen(menuScreen);
 			saveState.save();
+			openLevel("normal", 1);
+			//this.setScreen(new TestScreen(this));
 		} catch (IOException exception) {
 			System.out.println("Error while loading level.");
 			exception.printStackTrace();
@@ -121,5 +132,13 @@ public class MyGame extends Game {
 
 	public SaveState getSaveState() {
 		return saveState;
+	}
+
+	public ModelBuilder getModelBuilder() {
+		return modelBuilder;
+	}
+
+	public ModelBatch getModelBatch() {
+		return modelBatch;
 	}
 }
