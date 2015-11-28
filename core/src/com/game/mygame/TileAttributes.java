@@ -8,7 +8,8 @@ public class TileAttributes {
 		RED,
 		GREEN,
 		BLUE,
-		YELLOW
+		YELLOW,
+		NONE
 	}
 
 	public enum TKind {

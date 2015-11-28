@@ -44,6 +44,10 @@ public class MyGame extends Game {
 	private Model exitTileModel;
 
 	private Model playerModel;
+	private Model playerRedModel;
+	private Model playerGreenModel;
+	private Model playerBlueModel;
+	private Model playerYellowModel;
 
 	public void create() {
 		modelBatch = new ModelBatch(new DefaultShaderProvider());
@@ -68,11 +72,17 @@ public class MyGame extends Game {
 		lockTileYellowModel = createTileModel(TileAttributes.TKind.LOCK,
 				TileAttributes.TColor.YELLOW);
 		exitTileModel = createTileModel(TileAttributes.TKind.EXIT, null);
-
-		playerModel = getModelBuilder().createBox(10.0f, 5.0f, 10.0f,
+		/*
+		playerModel = getModelBuilder().createBox(10.0f, 10.0f, 10.0f,
 				new Material(ColorAttribute.createDiffuse(Color.DARK_GRAY)),
 				VertexAttributes.Usage.Position
 				| VertexAttributes.Usage.Normal);
+		*/
+		playerModel = createPlayerModel(TileAttributes.TColor.NONE);
+		playerRedModel = createPlayerModel(TileAttributes.TColor.RED);
+		playerGreenModel = createPlayerModel(TileAttributes.TColor.GREEN);
+		playerBlueModel = createPlayerModel(TileAttributes.TColor.BLUE);
+		playerYellowModel = createPlayerModel(TileAttributes.TColor.YELLOW);
 
 
 
@@ -154,6 +164,20 @@ public class MyGame extends Game {
 		return model;
 	}
 
+	private Model createPlayerModel(TileAttributes.TColor key) {
+		Material material = new Material();
+		if (key != TileAttributes.TColor.NONE) {
+			material.set(ColorAttribute.createDiffuse(
+					TileAttributes.getGDXColor(key)));
+		} else {
+			material.set(ColorAttribute.createDiffuse(Color.DARK_GRAY));
+		}
+		Model model = getModelBuilder().createBox(10.0f, 10.0f, 10.0f, material,
+				VertexAttributes.Usage.Position
+				| VertexAttributes.Usage.Normal);
+		return model;
+	}
+
 	public SpriteBatch getSpriteBatch() {
 		return batch;
 	}
@@ -210,12 +234,18 @@ public class MyGame extends Game {
 		}
 	}
 
-	public Model getExitTileModel() {
-		return exitTileModel;
+	public Model getPlayerModel(TileAttributes.TColor key) {
+		switch (key) {
+			case RED: return playerRedModel;
+			case GREEN: return playerGreenModel;
+			case BLUE: return playerBlueModel;
+			case YELLOW: return playerYellowModel;
+			default: return playerModel;
+		}
 	}
 
-	public Model getPlayerModel() {
-		return playerModel;
+	public Model getExitTileModel() {
+		return exitTileModel;
 	}
 
 }

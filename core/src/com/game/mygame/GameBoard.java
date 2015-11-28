@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.sun.corba.se.spi.activation.TCPPortHelper;
 
 public class GameBoard extends Actor {
 
@@ -21,7 +22,17 @@ public class GameBoard extends Actor {
 	private Model model;
 	private ModelInstance modelInstance;
 	private ModelInstance[][] matrix;
+	private ModelInstance playerModel;
+	private ModelInstance playerNormalModel;
+	private ModelInstance playerRedModel;
+	private ModelInstance playerGreenModel;
+	private ModelInstance playerBlueModel;
+	private ModelInstance playerYellowModel;
 	private float width, height;
+
+	private TileAttributes.TColor oldColor;
+
+	private float[] newTransform;
 
 	//private PerspectiveCamera camera;
 	private OrthographicCamera camera;
@@ -48,11 +59,26 @@ public class GameBoard extends Actor {
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, .4f, .4f, .4f, 1f));
 		environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -0.5f, -1f, 1f));
 
-		model = game.getModelBuilder().createBox(10f, 5f, 10f,
-				new Material(ColorAttribute.createDiffuse(Color.BLUE)),
-				VertexAttributes.Usage.Position
-				| VertexAttributes.Usage.Normal);
-		modelInstance = new ModelInstance(model);
+		//model = game.getModelBuilder().createBox(10f, 5f, 10f,
+		//		new Material(ColorAttribute.createDiffuse(Color.BLUE)),
+		//		VertexAttributes.Usage.Position
+		//		| VertexAttributes.Usage.Normal);
+		//modelInstance = new ModelInstance(model);
+
+		playerNormalModel = new ModelInstance(game.getPlayerModel(
+				TileAttributes.TColor.NONE));
+		playerRedModel = new ModelInstance(game.getPlayerModel(
+				TileAttributes.TColor.RED));
+		playerGreenModel = new ModelInstance(game.getPlayerModel(
+				TileAttributes.TColor.GREEN));
+		playerBlueModel = new ModelInstance(game.getPlayerModel(
+				TileAttributes.TColor.BLUE));
+		playerYellowModel = new ModelInstance(game.getPlayerModel(
+				TileAttributes.TColor.YELLOW));
+		//playerModel.transform.translate(1.0f, 5.0f, 10.0f);
+		playerModel = playerNormalModel;
+
+		oldColor = player.getKey();
 	}
 
 	@Override
@@ -103,9 +129,24 @@ public class GameBoard extends Actor {
 				}
 			}
 		}
-		game.getModelBatch().end();
 
 		//player.draw(getX() - width/2, getY() - height/2, shapeRenderer);
+
+		// Update player color.
+		if (player.getKey() != oldColor) {
+			playerModel = getPlayerModelInstance(player.getKey());
+			oldColor = player.getKey();
+			System.out.println("oh");
+		}
+
+		// Set position of player model.
+		playerModel.transform.setTranslation(
+				-width/2 + player.getX() * 10.0f, 7.5f,
+				height/2 - player.getY() * 10.0f);
+		game.getModelBatch().render(playerModel, environment);
+
+		game.getModelBatch().end();
+
 		shapeRenderer.end();
 		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 		batch.begin();
@@ -132,12 +173,21 @@ public class GameBoard extends Actor {
 					modelMatrix[i][j] = new ModelInstance(
 							game.getTileModel());
 				}
-				modelMatrix[i][j].transform.setToTranslation(
-						-width/2 + j*10.0f, 0, height/2 - i*10.0f);
+				modelMatrix[i][j].transform.setTranslation(
+						-width/2 + j*10.0f, 0.0f, height/2 - i*10.0f);
 			}
 		}
 
 		return modelMatrix;
 	}
 
+	public ModelInstance getPlayerModelInstance(TileAttributes.TColor key) {
+		switch (key) {
+			case RED: return playerRedModel;
+			case GREEN: return playerGreenModel;
+			case BLUE: return playerBlueModel;
+			case YELLOW: return playerYellowModel;
+			default: return playerNormalModel;
+		}
+	}
 }

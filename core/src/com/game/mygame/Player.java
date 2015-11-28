@@ -18,7 +18,7 @@ public class Player {
 		x = level.getStartColumn();
 		y = level.getStartRow();
 		steps = 0;
-		key = null;
+		key = TileAttributes.TColor.NONE;
 		completed = false;
 	}
 
@@ -70,12 +70,12 @@ public class Player {
 		x = level.getStartColumn();
 		y = level.getStartRow();
 		steps = 0;
-		key = null;
+		key = TileAttributes.TColor.NONE;
 		completed = false;
 	}
 
 	public void draw(float baseX, float baseY, ShapeRenderer renderer) {
-		if (key != null) {
+		if (key != TileAttributes.TColor.NONE) {
 			renderer.setColor(TileAttributes.getGDXColor(key));
 			renderer.rect(baseX + 50*x, baseY + 50*y, 50, 50);
 			renderer.end();
@@ -95,7 +95,7 @@ public class Player {
 	}
 
 	private void removeKey() {
-		key = null;
+		key = TileAttributes.TColor.NONE;
 		// Trigger animation.
 	}
 
@@ -120,8 +120,20 @@ public class Player {
 		return steps;
 	}
 
-public boolean hasCompleted() {
+	public boolean hasCompleted() {
 		return completed;
+	}
+
+	public float getX() {
+		return x;
+	}
+
+	public float getY() {
+		return y;
+	}
+
+	public TileAttributes.TColor getKey() {
+		return key;
 	}
 
 }
