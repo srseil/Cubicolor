@@ -1,6 +1,8 @@
 package com.game.mygame;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.loaders.ModelLoader;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.VertexAttributes;
@@ -10,9 +12,13 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
+import com.badlogic.gdx.graphics.g3d.model.data.ModelData;
+import com.badlogic.gdx.graphics.g3d.model.data.ModelMaterial;
 import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.UBJsonReader;
 
 import java.io.IOException;
 
@@ -27,6 +33,7 @@ public class MyGame extends Game {
 	private ModelBatch modelBatch;
 
 	private LevelLoader levelLoader;
+	private ModelLoader modelLoader;
 
 	private MenuScreen menuScreen;
 	private GameScreen gameScreen;
@@ -50,6 +57,7 @@ public class MyGame extends Game {
 	private Model playerYellowModel;
 
 	public void create() {
+		modelLoader = new G3dModelLoader(new UBJsonReader());
 		modelBatch = new ModelBatch(new DefaultShaderProvider());
 		modelBuilder = new ModelBuilder();
 
@@ -172,9 +180,15 @@ public class MyGame extends Game {
 		} else {
 			material.set(ColorAttribute.createDiffuse(Color.DARK_GRAY));
 		}
+		/*
 		Model model = getModelBuilder().createBox(10.0f, 10.0f, 10.0f, material,
 				VertexAttributes.Usage.Position
 				| VertexAttributes.Usage.Normal);
+		*/
+
+		Model model = modelLoader.loadModel(Gdx.files.internal("Player.g3db"));
+		model.materials.first().set(ColorAttribute.createDiffuse(Color.DARK_GRAY));
+
 		return model;
 	}
 

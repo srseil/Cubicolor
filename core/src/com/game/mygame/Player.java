@@ -22,25 +22,27 @@ public class Player {
 		completed = false;
 	}
 
-	public void move(int x, int y) {
+	public boolean move(int x, int y) {
 		int newX = this.x + x;
 		int newY = this.y + y;
+		System.out.println(newX + " " + newY);
 		if (newX >= level.getColumns() || newX < 0
 				|| newY >= level.getRows() || newY < 0) {
-			return;
+			System.out.println(newX + " " + newY + "nope");
+			return false;
 		}
 
 		Tile toTile = level.getMatrix()[newY][newX];
-		if (!toTile.isDead()) {
-			if (toTile instanceof ExitTile && !level.requirementsMet())
-				return;
-			// Trigger animation.
+		if (!toTile.isDead() &&
+				!(toTile instanceof ExitTile && !level.requirementsMet())) {
 			level.getMatrix()[this.y][this.x].setDead(true);
 			this.x = newX;
 			this.y = newY;
 			steps++;
-
 			interact();
+			return true;
+		} else {
+			return false;
 		}
 	}
 

@@ -39,6 +39,7 @@ public class GameScreen implements Screen {
 	private boolean paused;
 	private boolean pauseClosed;
 	private boolean completed;
+	private boolean moved;
 	// !!! -> eher solved als completed?
 
 	public GameScreen(Level level, OrthographicCamera camera, final MyGame game) {
@@ -107,15 +108,19 @@ public class GameScreen implements Screen {
 			return;
 		}
 
-		if (!paused && !completed) {
+		if (!paused && !completed && !gameBoard.inAction()) {
 			if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-				player.move(0, 1);
+				moved = player.move(0, 1);
+				gameBoard.triggerPlayerMovement(0, 1, moved);
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-				player.move(0, -1);
-			} else if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-				player.move(-1, 0);
+				moved = player.move(0, -1);
+				gameBoard.triggerPlayerMovement(0, -1, moved);
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-				player.move(1, 0);
+				moved = player.move(1, 0);
+				gameBoard.triggerPlayerMovement(1, 0, moved);
+			} else if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+				moved = player.move(-1, 0);
+				gameBoard.triggerPlayerMovement(-1, 0, moved);
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
 				resetLevel();
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {

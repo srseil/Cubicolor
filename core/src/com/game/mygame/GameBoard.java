@@ -9,11 +9,18 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.sun.corba.se.spi.activation.TCPPortHelper;
 
-public class GameBoard extends Actor {
+public class GameBoard extends Actor implements AnimationController.AnimationListener {
+
+	// animationcontroller update in draw: nicht thread safe? bessere lösung finden...
+
+	// TODO: Animation in Blender ändern -> Eine einzelne, nur Rotation, nicht Translation.
 
 	private MyGame game;
 	private Level level;
@@ -30,13 +37,24 @@ public class GameBoard extends Actor {
 	private ModelInstance playerYellowModel;
 	private float width, height;
 
-	private TileAttributes.TColor oldColor;
+	private AnimationController playerAnimation;
+	private AnimationController currentPlayerAnimation;
+	private AnimationController playerForwardAnimation;
+	private AnimationController playerBackAnimation;
+	private AnimationController playerRightAnimation;
+	private AnimationController playerLeftAnimation;
+
+	private TileAttributes.TColor oldPlayerKey;
+
+	private boolean playerAnimating;
 
 	private float[] newTransform;
 
 	//private PerspectiveCamera camera;
 	private OrthographicCamera camera;
 	private ShapeRenderer shapeRenderer;
+
+	private boolean moving;
 
 	public GameBoard(Level level, Player player, OrthographicCamera camera, MyGame game, ShapeRenderer shapeRenderer) {
 		this.level = level;
@@ -78,7 +96,23 @@ public class GameBoard extends Actor {
 		//playerModel.transform.translate(1.0f, 5.0f, 10.0f);
 		playerModel = playerNormalModel;
 
-		oldColor = player.getKey();
+		oldPlayerKey = player.getKey();
+
+		playerForwardAnimation = new AnimationController(playerModel);
+		playerAnimation = new AnimationController(playerModel);
+		//animationController.setAnimation("Cube|CubeMovement", -1, 2.0f, null);
+
+		playerModel.transform.setTranslation(
+				-width / 2 + player.getX() * 10.0f, 7.5f,
+				height / 2 - player.getY() * 10.0f);
+
+		playerAnimating = false;
+		//playerModel.transform.setTranslation(0, 7.5f, 0);
+		//playerModel.transform.setToRotation(0, 1, 0, 90);
+		playerModel.transform.setTranslation(
+				-width / 2 + player.getX() * 10.0f, 7.5f,
+				height / 2 - player.getY() * 10.0f);
+		//playerAnimation.setAnimation("Cube|Movement", -1, this);
 	}
 
 	@Override
@@ -97,16 +131,6 @@ public class GameBoard extends Actor {
 				if (!level.getMatrix()[i][j].isDead()) {
 					//level.getMatrix()[i][j].draw(getX() - width/2 + j*50.0f,
 					//		getY() - height/2 + i*50.0f, shapeRenderer);
-					*/
-
-		/*
-		for (int i = level.getRows() - 1; i >= 0; i--) {
-			for (int j = 0; j < level.getColumns(); j++) {
-				if (!level.getMatrix()[i][j].isDead()) {
-					spriteBatch.draw(texure, getX() - width/2 + j*72.0f + i*26.0f, getY() - height/2 + i*61.0f - j*22.0f);
-				}
-			}
-		}
 		*/
 
 
@@ -132,18 +156,40 @@ public class GameBoard extends Actor {
 
 		//player.draw(getX() - width/2, getY() - height/2, shapeRenderer);
 
+		/*
 		// Update player color.
-		if (player.getKey() != oldColor) {
+		if (player.getKey() != oldPlayerKey) {
 			playerModel = getPlayerModelInstance(player.getKey());
-			oldColor = player.getKey();
-			System.out.println("oh");
+			oldPlayerKey = player.getKey();
 		}
+		*/
+
+		// Play animation.
+		//if (playerAnimation.) {
+		//if (playerAnimation.inAction)
+
+		/*
+		if (playerAnimating) {
+			System.out.println(playerAnimation.current);
+			try {
+			} catch (Exception e) {
+				System.out.println(playerAnimation.current);
+			}
+		}
+		*/
+		if (playerAnimating)
+			playerAnimation.update(Gdx.graphics.getDeltaTime());
+
+		//}
 
 		// Set position of player model.
+		/*
 		playerModel.transform.setTranslation(
 				-width/2 + player.getX() * 10.0f, 7.5f,
 				height/2 - player.getY() * 10.0f);
+				*/
 		game.getModelBatch().render(playerModel, environment);
+
 
 		game.getModelBatch().end();
 
@@ -181,6 +227,30 @@ public class GameBoard extends Actor {
 		return modelMatrix;
 	}
 
+	public void triggerPlayerMovement(int x, int y, boolean moved) {
+
+		if (x == 0 && y == 1) {
+			playerModel.transform.setToRotation(0, 1, 0, 0);
+			if (moved) updatePlayerModelTransform(0, -1);
+		} else if (x == 0 && y == -1) {
+			playerModel.transform.setToRotation(0, 1, 0, 180);
+			if (moved) updatePlayerModelTransform(0, 1);
+		} else if (x == 1 && y == 0) {
+			playerModel.transform.setToRotation(0, 1, 0, 270);
+			if (moved) updatePlayerModelTransform(-1, 0);
+		} else if (x == -1 && y == 0) {
+			playerModel.transform.setToRotation(0, 1, 0, 90);
+			if (moved) updatePlayerModelTransform(1, 0);
+			System.out.println(moved);
+		}
+
+		if (!moved)
+			updatePlayerModelTransform(0, 0);
+
+		playerAnimation.setAnimation("Cube|Movement", 1, 1.0f, this);
+		playerAnimating = true;
+	}
+
 	public ModelInstance getPlayerModelInstance(TileAttributes.TColor key) {
 		switch (key) {
 			case RED: return playerRedModel;
@@ -189,5 +259,85 @@ public class GameBoard extends Actor {
 			case YELLOW: return playerYellowModel;
 			default: return playerNormalModel;
 		}
+	}
+
+	private void updatePlayerModelTransform(int x, int y) {
+		playerModel.transform.setTranslation(
+				-width / 2 + (player.getX() + x) * 10.0f, 7.5f,
+				height / 2 - (player.getY() + y) * 10.0f);
+	}
+
+	@Override
+	public void onEnd(AnimationController.AnimationDesc animation) {
+		// Update player color.
+		if (player.getKey() != oldPlayerKey) {
+			playerModel = getPlayerModelInstance(player.getKey());
+			oldPlayerKey = player.getKey();
+		}
+		if (animation.animation.id.equals("Cube|Movement")) {
+			playerAnimating = false;
+			playerAnimation.setAnimation(null);
+			playerAnimation.setAnimation("Cube|Movement", 1, this);
+			updatePlayerModelTransform(0, 0);
+		}
+		// Simplify...
+		if (animation.animation.id.equals("Cube|MovementForward")) {
+			Quaternion q = new Quaternion();
+			playerModel.transform.getRotation(q);
+			System.out.println(q.toString());
+			Vector3 v = new Vector3();
+			playerModel.transform.getTranslation(v);
+			System.out.println(v.toString());
+			playerAnimating = false;
+			playerAnimation.setAnimation(null);
+			playerAnimation.setAnimation("Cube|MovementForward", 1, 5.0f, this);
+			updatePlayerModelTransform(0, 0);
+		} else if (animation.animation.id.equals("Cube|MovementBack")) {
+			Quaternion q = new Quaternion();
+			playerModel.transform.getRotation(q);
+			System.out.println(q.toString());
+			Vector3 v = new Vector3();
+			playerModel.transform.getTranslation(v);
+			System.out.println(v.toString());
+			playerAnimating = false;
+			playerAnimation.setAnimation(null);
+			playerAnimation.setAnimation("Cube|MovementBack", 1, 5.0f, this);
+			updatePlayerModelTransform(0, 0);
+		} else if (animation.animation.id.equals("Cube|MovementRight")) {
+			Quaternion q = new Quaternion();
+			playerModel.transform.getRotation(q);
+			System.out.println(q.toString());
+			Vector3 v = new Vector3();
+			playerModel.transform.getTranslation(v);
+			System.out.println(v.toString());
+			playerAnimating = false;
+			playerAnimation.setAnimation(null);
+			playerAnimation.setAnimation("Cube|MovementRight", 1, 5.0f, this);
+			updatePlayerModelTransform(0, 0);
+		} else if (animation.animation.id.equals("Cube|MovementLeft")) {
+			Quaternion q = new Quaternion();
+			playerModel.transform.getRotation(q);
+			System.out.println(q.toString());
+			Vector3 v = new Vector3();
+			playerModel.transform.getTranslation(v);
+			System.out.println(v.toString());
+			playerAnimating = false;
+			playerAnimation.setAnimation(null);
+			playerAnimation.setAnimation("Cube|MovementLeft", 1, 5.0f, this);
+			//playerModel.transform.set()
+			updatePlayerModelTransform(0, 0);
+
+
+
+		}
+	}
+
+	@Override
+	public void onLoop(AnimationController.AnimationDesc animation) {
+
+	}
+
+	public boolean inAction() {
+		return playerAnimating;
 	}
 }
