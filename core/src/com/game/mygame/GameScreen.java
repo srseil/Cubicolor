@@ -65,7 +65,7 @@ public class GameScreen implements Screen {
 		stage = new Stage(new ExtendViewport(800, 600));
 		//Gdx.input.setInputProcessor(stage);
 
-		gameBoard = new GameBoard(level, player, pcam, game, game.getShapeRenderer());
+		gameBoard = new GameBoard(level, player, pcam, game);
 
 		rootTable = new Table();
 		rootTable.setFillParent(true);
