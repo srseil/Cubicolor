@@ -108,7 +108,7 @@ public class GameScreen implements Screen {
 			return;
 		}
 
-		if (!paused && !completed && !gameBoard.inAction()) {
+		if (!paused && !completed && !gameBoard.isPlayerMoving()) {
 			if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
 				moved = player.move(0, 1);
 				gameBoard.triggerPlayerMovement(0, 1, moved);
@@ -133,6 +133,7 @@ public class GameScreen implements Screen {
 	public void resetLevel() {
 		level.reset();
 		player.reset();
+		gameBoard.reset();
 		completed = false;
 	}
 
