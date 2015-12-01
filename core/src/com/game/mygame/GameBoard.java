@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 public class GameBoard extends Actor implements AnimationController.AnimationListener {
 
 	// animationcontroller update in draw: nicht thread safe? bessere lösung finden...
+	// animationcontroller kann man nicht resetten? null und neu zuweisen geht nicht.
 
 	private MyGame game;
 	private Level level;
@@ -30,8 +31,15 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 	private AnimationController playerAnimation;
 	private AnimationController playerAnimations[];
 
+	private AnimationController tileAnimations[][];
+	private BlendAnimation tileBlendAnimations[][];
+
 	private TileAttributes.TColor oldPlayerKey;
 	private boolean playerMoving;
+
+
+	BlendAnimation blendAnimation;
+
 
 	public GameBoard(Level level, Player player, OrthographicCamera camera, MyGame game) {
 		this.level = level;
@@ -78,6 +86,33 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 				getPlayerModelInstance(TileAttributes.TColor.YELLOW));
 		playerAnimation = playerAnimations[0];
 
+		tileAnimations
+				= new AnimationController[matrix.length][matrix[0].length];
+		for (int i = 0; i < tileAnimations.length; i++) {
+			for (int j = 0; j < tileAnimations[i].length; j++) {
+				tileAnimations[i][j] = new AnimationController(matrix[i][j]);
+				tileAnimations[i][j].setAnimation("Cube|Fall");
+			}
+		}
+
+		tileBlendAnimations =
+				new BlendAnimation[matrix.length][matrix[0].length];
+		for (int i = 0; i < tileAnimations.length; i++) {
+			for (int j = 0; j < tileAnimations[i].length; j++) {
+				tileBlendAnimations[i][j] =
+						new BlendAnimation(matrix[i][j], 1.0f);
+			}
+		}
+
+		/*
+		playerAnimation.setAnimation("Cube|Movement");
+		System.out.println(playerAnimation.current.duration);
+		for (int i = 0; i < 100; i++) {
+			System.out.println(game.getPlayerModel(TileAttributes.TColor.NONE).nodes.get(i).id);
+		}
+		*/
+		blendAnimation = new BlendAnimation(playerModel, 1f);
+
 		oldPlayerKey = player.getKey();
 		playerMoving = false;
 	}
@@ -92,15 +127,29 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 
 		for (int i = 0; i < level.getRows(); i++) {
 			for (int j = 0; j < level.getColumns(); j++) {
-				if (!level.getMatrix()[i][j].isDead()) {
-					game.getModelBatch().render(matrix[i][j], environment);
+				// Update dying animations (blending and moving).
+				if (level.getMatrix()[i][j].isDead()) {
+					if (i == 0 && j == 2) System.out.println("now");
+					continue;
+				} else if (level.getMatrix()[i][j].isDying()) {
+					tileBlendAnimations[i][j].update(
+							Gdx.graphics.getDeltaTime());
+					tileAnimations[i][j].update(Gdx.graphics.getDeltaTime());
+					if (!tileBlendAnimations[i][j].inAction()) {
+						level.getMatrix()[i][j].setDying(false);
+						level.getMatrix()[i][j].setDead(true);
+					}
 				}
+				game.getModelBatch().render(matrix[i][j], environment);
 			}
 		}
 
 		if (playerMoving) {
 			playerAnimation.update(Gdx.graphics.getDeltaTime());
 		}
+
+		//blendAnimation.update(Gdx.graphics.getDeltaTime());
+		//tileBlendAnimations[0][2].update(Gdx.graphics.getDeltaTime());
 
 		game.getModelBatch().render(playerModel, environment);
 
@@ -172,6 +221,20 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 		oldPlayerKey = TileAttributes.TColor.NONE;
 		playerModel.transform.setToRotation(0, 1, 0, 0);
 		updatePlayerModelTransform(0, 0);
+
+		for (int i = 0; i < tileAnimations.length; i++) {
+			for (int j = 0; j < tileAnimations[i].length; j++) {
+				tileAnimations[i][j].setAnimation(null);
+				tileAnimations[i][j].setAnimation("Cube|Fall");
+				tileAnimations[i][j].update(0);
+			}
+		}
+
+		for (int i = 0; i < tileAnimations.length; i++) {
+			for (int j = 0; j < tileAnimations[i].length; j++) {
+				tileBlendAnimations[i][j].reset();
+			}
+		}
 	}
 
 	private ModelInstance[][] parseMatrix(Tile[][] tileMatrix) {

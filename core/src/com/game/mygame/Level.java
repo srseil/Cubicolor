@@ -46,6 +46,8 @@ public class Level {
 
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < columns; j++) {
+				matrix[i][j].setDying(false);
+
 				if (!(matrix[i][j] instanceof EmptyTile))
 					matrix[i][j].setDead(false);
 
