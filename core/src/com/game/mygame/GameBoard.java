@@ -154,7 +154,7 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 					}
 				} else if (matrix[i][j].isReviving()) {
 					reviveDelta += Gdx.graphics.getDeltaTime();
-					if (reviveDelta >= 1.0f * i * j) {//(matrix.length - i) * (matrix[0].length - j)) {
+					if (reviveDelta >= ((matrix.length - i)*2.0f + j*1.0f)) {
 						tileBlendAnimations[i][j].update(-1.0f *
 								Gdx.graphics.getDeltaTime());
 						System.out.println("revive...");
