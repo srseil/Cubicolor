@@ -16,6 +16,9 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 	// animationcontroller update in draw: nicht thread safe? bessere lösung finden...
 	// animationcontroller kann man nicht resetten? null und neu zuweisen geht nicht.
 
+
+	// TODO: sameAnimationAllowed in playerAnimations auf true setzen, dann nicht mehr auf null setzen um zu resetten
+
 	private MyGame game;
 	private Level level;
 	private Player player;
@@ -91,6 +94,7 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 		for (int i = 0; i < tileAnimations.length; i++) {
 			for (int j = 0; j < tileAnimations[i].length; j++) {
 				tileAnimations[i][j] = new AnimationController(matrix[i][j]);
+				tileAnimations[i][j].allowSameAnimation = true;
 				tileAnimations[i][j].setAnimation("Cube|Fall");
 			}
 		}
@@ -99,8 +103,8 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 				new BlendAnimation[matrix.length][matrix[0].length];
 		for (int i = 0; i < tileAnimations.length; i++) {
 			for (int j = 0; j < tileAnimations[i].length; j++) {
-				tileBlendAnimations[i][j] =
-						new BlendAnimation(matrix[i][j], 1.0f);
+				tileBlendAnimations[i][j] =	new BlendAnimation(matrix[i][j],
+								tileAnimations[i][j].current.duration);
 			}
 		}
 
@@ -129,7 +133,6 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 			for (int j = 0; j < level.getColumns(); j++) {
 				// Update dying animations (blending and moving).
 				if (level.getMatrix()[i][j].isDead()) {
-					if (i == 0 && j == 2) System.out.println("now");
 					continue;
 				} else if (level.getMatrix()[i][j].isDying()) {
 					tileBlendAnimations[i][j].update(
@@ -224,7 +227,7 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 
 		for (int i = 0; i < tileAnimations.length; i++) {
 			for (int j = 0; j < tileAnimations[i].length; j++) {
-				tileAnimations[i][j].setAnimation(null);
+				//tileAnimations[i][j].setAnimation(null);
 				tileAnimations[i][j].setAnimation("Cube|Fall");
 				tileAnimations[i][j].update(0);
 			}
