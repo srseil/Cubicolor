@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.actions.DelayAction;
 
 public class GameBoard extends Actor implements AnimationController.AnimationListener {
 
@@ -20,12 +21,13 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 	// TODO: sameAnimationAllowed in playerAnimations auf true setzen, dann nicht mehr auf null setzen um zu resetten
 
 	private MyGame game;
-	private Level level;
+	//private Level level;
+	private Tile[][] matrix;
 	private Player player;
 	private OrthographicCamera camera;
 	private Environment environment;
 
-	private ModelInstance[][] matrix;
+	private ModelInstance[][] tileMatrix;
 	private float width, height;
 
 	private ModelInstance playerModel;
@@ -39,20 +41,22 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 
 	private TileAttributes.TColor oldPlayerKey;
 	private boolean playerMoving;
+	private float reviveDelta;
 
 
 	BlendAnimation blendAnimation;
+	DelayAction da;
 
 
 	public GameBoard(Level level, Player player, OrthographicCamera camera, MyGame game) {
-		this.level = level;
-		this.player = player;
 		this.game = game;
+		this.matrix = level.getMatrix();
+		this.player = player;
 		this.camera = camera;
 
 		width = (float) level.getColumns() * 10;
 		height = (float) level.getRows() * 10;
-		matrix = parseMatrix(level.getMatrix());
+		tileMatrix = parseMatrix(matrix);
 
 		camera.position.set(0, 25.0f, height/2);
 		camera.zoom = 0.12f;
@@ -93,9 +97,10 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 				= new AnimationController[matrix.length][matrix[0].length];
 		for (int i = 0; i < tileAnimations.length; i++) {
 			for (int j = 0; j < tileAnimations[i].length; j++) {
-				tileAnimations[i][j] = new AnimationController(matrix[i][j]);
+				tileAnimations[i][j] =
+						new AnimationController(tileMatrix[i][j]);
 				tileAnimations[i][j].allowSameAnimation = true;
-				tileAnimations[i][j].setAnimation("Cube|Fall");
+				tileAnimations[i][j].setAnimation("Cube|Fall", 1, 1f, null);
 			}
 		}
 
@@ -103,7 +108,7 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 				new BlendAnimation[matrix.length][matrix[0].length];
 		for (int i = 0; i < tileAnimations.length; i++) {
 			for (int j = 0; j < tileAnimations[i].length; j++) {
-				tileBlendAnimations[i][j] =	new BlendAnimation(matrix[i][j],
+				tileBlendAnimations[i][j] =	new BlendAnimation(tileMatrix[i][j],
 								tileAnimations[i][j].current.duration);
 			}
 		}
@@ -116,9 +121,11 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 		}
 		*/
 		blendAnimation = new BlendAnimation(playerModel, 1f);
+		da = new DelayAction(1.0f);
 
 		oldPlayerKey = player.getKey();
 		playerMoving = false;
+		reviveDelta = 0.0f;
 	}
 
 	@Override
@@ -129,21 +136,39 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		game.getModelBatch().begin(camera);
 
-		for (int i = 0; i < level.getRows(); i++) {
-			for (int j = 0; j < level.getColumns(); j++) {
+		//System.out.println(Gdx.graphics.getDeltaTime());
+
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[i].length; j++) {
 				// Update dying animations (blending and moving).
-				if (level.getMatrix()[i][j].isDead()) {
+				if (matrix[i][j].isDead() && !matrix[i][j].isReviving()) {
 					continue;
-				} else if (level.getMatrix()[i][j].isDying()) {
+				} else if (matrix[i][j].isDying()) {
 					tileBlendAnimations[i][j].update(
 							Gdx.graphics.getDeltaTime());
 					tileAnimations[i][j].update(Gdx.graphics.getDeltaTime());
 					if (!tileBlendAnimations[i][j].inAction()) {
-						level.getMatrix()[i][j].setDying(false);
-						level.getMatrix()[i][j].setDead(true);
+						matrix[i][j].setDying(false);
+						matrix[i][j].setDead(true);
+						System.out.println("killed");
+					}
+				} else if (matrix[i][j].isReviving()) {
+					reviveDelta += Gdx.graphics.getDeltaTime();
+					if (reviveDelta >= 1.0f * i * j) {//(matrix.length - i) * (matrix[0].length - j)) {
+						tileBlendAnimations[i][j].update(-1.0f *
+								Gdx.graphics.getDeltaTime());
+						System.out.println("revive...");
+						tileAnimations[i][j].update(Gdx.graphics.getDeltaTime());
+						if (!tileBlendAnimations[i][j].inAction()) {
+							System.out.println("in");
+							matrix[i][j].setReviving(false);
+							matrix[i][j].setDead(false);
+							tileBlendAnimations[i][j].reset();
+							tileAnimations[i][j].setAnimation("Cube|Fall");
+						}
 					}
 				}
-				game.getModelBatch().render(matrix[i][j], environment);
+				game.getModelBatch().render(tileMatrix[i][j], environment);
 			}
 		}
 
@@ -228,16 +253,23 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 		for (int i = 0; i < tileAnimations.length; i++) {
 			for (int j = 0; j < tileAnimations[i].length; j++) {
 				//tileAnimations[i][j].setAnimation(null);
-				tileAnimations[i][j].setAnimation("Cube|Fall");
-				tileAnimations[i][j].update(0);
+				if (matrix[i][j].isReviving()) {
+					tileAnimations[i][j].setAnimation("Cube|Fall", 1, -1.0f, null);
+				} else {
+					tileAnimations[i][j].setAnimation("Cube|Fall", 1, 1.0f, null);
+				}
+				tileAnimations[i][j].update(Gdx.graphics.getDeltaTime());
 			}
 		}
 
-		for (int i = 0; i < tileAnimations.length; i++) {
-			for (int j = 0; j < tileAnimations[i].length; j++) {
+		for (int i = 0; i < tileBlendAnimations.length; i++) {
+			for (int j = 0; j < tileBlendAnimations[i].length; j++) {
 				tileBlendAnimations[i][j].reset();
 			}
 		}
+
+
+		reviveDelta = 0.0f;
 	}
 
 	private ModelInstance[][] parseMatrix(Tile[][] tileMatrix) {

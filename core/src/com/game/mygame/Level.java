@@ -48,8 +48,10 @@ public class Level {
 			for (int j = 0; j < columns; j++) {
 				matrix[i][j].setDying(false);
 
-				if (!(matrix[i][j] instanceof EmptyTile))
-					matrix[i][j].setDead(false);
+				if (!(matrix[i][j] instanceof EmptyTile) &&
+						matrix[i][j].isDead()) {
+					matrix[i][j].setReviving(true);
+				}
 
 				if (matrix[i][j] instanceof KeyTile) {
 					KeyTile keyTile = (KeyTile) matrix[i][j];

@@ -3,6 +3,7 @@ package com.game.mygame;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
+import com.badlogic.gdx.math.MathUtils;
 
 public class BlendAnimation {
 
@@ -10,31 +11,45 @@ public class BlendAnimation {
 	private BlendingAttribute attribute;
 	private float transitionCurrentTime, transitionTargetTime;
 	private boolean inAction;
+	private float sig;
 
 	public BlendAnimation(ModelInstance model, float duration) {
 		material = model.materials.first();
 		attribute = (BlendingAttribute) material.get(BlendingAttribute.Type);
-		transitionCurrentTime = 0;
+		transitionCurrentTime = 0.0f;
 		transitionTargetTime = duration/20.0f;
 		inAction = true;
 	}
 
 	public void update(float delta) {
-		if (inAction && attribute.opacity > 0.0f) {
-			transitionCurrentTime += delta;
-			if (transitionCurrentTime >= transitionTargetTime) {
-				//System.out.println(transitionCurrentTime);
-				attribute.opacity -= 0.05f;
-				transitionCurrentTime -= transitionTargetTime;
-			}
-		} else {
+		if (!inAction)
+			return;
+
+		sig = Math.signum(delta);
+		System.out.println(sig + " " + attribute.opacity);
+
+		if ((sig == 1.0f && attribute.opacity <= 0.0f) ||
+				(sig == -1.0f && attribute.opacity >= 1.0f)) {
 			inAction = false;
+			transitionCurrentTime = 0.0f;
+			return;
+		}
+
+		transitionCurrentTime += Math.abs(delta);
+		if (transitionCurrentTime >= transitionTargetTime) {
+			if (sig == 1.0f)
+				attribute.opacity -= 0.05f;
+			else
+				attribute.opacity += 0.05f;
+			transitionCurrentTime -= transitionTargetTime;
 		}
 	}
 
+	// Manually reset animation.
 	public void reset() {
-		attribute.opacity = 1.0f;
-		transitionCurrentTime = 0;
+		//attribute.opacity = opacity;
+		transitionCurrentTime = 0.0f;
+		System.out.println(transitionTargetTime);
 		inAction = true;
 	}
 
