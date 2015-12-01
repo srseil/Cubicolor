@@ -46,8 +46,8 @@ public class BlendAnimation {
 	}
 
 	// Manually reset animation.
-	public void reset() {
-		//attribute.opacity = opacity;
+	public void reset(float opacity) {
+		attribute.opacity = opacity;
 		transitionCurrentTime = 0.0f;
 		System.out.println(transitionTargetTime);
 		inAction = true;

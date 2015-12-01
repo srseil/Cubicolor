@@ -43,6 +43,7 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 	private boolean playerMoving;
 	private float reviveDelta;
 
+	private int firstRowRevived;
 
 	BlendAnimation blendAnimation;
 	DelayAction da;
@@ -126,6 +127,8 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 		oldPlayerKey = player.getKey();
 		playerMoving = false;
 		reviveDelta = 0.0f;
+
+		firstRowRevived = -1;
 	}
 
 	@Override
@@ -154,17 +157,25 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 					}
 				} else if (matrix[i][j].isReviving()) {
 					reviveDelta += Gdx.graphics.getDeltaTime();
-					if (reviveDelta >= ((matrix.length - i)*2.0f + j*1.0f)) {
+
+					if (firstRowRevived == -1)
+						firstRowRevived = i;
+
+
+					if (reviveDelta >= (firstRowRevived - i)*1.0f + j*0.5f) {
 						tileBlendAnimations[i][j].update(-1.0f *
 								Gdx.graphics.getDeltaTime());
 						System.out.println("revive...");
 						tileAnimations[i][j].update(Gdx.graphics.getDeltaTime());
 						if (!tileBlendAnimations[i][j].inAction()) {
+						//if (!tileAnimations[i][j].inAction) {
 							System.out.println("in");
 							matrix[i][j].setReviving(false);
 							matrix[i][j].setDead(false);
-							tileBlendAnimations[i][j].reset();
+							tileBlendAnimations[i][j].reset(1.0f);
 							tileAnimations[i][j].setAnimation("Cube|Fall");
+							if (i == matrix.length-1 && j == matrix[i].length-1)
+								firstRowRevived = -1;
 						}
 					}
 				}
@@ -264,7 +275,8 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 
 		for (int i = 0; i < tileBlendAnimations.length; i++) {
 			for (int j = 0; j < tileBlendAnimations[i].length; j++) {
-				tileBlendAnimations[i][j].reset();
+				if (matrix[i][j].isReviving())
+					tileBlendAnimations[i][j].reset(0.0f);
 			}
 		}
 
