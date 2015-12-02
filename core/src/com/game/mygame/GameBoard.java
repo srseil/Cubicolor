@@ -18,18 +18,14 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 	// animationcontroller update in draw: nicht thread safe? bessere lösung finden...
 	// animationcontroller kann man nicht resetten? null und neu zuweisen geht nicht.
 
-
 	// TODO: sameAnimationAllowed in playerAnimations auf true setzen, dann nicht mehr auf null setzen um zu resetten
 
 	private MyGame game;
-	//private Level level;
-	private Tile[][] matrix;
 	private Player player;
 	private OrthographicCamera camera;
 	private Environment environment;
 
-	//private ModelInstance[][] tileMatrix;
-	private TileModel[][] tileMatrix;
+	private TileModel[][] modelMatrix;
 	private float width, height;
 
 	private ModelInstance playerModel;
@@ -38,36 +34,26 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 	private AnimationController playerAnimation;
 	private AnimationController playerAnimations[];
 
-	private AnimationController tileAnimations[][];
-	private BlendAnimation tileBlendAnimations[][];
-
 	private TileAttributes.TColor oldPlayerKey;
 	private boolean playerMoving;
-	private float reviveDelta;
-
 	private int firstRowRevived;
-
-	BlendAnimation blendAnimation;
-	DelayAction da;
-
 
 	public GameBoard(Level level, Player player, OrthographicCamera camera, MyGame game) {
 		this.game = game;
-		this.matrix = level.getMatrix();
 		this.player = player;
 		this.camera = camera;
 
 		width = (float) level.getColumns() * 10;
 		height = (float) level.getRows() * 10;
-		tileMatrix = parseMatrix(matrix);
-
-		camera.position.set(0, 25.0f, height/2);
-		camera.zoom = 0.12f;
-		camera.update();
+		modelMatrix = parseMatrix(level.getMatrix());
 
 		environment = new Environment();
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, .4f, .4f, .4f, 1f));
 		environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -0.5f, -1f, 1f));
+
+		camera.position.set(0, 25.0f, height/2);
+		camera.zoom = 0.12f;
+		camera.update();
 
 		playerModels = new ModelInstance[5];
 		playerModels[0] = new ModelInstance(game.getPlayerModel(
@@ -96,40 +82,8 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 				getPlayerModelInstance(TileAttributes.TColor.YELLOW));
 		playerAnimation = playerAnimations[0];
 
-		tileAnimations
-				= new AnimationController[matrix.length][matrix[0].length];
-		for (int i = 0; i < tileAnimations.length; i++) {
-			for (int j = 0; j < tileAnimations[i].length; j++) {
-				tileAnimations[i][j] =
-						new AnimationController(tileMatrix[i][j]);
-				tileAnimations[i][j].allowSameAnimation = true;
-				tileAnimations[i][j].setAnimation("Cube|Fall", 1, 1f, null);
-			}
-		}
-
-		tileBlendAnimations =
-				new BlendAnimation[matrix.length][matrix[0].length];
-		for (int i = 0; i < tileAnimations.length; i++) {
-			for (int j = 0; j < tileAnimations[i].length; j++) {
-				tileBlendAnimations[i][j] =	new BlendAnimation(tileMatrix[i][j],
-								tileAnimations[i][j].current.duration);
-			}
-		}
-
-		/*
-		playerAnimation.setAnimation("Cube|Movement");
-		System.out.println(playerAnimation.current.duration);
-		for (int i = 0; i < 100; i++) {
-			System.out.println(game.getPlayerModel(TileAttributes.TColor.NONE).nodes.get(i).id);
-		}
-		*/
-		blendAnimation = new BlendAnimation(playerModel, 1f);
-		da = new DelayAction(1.0f);
-
 		oldPlayerKey = player.getKey();
 		playerMoving = false;
-		reviveDelta = 0.0f;
-
 		firstRowRevived = -1;
 	}
 
@@ -141,72 +95,19 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		game.getModelBatch().begin(camera);
 
-		//System.out.println(Gdx.graphics.getDeltaTime());
-
-		for (int i = 0; i < tileMatrix.length; i++) {
-			for (int j = 0; j < tileMatrix[i].length; j++) {
-				firstRowRevived = tileMatrix[i][j].update(
+		for (int i = 0; i < modelMatrix.length; i++) {
+			for (int j = 0; j < modelMatrix[i].length; j++) {
+				firstRowRevived = modelMatrix[i][j].update(
 						Gdx.graphics.getDeltaTime(), firstRowRevived);
-				if (!tileMatrix[i][j].isDead())
-					game.getModelBatch().render(tileMatrix[i][j], environment);
+				if (!modelMatrix[i][j].isDead())
+					game.getModelBatch().render(modelMatrix[i][j], environment);
 			}
 		}
-
-		// necessary?
 		if (firstRowRevived != -1)
 			firstRowRevived = -1;
 
-		/*
-		for (int i = 0; i < matrix.length; i++) {
-			for (int j = 0; j < matrix[i].length; j++) {
-				// Update dying animations (blending and moving).
-				if (matrix[i][j].isDead() && !matrix[i][j].isReviving()) {
-					continue;
-				} else if (matrix[i][j].isDying()) {
-					tileBlendAnimations[i][j].update(
-							Gdx.graphics.getDeltaTime());
-					tileAnimations[i][j].update(Gdx.graphics.getDeltaTime());
-					if (!tileBlendAnimations[i][j].inAction()) {
-						matrix[i][j].setDying(false);
-						matrix[i][j].setDead(true);
-						System.out.println("killed");
-					}
-				} else if (matrix[i][j].isReviving()) {
-					reviveDelta += Gdx.graphics.getDeltaTime();
-
-					if (firstRowRevived == -1)
-						firstRowRevived = i;
-
-
-					if (reviveDelta >= (firstRowRevived - i)*1.0f + j*0.5f) {
-						tileBlendAnimations[i][j].update(-1.0f *
-								Gdx.graphics.getDeltaTime());
-						System.out.println("revive...");
-						tileAnimations[i][j].update(Gdx.graphics.getDeltaTime());
-						if (!tileBlendAnimations[i][j].inAction()) {
-						//if (!tileAnimations[i][j].inAction) {
-							System.out.println("in");
-							matrix[i][j].setReviving(false);
-							matrix[i][j].setDead(false);
-							tileBlendAnimations[i][j].reset(1.0f);
-							tileAnimations[i][j].setAnimation("Cube|Fall");
-							if (i == matrix.length-1 && j == matrix[i].length-1)
-								firstRowRevived = -1;
-						}
-					}
-				}
-				game.getModelBatch().render(tileMatrix[i][j], environment);
-			}
-		}
-		*/
-
-		if (playerMoving) {
+		if (playerMoving)
 			playerAnimation.update(Gdx.graphics.getDeltaTime());
-		}
-
-		//blendAnimation.update(Gdx.graphics.getDeltaTime());
-		//tileBlendAnimations[0][2].update(Gdx.graphics.getDeltaTime());
-
 		game.getModelBatch().render(playerModel, environment);
 
 		game.getModelBatch().end();
@@ -229,20 +130,8 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 				oldPlayerKey = player.getKey();
 			}
 
-			/*
-			Vector3 v = new Vector3();
-			Quaternion q = new Quaternion();
-			playerModel.transform.getRotation(q);
-			playerModel.transform.getTranslation(v);
-			System.out.println("before: " + v + " " + q);
-			*/
 			playerModel.transform.setToRotation(0, 1, 0, 0);
 			updatePlayerModelTransform(0, 0);
-			/*
-			playerModel.transform.getRotation(q);
-			playerModel.transform.getTranslation(v);
-			System.out.println("after: " + v + " " + q);
-			*/
 		}
 	}
 
@@ -278,88 +167,38 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 		playerModel.transform.setToRotation(0, 1, 0, 0);
 		updatePlayerModelTransform(0, 0);
 
-		for (int i = 0; i < tileMatrix.length; i++) {
-			for (int j = 0; j < tileMatrix[i].length; j++) {
-				tileMatrix[i][j].reset();
+		for (int i = 0; i < modelMatrix.length; i++) {
+			for (int j = 0; j < modelMatrix[i].length; j++) {
+				modelMatrix[i][j].reset();
 			}
 		}
-		/*
-		for (int i = 0; i < tileAnimations.length; i++) {
-			for (int j = 0; j < tileAnimations[i].length; j++) {
-				//tileAnimations[i][j].setAnimation(null);
-				if (matrix[i][j].isReviving()) {
-					tileAnimations[i][j].setAnimation("Cube|Fall", 1, -1.0f, null);
-				} else {
-					tileAnimations[i][j].setAnimation("Cube|Fall", 1, 1.0f, null);
-				}
-				tileAnimations[i][j].update(Gdx.graphics.getDeltaTime());
-			}
-		}
-
-		for (int i = 0; i < tileBlendAnimations.length; i++) {
-			for (int j = 0; j < tileBlendAnimations[i].length; j++) {
-				if (matrix[i][j].isReviving())
-					tileBlendAnimations[i][j].reset(0.0f);
-			}
-		}
-
-
-		reviveDelta = 0.0f;
-		*/
 	}
 
-	private TileModel[][] parseMatrix(Tile[][] tileMatrix) {
+	private TileModel[][] parseMatrix(Tile[][] matrix) {
 		TileModel[][] modelMatrix =
-				new TileModel[tileMatrix.length][tileMatrix[0].length];
+				new TileModel[matrix.length][matrix[0].length];
 
 		for (int i = 0; i < modelMatrix.length; i++) {
 			for (int j = 0; j < modelMatrix[i].length; j++) {
 				Model model;
-				if (tileMatrix[i][j] instanceof KeyTile) {
-					KeyTile keyTile = (KeyTile) tileMatrix[i][j];
+				if (matrix[i][j] instanceof KeyTile) {
+					KeyTile keyTile = (KeyTile) matrix[i][j];
 					model = game.getLockTileModel(keyTile.getColor());
-				} else if (tileMatrix[i][j] instanceof LockTile) {
-					LockTile lockTile = (LockTile) tileMatrix[i][j];
+				} else if (matrix[i][j] instanceof LockTile) {
+					LockTile lockTile = (LockTile) matrix[i][j];
 					model = game.getLockTileModel(lockTile.getColor());
-				} else if (tileMatrix[i][j] instanceof ExitTile) {
+				} else if (matrix[i][j] instanceof ExitTile) {
 					model = game.getExitTileModel();
 				} else {
 					model = game.getTileModel();
 				}
 				modelMatrix[i][j] = new TileModel(
-						model, tileMatrix[i][j], i, j);
+						model, matrix[i][j], i, j);
 				modelMatrix[i][j].transform.setTranslation(
 						-width/2 + j*10.0f, 0.0f, height/2 - i*10.0f);
-				tileMatrix[i][j].addObserver(modelMatrix[i][j]);
+				matrix[i][j].addObserver(modelMatrix[i][j]);
 			}
 		}
-
-		/*
-		ModelInstance[][] modelMatrix =
-				new ModelInstance[tileMatrix.length][tileMatrix[0].length];
-
-		for (int i = 0; i < tileMatrix.length; i++) {
-			for (int j = 0; j < tileMatrix[0].length; j++) {
-				if (tileMatrix[i][j] instanceof KeyTile) {
-					KeyTile keyTile = (KeyTile) tileMatrix[i][j];
-					modelMatrix[i][j] = new ModelInstance(
-							game.getKeyTileModel(keyTile.getColor()));
-				} else if (tileMatrix[i][j] instanceof LockTile) {
-					LockTile lockTile = (LockTile) tileMatrix[i][j];
-					modelMatrix[i][j] = new ModelInstance(
-							game.getLockTileModel(lockTile.getColor()));
-				} else if (tileMatrix[i][j] instanceof ExitTile) {
-					modelMatrix[i][j] = new ModelInstance(
-							game.getExitTileModel());
-				} else {
-					modelMatrix[i][j] = new ModelInstance(
-							game.getTileModel());
-				}
-				modelMatrix[i][j].transform.setTranslation(
-						-width/2 + j*10.0f, 0.0f, height/2 - i*10.0f);
-			}
-		}
-		*/
 
 		return modelMatrix;
 	}
@@ -395,3 +234,4 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 	}
 
 }
+

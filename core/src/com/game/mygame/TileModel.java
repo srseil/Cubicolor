@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 
 public class TileModel extends ModelInstance {
 
+	// TODO: Delay beim reviven des tiles auf dem der Spieler am anfang steht
+
 	public enum TileModelState {
 		ALIVE,
 		DYING,
@@ -40,7 +42,6 @@ public class TileModel extends ModelInstance {
 	}
 
 	public int update(float delta, int firstRowRevived) {
-		// Weird delay for reviving animation.
 		switch (state) {
 			case DEAD:
 				break;
@@ -65,43 +66,6 @@ public class TileModel extends ModelInstance {
 				}
 		}
 		return firstRowRevived;
-		/*
-		if (matrix[i][j].isDead() && !matrix[i][j].isReviving()) {
-			continue;
-		} else if (matrix[i][j].isDying()) {
-			tileBlendAnimations[i][j].update(
-					Gdx.graphics.getDeltaTime());
-			tileAnimations[i][j].update(Gdx.graphics.getDeltaTime());
-			if (!tileBlendAnimations[i][j].inAction()) {
-				matrix[i][j].setDying(false);
-				matrix[i][j].setDead(true);
-				System.out.println("killed");
-			}
-		} else if (matrix[i][j].isReviving()) {
-			reviveDelta += Gdx.graphics.getDeltaTime();
-
-			if (firstRowRevived == -1)
-				firstRowRevived = i;
-
-
-			if (reviveDelta >= (firstRowRevived - i)*1.0f + j*0.5f) {
-				tileBlendAnimations[i][j].update(-1.0f *
-						Gdx.graphics.getDeltaTime());
-				System.out.println("revive...");
-				tileAnimations[i][j].update(Gdx.graphics.getDeltaTime());
-				if (!tileBlendAnimations[i][j].inAction()) {
-					//if (!tileAnimations[i][j].inAction) {
-					System.out.println("in");
-					matrix[i][j].setReviving(false);
-					matrix[i][j].setDead(false);
-					tileBlendAnimations[i][j].reset(1.0f);
-					tileAnimations[i][j].setAnimation("Cube|Fall");
-					if (i == matrix.length-1 && j == matrix[i].length-1)
-						firstRowRevived = -1;
-				}
-			}
-		}
-		*/
 	}
 
 	public void updateState() {
