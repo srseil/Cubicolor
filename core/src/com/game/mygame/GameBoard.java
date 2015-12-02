@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
@@ -27,7 +28,8 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 	private OrthographicCamera camera;
 	private Environment environment;
 
-	private ModelInstance[][] tileMatrix;
+	//private ModelInstance[][] tileMatrix;
+	private TileModel[][] tileMatrix;
 	private float width, height;
 
 	private ModelInstance playerModel;
@@ -141,6 +143,20 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 
 		//System.out.println(Gdx.graphics.getDeltaTime());
 
+		for (int i = 0; i < tileMatrix.length; i++) {
+			for (int j = 0; j < tileMatrix[i].length; j++) {
+				firstRowRevived = tileMatrix[i][j].update(
+						Gdx.graphics.getDeltaTime(), firstRowRevived);
+				if (!tileMatrix[i][j].isDead())
+					game.getModelBatch().render(tileMatrix[i][j], environment);
+			}
+		}
+
+		// necessary?
+		if (firstRowRevived != -1)
+			firstRowRevived = -1;
+
+		/*
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix[i].length; j++) {
 				// Update dying animations (blending and moving).
@@ -182,6 +198,7 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 				game.getModelBatch().render(tileMatrix[i][j], environment);
 			}
 		}
+		*/
 
 		if (playerMoving) {
 			playerAnimation.update(Gdx.graphics.getDeltaTime());
@@ -261,6 +278,12 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 		playerModel.transform.setToRotation(0, 1, 0, 0);
 		updatePlayerModelTransform(0, 0);
 
+		for (int i = 0; i < tileMatrix.length; i++) {
+			for (int j = 0; j < tileMatrix[i].length; j++) {
+				tileMatrix[i][j].reset();
+			}
+		}
+		/*
 		for (int i = 0; i < tileAnimations.length; i++) {
 			for (int j = 0; j < tileAnimations[i].length; j++) {
 				//tileAnimations[i][j].setAnimation(null);
@@ -282,9 +305,36 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 
 
 		reviveDelta = 0.0f;
+		*/
 	}
 
-	private ModelInstance[][] parseMatrix(Tile[][] tileMatrix) {
+	private TileModel[][] parseMatrix(Tile[][] tileMatrix) {
+		TileModel[][] modelMatrix =
+				new TileModel[tileMatrix.length][tileMatrix[0].length];
+
+		for (int i = 0; i < modelMatrix.length; i++) {
+			for (int j = 0; j < modelMatrix[i].length; j++) {
+				Model model;
+				if (tileMatrix[i][j] instanceof KeyTile) {
+					KeyTile keyTile = (KeyTile) tileMatrix[i][j];
+					model = game.getLockTileModel(keyTile.getColor());
+				} else if (tileMatrix[i][j] instanceof LockTile) {
+					LockTile lockTile = (LockTile) tileMatrix[i][j];
+					model = game.getLockTileModel(lockTile.getColor());
+				} else if (tileMatrix[i][j] instanceof ExitTile) {
+					model = game.getExitTileModel();
+				} else {
+					model = game.getTileModel();
+				}
+				modelMatrix[i][j] = new TileModel(
+						model, tileMatrix[i][j], i, j);
+				modelMatrix[i][j].transform.setTranslation(
+						-width/2 + j*10.0f, 0.0f, height/2 - i*10.0f);
+				tileMatrix[i][j].addObserver(modelMatrix[i][j]);
+			}
+		}
+
+		/*
 		ModelInstance[][] modelMatrix =
 				new ModelInstance[tileMatrix.length][tileMatrix[0].length];
 
@@ -309,6 +359,7 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 						-width/2 + j*10.0f, 0.0f, height/2 - i*10.0f);
 			}
 		}
+		*/
 
 		return modelMatrix;
 	}

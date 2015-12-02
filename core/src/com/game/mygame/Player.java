@@ -34,6 +34,7 @@ public class Player {
 		if (!toTile.isDead() &&
 				!(toTile instanceof ExitTile && !level.requirementsMet())) {
 			level.getMatrix()[this.y][this.x].setDying(true);
+			level.getMatrix()[this.y][this.x].setDead(true);
 			this.x = newX;
 			this.y = newY;
 			steps++;

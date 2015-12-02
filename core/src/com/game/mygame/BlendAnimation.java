@@ -53,7 +53,7 @@ public class BlendAnimation {
 		inAction = true;
 	}
 
-	public boolean inAction() {
+	public boolean isInAction() {
 		return inAction;
 	}
 

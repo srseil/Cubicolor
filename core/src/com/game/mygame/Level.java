@@ -46,14 +46,21 @@ public class Level {
 
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < columns; j++) {
+				/*
+				if (matrix[i][j].isDead()) {
+					matrix[i][j].setDead(false);
+					matrix[i][j].notifyObservers();
+				}
 				if (matrix[i][j].isDying()) {
 					matrix[i][j].setDying(false);
 					matrix[i][j].setDead(true);
 				}
+				*/
 
 				if (!(matrix[i][j] instanceof EmptyTile) &&
 						matrix[i][j].isDead()) {
-					matrix[i][j].setReviving(true);
+					matrix[i][j].setDead(false);
+					//matrix[i][j].setReviving(true);
 				}
 
 				if (matrix[i][j] instanceof KeyTile) {
