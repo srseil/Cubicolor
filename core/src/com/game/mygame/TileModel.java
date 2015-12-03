@@ -5,11 +5,11 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 
-public class TileModel extends ModelInstance {
+public class TileModel extends ModelInstance implements AnimatedModel {
 
 	// TODO: Delay beim reviven des tiles auf dem der Spieler am anfang steht
 
-	public enum TileModelState {
+	private enum TileModelState {
 		ALIVE,
 		DYING,
 		DEAD,
@@ -22,6 +22,7 @@ public class TileModel extends ModelInstance {
 	private AnimationController fallAnimation;
 	private BlendAnimation blendAnimation;
 	private float reviveDelta;
+	private int reviveDelay;
 
 	public TileModel(Model model, Tile data, int row, int column) {
 		super(model);
@@ -34,6 +35,7 @@ public class TileModel extends ModelInstance {
 		blendAnimation = new BlendAnimation(this,
 				fallAnimation.current.duration);
 		reviveDelta = 0.0f;
+		reviveDelay = 0;
 
 		if (data.isDead())
 			state = TileModelState.DEAD;
@@ -41,7 +43,18 @@ public class TileModel extends ModelInstance {
 			state = TileModelState.ALIVE;
 	}
 
-	public int update(float delta, int firstRowRevived) {
+	public int getFirstRowRevived(int firstRowRevived) {
+		if (state == TileModelState.REVIVING && firstRowRevived == -1) {
+			reviveDelta = 0;
+			return row;
+		} else {
+			reviveDelta = firstRowRevived;
+			return firstRowRevived;
+		}
+	}
+
+	@Override
+	public void update(float delta) {
 		switch (state) {
 			case DEAD:
 				break;
@@ -53,9 +66,7 @@ public class TileModel extends ModelInstance {
 				break;
 			case REVIVING:
 				reviveDelta += delta;
-				if (firstRowRevived == -1)
-					firstRowRevived = row;
-				if (reviveDelta >= (firstRowRevived - row) + column * 0.5f) {
+				if (reviveDelta >= (reviveDelay - row) + column * 0.5f) {
 					blendAnimation.update(-delta);
 					fallAnimation.update(delta);
 					if (!blendAnimation.isInAction()) {
@@ -65,9 +76,9 @@ public class TileModel extends ModelInstance {
 					}
 				}
 		}
-		return firstRowRevived;
 	}
 
+	@Override
 	public void updateState() {
 		if (data.isDead() && state == TileModelState.ALIVE) {
 			state = TileModelState.DYING;
@@ -77,6 +88,7 @@ public class TileModel extends ModelInstance {
 		}
 	}
 
+	@Override
 	public void reset() {
 		if (state == TileModelState.REVIVING) {
 			fallAnimation.setAnimation("Cube|Fall", 1, -1.0f, null);

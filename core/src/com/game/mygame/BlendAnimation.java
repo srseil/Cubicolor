@@ -26,7 +26,6 @@ public class BlendAnimation {
 			return;
 
 		sig = Math.signum(delta);
-		System.out.println(sig + " " + attribute.opacity);
 
 		if ((sig == 1.0f && attribute.opacity <= 0.0f) ||
 				(sig == -1.0f && attribute.opacity >= 1.0f)) {
@@ -49,7 +48,6 @@ public class BlendAnimation {
 	public void reset(float opacity) {
 		attribute.opacity = opacity;
 		transitionCurrentTime = 0.0f;
-		System.out.println(transitionTargetTime);
 		inAction = true;
 	}
 

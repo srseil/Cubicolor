@@ -11,6 +11,7 @@ public class Player {
 	private TileAttributes.TColor key;
 	private GameScreen gameScreen;
 	private boolean completed;
+	private PlayerModel observer;
 
 	public Player(Level level, GameScreen gameScreen) {
 		this.level = level;
@@ -39,6 +40,7 @@ public class Player {
 			this.y = newY;
 			steps++;
 			interact();
+			notifyObservers();
 			return true;
 		} else {
 			return false;
@@ -65,6 +67,7 @@ public class Player {
 				gameScreen.completeLevel(false);
 			completed = true;
 		}
+		observer.updateState();
 	}
 
 	public void reset() {
@@ -116,6 +119,14 @@ public class Player {
 		}
 	}
 	*/
+
+	public void addObserver(PlayerModel model) {
+		observer = model;
+	}
+
+	public void notifyObservers() {
+		observer.updateState();
+	}
 
 	public int getSteps() {
 		return steps;

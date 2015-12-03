@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.DelayAction;
 
@@ -17,6 +18,7 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 
 	// animationcontroller update in draw: nicht thread safe? bessere lösung finden...
 	// animationcontroller kann man nicht resetten? null und neu zuweisen geht nicht.
+	// player model hat bei fall animation verrutschten origin punkt
 
 	// TODO: sameAnimationAllowed in playerAnimations auf true setzen, dann nicht mehr auf null setzen um zu resetten
 
@@ -28,14 +30,17 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 	private TileModel[][] modelMatrix;
 	private float width, height;
 
-	private ModelInstance playerModel;
+	//private ModelInstance playerModel;
+	private PlayerModel playerModel;
 	private ModelInstance playerModels[];
 
 	private AnimationController playerAnimation;
 	private AnimationController playerAnimations[];
+	private BlendAnimation playerBlendAnimation;
 
 	private TileAttributes.TColor oldPlayerKey;
 	private boolean playerMoving;
+	private boolean resetting;
 	private int firstRowRevived;
 
 	public GameBoard(Level level, Player player, OrthographicCamera camera, MyGame game) {
@@ -55,6 +60,7 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 		camera.zoom = 0.12f;
 		camera.update();
 
+		/*
 		playerModels = new ModelInstance[5];
 		playerModels[0] = new ModelInstance(game.getPlayerModel(
 				TileAttributes.TColor.NONE));
@@ -68,7 +74,14 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 				TileAttributes.TColor.YELLOW));
 		playerModel = playerModels[0];
 		updatePlayerModelTransform(0, 0);
+		*/
 
+		playerModel = new PlayerModel(
+				game.getPlayerModel(TileAttributes.TColor.NONE),
+				player, -width/2, height/2);
+
+		player.addObserver(playerModel);
+		/*
 		playerAnimations = new AnimationController[5];
 		playerAnimations[0] = new AnimationController(
 				getPlayerModelInstance(TileAttributes.TColor.NONE));
@@ -81,9 +94,13 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 		playerAnimations[4] = new AnimationController(
 				getPlayerModelInstance(TileAttributes.TColor.YELLOW));
 		playerAnimation = playerAnimations[0];
+		*/
+
+		playerBlendAnimation = new BlendAnimation(playerModel, 1.2f);
 
 		oldPlayerKey = player.getKey();
 		playerMoving = false;
+		resetting = false;
 		firstRowRevived = -1;
 	}
 
@@ -97,17 +114,27 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 
 		for (int i = 0; i < modelMatrix.length; i++) {
 			for (int j = 0; j < modelMatrix[i].length; j++) {
-				firstRowRevived = modelMatrix[i][j].update(
-						Gdx.graphics.getDeltaTime(), firstRowRevived);
+				if (resetting && firstRowRevived == -1) {
+					firstRowRevived = modelMatrix[i][j].getFirstRowRevived(
+							firstRowRevived);
+				}
+				modelMatrix[i][j].update(Gdx.graphics.getDeltaTime());
 				if (!modelMatrix[i][j].isDead())
 					game.getModelBatch().render(modelMatrix[i][j], environment);
 			}
 		}
-		if (firstRowRevived != -1)
+		if (!resetting && firstRowRevived != -1)
 			firstRowRevived = -1;
 
-		if (playerMoving)
+		playerModel.update(Gdx.graphics.getDeltaTime());
+		/*
+		if (playerMoving) {
 			playerAnimation.update(Gdx.graphics.getDeltaTime());
+		} else if (resetting) {
+			playerAnimation.update(Gdx.graphics.getDeltaTime());
+			playerBlendAnimation.update(Gdx.graphics.getDeltaTime());
+		}
+		*/
 		game.getModelBatch().render(playerModel, environment);
 
 		game.getModelBatch().end();
@@ -125,13 +152,25 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 
 			// Update player model if key has been taken.
 			if (player.getKey() != oldPlayerKey) {
-				playerModel = getPlayerModelInstance(player.getKey());
-				playerAnimation = getPlayerAnimation(player.getKey());
+				//playerModel = getPlayerModelInstance(player.getKey());
+				//playerAnimation = getPlayerAnimation(player.getKey());
 				oldPlayerKey = player.getKey();
 			}
 
 			playerModel.transform.setToRotation(0, 1, 0, 0);
 			updatePlayerModelTransform(0, 0);
+		} else if (animation.animation.id.equals("Cube|Fall")) {
+			if (animation.speed > 0.0f) {
+				//playerModel.transform.setToRotation(0, 1, 0, 0);
+				updatePlayerModelTransform(0, 0.5f);
+				playerAnimation.setAnimation(null);
+				playerAnimation.setAnimation("Cube|Fall", 1, -1.0f, this);
+				playerBlendAnimation.reset(0.0f);
+			} else {
+				//playerAnimation = getPlayerAnimation(
+				//		TileAttributes.TColor.NONE);
+				resetting = false;
+			}
 		}
 	}
 
@@ -139,6 +178,7 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 	public void onLoop(AnimationController.AnimationDesc animation) {}
 
 	public void triggerPlayerMovement(int x, int y, boolean moved) {
+		/*
 		if (x == 0 && y == 1) {
 			playerModel.transform.setToRotation(0, 1, 0, 0);
 			if (moved) updatePlayerModelTransform(0, -1);
@@ -158,20 +198,32 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 
 		playerAnimation.setAnimation("Cube|Movement", 1, 3.0f, this);
 		playerMoving = true;
+		*/
+		playerModel.move(x, y, moved);
 	}
 
 	public void reset() {
-		playerModel = getPlayerModelInstance(TileAttributes.TColor.NONE);
-		playerAnimation = getPlayerAnimation(TileAttributes.TColor.NONE);
-		oldPlayerKey = TileAttributes.TColor.NONE;
-		playerModel.transform.setToRotation(0, 1, 0, 0);
-		updatePlayerModelTransform(0, 0);
+		/*
+		Vector3 corrected = new Vector3();
+		playerModel.transform.getTranslation(corrected);
+		corrected.z -= 5f;
 
+		playerModel = getPlayerModelInstance(TileAttributes.TColor.NONE);
+		playerModel.transform.setToRotation(0, 1, 0, 0);
+		playerModel.transform.setToTranslation(corrected);
+
+		playerAnimation.setAnimation("Cube|Fall", 1, 1.0f, this);
+		oldPlayerKey = TileAttributes.TColor.NONE;
+		*/
+
+		playerModel.reset();
 		for (int i = 0; i < modelMatrix.length; i++) {
 			for (int j = 0; j < modelMatrix[i].length; j++) {
 				modelMatrix[i][j].reset();
 			}
 		}
+
+		resetting = true;
 	}
 
 	private TileModel[][] parseMatrix(Tile[][] matrix) {
@@ -203,12 +255,13 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 		return modelMatrix;
 	}
 
-	private void updatePlayerModelTransform(int x, int y) {
+	private void updatePlayerModelTransform(float correctX, float correctY) {
 		playerModel.transform.setTranslation(
-				-width / 2 + (player.getX() + x) * 10.0f, 7.5f,
-				height / 2 - (player.getY() + y) * 10.0f);
+				-width / 2 + (player.getX() + correctX) * 10.0f, 7.5f,
+				height / 2 - (player.getY() + correctY) * 10.0f);
 	}
 
+	/*
 	private ModelInstance getPlayerModelInstance(TileAttributes.TColor key) {
 		switch (key) {
 			case RED:		return playerModels[1];
@@ -228,6 +281,7 @@ public class GameBoard extends Actor implements AnimationController.AnimationLis
 			default:		return playerAnimations[0];
 		}
 	}
+	*/
 
 	public boolean isPlayerMoving() {
 		return playerMoving;
