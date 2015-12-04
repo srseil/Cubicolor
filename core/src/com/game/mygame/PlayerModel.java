@@ -39,6 +39,12 @@ public class PlayerModel extends ModelInstance
 		updateTransform(0, 0);
 	}
 
+	private void updateTransform(float correctX, float correctY) {
+		transform.setTranslation(
+				baseX + (data.getX() + correctX) * 10.0f, 7.5f,
+				baseY - (data.getY() + correctY) * 10.0f);
+	}
+
 	@Override
 	public void update(float delta) {
 		switch (state) {
@@ -105,9 +111,7 @@ public class PlayerModel extends ModelInstance
 	}
 
 	@Override
-	public void onLoop(AnimationController.AnimationDesc animation) {
-
-	}
+	public void onLoop(AnimationController.AnimationDesc animation) {}
 
 	public void move(int x, int y, boolean moved) {
 		if (x == 0 && y == 1) {
@@ -131,10 +135,11 @@ public class PlayerModel extends ModelInstance
 		state = State.MOVING;
 	}
 
-	private void updateTransform(float correctX, float correctY) {
-		transform.setTranslation(
-				baseX + (data.getX() + correctX) * 10.0f, 7.5f,
-				baseY - (data.getY() + correctY) * 10.0f);
+	public boolean isMoving() {
+		if (state == State.MOVING)
+			return true;
+		else
+			return false;
 	}
 
 }
