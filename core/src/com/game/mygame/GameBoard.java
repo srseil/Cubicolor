@@ -54,8 +54,6 @@ public class GameBoard extends Actor {
 		camera.zoom = 0.12f;
 		camera.update();
 
-		oldPlayerKey = player.getKey();
-		playerMoving = false;
 		resetting = false;
 		firstRowRevived = -1;
 	}
