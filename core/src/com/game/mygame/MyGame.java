@@ -80,7 +80,16 @@ public class MyGame extends Game {
 				TileAttributes.TColor.BLUE);
 		lockTileYellowModel = createTileModel(TileAttributes.TKind.LOCK,
 				TileAttributes.TColor.YELLOW);
-		exitTileModel = createTileModel(TileAttributes.TKind.EXIT, null);
+
+
+
+
+		exitTileModel = modelLoader.loadModel(Gdx.files.internal("ExitTile.g3db"));
+		exitTileModel.materials.first().set(new BlendingAttribute(true, 1.0f));
+		exitTileModel.materials.first().set(ColorAttribute.createDiffuse(Color.GOLD));
+
+
+
 		/*
 		playerModel = getModelBuilder().createBox(10.0f, 10.0f, 10.0f,
 				new Material(ColorAttribute.createDiffuse(Color.DARK_GRAY)),

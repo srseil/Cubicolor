@@ -28,7 +28,7 @@ public class Tile {
 		observers.add(model);
 	}
 
-	public void notifyObservers() {
+	public void notifyObserver() {
 		for (TileModel model : observers)
 			model.updateState();
 	}
@@ -39,7 +39,7 @@ public class Tile {
 
 	public void setDead(boolean dead) {
 		this.dead = dead;
-		notifyObservers();
+		notifyObserver();
 	}
 
 	public boolean isDying() {

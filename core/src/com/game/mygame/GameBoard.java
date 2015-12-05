@@ -18,15 +18,16 @@ public class GameBoard extends Actor {
 
 	// animationcontroller update in draw: nicht thread safe? bessere lösung finden...
 	// animationcontroller kann man nicht resetten? null und neu zuweisen geht nicht.
+	// ---> geht schon, aber unnötig. einfach reset methode?
 	// player model hat bei fall animation verrutschten origin punkt
 
 	private MyGame game;
-	private Player player;
 	private OrthographicCamera camera;
 	private Environment environment;
 
 	private TileModel[][] modelMatrix;
 	private float width, height;
+	private ExitTileModel exitModel;
 	private PlayerModel playerModel;
 
 	private int firstRowRevived;
@@ -34,7 +35,6 @@ public class GameBoard extends Actor {
 
 	public GameBoard(Level level, Player player, OrthographicCamera camera, MyGame game) {
 		this.game = game;
-		this.player = player;
 		this.camera = camera;
 
 		width = (float) level.getColumns() * 10;
@@ -65,7 +65,14 @@ public class GameBoard extends Actor {
 		for (int i = 0; i < modelMatrix.length; i++) {
 			for (int j = 0; j < modelMatrix[i].length; j++) {
 				Model model;
-				if (matrix[i][j] instanceof KeyTile) {
+				if (matrix[i][j] instanceof ExitTile) {
+					ExitTile exitTile = (ExitTile) matrix[i][j];
+					exitModel = new ExitTileModel(game.getExitTileModel(),
+							exitTile, -width/2 + j*10.0f, height/2 - i*10.0f);
+					exitTile.addObserver(exitModel);
+					continue;
+				}
+				else if (matrix[i][j] instanceof KeyTile) {
 					KeyTile keyTile = (KeyTile) matrix[i][j];
 					model = game.getLockTileModel(keyTile.getColor());
 				} else if (matrix[i][j] instanceof LockTile) {
@@ -97,6 +104,8 @@ public class GameBoard extends Actor {
 
 		for (int i = 0; i < modelMatrix.length; i++) {
 			for (int j = 0; j < modelMatrix[i].length; j++) {
+				if (modelMatrix[i][j] == null)
+					continue;
 				if (resetting && firstRowRevived == -1) {
 					firstRowRevived = modelMatrix[i][j].getFirstRowRevived(
 							firstRowRevived);
@@ -109,6 +118,9 @@ public class GameBoard extends Actor {
 		if (!resetting && firstRowRevived != -1)
 			firstRowRevived = -1;
 
+		exitModel.update(Gdx.graphics.getDeltaTime());
+		game.getModelBatch().render(exitModel, environment);
+
 		playerModel.update(Gdx.graphics.getDeltaTime());
 		game.getModelBatch().render(playerModel, environment);
 
@@ -119,10 +131,11 @@ public class GameBoard extends Actor {
 	public void reset() {
 		for (int i = 0; i < modelMatrix.length; i++) {
 			for (int j = 0; j < modelMatrix[i].length; j++) {
-				modelMatrix[i][j].reset();
+				if (modelMatrix[i][j] != null)
+					modelMatrix[i][j].reset();
 			}
 		}
-
+		exitModel.reset();
 		playerModel.reset();
 		resetting = true;
 	}

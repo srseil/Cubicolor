@@ -6,26 +6,32 @@ import java.util.EnumSet;
 
 public class ExitTile extends Tile {
 
-	private float height;
-	private float defaultHeight;
+	private int height;
+	private int defaultHeight;
 	private EnumSet<TileAttributes.TColor> requirements;
+	private ExitTileModel observer;
 
 	public ExitTile(EnumSet<TileAttributes.TColor> requirements) {
 		super();
 		this.requirements = requirements;
 		this.defaultHeight = requirements.size();
+		this.height = defaultHeight;
 	}
 
 	public void lower() {
-		height -= 1.0f;
+		height -= 1;
 	}
 
 	public void removeRequirement(TileAttributes.TColor req) {
 		requirements.remove(req);
+		height--;
+		notifyObserver();
 	}
 
 	public void reset(EnumSet<TileAttributes.TColor> requirements) {
 		this.requirements = requirements;
+		height = defaultHeight;
+		notifyObserver();
 	}
 
 	@Override
@@ -56,8 +62,21 @@ public class ExitTile extends Tile {
 		}
 	}
 
+	public void addObserver(ExitTileModel model) {
+		observer = model;
+	}
+
+	@Override
+	public void notifyObserver() {
+		observer.updateState();
+	}
+
 	public EnumSet<TileAttributes.TColor> getRequirements() {
 		return requirements;
+	}
+
+	public int getHeight() {
+		return height;
 	}
 
 }

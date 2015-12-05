@@ -66,7 +66,6 @@ public class PlayerModel extends ModelInstance
 		if (data.getX() != oldDataX || data.getY() != oldDataY) {
 			moveAnimation.setAnimation("Cube|Movement", 1, 3.0f, this);
 			state = state.MOVING;
-			System.out.println("moving");
 			oldDataX = (int) data.getX();
 			oldDataY = (int) data.getY();
 		}

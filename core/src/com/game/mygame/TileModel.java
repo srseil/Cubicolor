@@ -43,16 +43,6 @@ public class TileModel extends ModelInstance implements AnimatedModel {
 			state = TileModelState.ALIVE;
 	}
 
-	public int getFirstRowRevived(int firstRowRevived) {
-		if (state == TileModelState.REVIVING && firstRowRevived == -1) {
-			reviveDelta = 0;
-			return row;
-		} else {
-			reviveDelta = firstRowRevived;
-			return firstRowRevived;
-		}
-	}
-
 	@Override
 	public void update(float delta) {
 		switch (state) {
@@ -98,6 +88,16 @@ public class TileModel extends ModelInstance implements AnimatedModel {
 		}
 		fallAnimation.update(Gdx.graphics.getDeltaTime());
 		reviveDelta = 0.0f;
+	}
+
+	public int getFirstRowRevived(int firstRowRevived) {
+		if (state == TileModelState.REVIVING && firstRowRevived == -1) {
+			reviveDelta = 0;
+			return row;
+		} else {
+			reviveDelta = firstRowRevived;
+			return firstRowRevived;
+		}
 	}
 
 	public boolean isDead() {
