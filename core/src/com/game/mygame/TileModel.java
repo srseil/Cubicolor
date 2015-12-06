@@ -23,6 +23,7 @@ public class TileModel extends ModelInstance implements AnimatedModel {
 	private BlendAnimation blendAnimation;
 	private float reviveDelta;
 	private int reviveDelay;
+	private boolean hold;
 
 	public TileModel(Model model, Tile data, int row, int column) {
 		super(model);
@@ -36,6 +37,7 @@ public class TileModel extends ModelInstance implements AnimatedModel {
 				fallAnimation.current.duration);
 		reviveDelta = 0.0f;
 		reviveDelay = 0;
+		hold = false;
 
 		if (data.isDead())
 			state = TileModelState.DEAD;
@@ -45,6 +47,9 @@ public class TileModel extends ModelInstance implements AnimatedModel {
 
 	@Override
 	public void update(float delta) {
+		if (hold)
+			return;
+
 		switch (state) {
 			case DEAD:
 				break;
@@ -98,6 +103,14 @@ public class TileModel extends ModelInstance implements AnimatedModel {
 			reviveDelta = firstRowRevived;
 			return firstRowRevived;
 		}
+	}
+
+	public void hold() {
+		hold = true;
+	}
+
+	public void release() {
+		hold = false;
 	}
 
 	public boolean isDead() {

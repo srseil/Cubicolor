@@ -30,6 +30,7 @@ public class PlayerModel extends ModelInstance
 	private State state;
 	private BlendAnimation blendAnimation;
 	private AnimationController moveAnimation;
+	private TileModel[][] modelMatrix;
 	private ExitTileModel exitModel;
 	private float baseX, baseY;
 	private int dataX, dataY;
@@ -37,11 +38,12 @@ public class PlayerModel extends ModelInstance
 	private boolean controllable;
 
 	public PlayerModel(Model model, Player data, float baseX, float baseY,
-					   ExitTileModel exitModel) {
+					   TileModel[][] modelMatrix, ExitTileModel exitModel) {
 		super(model);
 		this.data = data;
 		this.baseX = baseX;
 		this.baseY = baseY;
+		this.modelMatrix = modelMatrix;
 		this.exitModel = exitModel;
 		state = State.STILL;
 		moveAnimation = new AnimationController(this);
@@ -49,8 +51,8 @@ public class PlayerModel extends ModelInstance
 		moveAnimation.setAnimation("Cube|Fall");
 		blendAnimation = new BlendAnimation(this,
 				moveAnimation.current.duration);
-		dataX = (int) data.getX();
-		dataY = (int) data.getY();
+		dataX = data.getX();
+		dataY = data.getY();
 		controllable = true;
 		updateTransform(0, 0);
 	}
@@ -63,14 +65,8 @@ public class PlayerModel extends ModelInstance
 
 	private void triggerMovement(int dx, int dy, boolean moved) {
 		controllable = false;
-		dataX = (int) data.getX();
-		dataY = (int) data.getY();
-
-		if (dataX == exitModel.getColumn() &&
-				dataY == exitModel.getRow() &&
-				!exitModel.isTraversable()) {
-			return;
-		}
+		dataX = data.getX();
+		dataY = data.getY();
 
 		if (dx == 0 && dy == 1) {
 			transform.setToRotation(0, 1, 0, 0);
@@ -155,6 +151,9 @@ public class PlayerModel extends ModelInstance
 		queuedMove = null;
 		controllable = false;
 
+		dataX = data.getX();
+		dataY = data.getY();
+
 		Vector3 corrected = new Vector3();
 		transform.getTranslation(corrected);
 		corrected.z -= 5f;
@@ -200,6 +199,16 @@ public class PlayerModel extends ModelInstance
 	public void onLoop(AnimationController.AnimationDesc animation) {}
 
 	public void move(int dx, int dy) {
+		if (data.getX() == exitModel.getColumn() &&
+				data.getY() == exitModel.getRow()) {
+			if (!exitModel.isTraversable()) {
+				modelMatrix[dataY][dataX].hold();
+				return;
+			} else {
+				modelMatrix[dataY][dataX].release();
+			}
+		}
+
 		boolean moved;
 		if (data.getX() != dataX || data.getY() != dataY)
 			moved = true;
@@ -218,8 +227,8 @@ public class PlayerModel extends ModelInstance
 
 	public boolean hasCompleted() {
 		System.out.println("called completed");
-		if (state == State.STILL && data.getX() == exitModel.getColumn() &&
-				data.getY() == exitModel.getRow()) {
+		if (state == State.STILL && dataX == exitModel.getColumn() &&
+				dataY == exitModel.getRow()) {
 			System.out.println("called completed -> true");
 			return true;
 		} else {

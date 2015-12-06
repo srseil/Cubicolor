@@ -43,7 +43,7 @@ public class GameBoard extends Actor {
 
 		playerModel = new PlayerModel(
 				game.getPlayerModel(TileAttributes.TColor.NONE),
-				player, -width/2, height/2, exitModel);
+				player, -width/2, height/2, modelMatrix, exitModel);
 		player.addObserver(playerModel);
 
 		environment = new Environment();
