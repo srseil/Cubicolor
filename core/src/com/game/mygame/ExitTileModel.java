@@ -39,16 +39,11 @@ public class ExitTileModel extends ModelInstance
 		requirementModels.add(null);
 		requirementModels.add(null);
 
-		updateTransform(false);
-		System.out.println(data.getHeight());
+		updateTransform(height);
 	}
 
-	private void updateTransform(boolean snapped) {
-		System.out.println(height);
-		if (snapped)
-			transform.setTranslation(x, 0.0f, z);
-		else
-			transform.setTranslation(x, (height+1) * 5.0f, z);
+	private void updateTransform(int height) {
+		transform.setTranslation(x, (height+1) * 5.0f, z);
 	}
 
 	@Override
@@ -68,7 +63,7 @@ public class ExitTileModel extends ModelInstance
 
 	@Override
 	public void updateState() {
-		//requirement met during removing model?
+		//requirement met during removing model? -> queuing
 		if (state == State.STILL &&
 				data.getRequirements().size() < requirementModels.size()) {
 			moveAnimation.setAnimation("Cube|Spiral", 1, 1.0f, this);
@@ -81,23 +76,20 @@ public class ExitTileModel extends ModelInstance
 	public void reset() {
 		// ganz ende, während snapping
 		height = data.getHeight();
-		System.out.println(requirementModels.size());
 		if (data.getRequirements().size() == requirementModels.size()) {
 			if (state == State.MOVING_DOWN) {
 				// Das oder unten >=:
 				requirementModels.remove(0); // Später unnötig
-
 				state = State.MOVING_UP;
 				moveAnimation.current.speed *= -1;
 			}
 		} else {
-			System.out.println(state);
 			if (state == State.STILL) {
 				if (requirementModels.size() == 0) {
 					state = State.MOVING_UP;
 					moveAnimation.setAnimation("Cube|Fall", 1, -1.0f, this);
 				} else {
-					updateTransform(false); // basierend auf differenz
+					updateTransform(height); // basierend auf differenz
 					moveAnimation.setAnimation("Cube|Spiral", 1, -1.0f, this);
 					state = State.MOVING_UP;
 				}
@@ -114,45 +106,35 @@ public class ExitTileModel extends ModelInstance
 
 	@Override
 	public void onEnd(AnimationController.AnimationDesc animation) {
-		System.out.println("event");
 		if (animation.animation.id.equals("Cube|Spiral")) {
 			if (state == State.MOVING_DOWN) {
-				System.out.println("h " + state);
 				requirementModels.remove(0);
 				if (requirementModels.size() == 0) {
-					System.out.println("snap");
 					state = State.SNAPPING;
 					moveAnimation.setAnimation("Cube|Fall", 1, 1.0f, this);
 				} else {
-					System.out.println("not snap");
 					state = State.STILL;
 					moveAnimation.setAnimation("Cube|Spiral", 1, 1.0f, this);
 				}
-				updateTransform(false);
-				System.out.println("h " + state);
+				updateTransform(height);
 			} else if (state == State.MOVING_UP) {
-				System.out.println("reset");
 				requirementModels.add(null);
 				if (requirementModels.size() == data.getRequirements().size()) {
-					System.out.println("reset in");
 					state = State.STILL;
 					moveAnimation.setAnimation("Cube|Spiral", 1, 1.0f, this);
-					//moveAnimation.setAnimation("Cube|Spiral", 1, 1.0f, this);
 				} else {
 					moveAnimation.setAnimation("Cube|Spiral", 1, -1.0f, this);
 				}
-				updateTransform(false);
+				updateTransform(height);
 			}
 		} else if (animation.animation.id.equals("Cube|Fall")) {
 			if (state == State.MOVING_UP) {
 				moveAnimation.setAnimation("Cube|Spiral", 1, -1.0f, this);
-
+				updateTransform(1);
 			} else {
 				state = State.STILL;
 				moveAnimation.setAnimation("Cube|Fall", 1, -1.0f, this);
 			}
-			System.out.println(height);
-			//updateTransform(true);
 		}
 	}
 
