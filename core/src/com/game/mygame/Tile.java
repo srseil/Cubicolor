@@ -6,13 +6,12 @@ import java.util.ArrayList;
 
 public class Tile {
 
-	protected ArrayList<TileModel> observers;
+	protected AnimatedModel observer;
 	protected boolean dead;
 	protected boolean dying;
 	protected boolean reviving;
 
 	public Tile() {
-		observers = new ArrayList<>();
 		dead = false;
 		dying = false;
 		reviving = false;
@@ -24,13 +23,12 @@ public class Tile {
 		renderer.rect(x, y, 50, 50);
 	}
 
-	public void addObserver(TileModel model) {
-		observers.add(model);
+	public void addObserver(AnimatedModel observer) {
+		this.observer = observer;
 	}
 
 	public void notifyObserver() {
-		for (TileModel model : observers)
-			model.updateState();
+		observer.updateState();
 	}
 
 	public boolean isDead() {

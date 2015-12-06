@@ -11,7 +11,7 @@ public class Player {
 	private TileAttributes.TColor key;
 	private GameScreen gameScreen;
 	private boolean completed;
-	private PlayerModel observer;
+	private AnimatedModel observer;
 
 	public Player(Level level, GameScreen gameScreen) {
 		this.level = level;
@@ -28,7 +28,7 @@ public class Player {
 		int newY = this.y + y;
 		if (newX >= level.getColumns() || newX < 0
 				|| newY >= level.getRows() || newY < 0) {
-			notifyObservers(true);
+			notifyObserver();
 			return false;
 		}
 
@@ -40,11 +40,11 @@ public class Player {
 			this.x = newX;
 			this.y = newY;
 			steps++;
-			notifyObservers(true);
+			notifyObserver();
 			interact();
 			return true;
 		} else {
-			notifyObservers(true);
+			notifyObserver();
 			return false;
 		}
 	}
@@ -69,7 +69,7 @@ public class Player {
 				gameScreen.completeLevel(false);
 			completed = true;
 		}
-		observer.updateState(false);
+		notifyObserver();
 	}
 
 	public void reset() {
@@ -122,12 +122,12 @@ public class Player {
 	}
 	*/
 
-	public void addObserver(PlayerModel model) {
-		observer = model;
+	public void addObserver(AnimatedModel observer) {
+		this.observer = observer;
 	}
 
-	public void notifyObservers(boolean input) {
-		observer.updateState(input);
+	public void notifyObserver() {
+		observer.updateState();
 	}
 
 	public int getSteps() {
