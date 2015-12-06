@@ -61,7 +61,6 @@ public class ExitTileModel extends ModelInstance
 
 	}
 
-	@Override
 	public void updateState() {
 		//requirement met during removing model? -> queuing
 		if (state == State.STILL &&

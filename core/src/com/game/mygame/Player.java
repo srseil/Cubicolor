@@ -28,21 +28,23 @@ public class Player {
 		int newY = this.y + y;
 		if (newX >= level.getColumns() || newX < 0
 				|| newY >= level.getRows() || newY < 0) {
+			notifyObservers(true);
 			return false;
 		}
 
 		Tile toTile = level.getMatrix()[newY][newX];
 		if (!toTile.isDead() &&
 				!(toTile instanceof ExitTile && !level.requirementsMet())) {
-			level.getMatrix()[this.y][this.x].setDying(true);
+			//level.getMatrix()[this.y][this.x].setDying(true);
 			level.getMatrix()[this.y][this.x].setDead(true);
 			this.x = newX;
 			this.y = newY;
 			steps++;
+			notifyObservers(true);
 			interact();
-			notifyObservers();
 			return true;
 		} else {
+			notifyObservers(true);
 			return false;
 		}
 	}
@@ -67,7 +69,7 @@ public class Player {
 				gameScreen.completeLevel(false);
 			completed = true;
 		}
-		observer.updateState();
+		observer.updateState(false);
 	}
 
 	public void reset() {
@@ -124,8 +126,8 @@ public class Player {
 		observer = model;
 	}
 
-	public void notifyObservers() {
-		observer.updateState();
+	public void notifyObservers(boolean input) {
+		observer.updateState(input);
 	}
 
 	public int getSteps() {

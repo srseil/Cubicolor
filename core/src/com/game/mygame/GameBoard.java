@@ -140,12 +140,12 @@ public class GameBoard extends Actor {
 		resetting = true;
 	}
 
-	public void triggerPlayerMovement(int x, int y, boolean moved) {
-		playerModel.move(x, y, moved);
+	public void movePlayerModel(int dx, int dy) {
+		playerModel.move(dx, dy);
 	}
 
-	public boolean isPlayerMoving() {
-		return playerModel.isMoving();
+	public boolean isControllable() {
+		return playerModel.isControllable();
 	}
 
 }

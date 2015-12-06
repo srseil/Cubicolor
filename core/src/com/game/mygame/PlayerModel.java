@@ -8,10 +8,20 @@ import com.badlogic.gdx.math.Vector3;
 public class PlayerModel extends ModelInstance
 		implements AnimatedModel, AnimationController.AnimationListener {
 
+	private class Move {
+		int dx, dy;
+		boolean moved;
+		public Move(int dx, int dy, boolean moved) {
+			this.dx = dx;
+			this.dy = dy;
+			this.moved = moved;
+		}
+	}
 
 	private enum State {
 		STILL,
 		MOVING,
+		INDICATING,
 		RESETTING_UP,
 		RESETTING_DOWN
 	}
@@ -22,6 +32,8 @@ public class PlayerModel extends ModelInstance
 	private AnimationController moveAnimation;
 	private float baseX, baseY;
 	private int oldDataX, oldDataY;
+	private Move queuedMove;
+	private boolean controllable;
 
 	public PlayerModel(Model model, Player data, float baseX, float baseY) {
 		super(model);
@@ -36,6 +48,7 @@ public class PlayerModel extends ModelInstance
 				moveAnimation.current.duration);
 		oldDataX = (int) data.getX();
 		oldDataY = (int) data.getY();
+		controllable = true;
 		updateTransform(0, 0);
 	}
 
@@ -45,11 +58,54 @@ public class PlayerModel extends ModelInstance
 				baseY - (data.getY() + correctY) * 10.0f);
 	}
 
+	private void triggerMovement(int dx, int dy, boolean moved) {
+		controllable = false;
+		oldDataX = (int) data.getX();
+		oldDataY = (int) data.getY();
+
+		if (dx == 0 && dy == 1) {
+			transform.setToRotation(0, 1, 0, 0);
+			if (moved) updateTransform(0, -1);
+		} else if (dx == 0 && dy == -1) {
+			transform.setToRotation(0, 1, 0, 180);
+			if (moved) updateTransform(0, 1);
+		} else if (dx == 1 && dy == 0) {
+			transform.setToRotation(0, 1, 0, 270);
+			if (moved) updateTransform(-1, 0);
+		} else if (dx == -1 && dy == 0) {
+			transform.setToRotation(0, 1, 0, 90);
+			if (moved) updateTransform(1, 0);
+		}
+
+		if (moved) {
+			moveAnimation.setAnimation("Cube|Movement", 1, 3.0f, this);
+			state = State.MOVING;
+		} else {
+			updateTransform(0, 0);
+			moveAnimation.setAnimation("Cube|Indication", 1, 2.5f, this);
+			state = State.INDICATING;
+		}
+	}
+
+	private void triggerQueuedMove() {
+		if (queuedMove != null) {
+			triggerMovement(queuedMove.dx, queuedMove.dy, queuedMove.moved);
+			queuedMove = null;
+		}
+	}
+
 	@Override
 	public void update(float delta) {
 		switch (state) {
-			case MOVING:
+			case MOVING: case INDICATING:
 				moveAnimation.update(delta);
+				//System.out.println(moveAnimation.current.duration -
+				//		moveAnimation.current.time + " ");
+				if ((moveAnimation.current.duration -
+						moveAnimation.current.time) < 0.2f) {
+					controllable = true;
+					//System.out.println("controllable");
+				}
 				break;
 			case RESETTING_UP:
 				blendAnimation.update(delta);
@@ -63,16 +119,33 @@ public class PlayerModel extends ModelInstance
 
 	@Override
 	public void updateState() {
-		if (data.getX() != oldDataX || data.getY() != oldDataY) {
-			moveAnimation.setAnimation("Cube|Movement", 1, 3.0f, this);
-			state = state.MOVING;
-			oldDataX = (int) data.getX();
-			oldDataY = (int) data.getY();
-		}
+		System.out.println("notified ");
+		/*
+			int dx = (int) data.getX() - oldDataX;
+			int dy = (int) data.getY() - oldDataY;
+			boolean moved;
+			System.out.println(dx + " " + dy);
+
+			if (dx != 0 || dy != 0)
+				moved = true;
+			else
+				moved = false;
+
+			if (state == State.MOVING) {
+				queuedMove = new Move(dx, dy, moved);
+			} else {
+				triggerMovement(dx, dy, moved);
+				oldDataX = (int) data.getX();
+				oldDataY = (int) data.getY();
+			}
+			*/
 	}
 
 	@Override
 	public void reset() {
+		queuedMove = null;
+		controllable = false;
+
 		Vector3 corrected = new Vector3();
 		transform.getTranslation(corrected);
 		corrected.z -= 5f;
@@ -93,6 +166,11 @@ public class PlayerModel extends ModelInstance
 			moveAnimation.setAnimation("Cube|Movement");
 			transform.setToRotation(0, 1, 0, 0);
 			updateTransform(0, 0);
+			triggerQueuedMove();
+		} else if (animation.animation.id.equals("Cube|Indication")) {
+			state = State.STILL;
+			moveAnimation.setAnimation("Cube|Movement");
+			triggerQueuedMove();
 		} else if (animation.animation.id.equals("Cube|Fall")) {
 			if (state == State.RESETTING_UP) {
 				System.out.println("up done");
@@ -101,44 +179,32 @@ public class PlayerModel extends ModelInstance
 				updateTransform(0, 0.5f);
 				moveAnimation.setAnimation("Cube|Fall", 1, -1.0f, this);
 				blendAnimation.reset(0.0f);
-			} else if (state == State.RESETTING_DOWN){
+			} else if (state == State.RESETTING_DOWN) {
 				state = State.STILL;
+				controllable = true;
 				//moveAnimation.setAnimation("Cube|Movement");
 			}
-
 		}
 	}
 
 	@Override
 	public void onLoop(AnimationController.AnimationDesc animation) {}
 
-	public void move(int x, int y, boolean moved) {
-		if (x == 0 && y == 1) {
-			transform.setToRotation(0, 1, 0, 0);
-			if (moved) updateTransform(0, -1);
-		} else if (x == 0 && y == -1) {
-			transform.setToRotation(0, 1, 0, 180);
-			if (moved) updateTransform(0, 1);
-		} else if (x == 1 && y == 0) {
-			transform.setToRotation(0, 1, 0, 270);
-			if (moved) updateTransform(-1, 0);
-		} else if (x == -1 && y == 0) {
-			transform.setToRotation(0, 1, 0, 90);
-			if (moved) updateTransform(1, 0);
-		}
+	public void move(int dx, int dy) {
+		boolean moved;
+		if (data.getX() != oldDataX || data.getY() != oldDataY)
+			moved = true;
+		else
+			moved = false;
 
-		if (!moved)
-			updateTransform(0, 0);
-
-		moveAnimation.setAnimation("Cube|Movement", 1, 3.0f, this);
-		state = State.MOVING;
+		if (state == State.MOVING)
+			queuedMove = new Move(dx, dy, moved);
+		else
+			triggerMovement(dx, dy, moved);
 	}
 
-	public boolean isMoving() {
-		if (state == State.MOVING)
-			return true;
-		else
-			return false;
+	public boolean isControllable() {
+		return controllable;
 	}
 
 }

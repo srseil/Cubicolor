@@ -108,19 +108,19 @@ public class GameScreen implements Screen {
 			return;
 		}
 
-		if (!paused && !completed && !gameBoard.isPlayerMoving()) {
+		if (!paused && !completed && gameBoard.isControllable()) {
 			if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-				moved = player.move(0, 1);
-				gameBoard.triggerPlayerMovement(0, 1, moved);
+				player.move(0, 1);
+				gameBoard.movePlayerModel(0, 1);
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-				moved = player.move(0, -1);
-				gameBoard.triggerPlayerMovement(0, -1, moved);
+				player.move(0, -1);
+				gameBoard.movePlayerModel(0, -1);
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-				moved = player.move(1, 0);
-				gameBoard.triggerPlayerMovement(1, 0, moved);
+				player.move(1, 0);
+				gameBoard.movePlayerModel(1, 0);
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-				moved = player.move(-1, 0);
-				gameBoard.triggerPlayerMovement(-1, 0, moved);
+				player.move(-1, 0);
+				gameBoard.movePlayerModel(-1, 0);
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
 				resetLevel();
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
