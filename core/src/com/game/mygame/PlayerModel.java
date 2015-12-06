@@ -30,24 +30,27 @@ public class PlayerModel extends ModelInstance
 	private State state;
 	private BlendAnimation blendAnimation;
 	private AnimationController moveAnimation;
+	private ExitTileModel exitModel;
 	private float baseX, baseY;
-	private int oldDataX, oldDataY;
+	private int dataX, dataY;
 	private Move queuedMove;
 	private boolean controllable;
 
-	public PlayerModel(Model model, Player data, float baseX, float baseY) {
+	public PlayerModel(Model model, Player data, float baseX, float baseY,
+					   ExitTileModel exitModel) {
 		super(model);
 		this.data = data;
 		this.baseX = baseX;
 		this.baseY = baseY;
+		this.exitModel = exitModel;
 		state = State.STILL;
 		moveAnimation = new AnimationController(this);
 		moveAnimation.allowSameAnimation = true;
 		moveAnimation.setAnimation("Cube|Fall");
 		blendAnimation = new BlendAnimation(this,
 				moveAnimation.current.duration);
-		oldDataX = (int) data.getX();
-		oldDataY = (int) data.getY();
+		dataX = (int) data.getX();
+		dataY = (int) data.getY();
 		controllable = true;
 		updateTransform(0, 0);
 	}
@@ -60,8 +63,14 @@ public class PlayerModel extends ModelInstance
 
 	private void triggerMovement(int dx, int dy, boolean moved) {
 		controllable = false;
-		oldDataX = (int) data.getX();
-		oldDataY = (int) data.getY();
+		dataX = (int) data.getX();
+		dataY = (int) data.getY();
+
+		if (dataX == exitModel.getColumn() &&
+				dataY == exitModel.getRow() &&
+				!exitModel.isTraversable()) {
+			return;
+		}
 
 		if (dx == 0 && dy == 1) {
 			transform.setToRotation(0, 1, 0, 0);
@@ -121,8 +130,8 @@ public class PlayerModel extends ModelInstance
 	public void updateState() {
 		System.out.println("notified ");
 		/*
-			int dx = (int) data.getX() - oldDataX;
-			int dy = (int) data.getY() - oldDataY;
+			int dx = (int) data.getX() - dataX;
+			int dy = (int) data.getY() - dataY;
 			boolean moved;
 			System.out.println(dx + " " + dy);
 
@@ -135,8 +144,8 @@ public class PlayerModel extends ModelInstance
 				queuedMove = new Move(dx, dy, moved);
 			} else {
 				triggerMovement(dx, dy, moved);
-				oldDataX = (int) data.getX();
-				oldDataY = (int) data.getY();
+				dataX = (int) data.getX();
+				dataY = (int) data.getY();
 			}
 			*/
 	}
@@ -192,7 +201,7 @@ public class PlayerModel extends ModelInstance
 
 	public void move(int dx, int dy) {
 		boolean moved;
-		if (data.getX() != oldDataX || data.getY() != oldDataY)
+		if (data.getX() != dataX || data.getY() != dataY)
 			moved = true;
 		else
 			moved = false;
@@ -205,6 +214,17 @@ public class PlayerModel extends ModelInstance
 
 	public boolean isControllable() {
 		return controllable;
+	}
+
+	public boolean hasCompleted() {
+		System.out.println("called completed");
+		if (state == State.STILL && data.getX() == exitModel.getColumn() &&
+				data.getY() == exitModel.getRow()) {
+			System.out.println("called completed -> true");
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }

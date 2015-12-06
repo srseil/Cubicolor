@@ -22,13 +22,17 @@ public class ExitTileModel extends ModelInstance
 
 	private ArrayList<ModelInstance> requirementModels;
 	private float x, z;
+	private int row, column;
 	private int height;
 
-	public ExitTileModel(Model model, ExitTile data, float x, float z) {
+	public ExitTileModel(Model model, ExitTile data, float x, float z,
+						 int row, int column) {
 		super(model);
 		this.data = data;
 		this.x = x;
 		this.z = z;
+		this.row = row;
+		this.column = column;
 		moveAnimation = new AnimationController(this);
 		moveAnimation.allowSameAnimation = true;
 		moveAnimation.setAnimation("Cube|Spiral", 1, 1.0f, this);
@@ -140,4 +144,20 @@ public class ExitTileModel extends ModelInstance
 	@Override
 	public void onLoop(AnimationController.AnimationDesc animation) {}
 
+	public int getRow() {
+		return row;
+	}
+
+	public int getColumn() {
+		return column;
+	}
+
+	public boolean isTraversable() {
+		if (height == 0 && state == State.STILL)
+			return true;
+		else
+			return false;
+	}
+
 }
+

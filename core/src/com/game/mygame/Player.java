@@ -63,11 +63,13 @@ public class Player {
 				removeKey();
 			}
 		} else if (tile instanceof ExitTile) {
+			/*
 			if (steps <= level.getOptimalSteps())
 				gameScreen.completeLevel(true);
 			else
 				gameScreen.completeLevel(false);
 			completed = true;
+			*/
 		}
 		notifyObserver();
 	}

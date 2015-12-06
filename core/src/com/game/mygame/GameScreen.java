@@ -128,6 +128,13 @@ public class GameScreen implements Screen {
 				pauseDialog.show(stage);
 			}
 		}
+
+		if (!completed && gameBoard.isCompleted()) {
+			if (player.getSteps() <= level.getOptimalSteps())
+				completeLevel(true);
+			else
+				completeLevel(false);
+		}
 	}
 
 	public void resetLevel() {
@@ -139,7 +146,10 @@ public class GameScreen implements Screen {
 
 	public void completeLevel(boolean optimal) {
 		completed = true;
-		completeDialogNormal.show(stage);
+		if (optimal)
+			completeDialogNormal.show(stage);
+		else
+			completeDialogOptimal.show(stage);
 		game.getSaveState().update(
 				level.getDifficulty(), level.getNumber(), optimal);
 
@@ -212,10 +222,12 @@ public class GameScreen implements Screen {
 
 		*/
 
+		/*
 		if (!completed && player.hasCompleted()) {
 			completed = true;
 			completeDialogOptimal.show(stage);
 		}
+		*/
 
 		// Process game logic and input.
 		process();

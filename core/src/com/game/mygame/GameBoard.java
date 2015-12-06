@@ -43,7 +43,7 @@ public class GameBoard extends Actor {
 
 		playerModel = new PlayerModel(
 				game.getPlayerModel(TileAttributes.TColor.NONE),
-				player, -width/2, height/2);
+				player, -width/2, height/2, exitModel);
 		player.addObserver(playerModel);
 
 		environment = new Environment();
@@ -67,8 +67,9 @@ public class GameBoard extends Actor {
 				Model model;
 				if (matrix[i][j] instanceof ExitTile) {
 					ExitTile exitTile = (ExitTile) matrix[i][j];
-					exitModel = new ExitTileModel(game.getExitTileModel(),
-							exitTile, -width/2 + j*10.0f, height/2 - i*10.0f);
+					exitModel = new ExitTileModel(
+							game.getExitTileModel(), exitTile,
+							-width/2 + j*10.0f, height/2 - i*10.0f, i, j);
 					exitTile.addObserver(exitModel);
 					continue;
 				}
@@ -146,6 +147,10 @@ public class GameBoard extends Actor {
 
 	public boolean isControllable() {
 		return playerModel.isControllable();
+	}
+
+	public boolean isCompleted() {
+		return playerModel.hasCompleted();
 	}
 
 }

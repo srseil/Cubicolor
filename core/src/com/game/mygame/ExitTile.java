@@ -9,7 +9,7 @@ public class ExitTile extends Tile {
 	private int height;
 	private int defaultHeight;
 	private EnumSet<TileAttributes.TColor> requirements;
-	private ExitTileModel observer;
+	private AnimatedModel observer;
 
 	public ExitTile(EnumSet<TileAttributes.TColor> requirements) {
 		super();
@@ -62,8 +62,8 @@ public class ExitTile extends Tile {
 		}
 	}
 
-	public void addObserver(ExitTileModel model) {
-		observer = model;
+	public void addObserver(AnimatedModel observer) {
+		this.observer = observer;
 	}
 
 	@Override
