@@ -1,48 +1,31 @@
 package com.game.mygame;
 
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-
 public class LockTile extends Tile {
 
-	private TileAttributes.TColor color;
-	//private Circle paint;
+	private TileAttributes.TColor lockColor;
+	private boolean locked;
 
-	public LockTile(TileAttributes.TColor color) {
+	public LockTile(TileAttributes.TColor lockColor) {
 		super();
-		this.color = color;
-	}
-
-	public void unlock() {
-		// Trigger some animation.
-	}
-
-	public void reset() {
+		this.lockColor = lockColor;
+		this.locked = true;
 	}
 
 	@Override
-	//public void draw(float x, float y, SpriteBatch batch) {
-	public void draw(float x, float y, ShapeRenderer renderer) {
-		switch (color) {
-			case RED:
-				renderer.setColor(1.0f, 0.1f, 0.1f, 1);
-				break;
-			case GREEN:
-				renderer.setColor(0.1f, 1.0f, 0.1f, 1);
-				break;
-			case BLUE:
-				renderer.setColor(0.1f, 0.1f, 1.0f, 1);
-				break;
-			case YELLOW:
-				renderer.setColor(1.0f, 1.0f, 0.1f, 1);
-				break;
-			default:
-				renderer.setColor(0.0f, 0.0f, 0.0f, 1);
+	public void interact(Player player) {
+		if (player.getKey() == lockColor) {
+			locked = false;
+			player.removeKey();
+			player.fulfillRequirement(lockColor);
 		}
-		renderer.rect(x, y, 50, 50);
 	}
 
-	public TileAttributes.TColor getColor() {
-		return color;
+	public void reset() {
+		locked = true;
+	}
+
+	public TileAttributes.TColor getLockColor() {
+		return lockColor;
 	}
 
 }

@@ -50,27 +50,7 @@ public class Player {
 	}
 
 	private void interact() {
-		Tile tile = level.getMatrix()[y][x];
-		if (tile instanceof KeyTile) {
-			KeyTile keyTile = (KeyTile) tile;
-			addKey(keyTile.getColor());
-			keyTile.takeKey();
-		} else if (tile instanceof LockTile) {
-			LockTile lockTile = (LockTile) tile;
-			if (key == lockTile.getColor()) {
-				lockTile.unlock();
-				level.fulfillRequirement(key);
-				removeKey();
-			}
-		} else if (tile instanceof ExitTile) {
-			/*
-			if (steps <= level.getOptimalSteps())
-				gameScreen.completeLevel(true);
-			else
-				gameScreen.completeLevel(false);
-			completed = true;
-			*/
-		}
+		level.getMatrix()[y][x].interact(this);
 		notifyObserver();
 	}
 
@@ -82,47 +62,19 @@ public class Player {
 		completed = false;
 	}
 
-	public void draw(float baseX, float baseY, ShapeRenderer renderer) {
-		if (key != TileAttributes.TColor.NONE) {
-			renderer.setColor(TileAttributes.getGDXColor(key));
-			renderer.rect(baseX + 50*x, baseY + 50*y, 50, 50);
-			renderer.end();
-			renderer.begin(ShapeRenderer.ShapeType.Line);
-			renderer.setColor(0, 0, 0, 1);
-			renderer.rect(baseX + 50*x, baseY + 50*y, 50, 50);
-			renderer.end();
-			renderer.begin(ShapeRenderer.ShapeType.Filled);
-		} else {
-			renderer.setColor(0, 0, 0, 1);
-			renderer.rect(baseX + 50*x, baseY + 50*y, 50, 50);
-		}
-	}
-
-	private void addKey(TileAttributes.TColor color) {
+	public void takeKey(TileAttributes.TColor color) {
 		key = color;
+		notifyObserver();
 	}
 
-	private void removeKey() {
+	public void removeKey() {
 		key = TileAttributes.TColor.NONE;
-		// Trigger animation.
+		notifyObserver();
 	}
 
-	/*
-	private Color getColor(TileColor tileColor) {
-		switch (tileColor) {
-			case RED:
-				return new Color(1, 0, 0, 1);
-			case GREEN:
-				return new Color(0, 1, 0, 1);
-			case BLUE:
-				return new Color(0, 0, 1, 1);
-			case YELLOW:
-				return new Color(1, 1, 0, 1);
-			default:
-				return new Color(0, 0, 0, 1);
-		}
+	public void fulfillRequirement(TileAttributes.TColor color) {
+		level.fulfillRequirement(color);
 	}
-	*/
 
 	public void addObserver(AnimatedModel observer) {
 		this.observer = observer;
