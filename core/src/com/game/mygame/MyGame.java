@@ -151,7 +151,7 @@ public class MyGame extends Game {
 	public void openLevel(String difficulty, int n) {
 		try {
 			Level level = levelLoader.load(difficulty, n);
-			gameScreen = new GameScreen(level, camera, this);
+			gameScreen = new GameScreen(level, this);
 			this.setScreen(gameScreen);
 		} catch (IOException exception) {
 			System.out.println("Error while loading level.");
