@@ -9,6 +9,8 @@ public class TileModel extends ModelInstance implements AnimatedModel {
 
 	// TODO: Delay beim reviven des tiles auf dem der Spieler am anfang steht
 
+	public static float SIZE = 2.0f;
+
 	private enum TileModelState {
 		ALIVE,
 		DYING,
@@ -27,6 +29,7 @@ public class TileModel extends ModelInstance implements AnimatedModel {
 
 	public TileModel(Model model, Tile data, int row, int column) {
 		super(model);
+		//transform.scale(10, 10, 10);
 		this.data = data;
 		this.row = row;
 		this.column = column;

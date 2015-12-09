@@ -59,8 +59,9 @@ public class PlayerModel extends ModelInstance
 
 	private void updateTransform(float correctX, float correctY) {
 		transform.setTranslation(
-				baseX + (data.getX() + correctX) * 10.0f, 7.5f,
-				baseY - (data.getY() + correctY) * 10.0f);
+				0*baseX + (data.getX() + correctX) * TileModel.SIZE,
+				0.75f * TileModel.SIZE,
+				0*baseY - (data.getY() + correctY) * TileModel.SIZE);
 	}
 
 	private void triggerMovement(int dx, int dy, boolean moved) {
@@ -156,7 +157,7 @@ public class PlayerModel extends ModelInstance
 
 		Vector3 corrected = new Vector3();
 		transform.getTranslation(corrected);
-		corrected.z -= 5f;
+		corrected.z -= TileModel.SIZE/2;
 
 		// Change material to standard
 		transform.setToRotation(0, 1, 0, 0);
@@ -226,10 +227,8 @@ public class PlayerModel extends ModelInstance
 	}
 
 	public boolean hasCompleted() {
-		System.out.println("called completed");
 		if (state == State.STILL && dataX == exitModel.getColumn() &&
 				dataY == exitModel.getRow()) {
-			System.out.println("called completed -> true");
 			return true;
 		} else {
 			return false;

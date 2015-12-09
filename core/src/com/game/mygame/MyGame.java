@@ -3,9 +3,7 @@ package com.game.mygame;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.loaders.ModelLoader;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Material;
@@ -13,9 +11,12 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.CubemapAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
 import com.badlogic.gdx.graphics.g3d.model.data.ModelData;
 import com.badlogic.gdx.graphics.g3d.model.data.ModelMaterial;
+import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader;
 import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -104,7 +105,7 @@ public class MyGame extends Game {
 
 
 
-		camera = new OrthographicCamera(800, 600);
+		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		camera.setToOrtho(false);
 
 		batch = new SpriteBatch();
@@ -164,24 +165,26 @@ public class MyGame extends Game {
 
 	private Model createTileModel(TileAttributes.TKind kind,
 								  TileAttributes.TColor color) {
-		//Material material = new Material();
+		Material material = new Material();
 		Model model = modelLoader.loadModel(Gdx.files.internal("Tile.g3db"));
 		model.materials.first().set(new BlendingAttribute(true, 1.0f));
 
 		if (color != null) {
-			//material.set(ColorAttribute.createDiffuse(
-			//		TileAttributes.getGDXColor(color)));
+			material.set(ColorAttribute.createDiffuse(
+					TileAttributes.getGDXColor(color)));
 			model.materials.first().set(ColorAttribute.createDiffuse(
 					TileAttributes.getGDXColor(color)));
 		} else {
-			//material.set(ColorAttribute.createDiffuse(Color.WHITE));
+			material.set(ColorAttribute.createDiffuse(Color.WHITE));
 			model.materials.first().set(ColorAttribute.createDiffuse(Color.WHITE));
 		}
+		//model.materials.removeIndex(0);
+		//model.materials.add(material);
 		/*
-		Model model = getModelBuilder().createBox(10.0f, 5.0f, 10.0f, material,
+		model = getModelBuilder().createBox(10.0f, 5.0f, 10.0f, material,
 				VertexAttributes.Usage.Position
 				| VertexAttributes.Usage.Normal);
-		*/
+				*/
 		/*
 		switch (kind) {
 			case NORMAL:
@@ -196,7 +199,7 @@ public class MyGame extends Game {
 			material.set(ColorAttribute.createDiffuse(
 					TileAttributes.getGDXColor(key)));
 		} else {
-			material.set(ColorAttribute.createDiffuse(Color.DARK_GRAY));
+			//material.set(ColorAttribute.createDiffuse(Color.DARK_GRAY));
 		}
 		/*
 		Model model = getModelBuilder().createBox(10.0f, 10.0f, 10.0f, material,
@@ -205,8 +208,18 @@ public class MyGame extends Game {
 		*/
 
 		Model model = modelLoader.loadModel(Gdx.files.internal("Player.g3db"));
-		model.materials.first().set(ColorAttribute.createDiffuse(Color.DARK_GRAY));
+		//model.materials.first().set(ColorAttribute.createDiffuse(Color.DARK_GRAY));
 		model.materials.first().set(new BlendingAttribute(true, 1.0f));
+
+
+		Cubemap cubeMap = new Cubemap(Gdx.files.internal("cube.jpg"),
+				Gdx.files.internal("cube.jpg"),Gdx.files.internal("cube.jpg"),
+				Gdx.files.internal("cube.jpg"),Gdx.files.internal("cube.jpg"),
+				Gdx.files.internal("cube.jpg"));
+
+		Texture texture = new Texture(Gdx.files.internal("cube.jpg"));
+
+		//model.materials.first().set(new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, "a_textCoords"));//new TextureAttribute(TextureAttribute.Diffuse, texture));
 
 		return model;
 	}

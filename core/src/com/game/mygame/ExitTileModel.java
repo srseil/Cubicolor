@@ -28,6 +28,7 @@ public class ExitTileModel extends ModelInstance
 	public ExitTileModel(Model model, ExitTile data, float x, float z,
 						 int row, int column) {
 		super(model);
+		//transform.scale(10, 10, 10);
 		this.data = data;
 		this.x = x;
 		this.z = z;
@@ -47,7 +48,7 @@ public class ExitTileModel extends ModelInstance
 	}
 
 	private void updateTransform(int height) {
-		transform.setTranslation(x, (height+1) * 5.0f, z);
+		transform.setTranslation(x, (height+1) * TileModel.SIZE/2, z);
 	}
 
 	@Override

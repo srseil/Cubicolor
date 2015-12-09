@@ -42,6 +42,8 @@ public class GameScreen implements Screen {
 	private boolean moved;
 	// !!! -> eher solved als completed?
 
+	private Label fps;
+
 	public GameScreen(Level level, OrthographicCamera camera, final MyGame game) {
 		this.level = level;
 		this.camera = camera;
@@ -50,13 +52,16 @@ public class GameScreen implements Screen {
 		//--
 		//pcam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		pcam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		//pcam.setToOrtho(false);
 		//pcam.lookAt(0, 0, 0);
+		/*
 		pcam.rotate(-60.0f, 1.0f, 0.0f, 0.0f);
 		pcam.rotate(20.0f, 0.0f, 1.0f, 0.0f);
 		//pcam.zoom = 0.06f;
-		pcam.near = 1f;
-		pcam.far = 300f;
+		pcam.near = 0f;
+		pcam.far = 700f;
 		pcam.update();
+		*/
 		//--
 
 		player = new Player(level, this);
@@ -77,15 +82,19 @@ public class GameScreen implements Screen {
 		Table leftUI = new Table();
 		Table boardTable = new Table();
 		Table rightUI = new Table();
-		rootTable.add(leftUI).top().left();
+		rootTable.add(leftUI).expandY().bottom().left();
 		rootTable.add(boardTable).expand().center();
 		rootTable.add(rightUI).bottom().right();
 
 		Label message = new Label("Message", skin);
 		steps = new Label("number of steps: ", skin);
 
-		leftUI.add(message);
-		rightUI.add(steps).width(160.0f);
+		fps = new Label("FPS: ", skin);
+		rightUI.add(fps);
+		rightUI.row();
+
+		//leftUI.add(message);
+		rightUI.add(steps);
 
 		//Label test = new Label("Test", skin);
 		//Image board = new Image(gameBoard);
@@ -195,6 +204,7 @@ public class GameScreen implements Screen {
 		game.getModelBatch().render(modelInstance, environment);
 		game.getModelBatch().end();
 		*/
+		fps.setText("FPS: " + Gdx.graphics.getFramesPerSecond());
 
 		steps.setText("number of steps: " + player.getSteps());
 
