@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.math.Vector3;
 
 public class PlayerModel extends ModelInstance
-		implements AnimatedModel, AnimationController.AnimationListener {
+		implements Observer, AnimationController.AnimationListener {
 
 	private class Move {
 		int dx, dy;
@@ -100,31 +100,7 @@ public class PlayerModel extends ModelInstance
 		}
 	}
 
-	@Override
-	public void update(float delta) {
-		switch (state) {
-			case MOVING: case INDICATING:
-				moveAnimation.update(delta);
-				//System.out.println(moveAnimation.current.duration -
-				//		moveAnimation.current.time + " ");
-				if ((moveAnimation.current.duration -
-						moveAnimation.current.time) < 0.2f) {
-					controllable = true;
-					//System.out.println("controllable");
-				}
-				break;
-			case RESETTING_UP:
-				blendAnimation.update(delta);
-				moveAnimation.update(delta);
-				break;
-			case RESETTING_DOWN:
-				blendAnimation.update(-delta);
-				moveAnimation.update(delta);
-		}
-	}
-
-	@Override
-	public void updateState() {
+	@Override public void updateState() {
 		System.out.println("notified ");
 		/*
 			int dx = (int) data.getX() - dataX;
@@ -145,27 +121,6 @@ public class PlayerModel extends ModelInstance
 				dataY = (int) data.getY();
 			}
 			*/
-	}
-
-	@Override
-	public void reset() {
-		queuedMove = null;
-		controllable = false;
-
-		dataX = data.getX();
-		dataY = data.getY();
-
-		Vector3 corrected = new Vector3();
-		transform.getTranslation(corrected);
-		corrected.z -= TileModel.SIZE/2;
-
-		// Change material to standard
-		transform.setToRotation(0, 1, 0, 0);
-		transform.setToTranslation(corrected);
-
-		moveAnimation.setAnimation("Cube|Fall", 1, 1.0f, this);
-		state = State.RESETTING_UP;
-		//oldPlayerKey = TileAttributes.TColor.NONE;
 	}
 
 	@Override
@@ -198,6 +153,48 @@ public class PlayerModel extends ModelInstance
 
 	@Override
 	public void onLoop(AnimationController.AnimationDesc animation) {}
+
+	public void update(float delta) {
+		switch (state) {
+			case MOVING: case INDICATING:
+				moveAnimation.update(delta);
+				//System.out.println(moveAnimation.current.duration -
+				//		moveAnimation.current.time + " ");
+				if ((moveAnimation.current.duration -
+						moveAnimation.current.time) < 0.2f) {
+					controllable = true;
+					//System.out.println("controllable");
+				}
+				break;
+			case RESETTING_UP:
+				blendAnimation.update(delta);
+				moveAnimation.update(delta);
+				break;
+			case RESETTING_DOWN:
+				blendAnimation.update(-delta);
+				moveAnimation.update(delta);
+		}
+	}
+
+	public void reset() {
+		queuedMove = null;
+		controllable = false;
+
+		dataX = data.getX();
+		dataY = data.getY();
+
+		Vector3 corrected = new Vector3();
+		transform.getTranslation(corrected);
+		corrected.z -= TileModel.SIZE/2;
+
+		// Change material to standard
+		transform.setToRotation(0, 1, 0, 0);
+		transform.setToTranslation(corrected);
+
+		moveAnimation.setAnimation("Cube|Fall", 1, 1.0f, this);
+		state = State.RESETTING_UP;
+		//oldPlayerKey = TileAttributes.TColor.NONE;
+	}
 
 	public void move(int dx, int dy) {
 		if (data.getX() == exitModel.getColumn() &&

@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 
-public class TileModel extends ModelInstance implements AnimatedModel {
+public class TileModel extends ModelInstance implements Observer {
 
 	// TODO: Delay beim reviven des tiles auf dem der Spieler am anfang steht
 
@@ -49,6 +49,15 @@ public class TileModel extends ModelInstance implements AnimatedModel {
 	}
 
 	@Override
+	public void updateState() {
+		if (data.isDead() && state == TileModelState.ALIVE) {
+			state = TileModelState.DYING;
+		} else if (!data.isDead() &&(state == TileModelState.DEAD ||
+				state == TileModelState.DYING)) {
+			state = TileModelState.REVIVING;
+		}
+	}
+
 	public void update(float delta) {
 		if (hold)
 			return;
@@ -76,17 +85,6 @@ public class TileModel extends ModelInstance implements AnimatedModel {
 		}
 	}
 
-	@Override
-	public void updateState() {
-		if (data.isDead() && state == TileModelState.ALIVE) {
-			state = TileModelState.DYING;
-		} else if (!data.isDead() &&(state == TileModelState.DEAD ||
-				state == TileModelState.DYING)) {
-			state = TileModelState.REVIVING;
-		}
-	}
-
-	@Override
 	public void reset() {
 		if (state == TileModelState.REVIVING) {
 			fallAnimation.setAnimation("Cube|Fall", 1, -1.0f, null);

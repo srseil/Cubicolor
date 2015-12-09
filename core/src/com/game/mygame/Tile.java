@@ -1,23 +1,25 @@
 package com.game.mygame;
 
-public class Tile {
+public class Tile implements Observable {
 
-	protected AnimatedModel observer;
+	protected Observer observer;
 	protected boolean dead;
 
 	public Tile() {
 		dead = false;
 	}
 
-	public void interact(Player player) {}
-
-	public void addObserver(AnimatedModel observer) {
+	@Override
+	public void addObserver(Observer observer) {
 		this.observer = observer;
 	}
 
+	@Override
 	public void notifyObserver() {
 		observer.updateState();
 	}
+
+	public void interact(Player player) {}
 
 	public boolean isDead() {
 		return dead;

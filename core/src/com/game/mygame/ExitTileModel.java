@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import java.util.ArrayList;
 
 public class ExitTileModel extends ModelInstance
-		implements AnimatedModel, AnimationController.AnimationListener {
+		implements Observer, AnimationController.AnimationListener {
 
 	private enum State {
 		STILL,
@@ -52,20 +52,6 @@ public class ExitTileModel extends ModelInstance
 	}
 
 	@Override
-	public void update(float delta) {
-		switch (state) {
-			case MOVING_DOWN:
-				moveAnimation.update(delta);
-				break;
-			case MOVING_UP:
-				moveAnimation.update(delta);
-				break;
-			case SNAPPING:
-				moveAnimation.update(delta);
-		}
-
-	}
-
 	public void updateState() {
 		//requirement met during removing model? -> queuing
 		if (state == State.STILL &&
@@ -74,38 +60,6 @@ public class ExitTileModel extends ModelInstance
 			state = State.MOVING_DOWN;
 		}
 		height = data.getHeight();
-	}
-
-	@Override
-	public void reset() {
-		// ganz ende, während snapping
-		height = data.getHeight();
-		if (data.getRequirements().size() == requirementModels.size()) {
-			if (state == State.MOVING_DOWN) {
-				// Das oder unten >=:
-				requirementModels.remove(0); // Später unnötig
-				state = State.MOVING_UP;
-				moveAnimation.current.speed *= -1;
-			}
-		} else {
-			if (state == State.STILL) {
-				if (requirementModels.size() == 0) {
-					state = State.MOVING_UP;
-					moveAnimation.setAnimation("Cube|Fall", 1, -1.0f, this);
-				} else {
-					updateTransform(height); // basierend auf differenz
-					moveAnimation.setAnimation("Cube|Spiral", 1, -1.0f, this);
-					state = State.MOVING_UP;
-				}
-			} else if (state == State.MOVING_DOWN) {
-				requirementModels.remove(0); // Später unnötig
-				state = State.MOVING_UP;
-				moveAnimation.current.speed *= -1;
-			} else if (state == State.SNAPPING) {
-				state = State.MOVING_UP;
-				moveAnimation.current.speed *= -1;
-			}
-		}
 	}
 
 	@Override
@@ -144,6 +98,51 @@ public class ExitTileModel extends ModelInstance
 
 	@Override
 	public void onLoop(AnimationController.AnimationDesc animation) {}
+
+	public void update(float delta) {
+		switch (state) {
+			case MOVING_DOWN:
+				moveAnimation.update(delta);
+				break;
+			case MOVING_UP:
+				moveAnimation.update(delta);
+				break;
+			case SNAPPING:
+				moveAnimation.update(delta);
+		}
+
+	}
+
+	public void reset() {
+		// ganz ende, während snapping
+		height = data.getHeight();
+		if (data.getRequirements().size() == requirementModels.size()) {
+			if (state == State.MOVING_DOWN) {
+				// Das oder unten >=:
+				requirementModels.remove(0); // Später unnötig
+				state = State.MOVING_UP;
+				moveAnimation.current.speed *= -1;
+			}
+		} else {
+			if (state == State.STILL) {
+				if (requirementModels.size() == 0) {
+					state = State.MOVING_UP;
+					moveAnimation.setAnimation("Cube|Fall", 1, -1.0f, this);
+				} else {
+					updateTransform(height); // basierend auf differenz
+					moveAnimation.setAnimation("Cube|Spiral", 1, -1.0f, this);
+					state = State.MOVING_UP;
+				}
+			} else if (state == State.MOVING_DOWN) {
+				requirementModels.remove(0); // Später unnötig
+				state = State.MOVING_UP;
+				moveAnimation.current.speed *= -1;
+			} else if (state == State.SNAPPING) {
+				state = State.MOVING_UP;
+				moveAnimation.current.speed *= -1;
+			}
+		}
+	}
 
 	public int getRow() {
 		return row;

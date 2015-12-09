@@ -1,9 +1,6 @@
 package com.game.mygame;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-
-public class Player {
+public class Player implements Observable {
 
 	private Level level;
 	private int x, y;
@@ -11,7 +8,7 @@ public class Player {
 	private TileAttributes.TColor key;
 	private GameScreen gameScreen;
 	private boolean completed;
-	private AnimatedModel observer;
+	private Observer observer;
 
 	public Player(Level level, GameScreen gameScreen) {
 		this.level = level;
@@ -49,6 +46,16 @@ public class Player {
 		}
 	}
 
+	@Override
+	public void addObserver(Observer observer) {
+		this.observer = observer;
+	}
+
+	@Override
+	public void notifyObserver() {
+		observer.updateState();
+	}
+
 	private void interact() {
 		level.getMatrix()[y][x].interact(this);
 		notifyObserver();
@@ -74,14 +81,6 @@ public class Player {
 
 	public void fulfillRequirement(TileAttributes.TColor color) {
 		level.fulfillRequirement(color);
-	}
-
-	public void addObserver(AnimatedModel observer) {
-		this.observer = observer;
-	}
-
-	public void notifyObserver() {
-		observer.updateState();
 	}
 
 	public int getSteps() {
