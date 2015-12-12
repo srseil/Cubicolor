@@ -5,15 +5,20 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.DelayAction;
+import com.badlogic.gdx.utils.Array;
 import com.sun.corba.se.impl.orbutil.graph.Graph;
 
 public class GameBoard extends Actor {
@@ -22,6 +27,7 @@ public class GameBoard extends Actor {
 	// animationcontroller kann man nicht resetten? null und neu zuweisen geht nicht.
 	// ---> geht schon, aber unnötig. einfach reset methode?
 	// player model hat bei fall animation verrutschten origin punkt
+	// fbx-conv g3dj lädt nicht, fehler mit skalierung
 
 	private MyGame game;
 	private OrthographicCamera camera;
@@ -34,6 +40,16 @@ public class GameBoard extends Actor {
 
 	private int firstRowRevived;
 	private boolean resetting;
+
+
+
+
+	private TextureAtlas atlas;
+	private Array<TextureAtlas.AtlasRegion> regions;
+	private float t;
+	private int i;
+	private Model m;
+	private ModelInstance mi;
 
 	public GameBoard(Level level, Player player, MyGame game) {
 		this.game = game;
@@ -49,7 +65,11 @@ public class GameBoard extends Actor {
 
 		environment = new Environment();
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, .6f, .6f, .6f, 1f));
-		environment.add(new DirectionalLight().set(0.6f, 0.6f, 0.6f, -0.3f, -1f, 1f));
+		//environment.add(new DirectionalLight().set(0.6f, 0.6f, 0.6f, -0.3f, -1f, 1f));
+		DirectionalLight directionalLight = new DirectionalLight();
+		directionalLight.setDirection(-0.15f, -1.0f, -0.6f);
+		directionalLight.setColor(0.3f, 0.3f, 0.3f, 1.0f);
+		environment.add(directionalLight);
 
 		float viewportHeight = (float) (Math.cos(Math.toRadians(35.0f)) *
 				(Math.sqrt(Math.pow(2 * level.getRows(), 2) +
@@ -74,6 +94,15 @@ public class GameBoard extends Actor {
 
 		resetting = false;
 		firstRowRevived = -1;
+
+
+		atlas = new TextureAtlas(Gdx.files.internal("anim/anim.atlas"));
+		regions = atlas.getRegions();
+		t = 1.0f;
+		i = 0;
+		m = game.modelLoader.loadModel(Gdx.files.internal("cubemap.g3db"));
+		m.materials.first().set(new BlendingAttribute(true, 1.0f));
+		mi = new ModelInstance(m, 2, 2, -4);
 	}
 
 	private TileModel[][] parseMatrix(Tile[][] matrix) {
@@ -124,8 +153,15 @@ public class GameBoard extends Actor {
 	public void draw(Batch batch, float parentAlpha) {
 		// Batch end, begin necessary?
 		batch.end();
+		//Gdx.gl.glHint(GL20.GL_CULL_FACE_MODE, GL20.GL_NONE);
+		//Gdx.gl.glCullFace(GL20.GL_NONE);
+		//Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+		//Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA_SATURATE, GL20.GL_ONE);
+
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
+
 		game.getModelBatch().begin(camera);
 
 		for (int i = 0; i < modelMatrix.length; i++) {
@@ -148,6 +184,27 @@ public class GameBoard extends Actor {
 		game.getModelBatch().render(exitModel, environment);
 
 		playerModel.update(Gdx.graphics.getDeltaTime());
+
+
+		game.getModelBatch().render(mi, environment);
+
+		t += Gdx.graphics.getDeltaTime();
+		if (t >= 1.0f/30.0f){
+			t -= 1.0f/30.0f;
+			i = (i+1) % regions.size;
+			//i = (i+1) % 2;
+			//System.out.println(i);
+			//regions.get(4).offsetY = 50.0f * i;
+			//regions.get(4).(50.0f);
+			//regions.get(i).scroll(50.0f, 50.0f);//.setU2(50.0f * i);//.offsetX = 50.0f * i;
+
+			//playerModel.materials.first().get(TextureAttribute.class, TextureAttribute.Diffuse).set(regions.get(i));
+
+			//playerModel.materials.first().get(TextureAttribute.class, TextureAttribute.Diffuse).offsetV = 50.0f * i;
+		}
+
+
+
 		game.getModelBatch().render(playerModel, environment);
 
 		game.getModelBatch().end();

@@ -9,10 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.CubemapAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.*;
 import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
 import com.badlogic.gdx.graphics.g3d.model.data.ModelData;
 import com.badlogic.gdx.graphics.g3d.model.data.ModelMaterial;
@@ -35,7 +32,7 @@ public class MyGame extends Game {
 	private ModelBatch modelBatch;
 
 	private LevelLoader levelLoader;
-	private ModelLoader modelLoader;
+	public ModelLoader modelLoader;
 
 	private MenuScreen menuScreen;
 	private GameScreen gameScreen;
@@ -208,7 +205,7 @@ public class MyGame extends Game {
 		*/
 
 		Model model = modelLoader.loadModel(Gdx.files.internal("Player.g3db"));
-		//model.materials.first().set(ColorAttribute.createDiffuse(Color.DARK_GRAY));
+		model.materials.first().set(ColorAttribute.createDiffuse(Color.DARK_GRAY));
 		model.materials.first().set(new BlendingAttribute(true, 1.0f));
 
 
@@ -218,6 +215,10 @@ public class MyGame extends Game {
 				Gdx.files.internal("cube.jpg"));
 
 		Texture texture = new Texture(Gdx.files.internal("cube.jpg"));
+
+		model.materials.first().set(new IntAttribute(IntAttribute.CullFace, Gdx.gl.GL_FALSE));
+		//model.materials.first().set(new CubemapAttribute());
+
 
 		//model.materials.first().set(new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, "a_textCoords"));//new TextureAttribute(TextureAttribute.Diffuse, texture));
 
