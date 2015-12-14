@@ -2,10 +2,10 @@ package com.game.mygame;
 
 public class LockTile extends Tile {
 
-	private TileAttributes.TColor lockColor;
+	private TileColor lockColor;
 	private boolean locked;
 
-	public LockTile(TileAttributes.TColor lockColor) {
+	public LockTile(TileColor lockColor) {
 		super();
 		this.lockColor = lockColor;
 		this.locked = true;
@@ -24,7 +24,7 @@ public class LockTile extends Tile {
 		locked = true;
 	}
 
-	public TileAttributes.TColor getLockColor() {
+	public TileColor getLockColor() {
 		return lockColor;
 	}
 

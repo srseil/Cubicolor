@@ -6,28 +6,28 @@ public class ExitTile extends Tile {
 
 	private int height;
 	private int defaultHeight;
-	private EnumSet<TileAttributes.TColor> requirements;
+	private EnumSet<TileColor> requirements;
 
-	public ExitTile(EnumSet<TileAttributes.TColor> requirements) {
+	public ExitTile(EnumSet<TileColor> requirements) {
 		super();
 		this.requirements = requirements;
 		this.defaultHeight = requirements.size();
 		this.height = defaultHeight;
 	}
 
-	public void removeRequirement(TileAttributes.TColor req) {
+	public void removeRequirement(TileColor req) {
 		requirements.remove(req);
 		height--;
 		notifyObserver();
 	}
 
-	public void reset(EnumSet<TileAttributes.TColor> requirements) {
+	public void reset(EnumSet<TileColor> requirements) {
 		this.requirements = requirements;
 		height = defaultHeight;
 		// no notify.
 	}
 
-	public EnumSet<TileAttributes.TColor> getRequirements() {
+	public EnumSet<TileColor> getRequirements() {
 		return requirements;
 	}
 

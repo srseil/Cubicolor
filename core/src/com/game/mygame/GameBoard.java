@@ -59,7 +59,7 @@ public class GameBoard extends Actor {
 		modelMatrix = parseMatrix(level.getMatrix());
 
 		playerModel = new PlayerModel(
-				game.getPlayerModel(TileAttributes.TColor.NONE),
+				game.getPlayerModel(TileColor.NONE),
 				player, -width/2, height/2, modelMatrix, exitModel);
 		player.addObserver(playerModel);
 
@@ -186,7 +186,7 @@ public class GameBoard extends Actor {
 		playerModel.update(Gdx.graphics.getDeltaTime());
 
 
-		game.getModelBatch().render(mi, environment);
+		//game.getModelBatch().render(mi, environment);
 
 		t += Gdx.graphics.getDeltaTime();
 		if (t >= 1.0f/30.0f){
@@ -205,6 +205,7 @@ public class GameBoard extends Actor {
 
 
 
+		//System.out.println(playerModel.materials.first().get(TextureAttribute.class, TextureAttribute.Diffuse).uvIndex);
 		game.getModelBatch().render(playerModel, environment);
 
 		game.getModelBatch().end();

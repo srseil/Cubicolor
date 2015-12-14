@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.math.Vector3;
 
+import java.util.EnumMap;
+
 public class PlayerModel extends ModelInstance
 		implements Observer, AnimationController.AnimationListener {
 
@@ -23,17 +25,24 @@ public class PlayerModel extends ModelInstance
 		MOVING,
 		INDICATING,
 		RESETTING_UP,
-		RESETTING_DOWN
+		RESETTING_DOWN,
+		COLORING,
+		UNCOLORING
 	}
 
 	private Player data;
 	private State state;
-	private BlendAnimation blendAnimation;
 	private AnimationController moveAnimation;
+	private BlendAnimation blendAnimation;
+	private TextureAnimation textureAnimation;
+
+	private EnumMap<TileColor, TextureAnimation> textureAnimations;
+
 	private TileModel[][] modelMatrix;
 	private ExitTileModel exitModel;
 	private float baseX, baseY;
 	private int dataX, dataY;
+	private TileColor key;
 	private Move queuedMove;
 	private boolean controllable;
 
@@ -51,8 +60,16 @@ public class PlayerModel extends ModelInstance
 		moveAnimation.setAnimation("Cube|Fall");
 		blendAnimation = new BlendAnimation(this,
 				moveAnimation.current.duration);
+		//textureAnimation = new TextureAnimation("player/anim.atlas", this, 3.0f);
+
+		textureAnimations = new EnumMap<>(TileColor.class);
+		textureAnimations.put(TileColor.RED,
+				new TextureAnimation("player_animation/player_animation.atlas", this, 1.0f));
+		textureAnimation = textureAnimations.get(TileColor.RED);
+
 		dataX = data.getX();
 		dataY = data.getY();
+		key = data.getKey();
 		controllable = true;
 		updateTransform(0, 0);
 	}
@@ -101,7 +118,7 @@ public class PlayerModel extends ModelInstance
 	}
 
 	@Override public void updateState() {
-		System.out.println("notified ");
+		//System.out.println("notified ");
 		/*
 			int dx = (int) data.getX() - dataX;
 			int dy = (int) data.getY() - dataY;
@@ -130,6 +147,24 @@ public class PlayerModel extends ModelInstance
 			moveAnimation.setAnimation("Cube|Movement");
 			transform.setToRotation(0, 1, 0, 0);
 			updateTransform(0, 0);
+
+			if (data.getKey() != key) {
+				System.out.println("PLAYER: coloring");
+				controllable = false;
+				key = data.getKey();
+				if (key == TileColor.NONE) {
+					System.out.println("none color");
+					textureAnimation.resetReverse();
+					state = State.UNCOLORING;
+				} else {
+					textureAnimation = textureAnimations.get(key);
+					textureAnimation.reset();
+					state = State.COLORING;
+				}
+				queuedMove = null;
+				return;
+			}
+
 			triggerQueuedMove();
 		} else if (animation.animation.id.equals("Cube|Indication")) {
 			state = State.STILL;
@@ -173,6 +208,25 @@ public class PlayerModel extends ModelInstance
 			case RESETTING_DOWN:
 				blendAnimation.update(-delta);
 				moveAnimation.update(delta);
+				break;
+			case COLORING:
+				//textureAnimations.get(key).update(delta);
+				textureAnimation.update(delta);
+				if (!textureAnimation.isInAction()) {
+					// set the material color or something?
+					state = State.STILL;
+					controllable = true;
+				}
+				break;
+			case UNCOLORING:
+				//textureAnimations.get(key).update(-delta);
+				textureAnimation.update(-delta);
+				System.out.println("uncoloring...");
+				if (!textureAnimation.isInAction()) {
+					// set the material color or something?
+					state = State.STILL;
+					controllable = true;
+				}
 		}
 	}
 
@@ -193,7 +247,7 @@ public class PlayerModel extends ModelInstance
 
 		moveAnimation.setAnimation("Cube|Fall", 1, 1.0f, this);
 		state = State.RESETTING_UP;
-		//oldPlayerKey = TileAttributes.TColor.NONE;
+		//oldPlayerKey = TileColor.NONE;
 	}
 
 	public void move(int dx, int dy) {

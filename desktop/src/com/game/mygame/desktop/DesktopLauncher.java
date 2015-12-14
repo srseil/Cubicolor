@@ -18,8 +18,15 @@ public class DesktopLauncher {
 		//cfg.foregroundFPS = 0;
 		//cfg.backgroundFPS = 0;
 
-		TexturePacker.process("/home/stefan/libGDX/MyGame/android/assets/anim",
-				"/home/stefan/libGDX/MyGame/android/assets/anim", "anim");
+		TexturePacker.Settings settings = new TexturePacker.Settings();
+		settings.paddingX = 0;
+		settings.paddingY = 0;
+		settings.maxHeight = 512;
+		settings.maxWidth = 512;
+		TexturePacker.process(settings, "/home/stefan/libGDX/MyGame/android/assets/player",
+				"/home/stefan/libGDX/MyGame/android/assets/player", "anim");
+		TexturePacker.process(settings, "/home/stefan/libGDX/MyGame/android/assets/player_animation",
+				"/home/stefan/libGDX/MyGame/android/assets/player_animation", "player_animation");
 
 		new LwjglApplication(new MyGame(), cfg);
 	}

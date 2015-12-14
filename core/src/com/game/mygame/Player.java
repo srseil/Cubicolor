@@ -5,7 +5,7 @@ public class Player implements Observable {
 	private Level level;
 	private int x, y;
 	private int steps;
-	private TileAttributes.TColor key;
+	private TileColor key;
 	private GameScreen gameScreen;
 	private boolean completed;
 	private Observer observer;
@@ -16,7 +16,7 @@ public class Player implements Observable {
 		x = level.getStartColumn();
 		y = level.getStartRow();
 		steps = 0;
-		key = TileAttributes.TColor.NONE;
+		key = TileColor.NONE;
 		completed = false;
 	}
 
@@ -65,21 +65,21 @@ public class Player implements Observable {
 		x = level.getStartColumn();
 		y = level.getStartRow();
 		steps = 0;
-		key = TileAttributes.TColor.NONE;
+		key = TileColor.NONE;
 		completed = false;
 	}
 
-	public void takeKey(TileAttributes.TColor color) {
+	public void takeKey(TileColor color) {
 		key = color;
 		notifyObserver();
 	}
 
 	public void removeKey() {
-		key = TileAttributes.TColor.NONE;
+		key = TileColor.NONE;
 		notifyObserver();
 	}
 
-	public void fulfillRequirement(TileAttributes.TColor color) {
+	public void fulfillRequirement(TileColor color) {
 		level.fulfillRequirement(color);
 	}
 
@@ -99,7 +99,7 @@ public class Player implements Observable {
 		return y;
 	}
 
-	public TileAttributes.TColor getKey() {
+	public TileColor getKey() {
 		return key;
 	}
 

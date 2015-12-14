@@ -2,24 +2,15 @@ package com.game.mygame;
 
 import com.badlogic.gdx.graphics.Color;
 
-public class TileAttributes {
+public enum TileColor {
 
-	public enum TColor {
-		RED,
-		GREEN,
-		BLUE,
-		YELLOW,
-		NONE
-	}
+	RED,
+	GREEN,
+	BLUE,
+	YELLOW,
+	NONE;
 
-	public enum TKind {
-		NORMAL,
-		KEY,
-		LOCK,
-		EXIT
-	}
-
-	public static Color getGDXColor(TileColor color) {
+	public static Color getGdxColor(TileColor color) {
 		switch (color) {
 			case RED:
 				return new Color(1.0f, 0.0f, 0.0f, 1.0f);
@@ -33,5 +24,4 @@ public class TileAttributes {
 				return new Color(0.0f, 0.0f, 0.0f, 1.0f);
 		}
 	}
-
 }

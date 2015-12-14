@@ -9,7 +9,7 @@ public class Level {
 	private int number;
 	private int optimal;
 	private int startRow, startColumn;
-	private EnumSet<TileAttributes.TColor> exitRequirements;
+	private EnumSet<TileColor> exitRequirements;
 
 	public int rows, columns;
 	public Tile[][] matrix;
@@ -17,7 +17,7 @@ public class Level {
 
 	public Level(Difficulty difficulty, int number, int optimal,
 				 int startRow, int startColumn,
-				 EnumSet<TileAttributes.TColor> exitRequirements,
+				 EnumSet<TileColor> exitRequirements,
 				 Tile[][] matrix) {
 		this.difficulty = difficulty;
 		this.number = number;
@@ -41,7 +41,7 @@ public class Level {
 	}
 
 	public void reset() {
-		EnumSet<TileAttributes.TColor> reqs = exitRequirements.clone();
+		EnumSet<TileColor> reqs = exitRequirements.clone();
 		exit.reset(reqs);
 
 		for (int i = 0; i < rows; i++) {
@@ -74,7 +74,7 @@ public class Level {
 		}
 	}
 
-	public void fulfillRequirement(TileAttributes.TColor color) {
+	public void fulfillRequirement(TileColor color) {
 		exit.removeRequirement(color);
 	}
 

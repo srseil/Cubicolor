@@ -2,10 +2,10 @@ package com.game.mygame;
 
 public class KeyTile extends Tile {
 
-	private TileAttributes.TColor keyColor;
+	private TileColor keyColor;
 	private boolean keyAvailable;
 
-	public KeyTile(TileAttributes.TColor color) {
+	public KeyTile(TileColor color) {
 		super();
 		this.keyColor = color;
 		keyAvailable = true;
@@ -23,7 +23,7 @@ public class KeyTile extends Tile {
 		// no notify.
 	}
 
-	public TileAttributes.TColor getKeyColor() {
+	public TileColor getKeyColor() {
 		return keyColor;
 	}
 

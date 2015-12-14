@@ -63,21 +63,21 @@ public class MyGame extends Game {
 
 		tileModel = createTileModel(TileAttributes.TKind.NORMAL, null);
 		keyTileRedModel = createTileModel(TileAttributes.TKind.KEY,
-				TileAttributes.TColor.RED);
+				TileColor.RED);
 		keyTileGreenModel = createTileModel(TileAttributes.TKind.KEY,
-				TileAttributes.TColor.GREEN);
+				TileColor.GREEN);
 		keyTileBlueModel = createTileModel(TileAttributes.TKind.KEY,
-				TileAttributes.TColor.BLUE);
+				TileColor.BLUE);
 		keyTileYellowModel = createTileModel(TileAttributes.TKind.KEY,
-				TileAttributes.TColor.YELLOW);
+				TileColor.YELLOW);
 		lockTileRedModel = createTileModel(TileAttributes.TKind.LOCK,
-				TileAttributes.TColor.RED);
+				TileColor.RED);
 		lockTileGreenModel = createTileModel(TileAttributes.TKind.LOCK,
-				TileAttributes.TColor.GREEN);
+				TileColor.GREEN);
 		lockTileBlueModel = createTileModel(TileAttributes.TKind.LOCK,
-				TileAttributes.TColor.BLUE);
+				TileColor.BLUE);
 		lockTileYellowModel = createTileModel(TileAttributes.TKind.LOCK,
-				TileAttributes.TColor.YELLOW);
+				TileColor.YELLOW);
 
 
 
@@ -94,11 +94,11 @@ public class MyGame extends Game {
 				VertexAttributes.Usage.Position
 				| VertexAttributes.Usage.Normal);
 		*/
-		playerModel = createPlayerModel(TileAttributes.TColor.NONE);
-		playerRedModel = createPlayerModel(TileAttributes.TColor.RED);
-		playerGreenModel = createPlayerModel(TileAttributes.TColor.GREEN);
-		playerBlueModel = createPlayerModel(TileAttributes.TColor.BLUE);
-		playerYellowModel = createPlayerModel(TileAttributes.TColor.YELLOW);
+		playerModel = createPlayerModel(TileColor.NONE);
+		playerRedModel = createPlayerModel(TileColor.RED);
+		playerGreenModel = createPlayerModel(TileColor.GREEN);
+		playerBlueModel = createPlayerModel(TileColor.BLUE);
+		playerYellowModel = createPlayerModel(TileColor.YELLOW);
 
 
 
@@ -161,7 +161,7 @@ public class MyGame extends Game {
 	}
 
 	private Model createTileModel(TileAttributes.TKind kind,
-								  TileAttributes.TColor color) {
+								  TileColor color) {
 		Material material = new Material();
 		Model model = modelLoader.loadModel(Gdx.files.internal("Tile.g3db"));
 		model.materials.first().set(new BlendingAttribute(true, 1.0f));
@@ -190,9 +190,9 @@ public class MyGame extends Game {
 		return model;
 	}
 
-	private Model createPlayerModel(TileAttributes.TColor key) {
+	private Model createPlayerModel(TileColor key) {
 		Material material = new Material();
-		if (key != TileAttributes.TColor.NONE) {
+		if (key != TileColor.NONE) {
 			material.set(ColorAttribute.createDiffuse(
 					TileAttributes.getGDXColor(key)));
 		} else {
@@ -216,7 +216,9 @@ public class MyGame extends Game {
 
 		Texture texture = new Texture(Gdx.files.internal("cube.jpg"));
 
-		model.materials.first().set(new IntAttribute(IntAttribute.CullFace, Gdx.gl.GL_FALSE));
+		//model.materials.first().set(new IntAttribute(IntAttribute.CullFace, Gdx.gl.GL_FALSE));
+		System.out.println("TEXTURE: " + model.materials.first().has(TextureAttribute.Diffuse));
+		//model.materials.first().set(new TextureAttribute(TextureAttribute.Diffuse));
 		//model.materials.first().set(new CubemapAttribute());
 
 
@@ -261,7 +263,7 @@ public class MyGame extends Game {
 		return tileModel;
 	}
 
-	public Model getKeyTileModel(TileAttributes.TColor color) {
+	public Model getKeyTileModel(TileColor color) {
 		switch (color) {
 			case RED: return keyTileRedModel;
 			case GREEN: return keyTileGreenModel;
@@ -271,7 +273,7 @@ public class MyGame extends Game {
 		}
 	}
 
-	public Model getLockTileModel(TileAttributes.TColor color) {
+	public Model getLockTileModel(TileColor color) {
 		switch (color) {
 			case RED: return lockTileRedModel;
 			case GREEN: return lockTileGreenModel;
@@ -281,7 +283,7 @@ public class MyGame extends Game {
 		}
 	}
 
-	public Model getPlayerModel(TileAttributes.TColor key) {
+	public Model getPlayerModel(TileColor key) {
 		switch (key) {
 			case RED: return playerRedModel;
 			case GREEN: return playerGreenModel;

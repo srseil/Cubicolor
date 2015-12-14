@@ -23,7 +23,7 @@ public class LevelLoader {
 
 		Difficulty difficulty;
 		int optimal, startRow, startColumn;
-		EnumSet<TileAttributes.TColor> exitRequirements;
+		EnumSet<TileColor> exitRequirements;
 		Tile[][] matrix;
 
 		try {
@@ -41,9 +41,9 @@ public class LevelLoader {
 			startColumn = Integer.parseInt(parts[1]);
 
 			char[] chars = root.get("requirements").toCharArray();
-			exitRequirements = EnumSet.noneOf(TileAttributes.TColor.class);
+			exitRequirements = EnumSet.noneOf(TileColor.class);
 			for (int i = 0; i < chars.length; i++) {
-				TileAttributes.TColor color = parseColor(chars[i]);
+				TileColor color = parseColor(chars[i]);
 				exitRequirements.add(color);
 			}
 
@@ -76,22 +76,22 @@ public class LevelLoader {
 	}
 
 
-	private TileAttributes.TColor parseColor(char identifier) throws IOException {
+	private TileColor parseColor(char identifier) throws IOException {
 		switch (identifier) {
 			case 'R':
-				return TileAttributes.TColor.RED;
+				return TileColor.RED;
 			case 'G':
-				return TileAttributes.TColor.GREEN;
+				return TileColor.GREEN;
 			case 'B':
-				return TileAttributes.TColor.BLUE;
+				return TileColor.BLUE;
 			case 'Y':
-				return TileAttributes.TColor.YELLOW;
+				return TileColor.YELLOW;
 			default:
 				throw new IOException();
 		}
 	}
 
-	private Tile parseTile(char identifier, EnumSet<TileAttributes.TColor> exitReqs) throws IOException {
+	private Tile parseTile(char identifier, EnumSet<TileColor> exitReqs) throws IOException {
 		switch (identifier) {
 			case '0':
 				return new EmptyTile();
@@ -100,21 +100,21 @@ public class LevelLoader {
 			case 'E':
 				return new ExitTile(exitReqs.clone());
 			case 'R':
-				return new LockTile(TileAttributes.TColor.RED);
+				return new LockTile(TileColor.RED);
 			case 'r':
-				return new KeyTile(TileAttributes.TColor.RED);
+				return new KeyTile(TileColor.RED);
 			case 'G':
-				return new LockTile(TileAttributes.TColor.GREEN);
+				return new LockTile(TileColor.GREEN);
 			case 'g':
-				return new KeyTile(TileAttributes.TColor.GREEN);
+				return new KeyTile(TileColor.GREEN);
 			case 'B':
-				return new LockTile(TileAttributes.TColor.BLUE);
+				return new LockTile(TileColor.BLUE);
 			case 'b':
-				return new KeyTile(TileAttributes.TColor.BLUE);
+				return new KeyTile(TileColor.BLUE);
 			case 'Y':
-				return new LockTile(TileAttributes.TColor.YELLOW);
+				return new LockTile(TileColor.YELLOW);
 			case 'y':
-				return new KeyTile(TileAttributes.TColor.YELLOW);
+				return new KeyTile(TileColor.YELLOW);
 			default:
 				throw new IOException();
 		}
