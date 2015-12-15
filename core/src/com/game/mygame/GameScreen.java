@@ -73,7 +73,12 @@ public class GameScreen implements Screen {
 	@Override
 	public void render(float delta) {
 		// Set background color.
-		Gdx.gl.glClearColor(0.85f, 0.8f, 0.7f, 1);
+		//Gdx.gl.glClearColor(0.85f, 0.8f, 0.7f, 1);
+		Gdx.gl.glClearColor(0.949f, 0.941f, 0.925f, 1.0f);
+
+		//Gdx.gl.glClearColor();
+
+		//Gdx.gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
