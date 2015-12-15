@@ -41,14 +41,14 @@ public class TextureAnimation {
 		if (transitionCurrentTime >= transitionTargetTime) {
 			//region = (region+1) % regions.size;
 			region += Math.signum(delta);
-			System.out.println("ANIMATION REGION: " + region + ", delta: " + delta);
+			//System.out.println("ANIMATION REGION: " + region + ", delta: " + delta);
 			if (region >= regions.size || region < 0) {
 				inAction = false;
 				transitionCurrentTime = 0.0f;
 				return;
 			}
 			//model.materials.first().get(TextureAttribute.class, TextureAttribute.Diffuse).set()
-			System.out.println("REGION: " + region + " _ " + regions.get(region).toString());
+			//System.out.println("REGION: " + region + " _ " + regions.get(region).toString());
 			//texture = model.materials.first().get(
 			//		TextureAttribute.class, TextureAttribute.Diffuse);
 			texture.set(regions.get(region));
@@ -56,15 +56,18 @@ public class TextureAnimation {
 		}
 	}
 
-	public void reset() {
+	public void reset(boolean inAction) {
 		region = 0;
 		transitionCurrentTime = 0.0f;
-		inAction = true;
+		texture.set(regions.get(region));
+		this.inAction = inAction;
 	}
 
-	public void resetReverse() {
+	public void resetReverse(boolean inAction) {
+		region = regions.size - 1;
 		transitionCurrentTime = 0.0f;
-		inAction = true;
+		texture.set(regions.get(region));
+		this.inAction = inAction;
 	}
 
 	public boolean isInAction() {

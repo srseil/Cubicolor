@@ -10,6 +10,8 @@ import java.util.EnumMap;
 public class PlayerModel extends ModelInstance
 		implements Observer, AnimationController.AnimationListener {
 
+	// Keep isControllable in this class, no need for extra getter for Gamescreen...
+
 	private class Move {
 		int dx, dy;
 		boolean moved;
@@ -148,17 +150,18 @@ public class PlayerModel extends ModelInstance
 			transform.setToRotation(0, 1, 0, 0);
 			updateTransform(0, 0);
 
-			if (data.getKey() != key) {
-				System.out.println("PLAYER: coloring");
+			// Warum die beiden letzten checks? funktinioniert, weiß aber nicht genau warum...
+			if (data.getKey() != key && data.getX() == dataX && data.getY() == dataY) {
+				//System.out.println("PLAYER: coloring");
 				controllable = false;
 				key = data.getKey();
 				if (key == TileColor.NONE) {
-					System.out.println("none color");
-					textureAnimation.resetReverse();
+					//System.out.println("none color");
+					textureAnimation.resetReverse(true);
 					state = State.UNCOLORING;
 				} else {
 					textureAnimation = textureAnimations.get(key);
-					textureAnimation.reset();
+					textureAnimation.reset(true);
 					state = State.COLORING;
 				}
 				queuedMove = null;
@@ -172,10 +175,11 @@ public class PlayerModel extends ModelInstance
 			triggerQueuedMove();
 		} else if (animation.animation.id.equals("Cube|Fall")) {
 			if (state == State.RESETTING_UP) {
-				System.out.println("up done");
+				//System.out.println("up done");
 				state = State.RESETTING_DOWN;
 				//playerModel.transform.setToRotation(0, 1, 0, 0);
 				updateTransform(0, 0.5f);
+				textureAnimation.reset(false);
 				moveAnimation.setAnimation("Cube|Fall", 1, -1.0f, this);
 				blendAnimation.reset(0.0f);
 			} else if (state == State.RESETTING_DOWN) {
@@ -211,6 +215,7 @@ public class PlayerModel extends ModelInstance
 				break;
 			case COLORING:
 				//textureAnimations.get(key).update(delta);
+				System.out.println("coloring...");
 				textureAnimation.update(delta);
 				if (!textureAnimation.isInAction()) {
 					// set the material color or something?
@@ -236,6 +241,7 @@ public class PlayerModel extends ModelInstance
 
 		dataX = data.getX();
 		dataY = data.getY();
+		key = data.getKey();
 
 		Vector3 corrected = new Vector3();
 		transform.getTranslation(corrected);
