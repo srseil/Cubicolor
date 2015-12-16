@@ -28,7 +28,6 @@ public class MyGame extends Game {
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
 	private ShapeRenderer shapeRenderer;
-	private BitmapFont font;
 
 	private ModelBuilder modelBuilder;
 	private ModelBatch modelBatch;
@@ -57,11 +56,17 @@ public class MyGame extends Game {
 	private Model playerBlueModel;
 	private Model playerYellowModel;
 
+	private BitmapFont font;
+	private BitmapFont bitmapOSR30;
+	private BitmapFont bitmapOSR60;
+
 	public void create() {
 		modelLoader = new G3dModelLoader(new UBJsonReader());
 		modelBatch = new ModelBatch(new DefaultShaderProvider());
 		modelBuilder = new ModelBuilder();
 
+		bitmapOSR30 = new BitmapFont(Gdx.files.internal("OldStandard-Regular-30.fnt"));
+		bitmapOSR60 = new BitmapFont(Gdx.files.internal("OldStandard-Regular-60.fnt"));
 
 		tileModel = createTileModel(TileAttributes.TKind.NORMAL, null);
 		keyTileRedModel = createTileModel(TileAttributes.TKind.KEY,
@@ -109,7 +114,7 @@ public class MyGame extends Game {
 
 		batch = new SpriteBatch();
 		shapeRenderer = new ShapeRenderer();
-		font = new BitmapFont();
+		font = new BitmapFont(Gdx.files.internal("OldStandard-Regular-30.fnt"));
 
 		levelLoader = new LevelLoader();
 		Level level;
@@ -245,6 +250,17 @@ public class MyGame extends Game {
 
 	public BitmapFont getFont() {
 		return font;
+	}
+
+	public BitmapFont getBitmapFont(String name) {
+		switch (name) {
+			case "OldStandard-Regular-30":
+				return bitmapOSR30;
+			case "OldStandard-Regular-60":
+				return bitmapOSR60;
+			default:
+				return null;
+		}
 	}
 
 	public MenuScreen getMenuScreen() {

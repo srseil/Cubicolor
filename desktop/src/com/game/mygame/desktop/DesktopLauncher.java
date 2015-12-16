@@ -23,9 +23,9 @@ public class DesktopLauncher {
 		settings.paddingY = 0;
 		settings.maxHeight = 512;
 		settings.maxWidth = 512;
-		TexturePacker.process(settings, "/home/stefan/libGDX/MyGame/android/assets/player",
+		TexturePacker.processIfModified(settings, "/home/stefan/libGDX/MyGame/android/assets/player",
 				"/home/stefan/libGDX/MyGame/android/assets/player", "anim");
-		TexturePacker.process(settings, "/home/stefan/libGDX/MyGame/android/assets/player_animation",
+		TexturePacker.processIfModified(settings, "/home/stefan/libGDX/MyGame/android/assets/player_animation",
 				"/home/stefan/libGDX/MyGame/android/assets/player_animation", "player_animation");
 
 		new LwjglApplication(new MyGame(), cfg);

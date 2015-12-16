@@ -3,10 +3,13 @@ package com.game.mygame;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
@@ -17,11 +20,18 @@ public class GameScreen implements Screen {
 	private Player player;
 	private GameBoard gameBoard;
 
+	private Stage boardStage;
+	private Stage interfaceStage;
+
 	private Stage stage;
-	private Label steps;
 	private PauseDialog pauseDialog;
 	private WinDialog completeDialogNormal;
 	private WinDialog completeDialogOptimal;
+	private Label levelLabel;
+	private Label difficultyLabel;
+	private Label stepsLabel;
+	private String stepsText;
+	private int steps;
 
 	private boolean paused;
 	private boolean pauseClosed;
@@ -39,30 +49,88 @@ public class GameScreen implements Screen {
 
 		stage = new Stage(new ExtendViewport(800, 600));
 
+		boardStage = new Stage(new ExtendViewport(800, 600));
+		boardStage.addActor(gameBoard);
+		interfaceStage = new Stage(new ExtendViewport(800, 600));
+
+		/*
+		Stack stack = new Stack();
+		stack.add(gameBoard);
+
+		Group rootGroup = new Group();
+		rootGroup.addActor(gameBoard);
+		//stage.addActor(gameBoard);
+		*/
+
 		Table rootTable = new Table();
 		rootTable.setFillParent(true);
-		rootTable.setDebug(true);
-		stage.addActor(rootTable);
+		//rootTable.setDebug(true);
+		//stage.addActor(rootTable);
+		//rootGroup.addActor(rootTable);
+		//stack.add(rootTable);
+		//stage.addActor(stack);
+		interfaceStage.addActor(rootTable);
 
 		Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
 
-		Table leftUI = new Table();
-		Table boardTable = new Table();
-		Table rightUI = new Table();
-		rootTable.add(leftUI).expandY().bottom().left();
-		rootTable.add(boardTable).expand().center();
-		rootTable.add(rightUI).bottom().right();
 
-		Label message = new Label("Message", skin);
-		leftUI.add(message);
+		//Group bg = new Group();
+		//Group fg = new Group();
+		//Table bg = new Table();
+		//bg.setFillParent(true);
+		//Table fg = new Table();
+		//fg.setFillParent(true);
+		//rootTable.add(bg);
+		//rootTable.add(fg);
+		//stage.addActor(bg);
+		//stage.addActor(fg);
+
+
+
+		Table leftUI = new Table();
+		//leftUI.debug();
+		//Table boardTable = new Table();
+		//boardTable.add(gameBoard);
+		Table rightUI = new Table();
+		//rightUI.debug();
+		//rightUI.debug();
+		//rootTable.add(boardTable).expand().center();
+		//rootTable.add(gameBoard).fill().expand().center();
+		rootTable.add(leftUI).fillY().expand().left().padLeft(10.0f).padTop(10.0f);
+		rootTable.add(rightUI).fillY().right().padRight(10.0f).padBottom(10.0f).width(65.0f);
+
+
+		//bg.add(gameBoard);
+		//fg.add(leftUI).left().fillY();
+		//fg.add(rightUI).right().fillY();
+
+		//rootTable.add(bg).center();
+		//rootTable.add(fg).fill();
+
+		System.out.println("TEST: " + level.getNumber());
+		difficultyLabel = new Label(level.getDifficulty().toString(), skin);
+		difficultyLabel.setStyle(new Label.LabelStyle(game.getBitmapFont("OldStandard-Regular-60"), Color.RED));
+		leftUI.add(difficultyLabel).top().padTop(-10.0f);
+		leftUI.row();
+		levelLabel = new Label("Level " + level.getNumber(), skin);
+		levelLabel.setStyle(new Label.LabelStyle(game.getBitmapFont("OldStandard-Regular-30"), Color.BLACK));
+		leftUI.add(levelLabel).expandY().top().padTop(-5.0f);
+		//Label message = new Label("Message", skin);
+		//leftUI.add(message);
 
 		fps = new Label("FPS: ", skin);
-		rightUI.add(fps);
+		rightUI.add(fps).expandY().top();
 		rightUI.row();
-		steps = new Label("number of steps: ", skin);
-		rightUI.add(steps);
+		stepsLabel = new Label("00", skin);
+		stepsLabel.setStyle(new Label.LabelStyle(game.getBitmapFont("OldStandard-Regular-60"), Color.RED));
+		rightUI.add(stepsLabel).bottom().padBottom(-18.0f);
+		rightUI.row();
+		Label stepsCaption = new Label("steps", skin);
+		stepsCaption.setStyle(new Label.LabelStyle(game.getBitmapFont("OldStandard-Regular-30"), Color.BLACK));
+		rightUI.add(stepsCaption).bottom();
 
-		boardTable.add(gameBoard);
+
+		steps = player.getSteps();
 
 		pauseDialog = new PauseDialog(skin, this, game);
 		completeDialogNormal = new WinDialog(false, skin, this, game);
@@ -84,14 +152,25 @@ public class GameScreen implements Screen {
 
 		fps.setText("FPS: " + Gdx.graphics.getFramesPerSecond());
 
-		steps.setText("number of steps: " + player.getSteps());
+		if (player.getSteps() != steps) {
+			steps = player.getSteps();
+			stepsText = Integer.toString(steps);
+			if (stepsText.length() == 1)
+				stepsLabel.setText("0" + stepsText);
+			else
+				stepsLabel.setText(stepsText);
+		}
 
 		// Process game logic and input.
 		processInput();
 
 		// Draw game board.
-		stage.act(delta);
-		stage.draw();
+		//stage.act(delta);
+		//stage.draw();
+		boardStage.act();
+		boardStage.draw();
+		interfaceStage.act();
+		interfaceStage.draw();
 	}
 
 	@Override
