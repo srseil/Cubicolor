@@ -15,6 +15,8 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class GameScreen implements Screen {
 
+	// Remove camera from GameBoard and use the one from boardStage (then just initialize with proper values)
+
 	private MyGame game;
 	private Level level;
 	private Player player;

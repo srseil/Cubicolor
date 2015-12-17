@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
@@ -68,26 +69,15 @@ public class MyGame extends Game {
 		bitmapOSR30 = new BitmapFont(Gdx.files.internal("OldStandard-Regular-30.fnt"));
 		bitmapOSR60 = new BitmapFont(Gdx.files.internal("OldStandard-Regular-60.fnt"));
 
-		tileModel = createTileModel(TileAttributes.TKind.NORMAL, null);
-		keyTileRedModel = createTileModel(TileAttributes.TKind.KEY,
-				TileColor.RED);
-		keyTileGreenModel = createTileModel(TileAttributes.TKind.KEY,
-				TileColor.GREEN);
-		keyTileBlueModel = createTileModel(TileAttributes.TKind.KEY,
-				TileColor.BLUE);
-		keyTileYellowModel = createTileModel(TileAttributes.TKind.KEY,
-				TileColor.YELLOW);
-		lockTileRedModel = createTileModel(TileAttributes.TKind.LOCK,
-				TileColor.RED);
-		lockTileGreenModel = createTileModel(TileAttributes.TKind.LOCK,
-				TileColor.GREEN);
-		lockTileBlueModel = createTileModel(TileAttributes.TKind.LOCK,
-				TileColor.BLUE);
-		lockTileYellowModel = createTileModel(TileAttributes.TKind.LOCK,
-				TileColor.YELLOW);
-
-
-
+		tileModel = createTileModel();
+		keyTileRedModel = createKeyTileModel(TileColor.RED);
+		keyTileGreenModel = createKeyTileModel(TileColor.GREEN);
+		keyTileBlueModel = createKeyTileModel(TileColor.BLUE);
+		keyTileYellowModel = createKeyTileModel(TileColor.YELLOW);
+		lockTileRedModel = createLockTileModel(TileColor.RED);
+		lockTileGreenModel = createLockTileModel(TileColor.GREEN);
+		lockTileBlueModel = createLockTileModel(TileColor.BLUE);
+		lockTileYellowModel = createLockTileModel(TileColor.YELLOW);
 
 		exitTileModel = modelLoader.loadModel(Gdx.files.internal("ExitTile.g3db"));
 		exitTileModel.materials.first().set(new BlendingAttribute(true, 1.0f));
@@ -167,24 +157,33 @@ public class MyGame extends Game {
 		this.setScreen(gameScreen);
 	}
 
-	private Model createTileModel(TileAttributes.TKind kind,
-								  TileColor color) {
-		Material material = new Material();
+	private Model createTileModel() {
 		Model model = modelLoader.loadModel(Gdx.files.internal("Tile.g3db"));
+		model.materials.first().set(ColorAttribute.createDiffuse(
+				TileColor.getGdxColor(TileColor.NONE)));
 		model.materials.first().set(new BlendingAttribute(true, 1.0f));
+		return model;
+	}
 
-		if (color != null) {
-			material.set(ColorAttribute.createDiffuse(
-					TileColor.getGdxColor(color)));
-			model.materials.first().set(ColorAttribute.createDiffuse(
-					TileColor.getGdxColor(color)));
-		} else {
+	private Model createKeyTileModel(TileColor color) {
+		Model model = modelLoader.loadModel(Gdx.files.internal("KeyTile.g3db"));
+		model.materials.first().set(ColorAttribute.createDiffuse(Color.WHITE));
+		model.materials.first().set(new BlendingAttribute(true, 1.0f));
+		TextureAttribute textureAttribute = model.materials.first().get(
+				TextureAttribute.class, TextureAttribute.Diffuse);
+		Texture texture = new Texture(Gdx.files.internal(
+				TileColor.getKeyTileTexturePath(color)));
+		textureAttribute.set(new TextureRegion(texture));
+		/*
 			material.set(ColorAttribute.createDiffuse(Color.WHITE));
 			//model.materials.first().set(ColorAttribute.createDiffuse(new Color(0.91f, 0.902f, 0.875f, 1.0f)));
 			//model.materials.first().set(ColorAttribute.createDiffuse(new Color(0.949f, 0.941f, 0.925f, 1.0f)));
-			model.materials.first().set(ColorAttribute.createDiffuse(new Color(0.989f, 0.981f, 0.965f, 1.0f)));
 
-		}
+			model = modelLoader.loadModel(Gdx.files.internal("Tile.g3db"));
+			model.materials.first().set(ColorAttribute.createDiffuse(new Color(0.989f, 0.981f, 0.965f, 1.0f)));
+			model.materials.first().set(new BlendingAttribute(true, 1.0f));
+			*/
+
 		//model.materials.removeIndex(0);
 		//model.materials.add(material);
 		/*
@@ -197,6 +196,14 @@ public class MyGame extends Game {
 			case NORMAL:
 		}
 		*/
+		return model;
+	}
+
+	private Model createLockTileModel(TileColor color) {
+		Model model = modelLoader.loadModel(Gdx.files.internal("Tile.g3db"));
+		model.materials.first().set(ColorAttribute.createDiffuse(
+				TileColor.getGdxColor(color)));
+		model.materials.first().set(new BlendingAttribute(true, 1.0f));
 		return model;
 	}
 

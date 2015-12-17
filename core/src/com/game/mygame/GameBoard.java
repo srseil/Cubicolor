@@ -123,7 +123,7 @@ public class GameBoard extends Actor {
 				}
 				else if (matrix[i][j] instanceof KeyTile) {
 					KeyTile keyTile = (KeyTile) matrix[i][j];
-					model = game.getLockTileModel(keyTile.getKeyColor());
+					model = game.getKeyTileModel(keyTile.getKeyColor());
 				} else if (matrix[i][j] instanceof LockTile) {
 					LockTile lockTile = (LockTile) matrix[i][j];
 					model = game.getLockTileModel(lockTile.getLockColor());
