@@ -262,6 +262,14 @@ public class PlayerModel extends ModelInstance
 		//oldPlayerKey = TileColor.NONE;
 	}
 
+	public void setup() {
+		controllable = false;
+		updateTransform(0, 0.5f);
+		moveAnimation.setAnimation("Cube|Fall", 1, -1.0f, this);
+		blendAnimation.reset(0.0f);
+		state = State.RESETTING_DOWN;
+	}
+
 	public void move(int dx, int dy) {
 		if (data.getX() == exitModel.getColumn() &&
 				data.getY() == exitModel.getRow()) {

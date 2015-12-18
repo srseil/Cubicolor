@@ -11,7 +11,7 @@ public class TileModel extends ModelInstance implements Observer {
 
 	public static float SIZE = 2.0f;
 
-	private enum TileModelState {
+	private enum State {
 		ALIVE,
 		DYING,
 		DEAD,
@@ -20,7 +20,7 @@ public class TileModel extends ModelInstance implements Observer {
 
 	private Tile data;
 	private int row, column;
-	private TileModelState state;
+	private State state;
 	private AnimationController fallAnimation;
 	private BlendAnimation blendAnimation;
 	private float reviveDelta;
@@ -35,26 +35,27 @@ public class TileModel extends ModelInstance implements Observer {
 		this.column = column;
 		fallAnimation = new AnimationController(this);
 		fallAnimation.allowSameAnimation = true;
-		fallAnimation.setAnimation("Cube|Fall");
+		fallAnimation.setAnimation("Cube|Fall", 1, 1.0f, null);
 		blendAnimation = new BlendAnimation(this,
 				fallAnimation.current.duration);
 		reviveDelta = 0.0f;
 		reviveDelay = 0;
 		hold = false;
 
+		// Set living tiles to reviving for setup.
 		if (data.isDead())
-			state = TileModelState.DEAD;
+			state = State.DEAD;
 		else
-			state = TileModelState.ALIVE;
+			state = State.REVIVING;
 	}
 
 	@Override
 	public void updateState() {
-		if (data.isDead() && state == TileModelState.ALIVE) {
-			state = TileModelState.DYING;
-		} else if (!data.isDead() &&(state == TileModelState.DEAD ||
-				state == TileModelState.DYING)) {
-			state = TileModelState.REVIVING;
+		if (data.isDead() && state == State.ALIVE) {
+			state = State.DYING;
+		} else if (!data.isDead() &&(state == State.DEAD ||
+				state == State.DYING)) {
+			state = State.REVIVING;
 		}
 	}
 
@@ -69,35 +70,37 @@ public class TileModel extends ModelInstance implements Observer {
 				blendAnimation.update(delta);
 				fallAnimation.update(delta);
 				if (!blendAnimation.isInAction())
-					state = TileModelState.DEAD;
+					state = State.DEAD;
 				break;
 			case REVIVING:
 				reviveDelta += delta;
 				if (reviveDelta >= (reviveDelay - row) + column * 0.5f) {
 					blendAnimation.update(-delta);
 					fallAnimation.update(delta);
+					System.out.println(fallAnimation.current.time + " " + fallAnimation.current.duration + " " + fallAnimation.current.speed);
 					if (!blendAnimation.isInAction()) {
-						state = TileModelState.ALIVE;
+						state = State.ALIVE;
 						blendAnimation.reset(1.0f);
 						fallAnimation.setAnimation("Cube|Fall");
+						System.out.println("done setup");
 					}
 				}
 		}
 	}
 
 	public void reset() {
-		if (state == TileModelState.REVIVING) {
+		if (state == State.REVIVING) {
 			fallAnimation.setAnimation("Cube|Fall", 1, -1.0f, null);
 			blendAnimation.reset(0.0f);
 		} else {
 			fallAnimation.setAnimation("Cube|Fall", 1, 1.0f, null);
 		}
-		fallAnimation.update(Gdx.graphics.getDeltaTime());
+		//fallAnimation.update(Gdx.graphics.getDeltaTime());
 		reviveDelta = 0.0f;
 	}
 
 	public int getFirstRowRevived(int firstRowRevived) {
-		if (state == TileModelState.REVIVING && firstRowRevived == -1) {
+		if (state == State.REVIVING && firstRowRevived == -1) {
 			reviveDelta = 0;
 			return row;
 		} else {
@@ -115,7 +118,7 @@ public class TileModel extends ModelInstance implements Observer {
 	}
 
 	public boolean isDead() {
-		if (state == TileModelState.DEAD)
+		if (state == State.DEAD)
 			return true;
 		else
 			return false;

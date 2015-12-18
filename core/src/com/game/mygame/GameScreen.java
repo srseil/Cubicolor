@@ -140,6 +140,9 @@ public class GameScreen implements Screen {
 		pauseDialog = new PauseDialog(skin, this, game);
 		completeDialogNormal = new WinDialog(false, skin, this, game);
 		completeDialogOptimal = new WinDialog(true, skin, this, game);
+
+		// Reset level to trigger animations.
+		//resetLevel();
 	}
 
 	// The render() method is being used as a hook into the game loop.

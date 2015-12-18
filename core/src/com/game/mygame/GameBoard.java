@@ -103,6 +103,8 @@ public class GameBoard extends Actor {
 		m = game.modelLoader.loadModel(Gdx.files.internal("cubemap.g3db"));
 		m.materials.first().set(new BlendingAttribute(true, 1.0f));
 		mi = new ModelInstance(m, 2, 2, -4);
+
+		setup();
 	}
 
 	private TileModel[][] parseMatrix(Tile[][] matrix) {
@@ -210,6 +212,18 @@ public class GameBoard extends Actor {
 
 		game.getModelBatch().end();
 		batch.begin();
+	}
+
+	public void setup() {
+		for (int i = 0; i < modelMatrix.length; i++) {
+			for (int j = 0; j < modelMatrix[i].length; j++) {
+				if (modelMatrix[i][j] != null)
+					modelMatrix[i][j].reset();
+			}
+		}
+		exitModel.setup();
+		playerModel.setup();
+		resetting = true;
 	}
 
 	public void reset() {

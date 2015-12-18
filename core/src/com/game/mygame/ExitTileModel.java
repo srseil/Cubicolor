@@ -37,14 +37,14 @@ public class ExitTileModel extends ModelInstance
 		moveAnimation = new AnimationController(this);
 		moveAnimation.allowSameAnimation = true;
 		moveAnimation.setAnimation("Cube|Spiral", 1, 1.0f, this);
-		state = State.STILL;
 		height = data.getHeight();
+		state = State.STILL;
 
 		requirementModels = new ArrayList<ModelInstance>();
-		requirementModels.add(null);
-		requirementModels.add(null);
+		//requirementModels.add(null);
+		//requirementModels.add(null);
 
-		updateTransform(height);
+		updateTransform(0);
 	}
 
 	private void updateTransform(int height) {
@@ -142,6 +142,11 @@ public class ExitTileModel extends ModelInstance
 				moveAnimation.current.speed *= -1;
 			}
 		}
+	}
+
+	public void setup() {
+		state = State.MOVING_UP;
+		moveAnimation.setAnimation("Cube|Fall", 1, -1.0f, this);
 	}
 
 	public int getRow() {
