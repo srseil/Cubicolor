@@ -64,8 +64,14 @@ public class PlayerModel extends ModelInstance
 				moveAnimation.current.duration);
 		//textureAnimation = new TextureAnimation("player/anim.atlas", this, 3.0f);
 
-		textureAnimations = new EnumMap<>(TileColor.class);
+		textureAnimations = new EnumMap<TileColor,TextureAnimation>(TileColor.class);
 		textureAnimations.put(TileColor.RED,
+				new TextureAnimation("player_animation/player_animation.atlas", this, 1.0f));
+		textureAnimations.put(TileColor.GREEN,
+				new TextureAnimation("player_animation/player_animation.atlas", this, 1.0f));
+		textureAnimations.put(TileColor.BLUE,
+				new TextureAnimation("player_animation/player_animation.atlas", this, 1.0f));
+		textureAnimations.put(TileColor.YELLOW,
 				new TextureAnimation("player_animation/player_animation.atlas", this, 1.0f));
 		textureAnimation = textureAnimations.get(TileColor.RED);
 

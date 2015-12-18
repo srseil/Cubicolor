@@ -9,27 +9,29 @@ import java.io.IOException;
 
 public class SettingsMenu extends Table {
 
-	public SettingsMenu(Skin skin, MenuScreen menuScreen, MyGame game) {
+	public SettingsMenu(Skin skin, final MenuScreen menuScreen, final MyGame game) {
 		/* Resolution, full/windowed screen, language, (reset progress), brightness, (vsync),
 			Music, SFX, Controls!, (colorblind? -> reddit), Tutorial
 		 */
 
 		// Confirmation dialog for resetting progress
-		Dialog confirmationDialog = new Dialog("Progress reset", skin);
+		final Dialog confirmationDialog = new Dialog("Progress reset", skin);
 		confirmationDialog.button("OK", null);
 		confirmationDialog.key(Input.Keys.ENTER, null);
 		confirmationDialog.key(Input.Keys.ESCAPE, null);
 
 		// Dialog for "Reset progress" button
-		Dialog resetDialog = new Dialog("Reset progress", skin) {
+		final Dialog resetDialog = new Dialog("Reset progress", skin) {
 			protected void result(Object object) {
 				if ((Boolean) object) {
 					game.getSaveState().reset();
+					/*
 					try {
 						game.getSaveState().save();
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
+					*/
 					confirmationDialog.show(menuScreen.getStage());
 				}
 			}
@@ -46,7 +48,7 @@ public class SettingsMenu extends Table {
 		// Language drop down menu
 		add(new Label("Language", skin)).left();
 		row();
-		SelectBox<String> languageDropdown = new SelectBox<>(skin);
+		SelectBox<String> languageDropdown = new SelectBox<String>(skin);
 		languageDropdown.setItems("English", "Deutsch", "Espanol", "Russian");
 		add(languageDropdown).left();
 		// Reset progress button
@@ -90,7 +92,7 @@ public class SettingsMenu extends Table {
 		// Resolution drop down menu and fullscreen checkbox
 		add(new Label("Resolution", skin)).left();
 		row();
-		SelectBox<String> resolutionDropdown = new SelectBox<>(skin);
+		SelectBox<String> resolutionDropdown = new SelectBox<String>(skin);
 		resolutionDropdown.setItems("resolution 1", "resolution 2", "less text");
 		add(resolutionDropdown).left();
 		add(new CheckBox("Fullscreen", skin)).left().padLeft(20.0f);

@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -18,7 +19,7 @@ public class GameScreen implements Screen {
 	// Remove camera from GameBoard and use the one from boardStage (then just initialize with proper values)
 
 	private MyGame game;
-	private Level level;
+	Level level;
 	private Player player;
 	private GameBoard gameBoard;
 
@@ -108,10 +109,12 @@ public class GameScreen implements Screen {
 
 		//rootTable.add(bg).center();
 		//rootTable.add(fg).fill();
+		BitmapFont bitmapOSR30 = new BitmapFont(Gdx.files.internal("fonts/OldStandard-Regular-30_2.fnt"));
 
 		System.out.println("TEST: " + level.getNumber());
 		difficultyLabel = new Label(level.getDifficulty().toString(), skin);
-		difficultyLabel.setStyle(new Label.LabelStyle(game.getBitmapFont("OldStandard-Regular-60"), Color.RED));
+		//difficultyLabel.setStyle(new Label.LabelStyle(game.getBitmapFont("OldStandard-Regular-60"), Color.BLACK));
+		difficultyLabel.setStyle(new Label.LabelStyle(bitmapOSR30, Color.BLACK));
 		leftUI.add(difficultyLabel).top().padTop(-10.0f);
 		leftUI.row();
 		levelLabel = new Label("Level " + level.getNumber(), skin);
@@ -124,7 +127,7 @@ public class GameScreen implements Screen {
 		rightUI.add(fps).expandY().top();
 		rightUI.row();
 		stepsLabel = new Label("00", skin);
-		stepsLabel.setStyle(new Label.LabelStyle(game.getBitmapFont("OldStandard-Regular-60"), Color.RED));
+		stepsLabel.setStyle(new Label.LabelStyle(game.getBitmapFont("OldStandard-Regular-60"), Color.BLACK));
 		rightUI.add(stepsLabel).bottom().padBottom(-18.0f);
 		rightUI.row();
 		Label stepsCaption = new Label("steps", skin);
@@ -177,7 +180,7 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void show() {
-		Gdx.input.setInputProcessor(stage);
+		Gdx.input.setInputProcessor(interfaceStage);
 	}
 
 	@Override
@@ -222,7 +225,7 @@ public class GameScreen implements Screen {
 				resetLevel();
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
 				paused = true;
-				pauseDialog.show(stage);
+				pauseDialog.show(interfaceStage);
 			}
 		}
 
@@ -244,9 +247,9 @@ public class GameScreen implements Screen {
 	public void completeLevel(boolean optimal) {
 		completed = true;
 		if (optimal)
-			completeDialogNormal.show(stage);
+			completeDialogNormal.show(interfaceStage);
 		else
-			completeDialogOptimal.show(stage);
+			completeDialogOptimal.show(interfaceStage);
 
 		game.getSaveState().update(
 				level.getDifficulty(), level.getNumber(), optimal);

@@ -53,7 +53,7 @@ public class LevelMenu extends Table {
 		difficultyButtons.setChecked("Normal");
 	}
 
-	private ChangeListener createChangeListener(int n) {
+	private ChangeListener createChangeListener(final int n) {
 		return new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {

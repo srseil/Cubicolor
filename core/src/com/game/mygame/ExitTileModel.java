@@ -40,7 +40,7 @@ public class ExitTileModel extends ModelInstance
 		state = State.STILL;
 		height = data.getHeight();
 
-		requirementModels = new ArrayList<>();
+		requirementModels = new ArrayList<ModelInstance>();
 		requirementModels.add(null);
 		requirementModels.add(null);
 

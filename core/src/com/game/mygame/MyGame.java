@@ -3,10 +3,7 @@ package com.game.mygame;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.loaders.ModelLoader;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Cubemap;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -66,7 +63,7 @@ public class MyGame extends Game {
 		modelBatch = new ModelBatch(new DefaultShaderProvider());
 		modelBuilder = new ModelBuilder();
 
-		bitmapOSR30 = new BitmapFont(Gdx.files.internal("OldStandard-Regular-30.fnt"));
+		bitmapOSR30 = new BitmapFont(Gdx.files.internal("fonts/OldStandard-Regular-30_2.fnt"));
 		bitmapOSR60 = new BitmapFont(Gdx.files.internal("OldStandard-Regular-60.fnt"));
 
 		tileModel = createTileModel();
@@ -119,7 +116,7 @@ public class MyGame extends Game {
 			saveState.load();
 			menuScreen = new MenuScreen(camera, this);
 			//this.setScreen(menuScreen);
-			saveState.save();
+			//saveState.save();
 			openLevel("normal", 1);
 			//this.setScreen(new TestScreen(this));
 		} catch (IOException exception) {
@@ -173,6 +170,8 @@ public class MyGame extends Game {
 				TextureAttribute.class, TextureAttribute.Diffuse);
 		Texture texture = new Texture(Gdx.files.internal(
 				TileColor.getKeyTileTexturePath(color)));
+		//texture = new Texture(Gdx.files.internal("keytile_red.png"));
+		texture = new Texture(Gdx.files.internal("keytile_red_2.png"));
 		textureAttribute.set(new TextureRegion(texture));
 		/*
 			material.set(ColorAttribute.createDiffuse(Color.WHITE));

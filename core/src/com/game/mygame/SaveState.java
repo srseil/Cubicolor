@@ -61,6 +61,7 @@ public class SaveState {
 		}
 	}
 
+	/*
 	// Saves a save state to disk.
 	public void save() throws IOException {
 		File saveFile = Gdx.files.internal("savestate.xml").file();
@@ -90,6 +91,7 @@ public class SaveState {
 		xmlWriter.close();
 		printWriter.close();
 	}
+	*/
 
 	// Updates the save state with the corresponding completed level.
 	public void update(Difficulty difficulty, int number, boolean optimal) {

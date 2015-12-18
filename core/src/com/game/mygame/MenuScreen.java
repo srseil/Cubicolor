@@ -36,12 +36,12 @@ public class MenuScreen implements Screen {
 		rootTable.left();
 		stage.addActor(rootTable);
 
-		LevelMenu levelMenu = new LevelMenu(skin, game);
-		SettingsMenu settingsMenu = new SettingsMenu(skin, this, game);
+		final LevelMenu levelMenu = new LevelMenu(skin, game);
+		final SettingsMenu settingsMenu = new SettingsMenu(skin, this, game);
 
 		// Quit dialog, comes up when Quit button is clicked.
 		// !!! Exit <-> Quit
-		Dialog quitDialog = new Dialog("Quit", skin) {
+		final Dialog quitDialog = new Dialog("Quit", skin) {
 			protected void result(Object object) {
 				if ((Boolean) object)
 					Gdx.app.exit();
