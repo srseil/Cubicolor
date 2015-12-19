@@ -3,23 +3,12 @@ package com.game.mygame;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.actions.DelayAction;
-import com.badlogic.gdx.utils.Array;
-import com.sun.corba.se.impl.orbutil.graph.Graph;
 
 public class GameBoard extends Actor {
 
@@ -32,31 +21,18 @@ public class GameBoard extends Actor {
 	private MyGame game;
 	private OrthographicCamera camera;
 	private Environment environment;
-
-	private TileModel[][] modelMatrix;
 	private float width, height;
+	private TileModel[][] modelMatrix;
 	private ExitTileModel exitModel;
 	private PlayerModel playerModel;
-
-	private int firstRowRevived;
 	private boolean resetting;
-
-
-
-
-	private TextureAtlas atlas;
-	private Array<TextureAtlas.AtlasRegion> regions;
-	private float t;
-	private int i;
-	private Model m;
-	private ModelInstance mi;
 
 	public GameBoard(Level level, Player player, MyGame game) {
 		this.game = game;
 
 		width = (float) level.getColumns() * TileModel.SIZE;
 		height = (float) level.getRows() * TileModel.SIZE;
-		modelMatrix = parseMatrix(level.getMatrix());
+		modelMatrix = parseModelMatrix(level.getMatrix());
 
 		playerModel = new PlayerModel(
 				game.getPlayerModel(TileColor.NONE),
@@ -92,22 +68,11 @@ public class GameBoard extends Actor {
 		camera.zoom = 1.2f;
 		camera.update();
 
-		resetting = false;
-		firstRowRevived = -1;
-
-
-		atlas = new TextureAtlas(Gdx.files.internal("anim/anim.atlas"));
-		regions = atlas.getRegions();
-		t = 1.0f;
-		i = 0;
-		m = game.modelLoader.loadModel(Gdx.files.internal("cubemap.g3db"));
-		m.materials.first().set(new BlendingAttribute(true, 1.0f));
-		mi = new ModelInstance(m, 2, 2, -4);
-
+		resetting = true;
 		setup();
 	}
 
-	private TileModel[][] parseMatrix(Tile[][] matrix) {
+	private TileModel[][] parseModelMatrix(Tile[][] matrix) {
 		TileModel[][] modelMatrix =
 				new TileModel[matrix.length][matrix[0].length];
 
@@ -122,25 +87,17 @@ public class GameBoard extends Actor {
 							-i * TileModel.SIZE, i, j);
 					exitTile.addObserver(exitModel);
 					continue;
-				}
-				else if (matrix[i][j] instanceof KeyTile) {
+				} else if (matrix[i][j] instanceof KeyTile) {
 					KeyTile keyTile = (KeyTile) matrix[i][j];
 					model = game.getKeyTileModel(keyTile.getKeyColor());
 				} else if (matrix[i][j] instanceof LockTile) {
 					LockTile lockTile = (LockTile) matrix[i][j];
 					model = game.getLockTileModel(lockTile.getLockColor());
-				} else if (matrix[i][j] instanceof ExitTile) {
-					model = game.getExitTileModel();
 				} else {
 					model = game.getTileModel();
 				}
 				modelMatrix[i][j] = new TileModel(
 						model, matrix[i][j], i, j);
-				/*
-				modelMatrix[i][j].transform.setTranslation(
-						-width/2 + j * TileModel.SIZE, 0.0f,
-						height/2 - i * TileModel.SIZE);
-				*/
 				modelMatrix[i][j].transform.setTranslation(
 						j * TileModel.SIZE, 0.0f,
 						-i * TileModel.SIZE);
@@ -151,101 +108,57 @@ public class GameBoard extends Actor {
 		return modelMatrix;
 	}
 
+	private void resetModelMatrix() {
+		int firstRowRevived = -1;
+		for (int i = modelMatrix.length - 1; i >= 0; i--) {
+			for (int j = 0; j < modelMatrix[i].length; j++) {
+				if (modelMatrix[i][j] != null) {
+					modelMatrix[i][j].reset();
+					firstRowRevived = modelMatrix[i][j].calculateReviveDelay(
+							firstRowRevived);
+				}
+			}
+		}
+	}
+
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
 		// Batch end, begin necessary?
 		batch.end();
-		//Gdx.gl.glHint(GL20.GL_CULL_FACE_MODE, GL20.GL_NONE);
-		//Gdx.gl.glCullFace(GL20.GL_NONE);
-		//Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-		//Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA_SATURATE, GL20.GL_ONE);
-
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-
-
 		game.getModelBatch().begin(camera);
 
 		for (int i = 0; i < modelMatrix.length; i++) {
 			for (int j = 0; j < modelMatrix[i].length; j++) {
 				if (modelMatrix[i][j] == null)
 					continue;
-				/*
-				if (resetting) {
-					firstRowRevived = modelMatrix[i][j].getFirstRowRevived(
-							firstRowRevived);
-				}
-				*/
 				modelMatrix[i][j].update(Gdx.graphics.getDeltaTime());
 				if (!modelMatrix[i][j].isDead())
 					game.getModelBatch().render(modelMatrix[i][j], environment);
 			}
 		}
-		if (!resetting && firstRowRevived != -1)
-			firstRowRevived = -1;
 
 		exitModel.update(Gdx.graphics.getDeltaTime());
 		game.getModelBatch().render(exitModel, environment);
 
 		playerModel.update(Gdx.graphics.getDeltaTime());
-
-
-		//game.getModelBatch().render(mi, environment);
-
-		t += Gdx.graphics.getDeltaTime();
-		if (t >= 1.0f/30.0f){
-			t -= 1.0f/30.0f;
-			i = (i+1) % regions.size;
-			//i = (i+1) % 2;
-			//System.out.println(i);
-			//regions.get(4).offsetY = 50.0f * i;
-			//regions.get(4).(50.0f);
-			//regions.get(i).scroll(50.0f, 50.0f);//.setU2(50.0f * i);//.offsetX = 50.0f * i;
-
-			//playerModel.materials.first().get(TextureAttribute.class, TextureAttribute.Diffuse).set(regions.get(i));
-
-			//playerModel.materials.first().get(TextureAttribute.class, TextureAttribute.Diffuse).offsetV = 50.0f * i;
-		}
-
-
-
-		//System.out.println(playerModel.materials.first().get(TextureAttribute.class, TextureAttribute.Diffuse).uvIndex);
 		game.getModelBatch().render(playerModel, environment);
 
 		game.getModelBatch().end();
 		batch.begin();
 	}
 
-	public void setup() {
-		int firstRowRevived = -1;
-		for (int i = modelMatrix.length - 1; i >= 0; i--) {
-			for (int j = 0; j < modelMatrix[i].length; j++) {
-				if (modelMatrix[i][j] != null) {
-					modelMatrix[i][j].reset();
-					firstRowRevived = modelMatrix[i][j].calculateReviveDelay(
-									firstRowRevived);
-				}
-			}
-		}
-		exitModel.setup();
-		playerModel.setup();
-		resetting = true;
-	}
-
 	public void reset() {
-		int firstRowRevived = -1;
-		for (int i = modelMatrix.length - 1; i >= 0; i--) {
-			for (int j = 0; j < modelMatrix[i].length; j++) {
-				if (modelMatrix[i][j] != null) {
-					modelMatrix[i][j].reset();
-					firstRowRevived = modelMatrix[i][j].calculateReviveDelay(
-							firstRowRevived);
-				}
-			}
-		}
+		resetModelMatrix();
 		exitModel.reset();
 		playerModel.reset();
-		resetting = true;
+	}
+
+	public void setup() {
+		resetModelMatrix();
+		exitModel.setup();
+		playerModel.setup();
 	}
 
 	public void movePlayerModel(int dx, int dy) {
