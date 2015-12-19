@@ -1,6 +1,7 @@
 package com.game.mygame;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -25,10 +26,11 @@ public class GameBoard extends Actor {
 	private TileModel[][] modelMatrix;
 	private ExitTileModel exitModel;
 	private PlayerModel playerModel;
-	private boolean resetting;
 
-	public GameBoard(Level level, Player player, MyGame game) {
+	public GameBoard(
+			Level level, Player player, Camera stageCamera, MyGame game) {
 		this.game = game;
+		this.camera = (OrthographicCamera) stageCamera;
 
 		width = (float) level.getColumns() * TileModel.SIZE;
 		height = (float) level.getRows() * TileModel.SIZE;
@@ -40,8 +42,8 @@ public class GameBoard extends Actor {
 		player.addObserver(playerModel);
 
 		environment = new Environment();
-		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, .6f, .6f, .6f, 1f));
-		//environment.add(new DirectionalLight().set(0.6f, 0.6f, 0.6f, -0.3f, -1f, 1f));
+		environment.set(new ColorAttribute(
+				ColorAttribute.AmbientLight, .6f, .6f, .6f, 1f));
 		DirectionalLight directionalLight = new DirectionalLight();
 		directionalLight.setDirection(-0.15f, -1.0f, -0.6f);
 		directionalLight.setColor(0.3f, 0.3f, 0.3f, 1.0f);
@@ -51,24 +53,15 @@ public class GameBoard extends Actor {
 				(Math.sqrt(Math.pow(2 * level.getRows(), 2) +
 						Math.pow(2 * level.getColumns(), 2))) + 1);
 		float viewportWidth = (4.0f/3.0f * viewportHeight);
-		System.out.println("VIEWPORT_HEIGHT: " + viewportHeight);
-		System.out.println("VIEWPORT_WIDTH: " + viewportWidth);
-		camera = new OrthographicCamera(viewportWidth, viewportHeight);
+		camera.setToOrtho(false, viewportWidth, viewportHeight);
 		camera.rotate(-60.0f, 1.0f, 0.0f, 0.0f);
 		camera.rotate(20.0f, 0.0f, 1.0f, 0.0f);
 		camera.near = 1.0f;
 		camera.far = 20.0f;
-		/*
-		float h = 120.0f;
-		float a = (float) ((-height) / Math.cos(Math.toRadians(20)) / 2)
-				+ (float) (h * Math.tan(Math.toRadians(60)) + 0.0f);
-		a = -viewportHeight/4;// + (float) (10.0f * Math.tan(Math.toRadians(60.0f)));
-		*/
 		camera.position.set(width/2, 10.0f, 0.5f);
 		camera.zoom = 1.2f;
 		camera.update();
 
-		resetting = true;
 		setup();
 	}
 

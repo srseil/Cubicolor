@@ -16,8 +16,6 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class GameScreen implements Screen {
 
-	// Remove camera from GameBoard and use the one from boardStage (then just initialize with proper values)
-
 	private MyGame game;
 	Level level;
 	private Player player;
@@ -48,13 +46,13 @@ public class GameScreen implements Screen {
 		this.game = game;
 
 		player = new Player(level, this);
-		gameBoard = new GameBoard(level, player, game);
 
 		stage = new Stage(new ExtendViewport(800, 600));
 
-		boardStage = new Stage(new ExtendViewport(800, 600));
-		boardStage.addActor(gameBoard);
 		interfaceStage = new Stage(new ExtendViewport(800, 600));
+		boardStage = new Stage(new ExtendViewport(800, 600));
+		gameBoard = new GameBoard(level, player, boardStage.getCamera(), game);
+		boardStage.addActor(gameBoard);
 
 		/*
 		Stack stack = new Stack();
