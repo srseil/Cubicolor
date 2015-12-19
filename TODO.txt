@@ -1,0 +1,3 @@
+
+Tweaking:
+- Fonts (super sampling, etc. -> siehe BMFont Anleitung)
