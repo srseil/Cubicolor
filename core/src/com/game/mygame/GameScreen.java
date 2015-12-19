@@ -5,41 +5,36 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class GameScreen implements Screen {
 
 	private MyGame game;
-	Level level;
+	private Level level;
 	private Player player;
 	private GameBoard gameBoard;
 
 	private Stage boardStage;
 	private Stage interfaceStage;
 
-	private Stage stage;
-	private PauseDialog pauseDialog;
-	private WinDialog completeDialogNormal;
-	private WinDialog completeDialogOptimal;
+	private Label fps;
 	private Label levelLabel;
 	private Label difficultyLabel;
 	private Label stepsLabel;
 	private String stepsText;
 	private int steps;
 
+	private PauseDialog pauseDialog;
+	private WinDialog completeDialogNormal;
+	private WinDialog completeDialogOptimal;
+
 	private boolean paused;
 	private boolean pauseClosed;
 	private boolean completed;
-
-	// FPS Counter
-	private Label fps;
 
 	public GameScreen(Level level, MyGame game) {
 		this.level = level;
@@ -47,117 +42,69 @@ public class GameScreen implements Screen {
 
 		player = new Player(level, this);
 
-		stage = new Stage(new ExtendViewport(800, 600));
-
 		interfaceStage = new Stage(new ExtendViewport(800, 600));
 		boardStage = new Stage(new ExtendViewport(800, 600));
 		gameBoard = new GameBoard(level, player, boardStage.getCamera(), game);
 		boardStage.addActor(gameBoard);
 
-		/*
-		Stack stack = new Stack();
-		stack.add(gameBoard);
-
-		Group rootGroup = new Group();
-		rootGroup.addActor(gameBoard);
-		//stage.addActor(gameBoard);
-		*/
+		Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
 
 		Table rootTable = new Table();
 		rootTable.setFillParent(true);
 		//rootTable.setDebug(true);
-		//stage.addActor(rootTable);
-		//rootGroup.addActor(rootTable);
-		//stack.add(rootTable);
-		//stage.addActor(stack);
 		interfaceStage.addActor(rootTable);
 
-		Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
-
-
-		//Group bg = new Group();
-		//Group fg = new Group();
-		//Table bg = new Table();
-		//bg.setFillParent(true);
-		//Table fg = new Table();
-		//fg.setFillParent(true);
-		//rootTable.add(bg);
-		//rootTable.add(fg);
-		//stage.addActor(bg);
-		//stage.addActor(fg);
-
-
-
+		// Left and right part of the interface.
 		Table leftUI = new Table();
-		//leftUI.debug();
-		//Table boardTable = new Table();
-		//boardTable.add(gameBoard);
-		Table rightUI = new Table();
-		//rightUI.debug();
-		//rightUI.debug();
-		//rootTable.add(boardTable).expand().center();
-		//rootTable.add(gameBoard).fill().expand().center();
 		rootTable.add(leftUI).fillY().expand().left().padLeft(10.0f).padTop(10.0f);
+		Table rightUI = new Table();
 		rootTable.add(rightUI).fillY().right().padRight(10.0f).padBottom(10.0f).width(65.0f);
 
-
-		//bg.add(gameBoard);
-		//fg.add(leftUI).left().fillY();
-		//fg.add(rightUI).right().fillY();
-
-		//rootTable.add(bg).center();
-		//rootTable.add(fg).fill();
-		//BitmapFont bitmapOSR30 = new BitmapFont(Gdx.files.internal("fonts/OldStandard-Regular-30_2.fnt"));
-
-		System.out.println("TEST: " + level.getNumber());
+		// Level number and difficulty labels in top left corner.
 		difficultyLabel = new Label(level.getDifficulty().toString(), skin);
-		//difficultyLabel.setStyle(new Label.LabelStyle(game.getBitmapFont("OldStandard-Regular-60"), Color.BLACK));
-		difficultyLabel.setStyle(new Label.LabelStyle(game.getBitmapFont("OldStandard-Regular-30"), Color.BLACK));
+		difficultyLabel.setStyle(new Label.LabelStyle(
+				game.getBitmapFont("OldStandard-Regular-60"), Color.BLACK));
 		leftUI.add(difficultyLabel).top().padTop(-10.0f);
 		leftUI.row();
 		levelLabel = new Label("Level " + level.getNumber(), skin);
-		levelLabel.setStyle(new Label.LabelStyle(game.getBitmapFont("OldStandard-Regular-30"), Color.BLACK));
+		levelLabel.setStyle(new Label.LabelStyle(
+				game.getBitmapFont("OldStandard-Regular-30"), Color.BLACK));
 		leftUI.add(levelLabel).expandY().top().padTop(-5.0f);
-		//Label message = new Label("Message", skin);
-		//leftUI.add(message);
 
+		// FPS counter in the top right corner.
 		fps = new Label("FPS: ", skin);
 		rightUI.add(fps).expandY().top();
 		rightUI.row();
+
+		// Steps label in the bottom right corner.
 		stepsLabel = new Label("00", skin);
-		stepsLabel.setStyle(new Label.LabelStyle(game.getBitmapFont("OldStandard-Regular-60"), Color.BLACK));
+		stepsLabel.setStyle(new Label.LabelStyle(
+				game.getBitmapFont("OldStandard-Regular-60"), Color.BLACK));
 		rightUI.add(stepsLabel).bottom().padBottom(-18.0f);
 		rightUI.row();
 		Label stepsCaption = new Label("steps", skin);
-		stepsCaption.setStyle(new Label.LabelStyle(game.getBitmapFont("OldStandard-Regular-30"), Color.BLACK));
+		stepsCaption.setStyle(new Label.LabelStyle(
+				game.getBitmapFont("OldStandard-Regular-30"), Color.BLACK));
 		rightUI.add(stepsCaption).bottom();
 
-
-		steps = player.getSteps();
-
+		// Dialog windows for pausing and completing the level.
 		pauseDialog = new PauseDialog(skin, this, game);
 		completeDialogNormal = new WinDialog(false, skin, this, game);
 		completeDialogOptimal = new WinDialog(true, skin, this, game);
 
-		// Reset level to trigger animations.
-		//resetLevel();
+		steps = player.getSteps();
 	}
 
 	// The render() method is being used as a hook into the game loop.
 	@Override
 	public void render(float delta) {
-		// Set background color.
-		//Gdx.gl.glClearColor(0.85f, 0.8f, 0.7f, 1);
 		Gdx.gl.glClearColor(0.949f, 0.941f, 0.925f, 1.0f);
-
-		//Gdx.gl.glClearColor();
-
-		//Gdx.gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
 		fps.setText("FPS: " + Gdx.graphics.getFramesPerSecond());
 
+		// Update steps variable and label.
 		if (player.getSteps() != steps) {
 			steps = player.getSteps();
 			stepsText = Integer.toString(steps);
@@ -167,12 +114,10 @@ public class GameScreen implements Screen {
 				stepsLabel.setText(stepsText);
 		}
 
-		// Process game logic and input.
+		// Process user input and execute game logic.
 		processInput();
 
-		// Draw game board.
-		//stage.act(delta);
-		//stage.draw();
+		// Update game board and interface.
 		boardStage.act();
 		boardStage.draw();
 		interfaceStage.act();
@@ -186,12 +131,17 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void dispose() {
-		stage.dispose();
+		interfaceStage.dispose();
+		boardStage.dispose();
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		stage.getViewport().update(width, height, true);
+		// This causes problems. Prohibit resizing in the first place?
+		/*
+		interfaceStage.getViewport().update(width, height, true);
+		boardStage.getViewport().update(width, height, true);
+		*/
 	}
 
 	@Override
