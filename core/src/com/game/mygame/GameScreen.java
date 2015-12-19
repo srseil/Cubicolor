@@ -109,12 +109,12 @@ public class GameScreen implements Screen {
 
 		//rootTable.add(bg).center();
 		//rootTable.add(fg).fill();
-		BitmapFont bitmapOSR30 = new BitmapFont(Gdx.files.internal("fonts/OldStandard-Regular-30_2.fnt"));
+		//BitmapFont bitmapOSR30 = new BitmapFont(Gdx.files.internal("fonts/OldStandard-Regular-30_2.fnt"));
 
 		System.out.println("TEST: " + level.getNumber());
 		difficultyLabel = new Label(level.getDifficulty().toString(), skin);
 		//difficultyLabel.setStyle(new Label.LabelStyle(game.getBitmapFont("OldStandard-Regular-60"), Color.BLACK));
-		difficultyLabel.setStyle(new Label.LabelStyle(bitmapOSR30, Color.BLACK));
+		difficultyLabel.setStyle(new Label.LabelStyle(game.getBitmapFont("OldStandard-Regular-30"), Color.BLACK));
 		leftUI.add(difficultyLabel).top().padTop(-10.0f);
 		leftUI.row();
 		levelLabel = new Label("Level " + level.getNumber(), skin);

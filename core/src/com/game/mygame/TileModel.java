@@ -24,7 +24,7 @@ public class TileModel extends ModelInstance implements Observer {
 	private AnimationController fallAnimation;
 	private BlendAnimation blendAnimation;
 	private float reviveDelta;
-	private int reviveDelay;
+	private float reviveDelay;
 	private boolean hold;
 
 	public TileModel(Model model, Tile data, int row, int column) {
@@ -74,15 +74,19 @@ public class TileModel extends ModelInstance implements Observer {
 				break;
 			case REVIVING:
 				reviveDelta += delta;
-				if (reviveDelta >= (reviveDelay - row) + column * 0.5f) {
+				if (reviveDelta >= (reviveDelay)) {
+					System.out.println("DELAY: " + reviveDelay);
+				//if (reviveDelta >= (reviveDelay) + column * 0.5f) {
+				//if (reviveDelta >= (row * 0.5f) + column * 0.5f) {
+					if (row == 1 && (column == 2 || column == 3))
+						System.out.println("TILE: " + row + " " + column + " " + System.currentTimeMillis());
 					blendAnimation.update(-delta);
 					fallAnimation.update(delta);
-					System.out.println(fallAnimation.current.time + " " + fallAnimation.current.duration + " " + fallAnimation.current.speed);
+					//System.out.println(fallAnimation.current.time + " " + fallAnimation.current.duration + " " + fallAnimation.current.speed);
 					if (!blendAnimation.isInAction()) {
 						state = State.ALIVE;
 						blendAnimation.reset(1.0f);
 						fallAnimation.setAnimation("Cube|Fall");
-						System.out.println("done setup");
 					}
 				}
 		}
@@ -99,12 +103,16 @@ public class TileModel extends ModelInstance implements Observer {
 		reviveDelta = 0.0f;
 	}
 
-	public int getFirstRowRevived(int firstRowRevived) {
-		if (state == State.REVIVING && firstRowRevived == -1) {
-			reviveDelta = 0;
-			return row;
+	public int calculateReviveDelay(int firstRowRevived) {
+		if (state == State.REVIVING) {
+			if (firstRowRevived == -1) {
+				reviveDelay = column * 0.3f;
+				return row;
+			} else {
+				reviveDelay = (firstRowRevived - row) * 0.75f + column * 0.3f;
+				return firstRowRevived;
+			}
 		} else {
-			reviveDelta = firstRowRevived;
 			return firstRowRevived;
 		}
 	}

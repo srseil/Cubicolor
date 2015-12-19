@@ -221,7 +221,6 @@ public class PlayerModel extends ModelInstance
 				break;
 			case COLORING:
 				//textureAnimations.get(key).update(delta);
-				System.out.println("coloring...");
 				textureAnimation.update(delta);
 				if (!textureAnimation.isInAction()) {
 					// set the material color or something?
@@ -232,7 +231,6 @@ public class PlayerModel extends ModelInstance
 			case UNCOLORING:
 				//textureAnimations.get(key).update(-delta);
 				textureAnimation.update(-delta);
-				System.out.println("uncoloring...");
 				if (!textureAnimation.isInAction()) {
 					// set the material color or something?
 					state = State.STILL;

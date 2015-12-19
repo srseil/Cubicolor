@@ -170,10 +170,12 @@ public class GameBoard extends Actor {
 			for (int j = 0; j < modelMatrix[i].length; j++) {
 				if (modelMatrix[i][j] == null)
 					continue;
-				if (resetting && firstRowRevived == -1) {
+				/*
+				if (resetting) {
 					firstRowRevived = modelMatrix[i][j].getFirstRowRevived(
 							firstRowRevived);
 				}
+				*/
 				modelMatrix[i][j].update(Gdx.graphics.getDeltaTime());
 				if (!modelMatrix[i][j].isDead())
 					game.getModelBatch().render(modelMatrix[i][j], environment);
@@ -215,10 +217,14 @@ public class GameBoard extends Actor {
 	}
 
 	public void setup() {
-		for (int i = 0; i < modelMatrix.length; i++) {
+		int firstRowRevived = -1;
+		for (int i = modelMatrix.length - 1; i >= 0; i--) {
 			for (int j = 0; j < modelMatrix[i].length; j++) {
-				if (modelMatrix[i][j] != null)
+				if (modelMatrix[i][j] != null) {
 					modelMatrix[i][j].reset();
+					firstRowRevived = modelMatrix[i][j].calculateReviveDelay(
+									firstRowRevived);
+				}
 			}
 		}
 		exitModel.setup();
@@ -227,10 +233,14 @@ public class GameBoard extends Actor {
 	}
 
 	public void reset() {
-		for (int i = 0; i < modelMatrix.length; i++) {
+		int firstRowRevived = -1;
+		for (int i = modelMatrix.length - 1; i >= 0; i--) {
 			for (int j = 0; j < modelMatrix[i].length; j++) {
-				if (modelMatrix[i][j] != null)
+				if (modelMatrix[i][j] != null) {
 					modelMatrix[i][j].reset();
+					firstRowRevived = modelMatrix[i][j].calculateReviveDelay(
+							firstRowRevived);
+				}
 			}
 		}
 		exitModel.reset();

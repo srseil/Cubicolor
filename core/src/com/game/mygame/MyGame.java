@@ -63,8 +63,8 @@ public class MyGame extends Game {
 		modelBatch = new ModelBatch(new DefaultShaderProvider());
 		modelBuilder = new ModelBuilder();
 
-		bitmapOSR30 = new BitmapFont(Gdx.files.internal("fonts/OldStandard-Regular-30_2.fnt"));
-		bitmapOSR60 = new BitmapFont(Gdx.files.internal("OldStandard-Regular-60.fnt"));
+		bitmapOSR30 = new BitmapFont(Gdx.files.internal("fonts/OldStandard-Regular-30.fnt"));
+		bitmapOSR60 = new BitmapFont(Gdx.files.internal("fonts/OldStandard-Regular-60.fnt"));
 
 		tileModel = createTileModel();
 		keyTileRedModel = createKeyTileModel(TileColor.RED);
@@ -171,7 +171,7 @@ public class MyGame extends Game {
 		Texture texture = new Texture(Gdx.files.internal(
 				TileColor.getKeyTileTexturePath(color)));
 		//texture = new Texture(Gdx.files.internal("keytile_red.png"));
-		texture = new Texture(Gdx.files.internal("keytile_red_2.png"));
+		texture = new Texture(Gdx.files.internal("keytile_red.png"));
 		textureAttribute.set(new TextureRegion(texture));
 		/*
 			material.set(ColorAttribute.createDiffuse(Color.WHITE));
