@@ -1,3 +1,6 @@
+Settings Menu:
+Resolution, full/windowed screen, language, (reset progress), brightness, (vsync),
+Music, SFX, Controls!, (colorblind? -> reddit), Tutorial
 
 Tweaking:
 - Fonts (super sampling, etc. -> siehe BMFont Anleitung)

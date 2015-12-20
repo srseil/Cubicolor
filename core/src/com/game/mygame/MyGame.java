@@ -58,11 +58,13 @@ public class MyGame extends Game {
 	private BitmapFont bitmapOSR30;
 	private BitmapFont bitmapOSR60;
 
+	@Override
 	public void create() {
 		modelLoader = new G3dModelLoader(new UBJsonReader());
 		modelBatch = new ModelBatch(new DefaultShaderProvider());
 		modelBuilder = new ModelBuilder();
 
+		// Fonts.
 		bitmapOSR30 = new BitmapFont(Gdx.files.internal("fonts/OldStandard-Regular-30.fnt"));
 		bitmapOSR60 = new BitmapFont(Gdx.files.internal("fonts/OldStandard-Regular-60.fnt"));
 
@@ -99,14 +101,13 @@ public class MyGame extends Game {
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		camera.setToOrtho(false);
 
+		/*
 		batch = new SpriteBatch();
 		shapeRenderer = new ShapeRenderer();
 		font = new BitmapFont(Gdx.files.internal("OldStandard-Regular-30.fnt"));
+		*/
 
 		levelLoader = new LevelLoader();
-		Level level;
-		Player player;
-
 		saveState = new SaveState();
 
 		try {
@@ -114,7 +115,7 @@ public class MyGame extends Game {
 			//player = new Player(level, gameScreen);
 			//gameScreen = new GameScreen(level, camera, this);
 			saveState.load();
-			menuScreen = new MenuScreen(camera, this);
+			menuScreen = new MenuScreen(this);
 			//this.setScreen(menuScreen);
 			//saveState.save();
 			openLevel("normal", 1);
@@ -129,14 +130,20 @@ public class MyGame extends Game {
 		System.out.println(saveState.getSolveState(Difficulty.NORMAL, 3));
 	}
 
+	@Override
 	public void render() {
 		super.render();
 	}
 
+	@Override
 	public void dispose() {
+		/*
 		batch.dispose();
 		shapeRenderer.dispose();
 		font.dispose();
+		*/
+		bitmapOSR30.dispose();
+		bitmapOSR60.dispose();
 	}
 
 	public void openLevel(String difficulty, int n) {
@@ -246,6 +253,7 @@ public class MyGame extends Game {
 		return model;
 	}
 
+	/*
 	public SpriteBatch getSpriteBatch() {
 		return batch;
 	}
@@ -253,10 +261,7 @@ public class MyGame extends Game {
 	public ShapeRenderer getShapeRenderer() {
 		return shapeRenderer;
 	}
-
-	public BitmapFont getFont() {
-		return font;
-	}
+	*/
 
 	public BitmapFont getBitmapFont(String name) {
 		switch (name) {
@@ -265,7 +270,7 @@ public class MyGame extends Game {
 			case "OldStandard-Regular-60":
 				return bitmapOSR60;
 			default:
-				return null;
+				return bitmapOSR30;
 		}
 	}
 

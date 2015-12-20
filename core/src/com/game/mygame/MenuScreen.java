@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -16,18 +15,17 @@ public class MenuScreen implements Screen {
 
 	// DISPOSE! -> Documentation
 
-	final MyGame game;
-
-	private OrthographicCamera camera;
+	private MyGame game;
 	private Stage stage;
+	private OrthographicCamera camera;
 	private Skin skin;
 	private Table rootTable;
 	private Table currentMenu;
 
-	public MenuScreen(OrthographicCamera camera, MyGame game) {
+	public MenuScreen(MyGame game) {
 		this.game = game;
-		this.camera = camera;
-		stage = new Stage(new ExtendViewport(800, 600, camera));
+		stage = new Stage(new ExtendViewport(800, 600));
+		camera = (OrthographicCamera) stage.getCamera();
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
 
 		rootTable = new Table();
@@ -37,10 +35,9 @@ public class MenuScreen implements Screen {
 		stage.addActor(rootTable);
 
 		final LevelMenu levelMenu = new LevelMenu(skin, game);
-		final SettingsMenu settingsMenu = new SettingsMenu(skin, this, game);
+		final SettingsMenu settingsMenu = new SettingsMenu(skin, stage, game);
 
-		// Quit dialog, comes up when Quit button is clicked.
-		// !!! Exit <-> Quit
+		// Quit dialog (Exit <-> Quit)
 		final Dialog quitDialog = new Dialog("Quit", skin) {
 			protected void result(Object object) {
 				if ((Boolean) object)
@@ -53,10 +50,11 @@ public class MenuScreen implements Screen {
 		quitDialog.key(Input.Keys.ENTER, true);
 		quitDialog.key(Input.Keys.ESCAPE, false);
 
-		// Menu buttons.
+		// Group of menu buttons
 		VerticalGroup menuItems = new VerticalGroup();
 		menuItems.fill();
-		// Play button.
+
+		// Play button
 		TextButton playButton = new TextButton("Play", skin);
 		playButton.setWidth(100.0f);
 		playButton.addListener(new ChangeListener() {
@@ -68,7 +66,8 @@ public class MenuScreen implements Screen {
 			}
 		});
 		menuItems.addActor(playButton);
-		// Settings button.
+
+		// Settings button
 		TextButton settingsButton = new TextButton("Settings", skin);
 		settingsButton.setWidth(100.0f);
 		settingsButton.addListener(new ChangeListener() {
@@ -81,7 +80,8 @@ public class MenuScreen implements Screen {
 			}
 		});
 		menuItems.addActor(settingsButton);
-		// Quit button.
+
+		// Quit button
 		TextButton quitButton = new TextButton("Quit", skin);
 		quitButton.setWidth(100.0f);
 		quitButton.addListener(new ChangeListener() {
@@ -101,26 +101,21 @@ public class MenuScreen implements Screen {
 
 	@Override
 	public void show() {
-		stage.getViewport().setCamera(camera);
-		camera.update();
+		camera.setToOrtho(false, 800, 600);
+		//stage.getViewport().setCamera(camera);
+		//camera.update();
 		Gdx.input.setInputProcessor(stage);
 	}
 
 	@Override
 	public void render(float delta) {
-		camera.update();
-		game.getShapeRenderer().setProjectionMatrix(camera.combined);
-		game.getSpriteBatch().setProjectionMatrix(camera.combined);
-
-		// Set background color.
+		//camera.update();
 		Gdx.gl.glClearColor(0.85f, 0.8f, 0.7f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		game.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
+		// Update and draw menu content.
 		stage.act(delta);
 		stage.draw();
-
-		game.getShapeRenderer().end();
 	}
 
 	@Override
@@ -147,10 +142,6 @@ public class MenuScreen implements Screen {
 	public void dispose() {
 		stage.dispose();
 		skin.dispose();
-	}
-
-	public Stage getStage() {
-		return stage;
 	}
 
 }
