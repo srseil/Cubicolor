@@ -8,8 +8,7 @@ public enum TileColor {
 	GREEN,	// 153,204,153 ; 99cc99
 	BLUE,	// 102,153,204 ; 6699cc
 	YELLOW,	// 255,204,102 ; ffcc66
-	WHITE,	// 252,250,246 ; fcfaf6 -> colorless Tiles
-	NONE;
+	NONE;	// 252,250,246 ; fcfaf6 -> colorless Tiles
 
 	public static Color getGdxColor(TileColor color) {
 		switch (color) {

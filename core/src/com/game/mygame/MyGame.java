@@ -1,157 +1,61 @@
 package com.game.mygame;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.loaders.ModelLoader;
-import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
-import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
 import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.utils.UBJsonReader;
 
 import java.io.IOException;
 import java.util.EnumMap;
-import java.util.EnumSet;
+import java.util.HashMap;
 
 public class MyGame extends Game {
 
-	private OrthographicCamera camera;
-	private SpriteBatch batch;
-	private ShapeRenderer shapeRenderer;
+	// Error handling for getters. What happens if maps font have element?
 
-	private ModelBuilder modelBuilder;
 	private ModelBatch modelBatch;
-
+	private AssetLoader assetLoader;
 	private LevelLoader levelLoader;
-	public ModelLoader modelLoader;
-
+	private SaveState saveState;
 	private MenuScreen menuScreen;
 	private GameScreen gameScreen;
-	private SaveState saveState;
-
-	private Model tileModel;
-	private Model keyTileRedModel;
-	private Model keyTileGreenModel;
-	private Model keyTileBlueModel;
-	private Model keyTileYellowModel;
-	private Model lockTileRedModel;
-	private Model lockTileGreenModel;
-	private Model lockTileBlueModel;
-	private Model lockTileYellowModel;
-	private Model exitTileModel;
 
 	private Model playerModel;
-	private Model playerRedModel;
-	private Model playerGreenModel;
-	private Model playerBlueModel;
-	private Model playerYellowModel;
-
-	private BitmapFont bitmapOSR30;
-	private BitmapFont bitmapOSR60;
-
-	private EnumMap<TileColor, TextureAtlas> playerAnimations;
-	private EnumMap<TileColor, Model> playerModels;
-
+	private Model tileModel;
+	private Model exitTileModel;
 	private EnumMap<TileColor, Model> keyTileModels;
 	private EnumMap<TileColor, Model> lockTileModels;
+	private EnumMap<TileColor, TextureAtlas> playerAnimations;
+	private HashMap<String, BitmapFont> bitmapFonts;
 
 	@Override
 	public void create() {
-		modelLoader = new G3dModelLoader(new UBJsonReader());
 		modelBatch = new ModelBatch(new DefaultShaderProvider());
-		modelBuilder = new ModelBuilder();
-
-		// Fonts
-		bitmapOSR30 = new BitmapFont(Gdx.files.internal(
-				"fonts/OldStandard-Regular-30.fnt"));
-		bitmapOSR60 = new BitmapFont(Gdx.files.internal(
-				"fonts/OldStandard-Regular-60.fnt"));
-
-		tileModel = createTileModel();
-
-		/*
-		keyTileModels.put(TileColor.RED, createKeyTileModel(TileColor.RED));
-		keyTileModels.put(TileColor.RED,
-				assetLoader.loadKeyTileModel("models/keytile_red.g3db"));
-		*/
-		keyTileGreenModel = createKeyTileModel(TileColor.GREEN);
-		keyTileBlueModel = createKeyTileModel(TileColor.BLUE);
-		keyTileYellowModel = createKeyTileModel(TileColor.YELLOW);
-
-		lockTileRedModel = createLockTileModel(TileColor.RED);
-		lockTileGreenModel = createLockTileModel(TileColor.GREEN);
-		lockTileBlueModel = createLockTileModel(TileColor.BLUE);
-		lockTileYellowModel = createLockTileModel(TileColor.YELLOW);
-
-		exitTileModel = modelLoader.loadModel(Gdx.files.internal("ExitTile.g3db"));
-		exitTileModel.materials.first().set(new BlendingAttribute(true, 1.0f));
-		exitTileModel.materials.first().set(ColorAttribute.createDiffuse(Color.GOLD));
-
-
-
-		/*
-		playerModel = getModelBuilder().createBox(10.0f, 10.0f, 10.0f,
-				new Material(ColorAttribute.createDiffuse(Color.DARK_GRAY)),
-				VertexAttributes.Usage.Position
-				| VertexAttributes.Usage.Normal);
-		*/
-		playerModel = createPlayerModel(TileColor.NONE);
-
-		playerAnimations.put(TileColor.RED, new TextureAtlas(
-				Gdx.files.internal("player_animation/player_animation.atlas")));
-		playerAnimations.put(TileColor.GREEN, new TextureAtlas(
-				Gdx.files.internal("player_animation/player_animation.atlas")));
-		playerAnimations.put(TileColor.BLUE, new TextureAtlas(
-				Gdx.files.internal("player_animation/player_animation.atlas")));
-		playerAnimations.put(TileColor.YELLOW, new TextureAtlas(
-				Gdx.files.internal("player_animation/player_animation.atlas")));
-		playerAnimations.put(TileColor.NONE, new TextureAtlas(
-				Gdx.files.internal("player_animation/player_animation.atlas")));
-
-
-		/*
-		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		camera.setToOrtho(false);
-		*/
-
-		/*
-		batch = new SpriteBatch();
-		shapeRenderer = new ShapeRenderer();
-		font = new BitmapFont(Gdx.files.internal("OldStandard-Regular-30.fnt"));
-		*/
-
+		assetLoader = new AssetLoader();
 		levelLoader = new LevelLoader();
 		saveState = new SaveState();
 
+		loadAssets();
+
+		// Create single instances of menu and game screen here?
+
 		try {
-			//level = levelLoader.load("level1.xml");
-			//player = new Player(level, gameScreen);
-			//gameScreen = new GameScreen(level, camera, this);
 			saveState.load();
 			menuScreen = new MenuScreen(this);
 			//this.setScreen(menuScreen);
 			//saveState.save();
 			openLevel("normal", 1);
-			//this.setScreen(new TestScreen(this));
 		} catch (IOException exception) {
 			System.out.println("Error while loading level.");
 			exception.printStackTrace();
 		}
 
-		System.out.println(saveState.getSolveState(Difficulty.NORMAL, 1));
-		System.out.println(saveState.getSolveState(Difficulty.NORMAL, 2));
-		System.out.println(saveState.getSolveState(Difficulty.NORMAL, 3));
+		// For debugging purposes
+		System.out.println("Level 1 solve state: " + saveState.getSolveState(Difficulty.NORMAL, 1));
+		System.out.println("Level 2 solve state: " + saveState.getSolveState(Difficulty.NORMAL, 2));
+		System.out.println("Level 3 solve state: " + saveState.getSolveState(Difficulty.NORMAL, 3));
 	}
 
 	@Override
@@ -161,17 +65,52 @@ public class MyGame extends Game {
 
 	@Override
 	public void dispose() {
-		/*
-		batch.dispose();
-		shapeRenderer.dispose();
-		font.dispose();
-		*/
-		bitmapOSR30.dispose();
-		bitmapOSR60.dispose();
+		// What to dispose?
 	}
 
-	public TextureAtlas getPlayerAnimation(TileColor color) {
-		return playerAnimations.get(color);
+	private void loadAssets() {
+		playerModel = assetLoader.loadPlayerModel();
+
+		playerAnimations = new EnumMap<>(TileColor.class);
+		playerAnimations.put(TileColor.RED,
+				assetLoader.loadPlayerAnimation(TileColor.RED));
+		playerAnimations.put(TileColor.GREEN,
+				assetLoader.loadPlayerAnimation(TileColor.GREEN));
+		playerAnimations.put(TileColor.BLUE,
+				assetLoader.loadPlayerAnimation(TileColor.BLUE));
+		playerAnimations.put(TileColor.YELLOW,
+				assetLoader.loadPlayerAnimation(TileColor.YELLOW));
+		playerAnimations.put(TileColor.NONE,
+				assetLoader.loadPlayerAnimation(TileColor.NONE));
+
+		tileModel = assetLoader.loadTileModel();
+		exitTileModel = assetLoader.loadExitTileModel();
+
+		keyTileModels = new EnumMap<>(TileColor.class);
+		keyTileModels.put(TileColor.RED,
+				assetLoader.loadKeyTileModel(TileColor.RED));
+		keyTileModels.put(TileColor.GREEN,
+				assetLoader.loadKeyTileModel(TileColor.GREEN));
+		keyTileModels.put(TileColor.BLUE,
+				assetLoader.loadKeyTileModel(TileColor.BLUE));
+		keyTileModels.put(TileColor.YELLOW,
+				assetLoader.loadKeyTileModel(TileColor.YELLOW));
+
+		lockTileModels = new EnumMap<>(TileColor.class);
+		lockTileModels.put(TileColor.RED,
+				assetLoader.loadLockTileModel(TileColor.RED));
+		lockTileModels.put(TileColor.GREEN,
+				assetLoader.loadLockTileModel(TileColor.GREEN));
+		lockTileModels.put(TileColor.BLUE,
+				assetLoader.loadLockTileModel(TileColor.BLUE));
+		lockTileModels.put(TileColor.YELLOW,
+				assetLoader.loadLockTileModel(TileColor.YELLOW));
+
+		bitmapFonts = new HashMap<>();
+		bitmapFonts.put("OldStandard-Regular-30",
+				assetLoader.loadBitmapFont("OldStandard-Regular-30"));
+		bitmapFonts.put("OldStandard-Regular-60",
+				assetLoader.loadBitmapFont("OldStandard-Regular-60"));
 	}
 
 	public void openLevel(String difficulty, int n) {
@@ -185,141 +124,30 @@ public class MyGame extends Game {
 		}
 	}
 
+	// Change screen methods...
 	public void toGameScreen() {
 		this.setScreen(gameScreen);
-	}
-
-	private Model createTileModel() {
-		Model model = modelLoader.loadModel(Gdx.files.internal("Tile.g3db"));
-		model.materials.first().set(ColorAttribute.createDiffuse(
-				TileColor.getGdxColor(TileColor.NONE)));
-		model.materials.first().set(new BlendingAttribute(true, 1.0f));
-		return model;
-	}
-
-	private Model createKeyTileModel(TileColor color) {
-		Model model = modelLoader.loadModel(Gdx.files.internal("KeyTile.g3db"));
-		model.materials.first().set(ColorAttribute.createDiffuse(Color.WHITE));
-		model.materials.first().set(new BlendingAttribute(true, 1.0f));
-		TextureAttribute textureAttribute = model.materials.first().get(
-				TextureAttribute.class, TextureAttribute.Diffuse);
-		Texture texture = new Texture(Gdx.files.internal(
-				TileColor.getKeyTileTexturePath(color)));
-		//texture = new Texture(Gdx.files.internal("keytile_red.png"));
-		texture = new Texture(Gdx.files.internal("keytile_red.png"));
-		textureAttribute.set(new TextureRegion(texture));
-		/*
-			material.set(ColorAttribute.createDiffuse(Color.WHITE));
-			//model.materials.first().set(ColorAttribute.createDiffuse(new Color(0.91f, 0.902f, 0.875f, 1.0f)));
-			//model.materials.first().set(ColorAttribute.createDiffuse(new Color(0.949f, 0.941f, 0.925f, 1.0f)));
-
-			model = modelLoader.loadModel(Gdx.files.internal("Tile.g3db"));
-			model.materials.first().set(ColorAttribute.createDiffuse(new Color(0.989f, 0.981f, 0.965f, 1.0f)));
-			model.materials.first().set(new BlendingAttribute(true, 1.0f));
-			*/
-
-		//model.materials.removeIndex(0);
-		//model.materials.add(material);
-		/*
-		model = getModelBuilder().createBox(10.0f, 5.0f, 10.0f, material,
-				VertexAttributes.Usage.Position
-				| VertexAttributes.Usage.Normal);
-				*/
-		/*
-		switch (kind) {
-			case NORMAL:
-		}
-		*/
-		return model;
-	}
-
-	private Model createLockTileModel(TileColor color) {
-		Model model = modelLoader.loadModel(Gdx.files.internal("Tile.g3db"));
-		model.materials.first().set(ColorAttribute.createDiffuse(
-				TileColor.getGdxColor(color)));
-		model.materials.first().set(new BlendingAttribute(true, 1.0f));
-		return model;
-	}
-
-	private Model createPlayerModel(TileColor key) {
-		Material material = new Material();
-		if (key != TileColor.NONE) {
-			/*
-			material.set(ColorAttribute.createDiffuse(
-					TileColor.getGdxColor(key)));
-					*/
-		} else {
-			//material.set(ColorAttribute.createDiffuse(Color.DARK_GRAY));
-		}
-		/*
-		Model model = getModelBuilder().createBox(10.0f, 10.0f, 10.0f, material,
-				VertexAttributes.Usage.Position
-				| VertexAttributes.Usage.Normal);
-		*/
-
-		Model model = modelLoader.loadModel(Gdx.files.internal("Player.g3db"));
-		//model.materials.first().set(ColorAttribute.createDiffuse(Color.DARK_GRAY));
-		model.materials.first().set(ColorAttribute.createDiffuse(Color.WHITE));
-		model.materials.first().set(new BlendingAttribute(true, 1.0f));
-
-
-		Cubemap cubeMap = new Cubemap(Gdx.files.internal("cube.jpg"),
-				Gdx.files.internal("cube.jpg"),Gdx.files.internal("cube.jpg"),
-				Gdx.files.internal("cube.jpg"),Gdx.files.internal("cube.jpg"),
-				Gdx.files.internal("cube.jpg"));
-
-		Texture texture = new Texture(Gdx.files.internal("cube.jpg"));
-
-		//model.materials.first().set(new IntAttribute(IntAttribute.CullFace, Gdx.gl.GL_FALSE));
-		System.out.println("TEXTURE: " + model.materials.first().has(TextureAttribute.Diffuse));
-		//model.materials.first().set(new TextureAttribute(TextureAttribute.Diffuse));
-		//model.materials.first().set(new CubemapAttribute());
-
-
-		//model.materials.first().set(new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, "a_textCoords"));//new TextureAttribute(TextureAttribute.Diffuse, texture));
-
-		return model;
-	}
-
-	/*
-	public SpriteBatch getSpriteBatch() {
-		return batch;
-	}
-
-	public ShapeRenderer getShapeRenderer() {
-		return shapeRenderer;
-	}
-	*/
-
-	public BitmapFont getBitmapFont(String name) {
-		switch (name) {
-			case "OldStandard-Regular-30":
-				return bitmapOSR30;
-			case "OldStandard-Regular-60":
-				return bitmapOSR60;
-			default:
-				return bitmapOSR30;
-		}
 	}
 
 	public MenuScreen getMenuScreen() {
 		return menuScreen;
 	}
+	// ---
 
-	public GameScreen getGameScreen() {
-		return gameScreen;
-	}
-
+	// Change to save() and load() or something?
 	public SaveState getSaveState() {
 		return saveState;
 	}
+	// ---
 
-	public ModelBuilder getModelBuilder() {
-		return modelBuilder;
-	}
-
+	// Change to start & end methods?
 	public ModelBatch getModelBatch() {
 		return modelBatch;
+	}
+	// ---
+
+	public Model getPlayerModel(TileColor key) {
+		return playerModel;
 	}
 
 	public Model getTileModel() {
@@ -327,37 +155,24 @@ public class MyGame extends Game {
 	}
 
 	public Model getKeyTileModel(TileColor color) {
-		switch (color) {
-			case RED: return keyTileRedModel;
-			case GREEN: return keyTileGreenModel;
-			case BLUE: return keyTileBlueModel;
-			case YELLOW: return keyTileYellowModel;
-			default: return tileModel;
-		}
+		return keyTileModels.get(color);
 	}
 
 	public Model getLockTileModel(TileColor color) {
-		switch (color) {
-			case RED: return lockTileRedModel;
-			case GREEN: return lockTileGreenModel;
-			case BLUE: return lockTileBlueModel;
-			case YELLOW: return lockTileYellowModel;
-			default: return tileModel;
-		}
-	}
-
-	public Model getPlayerModel(TileColor key) {
-		switch (key) {
-			case RED: return playerRedModel;
-			case GREEN: return playerGreenModel;
-			case BLUE: return playerBlueModel;
-			case YELLOW: return playerYellowModel;
-			default: return playerModel;
-		}
+		return lockTileModels.get(color);
 	}
 
 	public Model getExitTileModel() {
 		return exitTileModel;
 	}
 
+	public TextureAtlas getPlayerAnimation(TileColor color) {
+		return playerAnimations.get(color);
+	}
+
+	public BitmapFont getBitmapFont(String name) {
+		return bitmapFonts.get(name);
+	}
+
 }
+

@@ -69,6 +69,7 @@ public class PlayerModel extends ModelInstance
 				TextureAttribute.class, TextureAttribute.Diffuse);
 		textureAnimations = new EnumMap<>(TileColor.class);
 		for (TileColor color : TileColor.values()) {
+			System.out.println(color);
 			textureAnimations.put(color, new TextureAnimation(
 					texture, game.getPlayerAnimation(color), 1.0f));
 		}
