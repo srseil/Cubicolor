@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.Timer;
 
 public class GameBoard extends Actor {
 
@@ -150,7 +151,12 @@ public class GameBoard extends Actor {
 	public void setup() {
 		resetModelMatrix();
 		exitModel.setup();
-		playerModel.setup();
+		Timer.schedule(new Timer.Task() {
+			@Override
+			public void run() {
+				playerModel.setup();
+			}
+		}, (modelMatrix.length + 1) * TileModel.ROW_REVIVE_DELAY);
 	}
 
 	public void movePlayerModel(int dx, int dy) {

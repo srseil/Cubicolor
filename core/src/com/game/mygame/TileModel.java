@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 public class TileModel extends ModelInstance implements Observer {
 
 	public static float SIZE = 2.0f;
+	public static float ROW_REVIVE_DELAY = 0.3f;
+	public static float COLUMN_REVIVE_DELAY = 0.15f;
 
 	private enum State {
 		ALIVE,
@@ -31,7 +33,7 @@ public class TileModel extends ModelInstance implements Observer {
 		this.column = column;
 		fallAnimation = new AnimationController(this);
 		fallAnimation.allowSameAnimation = true;
-		fallAnimation.setAnimation("Cube|Fall", 1, 1.0f, null);
+		fallAnimation.setAnimation("Cube|Fall");
 		blendAnimation = new BlendAnimation(this,
 				fallAnimation.current.duration);
 		reviveDelta = 0.0f;
@@ -90,7 +92,7 @@ public class TileModel extends ModelInstance implements Observer {
 
 	public void reset() {
 		if (state == State.REVIVING) {
-			fallAnimation.setAnimation("Cube|Fall", 1, -1.0f, null);
+			fallAnimation.setAnimation("Cube|Fall", 1, -2.0f, null);
 			blendAnimation.reset(0.0f);
 		} else {
 			fallAnimation.setAnimation("Cube|Fall", 1, 1.0f, null);
@@ -102,10 +104,11 @@ public class TileModel extends ModelInstance implements Observer {
 	public int calculateReviveDelay(int firstRowRevived) {
 		if (state == State.REVIVING) {
 			if (firstRowRevived == -1) {
-				reviveDelay = column * 0.3f;
+				reviveDelay = column * COLUMN_REVIVE_DELAY;
 				return row;
 			} else {
-				reviveDelay = (firstRowRevived - row) * 0.75f + column * 0.3f;
+				reviveDelay = (firstRowRevived - row) * ROW_REVIVE_DELAY
+						+ column * COLUMN_REVIVE_DELAY;
 				return firstRowRevived;
 			}
 		} else {

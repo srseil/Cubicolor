@@ -75,23 +75,12 @@ public class PlayerModel extends ModelInstance
 		}
 		textureAnimation = textureAnimations.get(TileColor.RED);
 
-		/*
-		textureAnimations.put(TileColor.RED,
-				new TextureAnimation("player_animation/player_animation.atlas", this, 1.0f));
-		textureAnimations.put(TileColor.GREEN,
-				new TextureAnimation("player_animation/player_animation.atlas", this, 1.0f));
-		textureAnimations.put(TileColor.BLUE,
-				new TextureAnimation("player_animation/player_animation.atlas", this, 1.0f));
-		textureAnimations.put(TileColor.YELLOW,
-				new TextureAnimation("player_animation/player_animation.atlas", this, 1.0f));
-		*/
-
 		dataX = data.getX();
 		dataY = data.getY();
 		key = data.getKey();
 
 		state = State.STILL;
-		controllable = true;
+		blendAnimation.reset(0.0f);
 		updateTransform(0, 0);
 	}
 
