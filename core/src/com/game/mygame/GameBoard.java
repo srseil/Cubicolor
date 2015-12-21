@@ -38,7 +38,7 @@ public class GameBoard extends Actor {
 
 		playerModel = new PlayerModel(
 				game.getPlayerModel(TileColor.NONE),
-				player, -width/2, height/2, modelMatrix, exitModel);
+				player, -width/2, height/2, modelMatrix, exitModel, game);
 		player.addObserver(playerModel);
 
 		environment = new Environment();
@@ -76,8 +76,7 @@ public class GameBoard extends Actor {
 					ExitTile exitTile = (ExitTile) matrix[i][j];
 					exitModel = new ExitTileModel(
 							game.getExitTileModel(), exitTile,
-							j * TileModel.SIZE,
-							-i * TileModel.SIZE, i, j);
+							j * TileModel.SIZE, -i * TileModel.SIZE, i, j);
 					exitTile.addObserver(exitModel);
 					continue;
 				} else if (matrix[i][j] instanceof KeyTile) {

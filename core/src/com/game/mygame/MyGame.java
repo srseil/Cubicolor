@@ -6,6 +6,7 @@ import com.badlogic.gdx.assets.loaders.ModelLoader;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
@@ -20,6 +21,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.UBJsonReader;
 
 import java.io.IOException;
+import java.util.EnumMap;
+import java.util.EnumSet;
 
 public class MyGame extends Game {
 
@@ -54,9 +57,14 @@ public class MyGame extends Game {
 	private Model playerBlueModel;
 	private Model playerYellowModel;
 
-	private BitmapFont font;
 	private BitmapFont bitmapOSR30;
 	private BitmapFont bitmapOSR60;
+
+	private EnumMap<TileColor, TextureAtlas> playerAnimations;
+	private EnumMap<TileColor, Model> playerModels;
+
+	private EnumMap<TileColor, Model> keyTileModels;
+	private EnumMap<TileColor, Model> lockTileModels;
 
 	@Override
 	public void create() {
@@ -64,15 +72,23 @@ public class MyGame extends Game {
 		modelBatch = new ModelBatch(new DefaultShaderProvider());
 		modelBuilder = new ModelBuilder();
 
-		// Fonts.
-		bitmapOSR30 = new BitmapFont(Gdx.files.internal("fonts/OldStandard-Regular-30.fnt"));
-		bitmapOSR60 = new BitmapFont(Gdx.files.internal("fonts/OldStandard-Regular-60.fnt"));
+		// Fonts
+		bitmapOSR30 = new BitmapFont(Gdx.files.internal(
+				"fonts/OldStandard-Regular-30.fnt"));
+		bitmapOSR60 = new BitmapFont(Gdx.files.internal(
+				"fonts/OldStandard-Regular-60.fnt"));
 
 		tileModel = createTileModel();
-		keyTileRedModel = createKeyTileModel(TileColor.RED);
+
+		/*
+		keyTileModels.put(TileColor.RED, createKeyTileModel(TileColor.RED));
+		keyTileModels.put(TileColor.RED,
+				assetLoader.loadKeyTileModel("models/keytile_red.g3db"));
+		*/
 		keyTileGreenModel = createKeyTileModel(TileColor.GREEN);
 		keyTileBlueModel = createKeyTileModel(TileColor.BLUE);
 		keyTileYellowModel = createKeyTileModel(TileColor.YELLOW);
+
 		lockTileRedModel = createLockTileModel(TileColor.RED);
 		lockTileGreenModel = createLockTileModel(TileColor.GREEN);
 		lockTileBlueModel = createLockTileModel(TileColor.BLUE);
@@ -91,15 +107,23 @@ public class MyGame extends Game {
 				| VertexAttributes.Usage.Normal);
 		*/
 		playerModel = createPlayerModel(TileColor.NONE);
-		playerRedModel = createPlayerModel(TileColor.RED);
-		playerGreenModel = createPlayerModel(TileColor.GREEN);
-		playerBlueModel = createPlayerModel(TileColor.BLUE);
-		playerYellowModel = createPlayerModel(TileColor.YELLOW);
+
+		playerAnimations.put(TileColor.RED, new TextureAtlas(
+				Gdx.files.internal("player_animation/player_animation.atlas")));
+		playerAnimations.put(TileColor.GREEN, new TextureAtlas(
+				Gdx.files.internal("player_animation/player_animation.atlas")));
+		playerAnimations.put(TileColor.BLUE, new TextureAtlas(
+				Gdx.files.internal("player_animation/player_animation.atlas")));
+		playerAnimations.put(TileColor.YELLOW, new TextureAtlas(
+				Gdx.files.internal("player_animation/player_animation.atlas")));
+		playerAnimations.put(TileColor.NONE, new TextureAtlas(
+				Gdx.files.internal("player_animation/player_animation.atlas")));
 
 
-
+		/*
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		camera.setToOrtho(false);
+		*/
 
 		/*
 		batch = new SpriteBatch();
@@ -144,6 +168,10 @@ public class MyGame extends Game {
 		*/
 		bitmapOSR30.dispose();
 		bitmapOSR60.dispose();
+	}
+
+	public TextureAtlas getPlayerAnimation(TileColor color) {
+		return playerAnimations.get(color);
 	}
 
 	public void openLevel(String difficulty, int n) {

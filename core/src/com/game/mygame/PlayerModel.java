@@ -2,6 +2,7 @@ package com.game.mygame;
 
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.math.Vector3;
 
@@ -49,22 +50,31 @@ public class PlayerModel extends ModelInstance
 	private boolean controllable;
 
 	public PlayerModel(Model model, Player data, float baseX, float baseY,
-					   TileModel[][] modelMatrix, ExitTileModel exitModel) {
+					   TileModel[][] modelMatrix, ExitTileModel exitModel,
+					   MyGame game) {
 		super(model);
 		this.data = data;
 		this.baseX = baseX;
 		this.baseY = baseY;
 		this.modelMatrix = modelMatrix;
 		this.exitModel = exitModel;
-		state = State.STILL;
+
 		moveAnimation = new AnimationController(this);
 		moveAnimation.allowSameAnimation = true;
 		moveAnimation.setAnimation("Cube|Fall");
 		blendAnimation = new BlendAnimation(this,
 				moveAnimation.current.duration);
-		//textureAnimation = new TextureAnimation("player/anim.atlas", this, 3.0f);
 
-		textureAnimations = new EnumMap<TileColor,TextureAnimation>(TileColor.class);
+		TextureAttribute texture = materials.first().get(
+				TextureAttribute.class, TextureAttribute.Diffuse);
+		textureAnimations = new EnumMap<>(TileColor.class);
+		for (TileColor color : TileColor.values()) {
+			textureAnimations.put(color, new TextureAnimation(
+					texture, game.getPlayerAnimation(color), 1.0f));
+		}
+		textureAnimation = textureAnimations.get(TileColor.RED);
+
+		/*
 		textureAnimations.put(TileColor.RED,
 				new TextureAnimation("player_animation/player_animation.atlas", this, 1.0f));
 		textureAnimations.put(TileColor.GREEN,
@@ -73,11 +83,13 @@ public class PlayerModel extends ModelInstance
 				new TextureAnimation("player_animation/player_animation.atlas", this, 1.0f));
 		textureAnimations.put(TileColor.YELLOW,
 				new TextureAnimation("player_animation/player_animation.atlas", this, 1.0f));
-		textureAnimation = textureAnimations.get(TileColor.RED);
+		*/
 
 		dataX = data.getX();
 		dataY = data.getY();
 		key = data.getKey();
+
+		state = State.STILL;
 		controllable = true;
 		updateTransform(0, 0);
 	}

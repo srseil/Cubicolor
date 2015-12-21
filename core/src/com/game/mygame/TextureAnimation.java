@@ -15,19 +15,24 @@ public class TextureAnimation {
 	private float transitionTargetTime, transitionCurrentTime;
 	private boolean inAction;
 
-	private ModelInstance model;
+	//private ModelInstance model;
 
-	public TextureAnimation(String path, ModelInstance model, float duration) {
-		this.model = model;
+
+	public TextureAnimation(TextureAttribute texture, TextureAtlas atlas, float duration) {
+		//this.model = model;
+		/*
 		texture = model.materials.first().get(
 				TextureAttribute.class, TextureAttribute.Diffuse);
-		System.out.println(texture.toString());
-		atlas = new TextureAtlas(Gdx.files.internal(path));
+				*/
+		this.texture = texture;
+		//System.out.println(texture.toString());
+		//atlas = new TextureAtlas(Gdx.files.internal(path));
+		this.atlas = atlas;
 		regions = atlas.getRegions();
 		texture.set(regions.get(0));
-		System.out.println("REGIONS: " + regions.size);
+		//System.out.println("REGIONS: " + regions.size);
 		region = 0;
-		System.out.println("REGION: " + region + " _ " + regions.get(region).toString());
+		//System.out.println("REGION: " + region + " _ " + regions.get(region).toString());
 		transitionCurrentTime = 0.0f;
 		transitionTargetTime = duration/regions.size;
 		inAction = true;
