@@ -13,6 +13,10 @@ public class PlayerModel extends ModelInstance
 
 	// Keep isControllable in this class, no need for extra getter for Gamescreen...
 
+	public static final float MOVE_SPEED = 3.0f;
+	public static final float INDICATION_SPEED = 2.5f;
+	public static final float FALL_SPEED = 1.0f;
+
 	private class Move {
 		int dx, dy;
 		boolean moved;
@@ -111,11 +115,13 @@ public class PlayerModel extends ModelInstance
 		}
 
 		if (moved) {
-			moveAnimation.setAnimation("Cube|Movement", 1, 3.0f, this);
+			moveAnimation.setAnimation("Cube|Movement", 1, MOVE_SPEED, this);
+			exitModel.hold();
 			state = State.MOVING;
 		} else {
 			updateTransform(0, 0);
-			moveAnimation.setAnimation("Cube|Indication", 1, 2.5f, this);
+			moveAnimation.setAnimation(
+					"Cube|Indication", 1, INDICATION_SPEED, this);
 			state = State.INDICATING;
 		}
 	}
@@ -154,9 +160,11 @@ public class PlayerModel extends ModelInstance
 	public void onEnd(AnimationController.AnimationDesc animation) {
 		if (animation.animation.id.equals("Cube|Movement")) {
 			state = State.STILL;
-			moveAnimation.setAnimation("Cube|Movement");
+			//moveAnimation.setAnimation("Cube|Movement");
+			moveAnimation.current.time = 0.0f;
 			transform.setToRotation(0, 1, 0, 0);
 			updateTransform(0, 0);
+			exitModel.release();
 
 			// Warum die beiden letzten checks? funktinioniert, weiß aber nicht genau warum...
 			if (data.getKey() != key && data.getX() == dataX && data.getY() == dataY) {
@@ -180,6 +188,7 @@ public class PlayerModel extends ModelInstance
 		} else if (animation.animation.id.equals("Cube|Indication")) {
 			state = State.STILL;
 			moveAnimation.setAnimation("Cube|Movement");
+			moveAnimation.current.time = 0.0f;
 			triggerQueuedMove();
 		} else if (animation.animation.id.equals("Cube|Fall")) {
 			if (state == State.RESETTING_UP) {
@@ -257,7 +266,7 @@ public class PlayerModel extends ModelInstance
 		transform.setToRotation(0, 1, 0, 0);
 		transform.setToTranslation(corrected);
 
-		moveAnimation.setAnimation("Cube|Fall", 1, 1.0f, this);
+		moveAnimation.setAnimation("Cube|Fall", 1, FALL_SPEED, this);
 		state = State.RESETTING_UP;
 		//oldPlayerKey = TileColor.NONE;
 	}
@@ -265,7 +274,7 @@ public class PlayerModel extends ModelInstance
 	public void setup() {
 		controllable = false;
 		updateTransform(0, 0.5f);
-		moveAnimation.setAnimation("Cube|Fall", 1, -1.0f, this);
+		moveAnimation.setAnimation("Cube|Fall", 1, -FALL_SPEED, this);
 		blendAnimation.reset(0.0f);
 		state = State.RESETTING_DOWN;
 	}
@@ -305,5 +314,6 @@ public class PlayerModel extends ModelInstance
 			return false;
 		}
 	}
+
 
 }

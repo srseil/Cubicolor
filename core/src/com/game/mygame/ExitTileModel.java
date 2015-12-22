@@ -24,6 +24,7 @@ public class ExitTileModel extends ModelInstance
 	private float x, z;
 	private int row, column;
 	private int height;
+	private boolean onHold;
 
 	public ExitTileModel(Model model, ExitTile data, float x, float z,
 						 int row, int column) {
@@ -100,6 +101,9 @@ public class ExitTileModel extends ModelInstance
 	public void onLoop(AnimationController.AnimationDesc animation) {}
 
 	public void update(float delta) {
+		if (onHold)
+			return;
+
 		switch (state) {
 			case MOVING_DOWN:
 				moveAnimation.update(delta);
@@ -147,6 +151,14 @@ public class ExitTileModel extends ModelInstance
 	public void setup() {
 		state = State.MOVING_UP;
 		moveAnimation.setAnimation("Cube|Fall", 1, -1.0f, this);
+	}
+
+	public void hold() {
+		onHold = true;
+	}
+
+	public void release() {
+		onHold = false;
 	}
 
 	public int getRow() {

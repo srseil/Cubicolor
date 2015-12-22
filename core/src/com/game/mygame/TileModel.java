@@ -3,12 +3,13 @@ package com.game.mygame;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
+import com.badlogic.gdx.utils.Timer;
 
 public class TileModel extends ModelInstance implements Observer {
 
-	public static float SIZE = 2.0f;
-	public static float ROW_REVIVE_DELAY = 0.3f;
-	public static float COLUMN_REVIVE_DELAY = 0.15f;
+	public static final float SIZE = 2.0f;
+	public static final float ROW_REVIVE_DELAY = 0.3f;
+	public static final float COLUMN_REVIVE_DELAY = 0.15f;
 
 	private enum State {
 		ALIVE,
@@ -24,7 +25,7 @@ public class TileModel extends ModelInstance implements Observer {
 	private BlendAnimation blendAnimation;
 	private float reviveDelta;
 	private float reviveDelay;
-	private boolean hold;
+	private boolean onHold;
 
 	public TileModel(Model model, Tile data, int row, int column) {
 		super(model);
@@ -38,7 +39,7 @@ public class TileModel extends ModelInstance implements Observer {
 				fallAnimation.current.duration);
 		reviveDelta = 0.0f;
 		reviveDelay = 0;
-		hold = false;
+		//hold = false;
 
 		// Set living tiles to reviving for setup.
 		if (data.isDead())
@@ -51,14 +52,14 @@ public class TileModel extends ModelInstance implements Observer {
 	public void updateState() {
 		if (data.isDead() && state == State.ALIVE) {
 			state = State.DYING;
-		} else if (!data.isDead() &&(state == State.DEAD ||
+		} else if (!data.isDead() && (state == State.DEAD ||
 				state == State.DYING)) {
 			state = State.REVIVING;
 		}
 	}
 
 	public void update(float delta) {
-		if (hold)
+		if (onHold)
 			return;
 
 		switch (state) {
@@ -117,11 +118,11 @@ public class TileModel extends ModelInstance implements Observer {
 	}
 
 	public void hold() {
-		hold = true;
+		onHold = true;
 	}
 
 	public void release() {
-		hold = false;
+		onHold = false;
 	}
 
 	public boolean isDead() {
