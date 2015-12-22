@@ -9,6 +9,9 @@ import java.util.ArrayList;
 public class ExitTileModel extends ModelInstance
 		implements Observer, AnimationController.AnimationListener {
 
+	public static final float SPIRAL_SPEED = 1.5f;
+	public static final float FALL_SPEED = 1.0f;
+
 	private enum State {
 		STILL,
 		MOVING_DOWN,
@@ -37,7 +40,7 @@ public class ExitTileModel extends ModelInstance
 		this.column = column;
 		moveAnimation = new AnimationController(this);
 		moveAnimation.allowSameAnimation = true;
-		moveAnimation.setAnimation("Cube|Spiral", 1, 1.0f, this);
+		moveAnimation.setAnimation("Cube|Spiral");
 		height = data.getHeight();
 		state = State.STILL;
 
@@ -57,7 +60,7 @@ public class ExitTileModel extends ModelInstance
 		//requirement met during removing model? -> queuing
 		if (state == State.STILL &&
 				data.getRequirements().size() < requirementModels.size()) {
-			moveAnimation.setAnimation("Cube|Spiral", 1, 1.0f, this);
+			moveAnimation.setAnimation("Cube|Spiral", 1, SPIRAL_SPEED, this);
 			state = State.MOVING_DOWN;
 		}
 		height = data.getHeight();
@@ -70,29 +73,34 @@ public class ExitTileModel extends ModelInstance
 				requirementModels.remove(0);
 				if (requirementModels.size() == 0) {
 					state = State.SNAPPING;
-					moveAnimation.setAnimation("Cube|Fall", 1, 1.0f, this);
+					moveAnimation.setAnimation(
+							"Cube|Fall", 1, FALL_SPEED, this);
 				} else {
 					state = State.STILL;
-					moveAnimation.setAnimation("Cube|Spiral", 1, 1.0f, this);
+					moveAnimation.setAnimation(
+							"Cube|Spiral", 1, SPIRAL_SPEED, this);
 				}
 				updateTransform(height);
 			} else if (state == State.MOVING_UP) {
 				requirementModels.add(null);
 				if (requirementModels.size() == data.getRequirements().size()) {
 					state = State.STILL;
-					moveAnimation.setAnimation("Cube|Spiral", 1, 1.0f, this);
+					moveAnimation.setAnimation(
+							"Cube|Spiral", 1, SPIRAL_SPEED, this);
 				} else {
-					moveAnimation.setAnimation("Cube|Spiral", 1, -1.0f, this);
+					moveAnimation.setAnimation(
+							"Cube|Spiral", 1, -SPIRAL_SPEED, this);
 				}
 				updateTransform(height);
 			}
 		} else if (animation.animation.id.equals("Cube|Fall")) {
 			if (state == State.MOVING_UP) {
-				moveAnimation.setAnimation("Cube|Spiral", 1, -1.0f, this);
+				moveAnimation.setAnimation(
+						"Cube|Spiral", 1, -SPIRAL_SPEED, this);
 				updateTransform(1);
 			} else {
 				state = State.STILL;
-				moveAnimation.setAnimation("Cube|Fall", 1, -1.0f, this);
+				moveAnimation.setAnimation("Cube|Fall", 1, -FALL_SPEED, this);
 			}
 		}
 	}
@@ -131,10 +139,12 @@ public class ExitTileModel extends ModelInstance
 			if (state == State.STILL) {
 				if (requirementModels.size() == 0) {
 					state = State.MOVING_UP;
-					moveAnimation.setAnimation("Cube|Fall", 1, -1.0f, this);
+					moveAnimation.setAnimation(
+							"Cube|Fall", 1, -FALL_SPEED, this);
 				} else {
 					updateTransform(height); // basierend auf differenz
-					moveAnimation.setAnimation("Cube|Spiral", 1, -1.0f, this);
+					moveAnimation.setAnimation(
+							"Cube|Spiral", 1, -SPIRAL_SPEED, this);
 					state = State.MOVING_UP;
 				}
 			} else if (state == State.MOVING_DOWN) {
@@ -150,7 +160,7 @@ public class ExitTileModel extends ModelInstance
 
 	public void setup() {
 		state = State.MOVING_UP;
-		moveAnimation.setAnimation("Cube|Fall", 1, -1.0f, this);
+		moveAnimation.setAnimation("Cube|Fall", 1, -FALL_SPEED, this);
 	}
 
 	public void hold() {
