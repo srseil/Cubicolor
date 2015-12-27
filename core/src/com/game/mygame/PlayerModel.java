@@ -12,6 +12,8 @@ public class PlayerModel extends ModelInstance
 		implements Observer, AnimationController.AnimationListener {
 
 	// Keep isControllable in this class, no need for extra getter for Gamescreen...
+	// -> Call move method, but dont do anything...
+	// player should not be controllable until exitmodel has finished with animation, else problems.
 
 	public static final float MOVE_SPEED = 3.0f;
 	public static final float INDICATION_SPEED = 2.5f;

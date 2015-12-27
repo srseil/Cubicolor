@@ -18,17 +18,18 @@ public class RequirementModel extends ModelInstance {
 	private BlendAnimation blendAnimation;
 	private ExitTileModel exitModel;
 	private TileColor color;
-	private boolean alive;
+	//private boolean alive;
 
 	public RequirementModel(TileColor color, int height, float x, float z,
 							ExitTileModel exitModel, MyGame game) {
 		super(game.getLockTileModel(color));
 		this.color = color;
 		this.exitModel = exitModel;
-		state = State.STILL;
-		blendAnimation = new BlendAnimation(this, 1.2f);
+		state = State.DEAD;
+		blendAnimation = new BlendAnimation(this, 0.6f);
+		blendAnimation.reset(0.0f);
 		transform.setTranslation(x, (height+1) * TileModel.SIZE/2, z);
-		alive = true;
+		//alive = true;
 	}
 
 	/*
@@ -37,7 +38,7 @@ public class RequirementModel extends ModelInstance {
 	 */
 	public void update(float delta) {
 		switch (state) {
-			case STILL:
+			case STILL: case DEAD:
 				// Update particle animation?
 				break;
 			case DESTROYING:
@@ -45,13 +46,14 @@ public class RequirementModel extends ModelInstance {
 				if (!blendAnimation.isInAction()) {
 					state = State.DEAD;
 					exitModel.release();
+					//alive = false;
 				}
 				break;
 			case REVIVING:
 				blendAnimation.update(-delta);
 				if (!blendAnimation.isInAction()) {
 					state = State.STILL;
-					alive = true;
+					//alive = true;
 				}
 		}
 	}
@@ -61,7 +63,7 @@ public class RequirementModel extends ModelInstance {
 	 */
 	public void destroy() {
 		//exitModel.hold();
-		alive = false;
+		//alive = false;
 		blendAnimation.reset(1.0f);
 		state = State.DESTROYING;
 	}

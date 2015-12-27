@@ -69,7 +69,7 @@ public class ExitTileModel extends ModelInstance
 		System.out.println(height);
 		state = State.STILL;
 
-		// Construct list of RequirementModels.
+		// Construct list of RequirementModels, top to bottom.
 		requirementModels = new ArrayList<>();
 		int h = data.getHeight() - 1;
 		for (TileColor color : requirements) {
@@ -144,7 +144,8 @@ public class ExitTileModel extends ModelInstance
 				System.out.println("HEIGHT: " + height);
 				// Spiraling up.
 				//requirementModels.add();
-				requirementModels.get(livingModels).revive();
+				requirementModels.get(requirementModels.size() - livingModels - 1).revive();
+				//requirementModels.get(livingModels).revive();
 				livingModels++;
 				if (livingModels == data.getRequirements().size()) {
 					// Model has spiraled all the way up.

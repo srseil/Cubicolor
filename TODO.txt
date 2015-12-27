@@ -1,3 +1,7 @@
+Bugs:
+- Schnell nach vorne bewegen, Animationen werden übersprungen.
+- Manchmal wird exit tile Animation abgebrochen, freeze, möglicherweise wenn obiges eintritt.
+
 Settings Menu:
 Resolution, full/windowed screen, language, (reset progress), brightness, (vsync),
 Music, SFX, Controls!, (colorblind? -> reddit), Tutorial
