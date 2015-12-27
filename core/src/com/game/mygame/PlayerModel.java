@@ -116,6 +116,7 @@ public class PlayerModel extends ModelInstance
 
 		if (moved) {
 			moveAnimation.setAnimation("Cube|Movement", 1, MOVE_SPEED, this);
+			// Hold exit model, gets released by requirement model.
 			exitModel.hold();
 			state = State.MOVING;
 		} else {
@@ -133,7 +134,7 @@ public class PlayerModel extends ModelInstance
 		}
 	}
 
-	@Override public void updateState() {
+	@Override public void updateState(Object... args) {
 		//System.out.println("notified ");
 		/*
 			int dx = (int) data.getX() - dataX;
@@ -164,7 +165,7 @@ public class PlayerModel extends ModelInstance
 			moveAnimation.current.time = 0.0f;
 			transform.setToRotation(0, 1, 0, 0);
 			updateTransform(0, 0);
-			exitModel.release();
+			//exitModel.release();
 
 			// Warum die beiden letzten checks? funktinioniert, weiß aber nicht genau warum...
 			if (data.getKey() != key && data.getX() == dataX && data.getY() == dataY) {

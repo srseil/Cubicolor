@@ -52,7 +52,7 @@ public class Player implements Observable {
 	}
 
 	@Override
-	public void notifyObserver() {
+	public void notifyObserver(Object... args) {
 		observer.updateState();
 	}
 

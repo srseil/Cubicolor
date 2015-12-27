@@ -118,4 +118,8 @@ public class Level {
 		return matrix;
 	}
 
+	public EnumSet<TileColor> getExitRequirements() {
+		return exitRequirements;
+	}
+
 }

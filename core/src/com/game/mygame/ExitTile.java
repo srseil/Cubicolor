@@ -18,7 +18,8 @@ public class ExitTile extends Tile {
 	public void removeRequirement(TileColor req) {
 		requirements.remove(req);
 		height--;
-		notifyObserver();
+		Object[] args = {req};
+		notifyObserver(args);
 	}
 
 	public void reset(EnumSet<TileColor> requirements) {

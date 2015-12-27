@@ -15,8 +15,8 @@ public class Tile implements Observable {
 	}
 
 	@Override
-	public void notifyObserver() {
-		observer.updateState();
+	public void notifyObserver(Object... args) {
+		observer.updateState(args);
 	}
 
 	public void interact(Player player) {}

@@ -23,6 +23,7 @@ public class GameBoard extends Actor {
 	private MyGame game;
 	private OrthographicCamera camera;
 	private Environment environment;
+	private Level level;
 	private float width, height;
 	private TileModel[][] modelMatrix;
 	private ExitTileModel exitModel;
@@ -32,6 +33,7 @@ public class GameBoard extends Actor {
 			Level level, Player player, Camera stageCamera, MyGame game) {
 		this.game = game;
 		this.camera = (OrthographicCamera) stageCamera;
+		this.level = level;
 
 		width = (float) level.getColumns() * TileModel.SIZE;
 		height = (float) level.getRows() * TileModel.SIZE;
@@ -77,7 +79,9 @@ public class GameBoard extends Actor {
 					ExitTile exitTile = (ExitTile) matrix[i][j];
 					exitModel = new ExitTileModel(
 							game.getExitTileModel(), exitTile,
-							j * TileModel.SIZE, -i * TileModel.SIZE, i, j);
+							level.getExitRequirements(),
+							j * TileModel.SIZE, -i * TileModel.SIZE,
+							i, j, game);
 					exitTile.addObserver(exitModel);
 					continue;
 				} else if (matrix[i][j] instanceof KeyTile) {
@@ -134,6 +138,12 @@ public class GameBoard extends Actor {
 
 		exitModel.update(Gdx.graphics.getDeltaTime());
 		game.getModelBatch().render(exitModel, environment);
+
+		for (RequirementModel reqModel : exitModel.getRequirementModels()) {
+			reqModel.update(Gdx.graphics.getDeltaTime());
+			if (reqModel.isAlive())
+				game.getModelBatch().render(reqModel, environment);
+		}
 
 		playerModel.update(Gdx.graphics.getDeltaTime());
 		game.getModelBatch().render(playerModel, environment);

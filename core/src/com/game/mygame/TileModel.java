@@ -7,6 +7,8 @@ import com.badlogic.gdx.utils.Timer;
 
 public class TileModel extends ModelInstance implements Observer {
 
+	// Remove model from constructor, add game and call getModel... directly
+
 	public static final float SIZE = 2.0f;
 	public static final float ROW_REVIVE_DELAY = 0.3f;
 	public static final float COLUMN_REVIVE_DELAY = 0.15f;
@@ -49,7 +51,7 @@ public class TileModel extends ModelInstance implements Observer {
 	}
 
 	@Override
-	public void updateState() {
+	public void updateState(Object... args) {
 		if (data.isDead() && state == State.ALIVE) {
 			state = State.DYING;
 		} else if (!data.isDead() && (state == State.DEAD ||
@@ -74,11 +76,11 @@ public class TileModel extends ModelInstance implements Observer {
 			case REVIVING:
 				reviveDelta += delta;
 				if (reviveDelta >= (reviveDelay)) {
-					System.out.println("DELAY: " + reviveDelay);
+					//System.out.println("DELAY: " + reviveDelay);
 				//if (reviveDelta >= (reviveDelay) + column * 0.5f) {
 				//if (reviveDelta >= (row * 0.5f) + column * 0.5f) {
-					if (row == 1 && (column == 2 || column == 3))
-						System.out.println("TILE: " + row + " " + column + " " + System.currentTimeMillis());
+					//if (row == 1 && (column == 2 || column == 3))
+						//System.out.println("TILE: " + row + " " + column + " " + System.currentTimeMillis());
 					blendAnimation.update(-delta);
 					fallAnimation.update(delta);
 					//System.out.println(fallAnimation.current.time + " " + fallAnimation.current.duration + " " + fallAnimation.current.speed);
