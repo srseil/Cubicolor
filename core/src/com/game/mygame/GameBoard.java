@@ -177,6 +177,10 @@ public class GameBoard extends Actor {
 		return playerModel.isControllable();
 	}
 
+	public boolean isOccupied() {
+		return playerModel.isOccupied();
+	}
+
 	public boolean isCompleted() {
 		return playerModel.hasCompleted();
 	}

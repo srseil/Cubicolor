@@ -13,6 +13,15 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class GameScreen implements Screen {
 
+	private class Move {
+		int dx, dy;
+
+		private Move(int dx, int dy) {
+			this.dx = dx;
+			this.dy = dy;
+		}
+	}
+
 	private MyGame game;
 	private Level level;
 	private Player player;
@@ -32,6 +41,7 @@ public class GameScreen implements Screen {
 	private WinDialog completeDialogNormal;
 	private WinDialog completeDialogOptimal;
 
+	private Move queuedMove;
 	private boolean paused;
 	private boolean pauseClosed;
 	private boolean completed;
@@ -160,18 +170,41 @@ public class GameScreen implements Screen {
 		}
 
 		if (!paused && !completed && gameBoard.isControllable()) {
+			if (queuedMove != null && !gameBoard.isOccupied()) {
+				player.move(queuedMove.dx, queuedMove.dy);
+				gameBoard.movePlayerModel(queuedMove.dx, queuedMove.dy);
+				queuedMove = null;
+				return;
+			}
+
 			if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-				player.move(0, 1);
-				gameBoard.movePlayerModel(0, 1);
+				if (gameBoard.isOccupied()) {
+					queuedMove = new Move(0, 1);
+				} else {
+					player.move(0, 1);
+					gameBoard.movePlayerModel(0, 1);
+				}
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-				player.move(0, -1);
-				gameBoard.movePlayerModel(0, -1);
+				if (gameBoard.isOccupied()) {
+					queuedMove = new Move(0, -1);
+				} else {
+					player.move(0, -1);
+					gameBoard.movePlayerModel(0, -1);
+				}
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-				player.move(1, 0);
-				gameBoard.movePlayerModel(1, 0);
+				if (gameBoard.isOccupied()) {
+					queuedMove = new Move(1, 0);
+				} else {
+					player.move(1, 0);
+					gameBoard.movePlayerModel(1, 0);
+				}
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-				player.move(-1, 0);
-				gameBoard.movePlayerModel(-1, 0);
+				if (gameBoard.isOccupied()) {
+					queuedMove = new Move(-1, 0);
+				} else {
+					player.move(-1, 0);
+					gameBoard.movePlayerModel(-1, 0);
+				}
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
 				resetLevel();
 			} else if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {

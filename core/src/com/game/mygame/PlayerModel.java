@@ -50,8 +50,8 @@ public class PlayerModel extends ModelInstance
 	private TileModel[][] modelMatrix;
 	private ExitTileModel exitModel;
 	private float baseX, baseY;
-	private int dataX, dataY;
-	private TileColor key;
+	private int dataX, dataY, queueX, queueY;
+	private TileColor key, queueKey;
 	private Move queuedMove;
 	private boolean controllable;
 
@@ -101,6 +101,8 @@ public class PlayerModel extends ModelInstance
 		controllable = false;
 		dataX = data.getX();
 		dataY = data.getY();
+		System.out.println("INFO_TRIGGER: dataX: " + data.getX() + " key: " + dataX);
+		System.out.println("INFO_TRIGGER: dataY: " + data.getY() + " key: " + dataY);
 
 		if (dx == 0 && dy == 1) {
 			transform.setToRotation(0, 1, 0, 0);
@@ -130,6 +132,7 @@ public class PlayerModel extends ModelInstance
 	}
 
 	private void triggerQueuedMove() {
+		System.out.println("Triggering queued move.");
 		if (queuedMove != null) {
 			triggerMovement(queuedMove.dx, queuedMove.dy, queuedMove.moved);
 			queuedMove = null;
@@ -162,6 +165,9 @@ public class PlayerModel extends ModelInstance
 	@Override
 	public void onEnd(AnimationController.AnimationDesc animation) {
 		if (animation.animation.id.equals("Cube|Movement")) {
+			controllable = false;
+			System.out.println("is this being called?");
+			System.out.println("move is not possible... " + (queuedMove == null ? "queued" : ""));
 			state = State.STILL;
 			//moveAnimation.setAnimation("Cube|Movement");
 			moveAnimation.current.time = 0.0f;
@@ -169,9 +175,12 @@ public class PlayerModel extends ModelInstance
 			updateTransform(0, 0);
 			//exitModel.release();
 
-			// Warum die beiden letzten checks? funktinioniert, weiß aber nicht genau warum...
+			System.out.println("INFO: dataKey: " + data.getKey() + " key: " + key);
+			System.out.println("INFO: dataX: " + data.getX() + " key: " + dataX);
+			System.out.println("INFO: dataY: " + data.getY() + " key: " + dataY);
+			// Warum die beiden letzten checks? funktioniert, weiß aber nicht genau warum...
 			if (data.getKey() != key && data.getX() == dataX && data.getY() == dataY) {
-				//System.out.println("PLAYER: coloring");
+				System.out.println("PLAYER: coloring");
 				controllable = false;
 				key = data.getKey();
 				if (key == TileColor.NONE) {
@@ -187,12 +196,16 @@ public class PlayerModel extends ModelInstance
 				return;
 			}
 
+			// Not really safe...
+			controllable = true;
 			triggerQueuedMove();
 		} else if (animation.animation.id.equals("Cube|Indication")) {
+			controllable = false;
 			state = State.STILL;
 			moveAnimation.setAnimation("Cube|Movement");
 			moveAnimation.current.time = 0.0f;
 			triggerQueuedMove();
+			controllable = true;
 		} else if (animation.animation.id.equals("Cube|Fall")) {
 			if (state == State.RESETTING_UP) {
 				//System.out.println("up done");
@@ -219,7 +232,7 @@ public class PlayerModel extends ModelInstance
 				moveAnimation.update(delta);
 				//System.out.println(moveAnimation.current.duration -
 				//		moveAnimation.current.time + " ");
-				if ((moveAnimation.current.duration -
+				if (!controllable && (moveAnimation.current.duration -
 						moveAnimation.current.time) < 0.2f) {
 					controllable = true;
 					//System.out.println("controllable");
@@ -236,7 +249,10 @@ public class PlayerModel extends ModelInstance
 			case COLORING:
 				//textureAnimations.get(key).update(delta);
 				textureAnimation.update(delta);
-				if (!textureAnimation.isInAction()) {
+				if (!controllable && textureAnimation.getTimeLeft() < 0.2f) {
+					controllable = true;
+					System.out.println("controllable again... " + textureAnimation.getTimeLeft());
+				} else if (!textureAnimation.isInAction()) {
 					// set the material color or something?
 					state = State.STILL;
 					controllable = true;
@@ -245,7 +261,10 @@ public class PlayerModel extends ModelInstance
 			case UNCOLORING:
 				//textureAnimations.get(key).update(-delta);
 				textureAnimation.update(-delta);
-				if (!textureAnimation.isInAction()) {
+				if (!controllable && textureAnimation.getTimeLeft() < 0.2f) {
+					controllable = true;
+					System.out.println("controllable again 2... " + textureAnimation.getTimeLeft());
+				} else if (!textureAnimation.isInAction()) {
 					// set the material color or something?
 					state = State.STILL;
 					controllable = true;
@@ -283,10 +302,14 @@ public class PlayerModel extends ModelInstance
 	}
 
 	public void move(int dx, int dy) {
+		System.out.println("Called move: (" + (queuedMove == null ? "nope" : "yes") + ")");
+		controllable = false;
+
 		if (data.getX() == exitModel.getColumn() &&
 				data.getY() == exitModel.getRow()) {
 			if (!exitModel.isTraversable()) {
 				modelMatrix[dataY][dataX].hold();
+				// Play indication animation instead? Probably looks weird...
 				return;
 			} else {
 				modelMatrix[dataY][dataX].release();
@@ -299,14 +322,25 @@ public class PlayerModel extends ModelInstance
 		else
 			moved = false;
 
-		if (state == State.MOVING)
+		if (state == State.MOVING || state == State.COLORING
+				|| state == State.UNCOLORING) {
 			queuedMove = new Move(dx, dy, moved);
-		else
+
+			//controllable = true;
+		}
+		else {
 			triggerMovement(dx, dy, moved);
+			System.out.println("Actually triggered movement");
+		}
 	}
 
 	public boolean isControllable() {
 		return controllable;
+	}
+
+	public boolean isOccupied() {
+		return (state == State.MOVING || state == State.COLORING
+				|| state == State.UNCOLORING);
 	}
 
 	public boolean hasCompleted() {
