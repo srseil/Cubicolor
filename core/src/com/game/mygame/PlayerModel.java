@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
 import java.util.EnumMap;
@@ -101,8 +102,10 @@ public class PlayerModel extends ModelInstance
 		controllable = false;
 		dataX = data.getX();
 		dataY = data.getY();
+		/*
 		System.out.println("INFO_TRIGGER: dataX: " + data.getX() + " key: " + dataX);
 		System.out.println("INFO_TRIGGER: dataY: " + data.getY() + " key: " + dataY);
+		*/
 
 		if (dx == 0 && dy == 1) {
 			transform.setToRotation(0, 1, 0, 0);
@@ -132,7 +135,7 @@ public class PlayerModel extends ModelInstance
 	}
 
 	private void triggerQueuedMove() {
-		System.out.println("Triggering queued move.");
+		//System.out.println("Triggering queued move.");
 		if (queuedMove != null) {
 			triggerMovement(queuedMove.dx, queuedMove.dy, queuedMove.moved);
 			queuedMove = null;
@@ -166,8 +169,7 @@ public class PlayerModel extends ModelInstance
 	public void onEnd(AnimationController.AnimationDesc animation) {
 		if (animation.animation.id.equals("Cube|Movement")) {
 			controllable = false;
-			System.out.println("is this being called?");
-			System.out.println("move is not possible... " + (queuedMove == null ? "queued" : ""));
+			//System.out.println("move is not possible... " + (queuedMove == null ? "queued" : ""));
 			state = State.STILL;
 			//moveAnimation.setAnimation("Cube|Movement");
 			moveAnimation.current.time = 0.0f;
@@ -175,12 +177,13 @@ public class PlayerModel extends ModelInstance
 			updateTransform(0, 0);
 			//exitModel.release();
 
+			/*
 			System.out.println("INFO: dataKey: " + data.getKey() + " key: " + key);
 			System.out.println("INFO: dataX: " + data.getX() + " key: " + dataX);
 			System.out.println("INFO: dataY: " + data.getY() + " key: " + dataY);
+			*/
 			// Warum die beiden letzten checks? funktioniert, weiß aber nicht genau warum...
 			if (data.getKey() != key && data.getX() == dataX && data.getY() == dataY) {
-				System.out.println("PLAYER: coloring");
 				controllable = false;
 				key = data.getKey();
 				if (key == TileColor.NONE) {
@@ -252,7 +255,6 @@ public class PlayerModel extends ModelInstance
 				textureAnimation.update(delta);
 				if (!controllable && textureAnimation.getTimeLeft() < 0.2f) {
 					controllable = true;
-					System.out.println("controllable again... " + textureAnimation.getTimeLeft());
 				} else if (!textureAnimation.isInAction()) {
 					// set the material color or something?
 					state = State.STILL;
@@ -264,7 +266,6 @@ public class PlayerModel extends ModelInstance
 				textureAnimation.update(-delta);
 				if (!controllable && textureAnimation.getTimeLeft() < 0.2f) {
 					controllable = true;
-					System.out.println("controllable again 2... " + textureAnimation.getTimeLeft());
 				} else if (!textureAnimation.isInAction()) {
 					// set the material color or something?
 					state = State.STILL;
@@ -277,17 +278,19 @@ public class PlayerModel extends ModelInstance
 		queuedMove = null;
 		controllable = false;
 
+		// Update transform if player is not already at start tile.
+		// I don't actually know why this has to be done.
+		//transform.setToRotation(0, 1, 0, 0);
+		if (dataX != data.getX() || dataY != data.getY()) {
+			Vector3 corrected = new Vector3();
+			transform.getTranslation(corrected);
+			corrected.z -= TileModel.SIZE / 2;
+			transform.setToTranslation(corrected);
+		}
+
 		dataX = data.getX();
 		dataY = data.getY();
 		key = data.getKey();
-
-		Vector3 corrected = new Vector3();
-		transform.getTranslation(corrected);
-		corrected.z -= TileModel.SIZE/2;
-
-		// Change material to standard
-		transform.setToRotation(0, 1, 0, 0);
-		transform.setToTranslation(corrected);
 
 		moveAnimation.setAnimation("Cube|Fall", 1, FALL_SPEED, this);
 		state = State.RESETTING_UP;
@@ -297,13 +300,21 @@ public class PlayerModel extends ModelInstance
 	public void setup() {
 		controllable = false;
 		updateTransform(0, 0.5f);
+
+		Vector3 corrected = new Vector3();
+		transform.getTranslation(corrected);
+		//corrected.z -= TileModel.SIZE/2;
+		Quaternion q = new Quaternion();
+		transform.getRotation(q);
+		System.out.println("PLAYER TRANSFORM: " + corrected + " " + q);
+
 		moveAnimation.setAnimation("Cube|Fall", 1, -FALL_SPEED, this);
 		blendAnimation.reset(0.0f);
 		state = State.RESETTING_DOWN;
 	}
 
 	public void move(int dx, int dy) {
-		System.out.println("Called move: (" + (queuedMove == null ? "nope" : "yes") + ")");
+		//System.out.println("Called move: (" + (queuedMove == null ? "nope" : "yes") + ")");
 		controllable = false;
 
 		if (data.getX() == exitModel.getColumn() &&
@@ -332,7 +343,7 @@ public class PlayerModel extends ModelInstance
 		}
 		else {
 			triggerMovement(dx, dy, moved);
-			System.out.println("Actually triggered movement");
+			//System.out.println("Actually triggered movement");
 		}
 	}
 
