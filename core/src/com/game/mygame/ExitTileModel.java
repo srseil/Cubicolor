@@ -103,18 +103,27 @@ public class ExitTileModel extends ModelInstance
 		System.out.println("Index: " + removedColor + " " + args[0]);
 		requirementModels.get(removedColor).destroy();
 
+		/*
+		 * BELOW: Implement queuing!
+		 */
 		//requirement met during removing model? -> queuing
 		// Update the state and animation.
+		// if clause not necessary? why would it be different?
 		if (state == State.STILL &&
 				data.getRequirements().size() < requirementModels.size()) {
-			moveAnimation.setAnimation("Cube|Spiral", 1, SPIRAL_SPEED, this);
-			state = State.MOVING_DOWN;
 		}
+		moveAnimation.setAnimation("Cube|Spiral", 1, SPIRAL_SPEED, this);
+		state = State.MOVING_DOWN;
+
+
 		height = data.getHeight();
+
+		holdRequirements();
+		hold();
 	}
 
 	/*
-	 * Note that height is oftentimes  one too much, because the reversed
+	 * Note that height is oftentimes one too much, because the reversed
 	 * animations start at the bottom and thus at the wrong height.
 	 */
 	@Override
@@ -129,6 +138,7 @@ public class ExitTileModel extends ModelInstance
 				livingModels--;
 				if (livingModels == 0) {
 					// Model is close above the board.
+					System.out.println("SNAPPING MAN");
 					state = State.SNAPPING;
 					moveAnimation.setAnimation(
 							"Cube|Fall", 1, FALL_SPEED, this);
@@ -182,8 +192,10 @@ public class ExitTileModel extends ModelInstance
 	 * Update the models' animations according to time passed since last frame.
 	 */
 	public void update(float delta) {
-		if (onHold)
+		if (onHold) {
+			//System.out.println("onHold!");
 			return;
+		}
 
 		/*
 		for (RequirementModel model : requirementModels)
@@ -261,7 +273,7 @@ public class ExitTileModel extends ModelInstance
 	}
 
 	/*
-	 * Set the model on hold unless it manually gets released.
+	 * Set the model on hold until it manually gets released.
 	 */
 	public void hold() {
 		onHold = true;
@@ -273,6 +285,22 @@ public class ExitTileModel extends ModelInstance
 	public void release() {
 		System.out.println("RELEASING");
 		onHold = false;
+	}
+
+	/*
+	 * Set the requirement models on hold until they manually get released.
+	 */
+	public void holdRequirements() {
+		for (RequirementModel model : requirementModels)
+			model.hold();
+	}
+
+	/*
+	 * Release the requirement models if they are on hold.
+	 */
+	public void releaseRequirements() {
+		for (RequirementModel model : requirementModels)
+			model.release();
 	}
 
 	/*

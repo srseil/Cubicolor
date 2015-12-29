@@ -18,6 +18,7 @@ public class RequirementModel extends ModelInstance {
 	private BlendAnimation blendAnimation;
 	private ExitTileModel exitModel;
 	private TileColor color;
+	private boolean onHold;
 	//private boolean alive;
 
 	public RequirementModel(TileColor color, int height, float x, float z,
@@ -37,6 +38,9 @@ public class RequirementModel extends ModelInstance {
 	 * last frame.
 	 */
 	public void update(float delta) {
+		if (onHold)
+			return;
+
 		switch (state) {
 			case STILL: case DEAD:
 				// Update particle animation?
@@ -74,6 +78,20 @@ public class RequirementModel extends ModelInstance {
 	public void revive() {
 		blendAnimation.reset(0.0f);
 		state = State.REVIVING;
+	}
+
+	/*
+	 * Hold the model until it manually gets released.
+	 */
+	public void hold() {
+		onHold = true;
+	}
+
+	/*
+	 * Release the model if it is on hold.
+	 */
+	public void release() {
+		onHold = false;
 	}
 
 	public TileColor getColor() {

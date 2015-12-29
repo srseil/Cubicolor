@@ -121,7 +121,7 @@ public class PlayerModel extends ModelInstance
 		if (moved) {
 			moveAnimation.setAnimation("Cube|Movement", 1, MOVE_SPEED, this);
 			// Hold exit model, gets released by requirement model.
-			exitModel.hold();
+			//exitModel.hold();
 			state = State.MOVING;
 		} else {
 			updateTransform(0, 0);
@@ -193,6 +193,7 @@ public class PlayerModel extends ModelInstance
 					state = State.COLORING;
 				}
 				queuedMove = null;
+				exitModel.releaseRequirements();
 				return;
 			}
 
