@@ -1,15 +1,12 @@
 Bugs:
-- Schnell nach vorne bewegen, Animationen werden übersprungen.
--> FIXED?
-- Manchmal wird exit tile Animation abgebrochen, freeze, möglicherweise wenn obiges eintritt.
--> FIXED?
-
-- player model wartet nach reset nicht lange genug auf exit tile animation
--> FIXED?
+- Player Model wartet nach reset/setup möglicherweise nicht lange genug
+  auf Exit Tile Animation. Kann sich durch Anpassungen an Animation ändern...
+- Disposables in dispose()-Methoden eintragen.
 
 Settings Menu:
-Resolution, full/windowed screen, language, (reset progress), brightness, (vsync),
-Music, SFX, Controls!, (colorblind? -> reddit), Tutorial
+- Gedächtnisstütze:
+  Resolution, full/windowed screen, language, (reset progress), brightness,
+  (vsync), Music, SFX, Controls!, (colorblind? -> reddit), Tutorial
 
 Tweaking:
 - Fonts (super sampling, etc. -> siehe BMFont Anleitung)

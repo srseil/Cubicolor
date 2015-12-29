@@ -3,24 +3,29 @@ package com.game.mygame;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
-import com.badlogic.gdx.math.MathUtils;
 
 public class BlendAnimation {
 
 	private Material material;
 	private BlendingAttribute attribute;
 	private float transitionCurrentTime, transitionTargetTime;
-	private boolean inAction;
+	private float opacityStep;
 	private float sig;
+	private boolean inAction;
 
 	public BlendAnimation(ModelInstance model, float duration) {
 		material = model.materials.first();
 		attribute = (BlendingAttribute) material.get(BlendingAttribute.Type);
 		transitionCurrentTime = 0.0f;
-		transitionTargetTime = duration/20.0f;
+		transitionTargetTime = duration/30.0f;
+		opacityStep = 1.0f/30.0f;
 		inAction = true;
 	}
 
+	/*
+	 * Update the animation based on the times passed since last frame.
+	 * If delta is negative, the animation plays backwards.
+	 */
 	public void update(float delta) {
 		if (!inAction)
 			return;
@@ -37,14 +42,16 @@ public class BlendAnimation {
 		transitionCurrentTime += Math.abs(delta);
 		if (transitionCurrentTime >= transitionTargetTime) {
 			if (sig == 1.0f)
-				attribute.opacity -= 0.05f;
+				attribute.opacity -= opacityStep;
 			else
-				attribute.opacity += 0.05f;
+				attribute.opacity += opacityStep;
 			transitionCurrentTime -= transitionTargetTime;
 		}
 	}
 
-	// Manually reset animation.
+	/*
+	 * Reset the animation to the chose opacity.
+	 */
 	public void reset(float opacity) {
 		attribute.opacity = opacity;
 		transitionCurrentTime = 0.0f;
