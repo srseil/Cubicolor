@@ -181,6 +181,7 @@ public class ExitTileModel extends ModelInstance
 				// Model snapped to board height.
 				state = State.STILL;
 				moveAnimation.setAnimation("Cube|Fall", 1, -FALL_SPEED, this);
+				System.out.println("SNAPPING_DONE: " + height);
 			}
 		}
 	}

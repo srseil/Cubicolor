@@ -311,6 +311,7 @@ public class PlayerModel extends ModelInstance
 			if (!exitModel.isTraversable()) {
 				modelMatrix[dataY][dataX].hold();
 				// Play indication animation instead? Probably looks weird...
+				controllable = true;
 				return;
 			} else {
 				modelMatrix[dataY][dataX].release();

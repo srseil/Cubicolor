@@ -1,8 +1,11 @@
 Bugs:
 - Schnell nach vorne bewegen, Animationen werden übersprungen.
+-> FIXED?
 - Manchmal wird exit tile Animation abgebrochen, freeze, möglicherweise wenn obiges eintritt.
+-> FIXED?
 
 - player model wartet nach reset nicht lange genug auf exit tile animation
+-> FIXED?
 
 Settings Menu:
 Resolution, full/windowed screen, language, (reset progress), brightness, (vsync),
