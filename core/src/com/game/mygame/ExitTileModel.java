@@ -1,30 +1,21 @@
 package com.game.mygame;
 
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
-import com.sun.org.apache.regexp.internal.RE;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.Iterator;
 
 public class ExitTileModel extends ModelInstance
 		implements Observer, AnimationController.AnimationListener {
 
-	// Idea for requirement remove and add:
-	// Save requirements as array, then traverse over it with height and add
-	// the right one depending on the height.
-	// Also get color of removed one somehow to remove the right one...
-
-	// The speed the model's animations are played at.
+	// The speed the model's animations are being played at.
 	public static final float SPIRAL_SPEED = 1.5f;
 	public static final float FALL_SPEED = 1.0f;
 
 	/*
-	 * The possible states a ExitTileModel can be in.
+	 * The possible states an ExitTileModel can be in.
 	 */
 	private enum State {
 		STILL,
@@ -34,29 +25,23 @@ public class ExitTileModel extends ModelInstance
 	}
 
 	private ExitTile data;
-	private TileColor[] requirements;
 	private State state;
 	private AnimationController moveAnimation;
-
 	private ArrayList<RequirementModel> requirementModels;
-	private int livingModels;
+	// Index for removed model from requirementModels.
 	private int removedColor;
+	// Coordinates for model translation.
 	private float x, z;
 	private int row, column;
 	private int height;
+	private int livingModels;
 	private boolean onHold;
 
 	public ExitTileModel(Model model, ExitTile data,
 						 EnumSet<TileColor> requirements,
 						 float x, float z, int row, int column, MyGame game) {
 		super(model);
-
-		//materials.first().set(new IntAttribute(IntAttribute.CullFace, GL20.GL_NONE));
-		//IntAttribute i = (IntAttribute)materials.first().get(IntAttribute.CullFace);
-		//i.value = GL20.GL_NONE;
-
 		this.data = data;
-		//this.requirements = (TileColor[]) requirements.toArray();
 		this.x = x;
 		this.z = z;
 		this.row = row;
@@ -64,9 +49,7 @@ public class ExitTileModel extends ModelInstance
 		moveAnimation = new AnimationController(this);
 		moveAnimation.allowSameAnimation = true;
 		moveAnimation.setAnimation("Cube|Spiral");
-		//height = data.getHeight();
 		height = 0;
-		System.out.println(height);
 		state = State.STILL;
 
 		// Construct list of RequirementModels, top to bottom.
@@ -74,7 +57,8 @@ public class ExitTileModel extends ModelInstance
 		int h = data.getHeight() - 1;
 		for (TileColor color : requirements) {
 			System.out.println("Requirement: " + color);
-			requirementModels.add(new RequirementModel(color, h, x, z, this, game));
+			requirementModels.add(new RequirementModel(
+					color, h, x, z, this, game));
 			h--;
 		}
 
@@ -90,8 +74,7 @@ public class ExitTileModel extends ModelInstance
 
 	@Override
 	public void updateState(Object... args) {
-		// Calculate the index of the removed TileColor for requirementModels
-		// and destroy it.
+		// Calculate the index of the removed color for requirementModels...
 		TileColor removed = (TileColor) args[0];
 		for (int i = 0; i < requirementModels.size(); i++) {
 			if (requirementModels.get(i).isAlive() &&
@@ -100,24 +83,15 @@ public class ExitTileModel extends ModelInstance
 				break;
 			}
 		}
-		System.out.println("Index: " + removedColor + " " + args[0]);
+		// ...and destroy it.
 		requirementModels.get(removedColor).destroy();
 
-		/*
-		 * BELOW: Implement queuing!
-		 */
-		//requirement met during removing model? -> queuing
-		// Update the state and animation.
-		// if clause not necessary? why would it be different?
-		if (state == State.STILL &&
-				data.getRequirements().size() < requirementModels.size()) {
-		}
+		// Update animation and state.
 		moveAnimation.setAnimation("Cube|Spiral", 1, SPIRAL_SPEED, this);
+		height = data.getHeight();
 		state = State.MOVING_DOWN;
 
-
-		height = data.getHeight();
-
+		// Hold models until player model moved onto respective tile.
 		holdRequirements();
 		hold();
 	}
@@ -131,40 +105,32 @@ public class ExitTileModel extends ModelInstance
 		if (animation.animation.id.equals("Cube|Spiral")) {
 			if (state == State.MOVING_DOWN) {
 				// Spiraling down.
-
-				// Remove specific color...?
-				//requirementModels.remove(0);
-				//requirementModels.get(removedColor).destroy();
 				livingModels--;
 				if (livingModels == 0) {
-					// Model is close above the board.
-					System.out.println("SNAPPING MAN");
+					// Model is close above the board; snap to board.
 					state = State.SNAPPING;
 					moveAnimation.setAnimation(
 							"Cube|Fall", 1, FALL_SPEED, this);
 				} else {
-					// Model still has space to spiral down.
+					// Model still has space to spiral down; keep on spiraling.
 					state = State.STILL;
 					moveAnimation.setAnimation(
 							"Cube|Spiral", 1, SPIRAL_SPEED, this);
 				}
 				updateTransform(height);
-				System.out.println(height);
 			} else if (state == State.MOVING_UP) {
-				System.out.println("HEIGHT: " + height);
 				// Spiraling up.
-				//requirementModels.add();
-				requirementModels.get(requirementModels.size() - livingModels - 1).revive();
-				//requirementModels.get(livingModels).revive();
+				// Revive requirement model underneath current position.
+				requirementModels.get(
+						requirementModels.size() - livingModels - 1).revive();
 				livingModels++;
 				if (livingModels == data.getRequirements().size()) {
-					// Model has spiraled all the way up.
-					System.out.println("HEIGHT: 1 choice");
+					// Model has spiraled all the way up; stop moving.
 					state = State.STILL;
 					moveAnimation.setAnimation(
 							"Cube|Spiral", 1, SPIRAL_SPEED, this);
 				} else {
-					// Model still has to spiral further up.
+					// Model still has to spiral further up; keep on spiraling.
 					height++;
 					moveAnimation.setAnimation(
 							"Cube|Spiral", 1, -SPIRAL_SPEED, this);
@@ -173,16 +139,15 @@ public class ExitTileModel extends ModelInstance
 			}
 		} else if (animation.animation.id.equals("Cube|Fall")) {
 			if (state == State.MOVING_UP) {
-				// Model snaps out of board height.
+				// Model snaps out of board height; spiral up.
 				height = 1;
 				moveAnimation.setAnimation(
 						"Cube|Spiral", 1, -SPIRAL_SPEED, this);
 				updateTransform(height);
 			} else {
-				// Model snapped to board height.
+				// Model snapped to board height; stop moving.
 				state = State.STILL;
 				moveAnimation.setAnimation("Cube|Fall", 1, -FALL_SPEED, this);
-				System.out.println("SNAPPING_DONE: " + height);
 			}
 		}
 	}
@@ -194,47 +159,23 @@ public class ExitTileModel extends ModelInstance
 	 * Update the models' animations according to time passed since last frame.
 	 */
 	public void update(float delta) {
-		if (onHold) {
-			//System.out.println("onHold!");
+		if (onHold)
 			return;
-		}
-
-		/*
-		for (RequirementModel model : requirementModels)
-			model.update(delta);
-			*/
-
-		switch (state) {
-			case MOVING_DOWN:
-				moveAnimation.update(delta);
-				break;
-			case MOVING_UP:
-				moveAnimation.update(delta);
-				break;
-			case SNAPPING:
-				moveAnimation.update(delta);
-		}
-
+		else if (state != State.STILL)
+			moveAnimation.update(delta);
 	}
 
 	/*
 	 * Initiate resetting the model to its default height.
 	 */
 	public void reset() {
-		// ganz ende, während snapping
-		//height = data.getHeight();
-		if (livingModels == data.getRequirements().size()) {
-			// Model is already at the correct height.
-			if (state == State.MOVING_DOWN) {
-				// Model is moving down; reverse movement.
-				// Das oder unten >=:
-				//requirementModels.get(0).destroy(); // Später unnötig
-				height++;
-				System.out.println("RIGHT BRANCH? " + height);
-				livingModels--;
-				state = State.MOVING_UP;
-				moveAnimation.current.speed *= -1;
-			}
+		if (livingModels == data.getRequirements().size()
+				&& state == State.MOVING_DOWN) {
+			// Model is at the top and currently moving down; reverse movement.
+			height++;
+			livingModels--;
+			moveAnimation.current.speed *= -1;
+			state = State.MOVING_UP;
 		} else {
 			// Model is not at correct height yet.
 			if (state == State.STILL) {
@@ -247,22 +188,21 @@ public class ExitTileModel extends ModelInstance
 				} else {
 					// Model is in the air; initiate spiraling animation.
 					height++;
-					updateTransform(height); // basierend auf differenz
+					updateTransform(height);
 					moveAnimation.setAnimation(
 							"Cube|Spiral", 1, -SPIRAL_SPEED, this);
 					state = State.MOVING_UP;
 				}
 			} else if (state == State.MOVING_DOWN) {
 				// Model is currently moving down; reverse movement.
-				//requirementModels.get(0).destroy(); // Später unnötig
 				height++;
 				livingModels--;
-				state = State.MOVING_UP;
 				moveAnimation.current.speed *= -1;
+				state = State.MOVING_UP;
 			} else if (state == State.SNAPPING) {
 				// Model is currently snapping to the board; reverse snapping.
-				state = State.MOVING_UP;
 				moveAnimation.current.speed *= -1;
+				state = State.MOVING_UP;
 			}
 		}
 	}
@@ -273,8 +213,8 @@ public class ExitTileModel extends ModelInstance
 	public void setup() {
 		height = 1;
 		livingModels = 0;
-		state = State.MOVING_UP;
 		moveAnimation.setAnimation("Cube|Fall", 1, -FALL_SPEED, this);
+		state = State.MOVING_UP;
 	}
 
 	/*
@@ -288,7 +228,6 @@ public class ExitTileModel extends ModelInstance
 	 * Release the model if it is on hold.
 	 */
 	public void release() {
-		System.out.println("RELEASING");
 		onHold = false;
 	}
 
@@ -312,10 +251,7 @@ public class ExitTileModel extends ModelInstance
 	 * Check if the model is at the bottom and can be traversed by the player.
 	 */
 	public boolean isTraversable() {
-		if (height == 0 && state == State.STILL)
-			return true;
-		else
-			return false;
+		return (height == 0 && state == State.STILL);
 	}
 
 	public ArrayList<RequirementModel> getRequirementModels() {

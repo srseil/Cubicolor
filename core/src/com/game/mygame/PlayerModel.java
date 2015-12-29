@@ -16,10 +16,14 @@ public class PlayerModel extends ModelInstance
 	// -> Call move method, but dont do anything...
 	// player should not be controllable until exitmodel has finished with animation, else problems.
 
+	// The speed the model's animation are being played at.
 	public static final float MOVE_SPEED = 3.0f;
 	public static final float INDICATION_SPEED = 2.5f;
 	public static final float FALL_SPEED = 1.0f;
 
+	/*
+	 * not needed anymore?
+	 */
 	private class Move {
 		int dx, dy;
 		boolean moved;
@@ -30,6 +34,9 @@ public class PlayerModel extends ModelInstance
 		}
 	}
 
+	/*
+	 * The possible states the model can be in.
+	 */
 	private enum State {
 		STILL,
 		MOVING,
@@ -37,7 +44,7 @@ public class PlayerModel extends ModelInstance
 		RESETTING_UP,
 		RESETTING_DOWN,
 		COLORING,
-		UNCOLORING
+		DECOLORING
 	}
 
 	private Player data;
@@ -189,7 +196,7 @@ public class PlayerModel extends ModelInstance
 				if (key == TileColor.NONE) {
 					//System.out.println("none color");
 					textureAnimation.resetReverse(true);
-					state = State.UNCOLORING;
+					state = State.DECOLORING;
 				} else {
 					textureAnimation = textureAnimations.get(key);
 					textureAnimation.reset(true);
@@ -261,7 +268,7 @@ public class PlayerModel extends ModelInstance
 					controllable = true;
 				}
 				break;
-			case UNCOLORING:
+			case DECOLORING:
 				//textureAnimations.get(key).update(-delta);
 				textureAnimation.update(-delta);
 				if (!controllable && textureAnimation.getTimeLeft() < 0.2f) {
@@ -336,8 +343,9 @@ public class PlayerModel extends ModelInstance
 			moved = false;
 
 		if (state == State.MOVING || state == State.COLORING
-				|| state == State.UNCOLORING) {
+				|| state == State.DECOLORING) {
 			queuedMove = new Move(dx, dy, moved);
+			System.out.println("MOVE QUEUED IN PLAYERMODEL");
 
 			//controllable = true;
 		}
@@ -353,7 +361,7 @@ public class PlayerModel extends ModelInstance
 
 	public boolean isOccupied() {
 		return (state == State.MOVING || state == State.COLORING
-				|| state == State.UNCOLORING);
+				|| state == State.DECOLORING);
 	}
 
 	public boolean hasCompleted() {
@@ -364,6 +372,5 @@ public class PlayerModel extends ModelInstance
 			return false;
 		}
 	}
-
 
 }

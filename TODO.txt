@@ -1,6 +1,8 @@
 Bugs:
 - Player Model wartet nach reset/setup möglicherweise nicht lange genug
   auf Exit Tile Animation. Kann sich durch Anpassungen an Animation ändern...
+- Möglicherweise Queuing von Exit Tile Animation notwendig, wenn Dauer der
+  Animationen geändert wird oder etwas schief geht?
 - Disposables in dispose()-Methoden eintragen.
 
 Settings Menu:
