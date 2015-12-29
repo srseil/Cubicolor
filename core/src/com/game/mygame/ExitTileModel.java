@@ -159,6 +159,7 @@ public class ExitTileModel extends ModelInstance
 				livingModels++;
 				if (livingModels == data.getRequirements().size()) {
 					// Model has spiraled all the way up.
+					System.out.println("HEIGHT: 1 choice");
 					state = State.STILL;
 					moveAnimation.setAnimation(
 							"Cube|Spiral", 1, SPIRAL_SPEED, this);
@@ -227,7 +228,9 @@ public class ExitTileModel extends ModelInstance
 			if (state == State.MOVING_DOWN) {
 				// Model is moving down; reverse movement.
 				// Das oder unten >=:
-				requirementModels.get(0).destroy(); // Später unnötig
+				//requirementModels.get(0).destroy(); // Später unnötig
+				height++;
+				System.out.println("RIGHT BRANCH? " + height);
 				livingModels--;
 				state = State.MOVING_UP;
 				moveAnimation.current.speed *= -1;
@@ -251,7 +254,8 @@ public class ExitTileModel extends ModelInstance
 				}
 			} else if (state == State.MOVING_DOWN) {
 				// Model is currently moving down; reverse movement.
-				requirementModels.get(0).destroy(); // Später unnötig
+				//requirementModels.get(0).destroy(); // Später unnötig
+				height++;
 				livingModels--;
 				state = State.MOVING_UP;
 				moveAnimation.current.speed *= -1;
