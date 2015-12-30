@@ -148,6 +148,8 @@ public class ExitTileModel extends ModelInstance
 				// Model snapped to board height; stop moving.
 				state = State.STILL;
 				moveAnimation.setAnimation("Cube|Fall", 1, -FALL_SPEED, this);
+				// Set data to alive to make it traversable.
+				data.setDead(false);
 			}
 		}
 	}

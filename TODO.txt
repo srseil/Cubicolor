@@ -1,4 +1,7 @@
 Bugs:
+- CURRENT: Kurz vor exit tile nochmal nach unten bewegen, spieler wird auf
+  exit tile glitchen und dann animation nach unten ausführen.
+  -> Scheint gefixt, am besten nochmal mit vernünftiger Tastatur testen
 - Player Model wartet nach reset/setup möglicherweise nicht lange genug
   auf Exit Tile Animation. Kann sich durch Anpassungen an Animation ändern...
 - Möglicherweise Queuing von Exit Tile Animation notwendig, wenn Dauer der

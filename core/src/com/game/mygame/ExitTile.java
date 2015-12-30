@@ -13,10 +13,21 @@ public class ExitTile extends Tile {
 		this.requirements = requirements;
 		this.defaultHeight = requirements.size();
 		this.height = defaultHeight;
+		dead = true;
+	}
+
+	@Override
+	public void setDead(boolean dead) {
+		this.dead = dead;
 	}
 
 	public void removeRequirement(TileColor req) {
 		requirements.remove(req);
+		/*
+		if (requirements.size() == 0)
+			dead = false;
+		*/
+
 		height--;
 		Object[] args = {req};
 		notifyObserver(args);

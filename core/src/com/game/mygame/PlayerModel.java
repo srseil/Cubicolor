@@ -324,17 +324,24 @@ public class PlayerModel extends ModelInstance
 		//System.out.println("Called move: (" + (queuedMove == null ? "nope" : "yes") + ")");
 		controllable = false;
 
-		if (data.getX() == exitModel.getColumn() &&
-				data.getY() == exitModel.getRow()) {
+
+		// If model is already on exit tile, do not move.
+		if (dataX == exitModel.getColumn() && dataY == exitModel.getRow()) {
+			return;
+		}
+		/*
+		else if (data.getX() == exitModel.getColumn()
+				&& data.getY() == exitModel.getRow()) {
+			// Data is on exit tile, wait until exit model is ready.
 			if (!exitModel.isTraversable()) {
 				modelMatrix[dataY][dataX].hold();
-				// Play indication animation instead? Probably looks weird...
 				controllable = true;
 				return;
 			} else {
 				modelMatrix[dataY][dataX].release();
 			}
 		}
+		*/
 
 		boolean moved;
 		if (data.getX() != dataX || data.getY() != dataY)

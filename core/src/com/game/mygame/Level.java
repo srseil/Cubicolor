@@ -57,11 +57,22 @@ public class Level {
 				}
 				*/
 
-				if (!(matrix[i][j] instanceof EmptyTile) &&
+				if (matrix[i][j] instanceof EmptyTile
+						|| matrix[i][j] instanceof ExitTile) {
+					matrix[i][j].setDead(true);
+				} else if (matrix[i][j].isDead()) {
+					matrix[i][j].setDead(false);
+				} else {
+					matrix[i][j].setDead(false);
+				}
+					/*
+				if (!(matrix[i][j] instanceof EmptyTile)
+						&&
 						matrix[i][j].isDead()) {
 					matrix[i][j].setDead(false);
 					//matrix[i][j].setReviving(true);
 				}
+					*/
 
 				if (matrix[i][j] instanceof KeyTile) {
 					KeyTile keyTile = (KeyTile) matrix[i][j];

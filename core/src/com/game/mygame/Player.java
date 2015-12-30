@@ -23,9 +23,15 @@ public class Player implements Observable {
 	public boolean move(int x, int y) {
 		int newX = this.x + x;
 		int newY = this.y + y;
+
 		if (newX >= level.getColumns() || newX < 0
 				|| newY >= level.getRows() || newY < 0) {
+			// Target location is out of bounds.
 			notifyObserver();
+			return false;
+		} else if (level.getMatrix()[this.y][this.x] instanceof ExitTile) {
+			// Player is standing on exit tile.
+			System.out.println("ON EXIT TILE");
 			return false;
 		}
 
