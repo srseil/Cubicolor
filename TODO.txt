@@ -8,6 +8,10 @@ Bugs:
   Animationen geändert wird oder etwas schief geht?
 - Disposables in dispose()-Methoden eintragen.
 
+Enhancements:
+- Player Model Indication bei Exit Model sieht potentiell eigenartig aus, da
+  die sich die Modelle möglicherweise ineinander bewegen.
+
 Settings Menu:
 - Gedächtnisstütze:
   Resolution, full/windowed screen, language, (reset progress), brightness,

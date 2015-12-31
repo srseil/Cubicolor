@@ -171,13 +171,15 @@ public class ExitTileModel extends ModelInstance
 	 * Initiate resetting the model to its default height.
 	 */
 	public void reset() {
-		if (livingModels == data.getRequirements().size()
-				&& state == State.MOVING_DOWN) {
-			// Model is at the top and currently moving down; reverse movement.
-			height++;
-			livingModels--;
-			moveAnimation.current.speed *= -1;
-			state = State.MOVING_UP;
+		if (livingModels == data.getRequirements().size()) {
+			// Model is already at the top.
+			if (state == State.MOVING_DOWN) {
+				// Model is currently moving down; reverse movement.
+				height++;
+				livingModels--;
+				moveAnimation.current.speed *= -1;
+				state = State.MOVING_UP;
+			}
 		} else {
 			// Model is not at correct height yet.
 			if (state == State.STILL) {
