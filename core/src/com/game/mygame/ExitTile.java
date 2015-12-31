@@ -21,22 +21,23 @@ public class ExitTile extends Tile {
 		this.dead = dead;
 	}
 
+	/*
+	 * Fulfills a requirement with the specified color.
+	 */
 	public void removeRequirement(TileColor req) {
 		requirements.remove(req);
-		/*
-		if (requirements.size() == 0)
-			dead = false;
-		*/
-
 		height--;
 		Object[] args = {req};
 		notifyObserver(args);
 	}
 
+	/*
+	 * Resets the tile to default height and requirements.
+	 * Does not notify observer, because resetting is also calling the models.
+	 */
 	public void reset(EnumSet<TileColor> requirements) {
 		this.requirements = requirements;
 		height = defaultHeight;
-		// no notify.
 	}
 
 	public EnumSet<TileColor> getRequirements() {
@@ -48,3 +49,4 @@ public class ExitTile extends Tile {
 	}
 
 }
+

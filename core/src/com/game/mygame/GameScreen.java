@@ -50,7 +50,7 @@ public class GameScreen implements Screen {
 		this.level = level;
 		this.game = game;
 
-		player = new Player(level, this);
+		player = new Player(level);
 
 		interfaceStage = new Stage(new ExtendViewport(800, 600));
 		boardStage = new Stage(new ExtendViewport(800, 600));
