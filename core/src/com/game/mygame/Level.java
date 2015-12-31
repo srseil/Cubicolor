@@ -26,54 +26,40 @@ public class Level {
 		this.startColumn = startColumn;
 		this.exitRequirements = exitRequirements;
 		this.matrix = matrix;
-
 		rows = matrix.length;
 		columns = matrix[0].length;
 
+		// Look for exit tile in matrix and assign it to reference.
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < columns; j++) {
 				if (matrix[i][j] instanceof ExitTile) {
 					exit = (ExitTile) matrix[i][j];
+					return;
 				}
 			}
 		}
-
 	}
 
+	/*
+	 * Reset the level to its default state.
+	 */
 	public void reset() {
-		EnumSet<TileColor> reqs = exitRequirements.clone();
-		exit.reset(reqs);
+		// Reset the exit tile to its default requirements.
+		exit.reset(exitRequirements.clone());
 
+		// Reset individual tiles in matrix.
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < columns; j++) {
-				/*
-				if (matrix[i][j].isDead()) {
-					matrix[i][j].setDead(false);
-					matrix[i][j].notifyObservers();
-				}
-				if (matrix[i][j].isDying()) {
-					matrix[i][j].setDying(false);
-					matrix[i][j].setDead(true);
-				}
-				*/
-
 				if (matrix[i][j] instanceof EmptyTile
 						|| matrix[i][j] instanceof ExitTile) {
+					// Tile is empty or exit; set to dead.
 					matrix[i][j].setDead(true);
 				} else if (matrix[i][j].isDead()) {
-					matrix[i][j].setDead(false);
-				} else {
+					// Tile is dead but should not be, set to alive.
 					matrix[i][j].setDead(false);
 				}
-					/*
-				if (!(matrix[i][j] instanceof EmptyTile)
-						&&
-						matrix[i][j].isDead()) {
-					matrix[i][j].setDead(false);
-					//matrix[i][j].setReviving(true);
-				}
-					*/
 
+				// Reset key and lock tiles.
 				if (matrix[i][j] instanceof KeyTile) {
 					KeyTile keyTile = (KeyTile) matrix[i][j];
 					keyTile.reset();
@@ -85,16 +71,22 @@ public class Level {
 		}
 	}
 
+	/*
+	 * Fulfill a requirement of the exit with the specified color.
+	 */
 	public void fulfillRequirement(TileColor color) {
 		exit.removeRequirement(color);
 	}
 
+	/*
+	 * Check if all requirements of the exit are met.
+	 */
 	public boolean requirementsMet() {
-		if (exit.getRequirements().size() == 0) {
-			return true;
-		} else {
-			return false;
-		}
+		return (exit.getRequirements().size() == 0);
+	}
+
+	public EnumSet<TileColor> getExitRequirements() {
+		return exitRequirements;
 	}
 
 	public Difficulty getDifficulty() {
@@ -107,6 +99,10 @@ public class Level {
 
 	public int getOptimalSteps() {
 		return optimal;
+	}
+
+	public Tile[][] getMatrix() {
+		return matrix;
 	}
 
 	public int getRows() {
@@ -125,12 +121,5 @@ public class Level {
 		return startColumn;
 	}
 
-	public Tile[][] getMatrix() {
-		return matrix;
-	}
-
-	public EnumSet<TileColor> getExitRequirements() {
-		return exitRequirements;
-	}
-
 }
+

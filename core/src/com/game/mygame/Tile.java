@@ -19,6 +19,9 @@ public class Tile implements Observable {
 		observer.updateState(args);
 	}
 
+	/*
+	 * Interact with the specified player.
+	 */
 	public void interact(Player player) {}
 
 	public boolean isDead() {
@@ -31,3 +34,4 @@ public class Tile implements Observable {
 	}
 
 }
+

@@ -18,17 +18,16 @@ public class KeyTile extends Tile {
 		notifyObserver();
 	}
 
+	/*
+	 * Reset the tile to its default state.
+	 */
 	public void reset() {
 		keyAvailable = true;
-		// no notify.
 	}
 
 	public TileColor getKeyColor() {
 		return keyColor;
 	}
 
-	public boolean hasKey() {
-		return keyAvailable;
-	}
-
 }
+

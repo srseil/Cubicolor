@@ -13,6 +13,7 @@ public class LockTile extends Tile {
 
 	@Override
 	public void interact(Player player) {
+		// Unlock the tile if the player has the right key.
 		if (player.getKey() == lockColor) {
 			locked = false;
 			player.removeKey();
@@ -20,6 +21,9 @@ public class LockTile extends Tile {
 		}
 	}
 
+	/*
+	 * Reset the tile to its default state.
+	 */
 	public void reset() {
 		locked = true;
 	}
@@ -29,3 +33,4 @@ public class LockTile extends Tile {
 	}
 
 }
+
