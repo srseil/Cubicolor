@@ -253,6 +253,7 @@ public class PlayerModel extends ModelInstance
 		key = data.getKey();
 		// Start resetting animation and adjust state.
 		moveAnimation.setAnimation("Cube|Fall", 1, FALL_SPEED, this);
+		blendAnimation.reset(1.0f);
 		state = State.RESETTING_UP;
 	}
 

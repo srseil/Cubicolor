@@ -21,7 +21,7 @@ public class MyGame extends Game {
 	private SaveState saveState;
 	private MenuScreen menuScreen;
 	private GameScreen gameScreen;
-
+	// Assets
 	private Model playerModel;
 	private Model tileModel;
 	private Model exitTileModel;
@@ -29,6 +29,59 @@ public class MyGame extends Game {
 	private EnumMap<TileColor, Model> lockTileModels;
 	private EnumMap<TileColor, TextureAtlas> playerAnimations;
 	private HashMap<String, BitmapFont> bitmapFonts;
+
+	public MyGame() {}
+
+	private void loadAssets() {
+		// Player model
+		playerModel = assetLoader.loadPlayerModel();
+
+		// Player animations
+		playerAnimations = new EnumMap<>(TileColor.class);
+		playerAnimations.put(TileColor.RED,
+				assetLoader.loadPlayerAnimation(TileColor.RED));
+		playerAnimations.put(TileColor.GREEN,
+				assetLoader.loadPlayerAnimation(TileColor.GREEN));
+		playerAnimations.put(TileColor.BLUE,
+				assetLoader.loadPlayerAnimation(TileColor.BLUE));
+		playerAnimations.put(TileColor.YELLOW,
+				assetLoader.loadPlayerAnimation(TileColor.YELLOW));
+		playerAnimations.put(TileColor.NONE,
+				assetLoader.loadPlayerAnimation(TileColor.NONE));
+
+		// Tile and exit tile model
+		tileModel = assetLoader.loadTileModel();
+		exitTileModel = assetLoader.loadExitTileModel();
+
+		// Key tile models
+		keyTileModels = new EnumMap<>(TileColor.class);
+		keyTileModels.put(TileColor.RED,
+				assetLoader.loadKeyTileModel(TileColor.RED));
+		keyTileModels.put(TileColor.GREEN,
+				assetLoader.loadKeyTileModel(TileColor.GREEN));
+		keyTileModels.put(TileColor.BLUE,
+				assetLoader.loadKeyTileModel(TileColor.BLUE));
+		keyTileModels.put(TileColor.YELLOW,
+				assetLoader.loadKeyTileModel(TileColor.YELLOW));
+
+		// Lock tile models
+		lockTileModels = new EnumMap<>(TileColor.class);
+		lockTileModels.put(TileColor.RED,
+				assetLoader.loadLockTileModel(TileColor.RED));
+		lockTileModels.put(TileColor.GREEN,
+				assetLoader.loadLockTileModel(TileColor.GREEN));
+		lockTileModels.put(TileColor.BLUE,
+				assetLoader.loadLockTileModel(TileColor.BLUE));
+		lockTileModels.put(TileColor.YELLOW,
+				assetLoader.loadLockTileModel(TileColor.YELLOW));
+
+		// Bitmap fonts
+		bitmapFonts = new HashMap<>();
+		bitmapFonts.put("OldStandard-Regular-30",
+				assetLoader.loadBitmapFont("OldStandard-Regular-30"));
+		bitmapFonts.put("OldStandard-Regular-60",
+				assetLoader.loadBitmapFont("OldStandard-Regular-60"));
+	}
 
 	@Override
 	public void create() {
@@ -41,12 +94,13 @@ public class MyGame extends Game {
 
 		// Create single instances of menu and game screen here?
 
+		// Load save state and switch to menu screen.
 		try {
 			saveState.load();
 			menuScreen = new MenuScreen(this);
-			//this.setScreen(menuScreen);
+			this.setScreen(menuScreen);
 			//saveState.save();
-			openLevel("normal", 1);
+			//openLevel("normal", 1);
 		} catch (IOException exception) {
 			System.out.println("Error while loading level.");
 			exception.printStackTrace();
@@ -68,51 +122,9 @@ public class MyGame extends Game {
 		// What to dispose?
 	}
 
-	private void loadAssets() {
-		playerModel = assetLoader.loadPlayerModel();
-
-		playerAnimations = new EnumMap<>(TileColor.class);
-		playerAnimations.put(TileColor.RED,
-				assetLoader.loadPlayerAnimation(TileColor.RED));
-		playerAnimations.put(TileColor.GREEN,
-				assetLoader.loadPlayerAnimation(TileColor.GREEN));
-		playerAnimations.put(TileColor.BLUE,
-				assetLoader.loadPlayerAnimation(TileColor.BLUE));
-		playerAnimations.put(TileColor.YELLOW,
-				assetLoader.loadPlayerAnimation(TileColor.YELLOW));
-		playerAnimations.put(TileColor.NONE,
-				assetLoader.loadPlayerAnimation(TileColor.NONE));
-
-		tileModel = assetLoader.loadTileModel();
-		exitTileModel = assetLoader.loadExitTileModel();
-
-		keyTileModels = new EnumMap<>(TileColor.class);
-		keyTileModels.put(TileColor.RED,
-				assetLoader.loadKeyTileModel(TileColor.RED));
-		keyTileModels.put(TileColor.GREEN,
-				assetLoader.loadKeyTileModel(TileColor.GREEN));
-		keyTileModels.put(TileColor.BLUE,
-				assetLoader.loadKeyTileModel(TileColor.BLUE));
-		keyTileModels.put(TileColor.YELLOW,
-				assetLoader.loadKeyTileModel(TileColor.YELLOW));
-
-		lockTileModels = new EnumMap<>(TileColor.class);
-		lockTileModels.put(TileColor.RED,
-				assetLoader.loadLockTileModel(TileColor.RED));
-		lockTileModels.put(TileColor.GREEN,
-				assetLoader.loadLockTileModel(TileColor.GREEN));
-		lockTileModels.put(TileColor.BLUE,
-				assetLoader.loadLockTileModel(TileColor.BLUE));
-		lockTileModels.put(TileColor.YELLOW,
-				assetLoader.loadLockTileModel(TileColor.YELLOW));
-
-		bitmapFonts = new HashMap<>();
-		bitmapFonts.put("OldStandard-Regular-30",
-				assetLoader.loadBitmapFont("OldStandard-Regular-30"));
-		bitmapFonts.put("OldStandard-Regular-60",
-				assetLoader.loadBitmapFont("OldStandard-Regular-60"));
-	}
-
+	/*
+	 * Open the level with the specified difficulty and number.
+	 */
 	public void openLevel(String difficulty, int n) {
 		try {
 			Level level = levelLoader.load(difficulty, n);

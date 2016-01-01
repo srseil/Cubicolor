@@ -19,6 +19,7 @@ Enhancements:
   richtiger Farbe auf sie tritt.
   -> Ansonsten attribute in key und lock Klassen entfernen.
 - Observer-Beziehung von Player und PlayerModel entfernen?
+- Escape-Menü auch aufrufbar machen, wenn man Spieler nicht kontrollieren kann.
 
 Settings Menu:
 - Gedächtnisstütze:
