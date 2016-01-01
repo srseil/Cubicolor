@@ -79,6 +79,10 @@ public class MyGame extends Game {
 		bitmapFonts = new HashMap<>();
 		bitmapFonts.put("OldStandard-Regular-30",
 				assetLoader.loadBitmapFont("OldStandard-Regular-30"));
+		bitmapFonts.put("OldStandard-Regular-50",
+				assetLoader.loadBitmapFont("OldStandard-Regular-50"));
+		bitmapFonts.put("OldStandard-Regular-40",
+				assetLoader.loadBitmapFont("OldStandard-Regular-40"));
 		bitmapFonts.put("OldStandard-Regular-60",
 				assetLoader.loadBitmapFont("OldStandard-Regular-60"));
 	}
@@ -98,9 +102,9 @@ public class MyGame extends Game {
 		try {
 			saveState.load();
 			menuScreen = new MenuScreen(this);
-			this.setScreen(menuScreen);
+			//this.setScreen(menuScreen);
 			//saveState.save();
-			//openLevel("normal", 1);
+			openLevel("normal", 1);
 		} catch (IOException exception) {
 			System.out.println("Error while loading level.");
 			exception.printStackTrace();

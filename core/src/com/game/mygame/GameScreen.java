@@ -68,18 +68,18 @@ public class GameScreen implements Screen {
 		Table leftUI = new Table();
 		rootTable.add(leftUI).fillY().expand().left().padLeft(10.0f).padTop(10.0f);
 		Table rightUI = new Table();
-		rootTable.add(rightUI).fillY().right().padRight(10.0f).padBottom(10.0f).width(65.0f);
+		rootTable.add(rightUI).fillY().right().padRight(15.0f).padBottom(10.0f).width(65.0f);
 
 		// Level number and difficulty labels in top left corner.
 		difficultyLabel = new Label(level.getDifficulty().toString(), skin);
 		difficultyLabel.setStyle(new Label.LabelStyle(
-				game.getBitmapFont("OldStandard-Regular-60"), Color.BLACK));
-		leftUI.add(difficultyLabel).top().padTop(-10.0f);
+				game.getBitmapFont("OldStandard-Regular-40"), Color.BLACK));
+		leftUI.add(difficultyLabel).top().padTop(-30.0f);
 		leftUI.row();
 		levelLabel = new Label("Level " + level.getNumber(), skin);
 		levelLabel.setStyle(new Label.LabelStyle(
 				game.getBitmapFont("OldStandard-Regular-30"), Color.BLACK));
-		leftUI.add(levelLabel).expandY().top().padTop(-5.0f);
+		leftUI.add(levelLabel).expandY().top().left().padTop(-20.0f);
 
 		// FPS counter in the top right corner.
 		fps = new Label("FPS: ", skin);
@@ -90,7 +90,7 @@ public class GameScreen implements Screen {
 		stepsLabel = new Label("00", skin);
 		stepsLabel.setStyle(new Label.LabelStyle(
 				game.getBitmapFont("OldStandard-Regular-60"), Color.BLACK));
-		rightUI.add(stepsLabel).bottom().padBottom(-18.0f);
+		rightUI.add(stepsLabel).bottom().padBottom(-30.0f);
 		rightUI.row();
 		Label stepsCaption = new Label("steps", skin);
 		stepsCaption.setStyle(new Label.LabelStyle(
