@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 
 public class BlendAnimation {
 
-	private Material material;
 	private BlendingAttribute attribute;
 	private float transitionCurrentTime, transitionTargetTime;
 	private float opacityStep;
@@ -14,8 +13,9 @@ public class BlendAnimation {
 	private boolean inAction;
 
 	public BlendAnimation(ModelInstance model, float duration) {
-		material = model.materials.first();
+		Material material = model.materials.first();
 		attribute = (BlendingAttribute) material.get(BlendingAttribute.Type);
+		// Set animation to 30 frames per second and start it.
 		transitionCurrentTime = 0.0f;
 		transitionTargetTime = duration/30.0f;
 		opacityStep = 1.0f/30.0f;
@@ -24,33 +24,34 @@ public class BlendAnimation {
 
 	/*
 	 * Update the animation based on the times passed since last frame.
-	 * If delta is negative, the animation plays backwards.
+	 * If delta is negative, the animation plays backwards (to opaque).
 	 */
 	public void update(float delta) {
 		if (!inAction)
 			return;
 
+		// Update opacity if target time has been reached.
 		sig = Math.signum(delta);
-
-		if ((sig == 1.0f && attribute.opacity <= 0.0f) ||
-				(sig == -1.0f && attribute.opacity >= 1.0f)) {
-			inAction = false;
-			transitionCurrentTime = 0.0f;
-			return;
-		}
-
 		transitionCurrentTime += Math.abs(delta);
 		if (transitionCurrentTime >= transitionTargetTime) {
 			if (sig == 1.0f)
 				attribute.opacity -= opacityStep;
 			else
 				attribute.opacity += opacityStep;
+
 			transitionCurrentTime -= transitionTargetTime;
+
+			// Stop the animation if it has reached the end.
+			if ((sig == 1.0f && attribute.opacity <= 0.0f)
+					|| (sig == -1.0f && attribute.opacity >= 1.0f)) {
+				transitionCurrentTime = 0.0f;
+				inAction = false;
+			}
 		}
 	}
 
 	/*
-	 * Reset the animation to the chose opacity.
+	 * Reset the animation to the chosen opacity.
 	 */
 	public void reset(float opacity) {
 		attribute.opacity = opacity;
@@ -63,3 +64,4 @@ public class BlendAnimation {
 	}
 
 }
+

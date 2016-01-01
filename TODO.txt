@@ -8,6 +8,9 @@ Bugs:
 - Möglicherweise Queuing von Exit Tile Animation notwendig, wenn Dauer der
   Animationen geändert wird oder etwas schief geht?
 - Disposables in dispose()-Methoden eintragen.
+- Vorderseit von Tile (unten links im Testlevel) wird bei Blendanimation nicht
+  korrekt gerendert; weiße Seite (ähnlich Problem bei Exit Tile Model mit
+  ineinander schneidenen Modellen...).
 
 Enhancements:
 - Player Model Indication bei Exit Model sieht potentiell eigenartig aus, da
