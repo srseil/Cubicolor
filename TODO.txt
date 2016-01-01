@@ -4,6 +4,7 @@ Bugs:
   -> Scheint gefixt, am besten nochmal mit vernünftiger Tastatur testen
 - Player Model wartet nach reset/setup möglicherweise nicht lange genug
   auf Exit Tile Animation. Kann sich durch Anpassungen an Animation ändern...
+  -> Wartet nicht lange genug auf Start-Tile!
 - Möglicherweise Queuing von Exit Tile Animation notwendig, wenn Dauer der
   Animationen geändert wird oder etwas schief geht?
 - Disposables in dispose()-Methoden eintragen.
@@ -14,6 +15,7 @@ Enhancements:
 - Lock Tiles und Key Tiles könnten Farbe verlieren, wenn der Spieler mit
   richtiger Farbe auf sie tritt.
   -> Ansonsten attribute in key und lock Klassen entfernen.
+- Observer-Beziehung von Player und PlayerModel entfernen?
 
 Settings Menu:
 - Gedächtnisstütze:

@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
-import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
 import java.util.EnumMap;
@@ -12,27 +11,13 @@ import java.util.EnumMap;
 public class PlayerModel extends ModelInstance
 		implements Observer, AnimationController.AnimationListener {
 
-	// Keep isControllable in this class, no need for extra getter for Gamescreen...
-	// -> Call move method, but dont do anything...
-	// player should not be controllable until exitmodel has finished with animation, else problems.
-
+	// The time in seconds before the end of an animation the player can be
+	// controlled. This allows for smoother controls.
+	public static final float CONTROL_MARGIN = 0.2f;
 	// The speed the model's animation are being played at.
 	public static final float MOVE_SPEED = 3.0f;
 	public static final float INDICATION_SPEED = 2.5f;
 	public static final float FALL_SPEED = 1.0f;
-
-	/*
-	 * not needed anymore?
-	 */
-	private class Move {
-		int dx, dy;
-		boolean moved;
-		public Move(int dx, int dy, boolean moved) {
-			this.dx = dx;
-			this.dy = dy;
-			this.moved = moved;
-		}
-	}
 
 	/*
 	 * The possible states the model can be in.
@@ -48,56 +33,56 @@ public class PlayerModel extends ModelInstance
 	}
 
 	private Player data;
-	private State state;
+	private ExitTileModel exitModel;
+	// Animations
 	private AnimationController moveAnimation;
 	private BlendAnimation blendAnimation;
 	private TextureAnimation textureAnimation;
-
 	private EnumMap<TileColor, TextureAnimation> textureAnimations;
-
-	private TileModel[][] modelMatrix;
-	private ExitTileModel exitModel;
+	// Private data
+	private State state;
+	private TileColor key;
 	private float baseX, baseY;
-	private int dataX, dataY, queueX, queueY;
-	private TileColor key, queueKey;
-	private Move queuedMove;
+	private int dataX, dataY;
 	private boolean controllable;
 
 	public PlayerModel(Model model, Player data, float baseX, float baseY,
-					   TileModel[][] modelMatrix, ExitTileModel exitModel,
-					   MyGame game) {
+					   ExitTileModel exitModel, MyGame game) {
 		super(model);
 		this.data = data;
 		this.baseX = baseX;
 		this.baseY = baseY;
-		this.modelMatrix = modelMatrix;
 		this.exitModel = exitModel;
 
+		// Setup move and blend animations.
 		moveAnimation = new AnimationController(this);
 		moveAnimation.allowSameAnimation = true;
 		moveAnimation.setAnimation("Cube|Fall");
-		blendAnimation = new BlendAnimation(this,
-				moveAnimation.current.duration);
+		blendAnimation = new BlendAnimation(
+				this, moveAnimation.current.duration);
+		blendAnimation.reset(0.0f);
 
+		// Build map of different texture animations.
 		TextureAttribute texture = materials.first().get(
 				TextureAttribute.class, TextureAttribute.Diffuse);
 		textureAnimations = new EnumMap<>(TileColor.class);
 		for (TileColor color : TileColor.values()) {
-			System.out.println(color);
 			textureAnimations.put(color, new TextureAnimation(
 					texture, game.getPlayerAnimation(color), 1.0f));
 		}
 		textureAnimation = textureAnimations.get(TileColor.RED);
 
+		// Position player and set to default state.
 		dataX = data.getX();
 		dataY = data.getY();
 		key = data.getKey();
-
 		state = State.STILL;
-		blendAnimation.reset(0.0f);
-		updateTransform(0, 0);
 	}
 
+	/*
+	 * Update the model's transform to data's position.
+	 * The position can be corrected by the specified values.
+	 */
 	private void updateTransform(float correctX, float correctY) {
 		transform.setTranslation(
 				0*baseX + (data.getX() + correctX) * TileModel.SIZE,
@@ -105,33 +90,38 @@ public class PlayerModel extends ModelInstance
 				0*baseY - (data.getY() + correctY) * TileModel.SIZE);
 	}
 
+	/*
+	 * Trigger the movement of the model along the specified axis.
+	 * Start corresponding animation if the player actually moved or not.
+	 */
 	private void triggerMovement(int dx, int dy, boolean moved) {
 		controllable = false;
+		// Update the model's position from data.
 		dataX = data.getX();
 		dataY = data.getY();
-		/*
-		System.out.println("INFO_TRIGGER: dataX: " + data.getX() + " key: " + dataX);
-		System.out.println("INFO_TRIGGER: dataY: " + data.getY() + " key: " + dataY);
-		*/
 
+		// Rotate model to the axis it is moving along and update the position.
 		if (dx == 0 && dy == 1) {
 			transform.setToRotation(0, 1, 0, 0);
-			if (moved) updateTransform(0, -1);
+			if (moved)
+				updateTransform(0, -1);
 		} else if (dx == 0 && dy == -1) {
 			transform.setToRotation(0, 1, 0, 180);
-			if (moved) updateTransform(0, 1);
+			if (moved)
+				updateTransform(0, 1);
 		} else if (dx == 1 && dy == 0) {
 			transform.setToRotation(0, 1, 0, 270);
-			if (moved) updateTransform(-1, 0);
+			if (moved)
+				updateTransform(-1, 0);
 		} else if (dx == -1 && dy == 0) {
 			transform.setToRotation(0, 1, 0, 90);
-			if (moved) updateTransform(1, 0);
+			if (moved)
+				updateTransform(1, 0);
 		}
 
+		// Start corresponding animation and adjust the state.
 		if (moved) {
 			moveAnimation.setAnimation("Cube|Movement", 1, MOVE_SPEED, this);
-			// Hold exit model, gets released by requirement model.
-			//exitModel.hold();
 			state = State.MOVING;
 		} else {
 			updateTransform(0, 0);
@@ -141,60 +131,23 @@ public class PlayerModel extends ModelInstance
 		}
 	}
 
-	private void triggerQueuedMove() {
-		//System.out.println("Triggering queued move.");
-		if (queuedMove != null) {
-			triggerMovement(queuedMove.dx, queuedMove.dy, queuedMove.moved);
-			queuedMove = null;
-		}
-	}
-
-	@Override public void updateState(Object... args) {
-		//System.out.println("notified ");
-		/*
-			int dx = (int) data.getX() - dataX;
-			int dy = (int) data.getY() - dataY;
-			boolean moved;
-			System.out.println(dx + " " + dy);
-
-			if (dx != 0 || dy != 0)
-				moved = true;
-			else
-				moved = false;
-
-			if (state == State.MOVING) {
-				queuedMove = new Move(dx, dy, moved);
-			} else {
-				triggerMovement(dx, dy, moved);
-				dataX = (int) data.getX();
-				dataY = (int) data.getY();
-			}
-			*/
-	}
+	@Override public void updateState(Object... args) {}
 
 	@Override
 	public void onEnd(AnimationController.AnimationDesc animation) {
 		if (animation.animation.id.equals("Cube|Movement")) {
+			// Movement has finished.
 			controllable = false;
-			//System.out.println("move is not possible... " + (queuedMove == null ? "queued" : ""));
+			// Reset animation and make model ready for next move.
 			state = State.STILL;
-			//moveAnimation.setAnimation("Cube|Movement");
 			moveAnimation.current.time = 0.0f;
 			transform.setToRotation(0, 1, 0, 0);
 			updateTransform(0, 0);
-			//exitModel.release();
 
-			/*
-			System.out.println("INFO: dataKey: " + data.getKey() + " key: " + key);
-			System.out.println("INFO: dataX: " + data.getX() + " key: " + dataX);
-			System.out.println("INFO: dataY: " + data.getY() + " key: " + dataY);
-			*/
-			// Warum die beiden letzten checks? funktioniert, weiß aber nicht genau warum...
-			if (data.getKey() != key && data.getX() == dataX && data.getY() == dataY) {
-				controllable = false;
+			// Take key if model is standing on key tile.
+			if (data.getKey() != key) {
 				key = data.getKey();
 				if (key == TileColor.NONE) {
-					//System.out.println("none color");
 					textureAnimation.resetReverse(true);
 					state = State.DECOLORING;
 				} else {
@@ -202,34 +155,32 @@ public class PlayerModel extends ModelInstance
 					textureAnimation.reset(true);
 					state = State.COLORING;
 				}
-				queuedMove = null;
 				exitModel.releaseRequirements();
 				return;
 			}
 
-			// Not really safe...
 			controllable = true;
-			triggerQueuedMove();
 		} else if (animation.animation.id.equals("Cube|Indication")) {
+			// Movement indication has finished.
 			controllable = false;
+			// Reset animation and make model ready for next move.
 			state = State.STILL;
 			moveAnimation.setAnimation("Cube|Movement");
 			moveAnimation.current.time = 0.0f;
-			triggerQueuedMove();
 			controllable = true;
 		} else if (animation.animation.id.equals("Cube|Fall")) {
+			// Falling/hovering has finished.
 			if (state == State.RESETTING_UP) {
-				//System.out.println("up done");
+				// Player has hovered up; start hovering down on start tile.
 				state = State.RESETTING_DOWN;
-				//playerModel.transform.setToRotation(0, 1, 0, 0);
 				updateTransform(0, 0.5f);
 				textureAnimation.reset(false);
 				moveAnimation.setAnimation("Cube|Fall", 1, -1.0f, this);
 				blendAnimation.reset(0.0f);
 			} else if (state == State.RESETTING_DOWN) {
+				// Player has hovered down; is ready and controllable again.
 				state = State.STILL;
 				controllable = true;
-				//moveAnimation.setAnimation("Cube|Movement");
 			}
 		}
 	}
@@ -237,16 +188,18 @@ public class PlayerModel extends ModelInstance
 	@Override
 	public void onLoop(AnimationController.AnimationDesc animation) {}
 
+	/*
+	 * Update the model's animations based on the time passed since last frame.
+	 * The player becomes controllable when the animations are close to being
+	 * finished, so that the control feels better for the player.
+	 */
 	public void update(float delta) {
 		switch (state) {
 			case MOVING: case INDICATING:
 				moveAnimation.update(delta);
-				//System.out.println(moveAnimation.current.duration -
-				//		moveAnimation.current.time + " ");
-				if (!controllable && (moveAnimation.current.duration -
-						moveAnimation.current.time) < 0.2f) {
+				if (!controllable && (moveAnimation.current.duration
+						- moveAnimation.current.time) < CONTROL_MARGIN) {
 					controllable = true;
-					//System.out.println("controllable");
 				}
 				break;
 			case RESETTING_UP:
@@ -258,36 +211,35 @@ public class PlayerModel extends ModelInstance
 				moveAnimation.update(delta);
 				break;
 			case COLORING:
-				//textureAnimations.get(key).update(delta);
 				textureAnimation.update(delta);
-				if (!controllable && textureAnimation.getTimeLeft() < 0.2f) {
+				if (textureAnimation.getTimeLeft() < CONTROL_MARGIN
+						&& !controllable) {
 					controllable = true;
 				} else if (!textureAnimation.isInAction()) {
-					// set the material color or something?
 					state = State.STILL;
 					controllable = true;
 				}
 				break;
 			case DECOLORING:
-				//textureAnimations.get(key).update(-delta);
 				textureAnimation.update(-delta);
-				if (!controllable && textureAnimation.getTimeLeft() < 0.2f) {
+				if (textureAnimation.getTimeLeft() < CONTROL_MARGIN
+						&& !controllable) {
 					controllable = true;
 				} else if (!textureAnimation.isInAction()) {
-					// set the material color or something?
 					state = State.STILL;
 					controllable = true;
 				}
 		}
 	}
 
+	/*
+	 * Reset the model to its default state and position.
+	 */
 	public void reset() {
-		queuedMove = null;
 		controllable = false;
 
 		// Update transform if player is not already at start tile.
 		// I don't actually know why this has to be done.
-		//transform.setToRotation(0, 1, 0, 0);
 		if (dataX != data.getX() || dataY != data.getY()) {
 			Vector3 corrected = new Vector3();
 			transform.getTranslation(corrected);
@@ -295,89 +247,64 @@ public class PlayerModel extends ModelInstance
 			transform.setToTranslation(corrected);
 		}
 
+		// Update the local data.
 		dataX = data.getX();
 		dataY = data.getY();
 		key = data.getKey();
-
+		// Start resetting animation and adjust state.
 		moveAnimation.setAnimation("Cube|Fall", 1, FALL_SPEED, this);
 		state = State.RESETTING_UP;
-		//oldPlayerKey = TileColor.NONE;
 	}
 
+	/*
+	 * Setup the model during the start of the level.
+	 */
 	public void setup() {
 		controllable = false;
+		// I actually don't know why the transform needs to be corrected.
 		updateTransform(0, 0.5f);
-
-		Vector3 corrected = new Vector3();
-		transform.getTranslation(corrected);
-		//corrected.z -= TileModel.SIZE/2;
-		Quaternion q = new Quaternion();
-		transform.getRotation(q);
-		System.out.println("PLAYER TRANSFORM: " + corrected + " " + q);
-
+		// Reset animations and adjust state.
 		moveAnimation.setAnimation("Cube|Fall", 1, -FALL_SPEED, this);
 		blendAnimation.reset(0.0f);
 		state = State.RESETTING_DOWN;
 	}
 
+	/*
+	 * Initiate a move along the specified directional axis.
+	 */
 	public void move(int dx, int dy) {
-		//System.out.println("Called move: (" + (queuedMove == null ? "nope" : "yes") + ")");
 		controllable = false;
 
-
 		// If model is already on exit tile, do not move.
-		if (dataX == exitModel.getColumn() && dataY == exitModel.getRow()) {
+		if (dataX == exitModel.getColumn() && dataY == exitModel.getRow())
 			return;
-		}
-		/*
-		else if (data.getX() == exitModel.getColumn()
-				&& data.getY() == exitModel.getRow()) {
-			// Data is on exit tile, wait until exit model is ready.
-			if (!exitModel.isTraversable()) {
-				modelMatrix[dataY][dataX].hold();
-				controllable = true;
-				return;
-			} else {
-				modelMatrix[dataY][dataX].release();
-			}
-		}
-		*/
 
-		boolean moved;
-		if (data.getX() != dataX || data.getY() != dataY)
-			moved = true;
-		else
-			moved = false;
+		// Check if player has actually moved and trigger movement.
+		boolean moved = (data.getX() != dataX || data.getY() != dataY);
+		triggerMovement(dx, dy, moved);
+	}
 
-		if (state == State.MOVING || state == State.COLORING
-				|| state == State.DECOLORING) {
-			queuedMove = new Move(dx, dy, moved);
-			System.out.println("MOVE QUEUED IN PLAYERMODEL");
+	/*
+	 * Check if the model has completed the level.
+	 */
+	public boolean hasCompleted() {
+		return (state == State.STILL
+				&& dataX == exitModel.getColumn()
+				&& dataY == exitModel.getRow());
+	}
 
-			//controllable = true;
-		}
-		else {
-			triggerMovement(dx, dy, moved);
-			//System.out.println("Actually triggered movement");
-		}
+	/*
+	 * Check if the player is occupied by some animation.
+	 */
+	public boolean isOccupied() {
+		return (state == State.MOVING
+				|| state == State.COLORING
+				|| state == State.DECOLORING);
 	}
 
 	public boolean isControllable() {
 		return controllable;
 	}
 
-	public boolean isOccupied() {
-		return (state == State.MOVING || state == State.COLORING
-				|| state == State.DECOLORING);
-	}
-
-	public boolean hasCompleted() {
-		if (state == State.STILL && dataX == exitModel.getColumn() &&
-				dataY == exitModel.getRow()) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 }
+
