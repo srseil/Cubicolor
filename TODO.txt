@@ -1,3 +1,7 @@
+Screenshots:
+- Exit Tile Farbe ändern (zu weiß?)
+- Texturen und Textur-Animationen für restliche Farben erstellen
+
 Bugs:
 - CURRENT: Kurz vor exit tile nochmal nach unten bewegen, spieler wird auf
   exit tile glitchen und dann animation nach unten ausführen.
@@ -11,8 +15,12 @@ Bugs:
 - Vorderseit von Tile (unten links im Testlevel) wird bei Blendanimation nicht
   korrekt gerendert; weiße Seite (ähnlich Problem bei Exit Tile Model mit
   ineinander schneidenen Modellen...).
+- Requirement Models werden entfernt, aber die verbleibenden darüber bewegen
+  sich nicht nach unten. -> Batch-Spiraling
+  -> Implementiert, möglicherweise jedoch fehlerhaftes Verhalten wenn während
+    der Animation resettet wird.
 
-Enhancements:
+Verbesserungen:
 - Player Model Indication bei Exit Model sieht potentiell eigenartig aus, da
   die sich die Modelle möglicherweise ineinander bewegen.
 - Lock Tiles und Key Tiles könnten Farbe verlieren, wenn der Spieler mit
@@ -20,11 +28,11 @@ Enhancements:
   -> Ansonsten attribute in key und lock Klassen entfernen.
 - Observer-Beziehung von Player und PlayerModel entfernen?
 - Escape-Menü auch aufrufbar machen, wenn man Spieler nicht kontrollieren kann.
+- Fonts (super sampling, etc. -> siehe BMFont Anleitung)
+- Assets besser im Dateisystem organisieren.
 
-Settings Menu:
+Einstellungen:
 - Gedächtnisstütze:
   Resolution, full/windowed screen, language, (reset progress), brightness,
   (vsync), Music, SFX, Controls!, (colorblind? -> reddit), Tutorial
 
-Tweaking:
-- Fonts (super sampling, etc. -> siehe BMFont Anleitung)

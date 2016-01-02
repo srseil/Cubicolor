@@ -90,7 +90,7 @@ public class GameScreen implements Screen {
 		stepsLabel = new Label("00", skin);
 		stepsLabel.setStyle(new Label.LabelStyle(
 				game.getBitmapFont("OldStandard-Regular-60"), Color.BLACK));
-		rightUI.add(stepsLabel).bottom().padBottom(-30.0f);
+		rightUI.add(stepsLabel).expandY().bottom().padBottom(-30.0f);
 		rightUI.row();
 		Label stepsCaption = new Label("steps", skin);
 		stepsCaption.setStyle(new Label.LabelStyle(

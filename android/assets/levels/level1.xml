@@ -6,10 +6,10 @@
 	<requirements>RB</requirements>
 	<matrix rows="5" columns="4">
 		<line>00N0</line>
-		<line>NNrN</line>
+		<line>bNNN</line>
 		<line>NNRN</line>
-		<line>NNbN</line>
-		<line>ENBN</line>
+		<line>NBNN</line>
+		<line>ENNr</line>
 	</matrix>
 </level>
 

@@ -56,7 +56,6 @@ public class ExitTileModel extends ModelInstance
 		requirementModels = new ArrayList<>();
 		int h = data.getHeight() - 1;
 		for (TileColor color : requirements) {
-			System.out.println("Requirement: " + color);
 			requirementModels.add(new RequirementModel(
 					color, h, x, z, this, game));
 			h--;
@@ -85,6 +84,10 @@ public class ExitTileModel extends ModelInstance
 		}
 		// ...and destroy it.
 		requirementModels.get(removedColor).destroy();
+
+		// Let requirement models on top of removed one fall down.
+		for (int i = removedColor - 1; i >= 0; i--)
+			requirementModels.get(i).fall();
 
 		// Update animation and state.
 		moveAnimation.setAnimation("Cube|Spiral", 1, SPIRAL_SPEED, this);
@@ -120,9 +123,12 @@ public class ExitTileModel extends ModelInstance
 				updateTransform(height);
 			} else if (state == State.MOVING_UP) {
 				// Spiraling up.
-				// Revive requirement model underneath current position.
-				requirementModels.get(
-						requirementModels.size() - livingModels - 1).revive();
+				// Revive requirement models underneath current position.
+				for (int i = requirementModels.size() - livingModels - 1;
+						i < requirementModels.size(); i++) {
+					requirementModels.get(i).revive();
+				}
+
 				livingModels++;
 				if (livingModels == data.getRequirements().size()) {
 					// Model has spiraled all the way up; stop moving.
@@ -171,6 +177,11 @@ public class ExitTileModel extends ModelInstance
 	 * Initiate resetting the model to its default height.
 	 */
 	public void reset() {
+		// Reset requirement models.
+		for (RequirementModel model : requirementModels)
+			model.reset();
+
+		// Reset exit tile model.
 		if (livingModels == data.getRequirements().size()) {
 			// Model is already at the top.
 			if (state == State.MOVING_DOWN) {

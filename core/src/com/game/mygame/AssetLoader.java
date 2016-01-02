@@ -54,21 +54,25 @@ public class AssetLoader {
 		TextureAttribute textureAttribute = model.materials.first().get(
 				TextureAttribute.class, TextureAttribute.Diffuse);
 
-		String path;
+		String path = "tiles/";
 		switch (color) {
 			case RED:
-				path = "keytile_red.png";
+				path += "keytile_red.png";
+				break;
 			case GREEN:
-				path = "keytile_green.png";
+				path += "keytile_green.png";
+				break;
 			case BLUE:
-				path = "keytile_blue.png";
+				path += "keytile_blue.png";
+				break;
 			case YELLOW:
-				path = "keytile_yellow.png";
+				path += "keytile_yellow.png";
+				break;
 			default:
-				path = "keytile_red.png";
+				path += "keytile_red.png";
 		}
 
-		Texture texture = new Texture(Gdx.files.internal("keytile_red.png"));
+		Texture texture = new Texture(Gdx.files.internal(path));
 		textureAttribute.set(new TextureRegion(texture));
 		return model;
 	}
@@ -76,13 +80,30 @@ public class AssetLoader {
 	public Model loadExitTileModel() {
 		Model model = modelLoader.loadModel(Gdx.files.internal("ExitTile.g3db"));
 		model.materials.first().set(new BlendingAttribute(true, 1.0f));
-		model.materials.first().set(ColorAttribute.createDiffuse(Color.GOLD));
+		model.materials.first().set(ColorAttribute.createDiffuse(
+				TileColor.getGdxColor(TileColor.NONE)));
 		return model;
 	}
 
-	// Implement for different colors.
 	public TextureAtlas loadPlayerAnimation(TileColor color) {
-		return new TextureAtlas(Gdx.files.internal("player_animation/player_animation.atlas"));
+		String path = "animations/";
+		switch (color) {
+			case RED:
+				path += "player_red/player_red.atlas";
+				break;
+			case GREEN:
+				path += "player_green/player_green.atlas";
+				break;
+			case BLUE:
+				path += "player_blue/player_blue.atlas";
+				break;
+			case YELLOW:
+				path += "player_yellow/player_yellow.atlas";
+				break;
+			default:
+				path += "player_red/player_red.atlas";
+		}
+		return new TextureAtlas(Gdx.files.internal(path));
 	}
 
 	public BitmapFont loadBitmapFont(String fileName) {

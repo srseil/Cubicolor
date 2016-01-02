@@ -23,10 +23,15 @@ public class DesktopLauncher {
 		settings.paddingY = 0;
 		settings.maxHeight = 512;
 		settings.maxWidth = 512;
-		TexturePacker.processIfModified(settings, "/home/stefan/libGDX/MyGame/android/assets/player",
-				"/home/stefan/libGDX/MyGame/android/assets/player", "anim");
-		TexturePacker.processIfModified(settings, "/home/stefan/libGDX/MyGame/android/assets/player_animation",
-				"/home/stefan/libGDX/MyGame/android/assets/player_animation", "player_animation");
+
+		TexturePacker.processIfModified(settings, "/home/stefan/libGDX/MyGame/android/assets/animations/player_red",
+				"/home/stefan/libGDX/MyGame/android/assets/animations/player_red", "player_red");
+		TexturePacker.processIfModified(settings, "/home/stefan/libGDX/MyGame/android/assets/animations/player_green",
+				"/home/stefan/libGDX/MyGame/android/assets/animations/player_green", "player_green");
+		TexturePacker.processIfModified(settings, "/home/stefan/libGDX/MyGame/android/assets/animations/player_blue",
+				"/home/stefan/libGDX/MyGame/android/assets/animations/player_blue", "player_blue");
+		TexturePacker.processIfModified(settings, "/home/stefan/libGDX/MyGame/android/assets/animations/player_yellow",
+				"/home/stefan/libGDX/MyGame/android/assets/animations/player_yellow", "player_yellow");
 
 		new LwjglApplication(new MyGame(), cfg);
 	}

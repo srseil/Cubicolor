@@ -1,0 +1,390 @@
+
+player_red.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0001
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red2.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0002
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red3.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0003
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red4.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0004
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red5.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0005
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red6.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0006
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red7.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0007
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red8.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0008
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red9.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0009
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red10.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0010
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red11.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0011
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red12.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0012
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red13.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0013
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red14.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0014
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red15.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0015
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red16.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0016
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red17.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0017
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red18.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0018
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red19.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0019
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red20.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0020
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red21.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0021
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red22.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0022
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red23.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0023
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red24.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0024
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red25.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0025
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red26.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0026
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red27.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0027
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red28.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0028
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red29.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0029
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1
+
+player_red30.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+anim0030
+  rotate: false
+  xy: 0, 0
+  size: 512, 384
+  orig: 512, 384
+  offset: 0, 0
+  index: -1

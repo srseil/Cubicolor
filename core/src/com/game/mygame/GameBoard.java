@@ -140,7 +140,7 @@ public class GameBoard extends Actor {
 
 		for (RequirementModel reqModel : exitModel.getRequirementModels()) {
 			reqModel.update(Gdx.graphics.getDeltaTime());
-			if (reqModel.isAlive())
+			if (reqModel.isVisible())
 				game.getModelBatch().render(reqModel, environment);
 		}
 
