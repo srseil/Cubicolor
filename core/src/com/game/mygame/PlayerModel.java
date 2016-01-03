@@ -150,12 +150,12 @@ public class PlayerModel extends ModelInstance
 				if (key == TileColor.NONE) {
 					textureAnimation.resetReverse(true);
 					state = State.DECOLORING;
+					exitModel.releaseRequirements();
 				} else {
 					textureAnimation = textureAnimations.get(key);
 					textureAnimation.reset(true);
 					state = State.COLORING;
 				}
-				exitModel.releaseRequirements();
 				return;
 			}
 
