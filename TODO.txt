@@ -22,8 +22,10 @@ Bugs:
 - Transparenz von Spieler manchmal zu schwach (nicht komplett opaque),
   wahrscheinlich nach setup/reset fall down; möglicherweise zu schnell nach
   nach vorne bewegen?
+  -> Höchstwahrscheinlich gefixt, auf Dauer sehen ob etwas komisch aussieht!
 
 Verbesserungen:
+- !!! Zwei mal hintereinander einfärben -> Zuerst entfärben? Sonst eigenartig.
 - Player Model Indication bei Exit Model sieht potentiell eigenartig aus, da
   die sich die Modelle möglicherweise ineinander bewegen.
 - Lock Tiles und Key Tiles könnten Farbe verlieren, wenn der Spieler mit

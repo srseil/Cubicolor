@@ -179,6 +179,7 @@ public class PlayerModel extends ModelInstance
 				blendAnimation.reset(0.0f);
 			} else if (state == State.RESETTING_DOWN) {
 				// Player has hovered down; is ready and controllable again.
+				blendAnimation.reset(1.0f);
 				state = State.STILL;
 				controllable = true;
 			}
