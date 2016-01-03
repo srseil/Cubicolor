@@ -2,6 +2,10 @@ Screenshots:
 - /
 
 Bugs:
+- Vorderseite von Tile (unten links im Test-Level) wird bei Blendanimation nicht
+  korrekt gerendert; weiße Seite (ähnlich Problem bei Exit Tile Model mit
+  ineinander schneidenden Modellen...).
+  GENERELL RENDER PROBLEME (auch requirement models mit isVisible())
 - Player Model wartet nach reset/setup möglicherweise nicht lange genug
   auf Exit Tile Animation. Kann sich durch Anpassungen an Animation ändern...
   -> Derzeit alles in Ordnung!
@@ -9,14 +13,12 @@ Bugs:
   Animationen geändert wird oder etwas schief geht?
   -> Derzeit alles in Ordnung!
 - Disposables in dispose()-Methoden eintragen.
-- Vorderseit von Tile (unten links im Testlevel) wird bei Blendanimation nicht
-  korrekt gerendert; weiße Seite (ähnlich Problem bei Exit Tile Model mit
-  ineinander schneidenen Modellen...).
+  -> Sollte alles getan sein, am besten gegen Ende nochmal überprüfen!
 - Requirement Models werden entfernt, aber die verbleibenden darüber bewegen
   sich nicht nach unten. -> Batch-Spiraling
   -> Implementiert, möglicherweise jedoch fehlerhaftes Verhalten wenn während
     der Animation resettet wird.
-- Kurz bevor Spieler auf blaues Lock Tile im Startlevel geht, resetten, danach
+- Kurz bevor Spieler auf blaues Lock Tile im Start-Level geht, resetten, danach
   sind requirement Models falsch
   -> Scheint zu funktionieren!
 - Transparenz von Spieler manchmal zu schwach (nicht komplett opaque),

@@ -29,6 +29,7 @@ public class GameScreen implements Screen {
 
 	private Stage boardStage;
 	private Stage interfaceStage;
+	private Skin skin;
 
 	private Label fps;
 	private Label levelLabel;
@@ -57,7 +58,7 @@ public class GameScreen implements Screen {
 		gameBoard = new GameBoard(level, player, boardStage.getCamera(), game);
 		boardStage.addActor(gameBoard);
 
-		Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
+		skin = new Skin(Gdx.files.internal("uiskin.json"));
 
 		Table rootTable = new Table();
 		rootTable.setFillParent(true);
@@ -143,6 +144,7 @@ public class GameScreen implements Screen {
 	public void dispose() {
 		interfaceStage.dispose();
 		boardStage.dispose();
+		skin.dispose();
 	}
 
 	@Override

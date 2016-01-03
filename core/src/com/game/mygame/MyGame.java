@@ -123,7 +123,18 @@ public class MyGame extends Game {
 
 	@Override
 	public void dispose() {
-		// What to dispose?
+		modelBatch.dispose();
+		playerModel.dispose();
+		tileModel.dispose();
+		exitTileModel.dispose();
+		for (Model model : keyTileModels.values())
+			model.dispose();
+		for (Model model : lockTileModels.values())
+			model.dispose();
+		for (TextureAtlas atlas : playerAnimations.values())
+			atlas.dispose();
+		for (BitmapFont font : bitmapFonts.values())
+			font.dispose();
 	}
 
 	/*
