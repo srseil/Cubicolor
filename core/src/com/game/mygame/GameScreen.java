@@ -169,7 +169,21 @@ public class GameScreen implements Screen {
 			return;
 		}
 
-		if (!paused && !completed && gameBoard.isControllable()) {
+		// Only process in-game input if game is (still) running.
+		if (!paused && !completed) {
+			// Escape to open pause menu.
+			if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+				paused = true;
+				pauseDialog.show(interfaceStage);
+				return;
+			}
+
+			// Stop if player is not controllable.
+			if (!gameBoard.isControllable()) {
+				return;
+			}
+
+			// Initiate queued move if there is one.
 			if (queuedMove != null && !gameBoard.isOccupied()) {
 				player.move(queuedMove.dx, queuedMove.dy);
 				gameBoard.movePlayerModel(queuedMove.dx, queuedMove.dy);
@@ -177,42 +191,37 @@ public class GameScreen implements Screen {
 				return;
 			}
 
-			if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-				if (gameBoard.isOccupied()) {
+			// Queue player move if it is occupied; else move or restart.
+			if (gameBoard.isOccupied()) {
+				if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
 					queuedMove = new Move(0, 1);
-				} else {
+				} else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+					queuedMove = new Move(0, -1);
+				} else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+					queuedMove = new Move(1, 0);
+				} else if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+					queuedMove = new Move(-1, 0);
+				}
+			} else {
+				if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
 					player.move(0, 1);
 					gameBoard.movePlayerModel(0, 1);
-				}
-			} else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-				if (gameBoard.isOccupied()) {
-					queuedMove = new Move(0, -1);
-				} else {
+				} else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
 					player.move(0, -1);
 					gameBoard.movePlayerModel(0, -1);
-				}
-			} else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-				if (gameBoard.isOccupied()) {
-					queuedMove = new Move(1, 0);
-				} else {
+				} else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
 					player.move(1, 0);
 					gameBoard.movePlayerModel(1, 0);
-				}
-			} else if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-				if (gameBoard.isOccupied()) {
-					queuedMove = new Move(-1, 0);
-				} else {
+				} else if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
 					player.move(-1, 0);
 					gameBoard.movePlayerModel(-1, 0);
+				} else if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+					resetLevel();
 				}
-			} else if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-				resetLevel();
-			} else if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-				paused = true;
-				pauseDialog.show(interfaceStage);
 			}
 		}
 
+		// Show completion dialog if level is completed.
 		if (!completed && gameBoard.isCompleted()) {
 			if (player.getSteps() <= level.getOptimalSteps())
 				completeLevel(true);

@@ -1,16 +1,13 @@
 Screenshots:
-- Exit Tile Farbe ändern (zu weiß?)
-- Texturen und Textur-Animationen für restliche Farben erstellen
+- /
 
 Bugs:
-- CURRENT: Kurz vor exit tile nochmal nach unten bewegen, spieler wird auf
-  exit tile glitchen und dann animation nach unten ausführen.
-  -> Scheint gefixt, am besten nochmal mit vernünftiger Tastatur testen
 - Player Model wartet nach reset/setup möglicherweise nicht lange genug
   auf Exit Tile Animation. Kann sich durch Anpassungen an Animation ändern...
-  -> Wartet nicht lange genug auf Start-Tile!
+  -> Derzeit alles in Ordnung!
 - Möglicherweise Queuing von Exit Tile Animation notwendig, wenn Dauer der
   Animationen geändert wird oder etwas schief geht?
+  -> Derzeit alles in Ordnung!
 - Disposables in dispose()-Methoden eintragen.
 - Vorderseit von Tile (unten links im Testlevel) wird bei Blendanimation nicht
   korrekt gerendert; weiße Seite (ähnlich Problem bei Exit Tile Model mit
@@ -19,6 +16,12 @@ Bugs:
   sich nicht nach unten. -> Batch-Spiraling
   -> Implementiert, möglicherweise jedoch fehlerhaftes Verhalten wenn während
     der Animation resettet wird.
+- Kurz bevor Spieler auf blaues Lock Tile im Startlevel geht, resetten, danach
+  sind requirement Models falsch
+  -> Scheint zu funktionieren!
+- Transparenz von Spieler manchmal zu schwach (nicht komplett opaque),
+  wahrscheinlich nach setup/reset fall down; möglicherweise zu schnell nach
+  nach vorne bewegen?
 
 Verbesserungen:
 - Player Model Indication bei Exit Model sieht potentiell eigenartig aus, da
@@ -30,6 +33,8 @@ Verbesserungen:
 - Escape-Menü auch aufrufbar machen, wenn man Spieler nicht kontrollieren kann.
 - Fonts (super sampling, etc. -> siehe BMFont Anleitung)
 - Assets besser im Dateisystem organisieren.
+- Player Model bei reset länger warten lassen, damit start Tile länger Zeit hat
+  korrekt aufzutauchen?
 
 Einstellungen:
 - Gedächtnisstütze:
