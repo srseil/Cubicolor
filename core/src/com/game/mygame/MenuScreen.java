@@ -26,7 +26,7 @@ public class MenuScreen implements Screen {
 		this.game = game;
 		stage = new Stage(new ExtendViewport(800, 600));
 		camera = (OrthographicCamera) stage.getCamera();
-		skin = new Skin(Gdx.files.internal("uiskin.json"));
+		skin = game.getSkin();
 
 		rootTable = new Table();
 		rootTable.setFillParent(true);
@@ -141,7 +141,6 @@ public class MenuScreen implements Screen {
 	@Override
 	public void dispose() {
 		stage.dispose();
-		skin.dispose();
 	}
 
 }

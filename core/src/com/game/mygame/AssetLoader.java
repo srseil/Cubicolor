@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.UBJsonReader;
 
 public class AssetLoader {
@@ -108,6 +109,10 @@ public class AssetLoader {
 
 	public BitmapFont loadBitmapFont(String fileName) {
 		return new BitmapFont(Gdx.files.internal("fonts/" + fileName + ".fnt"));
+	}
+
+	public Skin loadSkin(String fileName) {
+		return new Skin(Gdx.files.internal("skins/" + fileName + ".json"));
 	}
 
 }

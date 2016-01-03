@@ -1,11 +1,13 @@
 package com.game.mygame;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 import java.io.IOException;
 import java.util.EnumMap;
@@ -29,6 +31,7 @@ public class MyGame extends Game {
 	private EnumMap<TileColor, Model> lockTileModels;
 	private EnumMap<TileColor, TextureAtlas> playerAnimations;
 	private HashMap<String, BitmapFont> bitmapFonts;
+	private Skin skin;
 
 	public MyGame() {}
 
@@ -85,6 +88,9 @@ public class MyGame extends Game {
 				assetLoader.loadBitmapFont("OldStandard-Regular-40"));
 		bitmapFonts.put("OldStandard-Regular-60",
 				assetLoader.loadBitmapFont("OldStandard-Regular-60"));
+
+		// Skin
+		skin = assetLoader.loadSkin("uiskin");
 	}
 
 	@Override
@@ -124,6 +130,7 @@ public class MyGame extends Game {
 	@Override
 	public void dispose() {
 		modelBatch.dispose();
+		skin.dispose();
 		playerModel.dispose();
 		tileModel.dispose();
 		exitTileModel.dispose();
@@ -199,6 +206,10 @@ public class MyGame extends Game {
 
 	public BitmapFont getBitmapFont(String name) {
 		return bitmapFonts.get(name);
+	}
+
+	public Skin getSkin() {
+		return skin;
 	}
 
 }
