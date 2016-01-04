@@ -169,6 +169,11 @@ public class GameScreen implements Screen {
 			return;
 		}
 
+		// DEBUGGING: Re-setup level
+		if (Gdx.input.isKeyJustPressed(Input.Keys.S))
+			game.openLevel("normal", 1);
+		// DEBUGGING ---------------
+
 		// Only process in-game input if game is (still) running.
 		if (!paused && !completed) {
 			// Escape to open pause menu.
