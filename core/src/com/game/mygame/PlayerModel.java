@@ -131,6 +131,22 @@ public class PlayerModel extends ModelInstance
 		}
 	}
 
+	/*
+	 * Initiate a coloring animation to the specified color.
+	 */
+	private void initiateColoring(TileColor toColor) {
+		if (toColor == TileColor.NONE) {
+			// Decolor the model.
+			textureAnimation.resetReverse(true);
+			state = State.DECOLORING;
+		} else {
+			// Color the model with the specified color.
+			textureAnimation = textureAnimations.get(toColor);
+			textureAnimation.reset(true);
+			state = State.COLORING;
+		}
+	}
+
 	@Override public void updateState(Object... args) {}
 
 	@Override
@@ -146,15 +162,20 @@ public class PlayerModel extends ModelInstance
 
 			// Take key if model is standing on key tile.
 			if (data.getKey() != key) {
+				// If model takes key and is already colored, decolor first.
+				if (data.getKey() != TileColor.NONE && key != TileColor.NONE) {
+					initiateColoring(TileColor.NONE);
+					return;
+				}
+
 				key = data.getKey();
 				if (key == TileColor.NONE) {
-					textureAnimation.resetReverse(true);
-					state = State.DECOLORING;
+					// Model is standing on lock tile, decolor.
+					initiateColoring(TileColor.NONE);
 					exitModel.releaseRequirements();
 				} else {
-					textureAnimation = textureAnimations.get(key);
-					textureAnimation.reset(true);
-					state = State.COLORING;
+					// Model is standing on key tile, take key color.
+					initiateColoring(key);
 				}
 				return;
 			}
@@ -223,7 +244,13 @@ public class PlayerModel extends ModelInstance
 				break;
 			case DECOLORING:
 				textureAnimation.update(-delta);
-				if (textureAnimation.getTimeLeft() < CONTROL_MARGIN
+				if (data.getKey() != key) {
+					// Initiate coloring if player has to pick up key.
+					if (!textureAnimation.isInAction()) {
+						key = data.getKey();
+						initiateColoring(key);
+					}
+				} else if (textureAnimation.getTimeLeft() < CONTROL_MARGIN
 						&& !controllable) {
 					controllable = true;
 				} else if (!textureAnimation.isInAction()) {

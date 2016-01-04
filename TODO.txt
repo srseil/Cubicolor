@@ -8,23 +8,23 @@ Bugs:
   GENERELL RENDER PROBLEME (auch requirement models mit isVisible())
 - Player Model wartet nach reset/setup möglicherweise nicht lange genug
   auf Exit Tile Animation. Kann sich durch Anpassungen an Animation ändern...
-  -> Derzeit alles in Ordnung!
+ --> Derzeit alles in Ordnung!
 - Möglicherweise Queuing von Exit Tile Animation notwendig, wenn Dauer der
   Animationen geändert wird oder etwas schief geht?
-  -> Derzeit alles in Ordnung!
+ --> Derzeit alles in Ordnung!
 - Disposables in dispose()-Methoden eintragen.
   -> Sollte alles getan sein, am besten gegen Ende nochmal überprüfen!
 - Requirement Models werden entfernt, aber die verbleibenden darüber bewegen
   sich nicht nach unten. -> Batch-Spiraling
-  -> Implementiert, möglicherweise jedoch fehlerhaftes Verhalten wenn während
-    der Animation resettet wird.
+ --> Implementiert, möglicherweise jedoch fehlerhaftes Verhalten wenn während
+      der Animation resettet wird.
 - Kurz bevor Spieler auf blaues Lock Tile im Start-Level geht, resetten, danach
   sind requirement Models falsch
-  -> Scheint zu funktionieren!
+ --> Scheint zu funktionieren!
 - Transparenz von Spieler manchmal zu schwach (nicht komplett opaque),
   wahrscheinlich nach setup/reset fall down; möglicherweise zu schnell nach
   nach vorne bewegen?
-  -> Höchstwahrscheinlich gefixt, auf Dauer sehen ob etwas komisch aussieht!
+ --> Höchstwahrscheinlich gefixt, auf Dauer sehen ob etwas komisch aussieht!
 
 Verbesserungen:
 - !!! Zwei mal hintereinander einfärben -> Zuerst entfärben? Sonst eigenartig.
