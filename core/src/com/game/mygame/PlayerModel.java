@@ -76,6 +76,7 @@ public class PlayerModel extends ModelInstance
 		dataX = data.getX();
 		dataY = data.getY();
 		key = data.getKey();
+		updateTransform(0.0f, 0.0f);
 		state = State.STILL;
 	}
 

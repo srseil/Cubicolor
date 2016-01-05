@@ -15,6 +15,7 @@ public class BlendAnimation {
 	public BlendAnimation(ModelInstance model, float duration) {
 		Material material = model.materials.first();
 		attribute = (BlendingAttribute) material.get(BlendingAttribute.Type);
+		attribute.blended = true;
 		// Set animation to 30 frames per second and start it.
 		transitionCurrentTime = 0.0f;
 		transitionTargetTime = duration/30.0f;
