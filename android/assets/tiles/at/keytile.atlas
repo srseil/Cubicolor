@@ -1,0 +1,65 @@
+
+keytile.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+keytile_0_red
+  rotate: false
+  xy: 0, 0
+  size: 384, 384
+  orig: 384, 384
+  offset: 0, 0
+  index: -1
+
+keytile2.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+keytile_1_green
+  rotate: false
+  xy: 0, 0
+  size: 384, 384
+  orig: 384, 384
+  offset: 0, 0
+  index: -1
+
+keytile3.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+keytile_2_blue
+  rotate: false
+  xy: 0, 0
+  size: 384, 384
+  orig: 384, 384
+  offset: 0, 0
+  index: -1
+
+keytile4.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+keytile_3_yellow
+  rotate: false
+  xy: 0, 0
+  size: 384, 384
+  orig: 384, 384
+  offset: 0, 0
+  index: -1
+
+keytile5.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+keytile_4_none
+  rotate: false
+  xy: 0, 0
+  size: 384, 384
+  orig: 384, 384
+  offset: 0, 0
+  index: -1

@@ -75,6 +75,7 @@ public class GameBoard extends Actor {
 			for (int j = 0; j < modelMatrix[i].length; j++) {
 				Model model;
 				if (matrix[i][j] instanceof ExitTile) {
+					// Exit tile model
 					ExitTile exitTile = (ExitTile) matrix[i][j];
 					exitModel = new ExitTileModel(
 							game.getExitTileModel(), exitTile,
@@ -84,16 +85,23 @@ public class GameBoard extends Actor {
 					exitTile.addObserver(exitModel);
 					continue;
 				} else if (matrix[i][j] instanceof KeyTile) {
+					// Key tile model
 					KeyTile keyTile = (KeyTile) matrix[i][j];
-					model = game.getKeyTileModel(keyTile.getKeyColor());
+					model = game.getKeyTileModel();
+					modelMatrix[i][j] = new KeyTileModel(
+							model, keyTile, i, j, game);
 				} else if (matrix[i][j] instanceof LockTile) {
+					// Lock tile model
 					LockTile lockTile = (LockTile) matrix[i][j];
 					model = game.getLockTileModel(lockTile.getLockColor());
+					modelMatrix[i][j] = new TileModel(
+							model, matrix[i][j], i, j);
 				} else {
+					// Tile model
 					model = game.getTileModel();
+					modelMatrix[i][j] = new TileModel(
+							model, matrix[i][j], i, j);
 				}
-				modelMatrix[i][j] = new TileModel(
-						model, matrix[i][j], i, j);
 				modelMatrix[i][j].transform.setTranslation(
 						j * TileModel.SIZE, 0.0f,
 						-i * TileModel.SIZE);

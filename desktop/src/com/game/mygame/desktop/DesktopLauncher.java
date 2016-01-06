@@ -33,6 +33,9 @@ public class DesktopLauncher {
 		TexturePacker.processIfModified(settings, "/home/stefan/libGDX/MyGame/android/assets/animations/player_yellow",
 				"/home/stefan/libGDX/MyGame/android/assets/animations/player_yellow", "player_yellow");
 
+		TexturePacker.processIfModified(settings, "/home/stefan/libGDX/MyGame/android/assets/tiles/at",
+				"/home/stefan/libGDX/MyGame/android/assets/tiles/at", "keytile");
+
 		new LwjglApplication(new MyGame(), cfg);
 	}
 

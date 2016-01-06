@@ -4,10 +4,12 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Array;
 
 import java.io.IOException;
 import java.util.EnumMap;
@@ -27,9 +29,10 @@ public class MyGame extends Game {
 	private Model playerModel;
 	private Model tileModel;
 	private Model exitTileModel;
-	private EnumMap<TileColor, Model> keyTileModels;
+	private Model keyTileModel;
 	private EnumMap<TileColor, Model> lockTileModels;
 	private EnumMap<TileColor, TextureAtlas> playerAnimations;
+	private EnumMap<TileColor, TextureAtlas.AtlasRegion> keyTileTextures;
 	private HashMap<String, BitmapFont> bitmapFonts;
 	private Skin skin;
 
@@ -52,20 +55,10 @@ public class MyGame extends Game {
 		playerAnimations.put(TileColor.NONE,
 				assetLoader.loadPlayerAnimation(TileColor.NONE));
 
-		// Tile and exit tile model
+		// Tile, exit tile and key tile model
 		tileModel = assetLoader.loadTileModel();
 		exitTileModel = assetLoader.loadExitTileModel();
-
-		// Key tile models
-		keyTileModels = new EnumMap<>(TileColor.class);
-		keyTileModels.put(TileColor.RED,
-				assetLoader.loadKeyTileModel(TileColor.RED));
-		keyTileModels.put(TileColor.GREEN,
-				assetLoader.loadKeyTileModel(TileColor.GREEN));
-		keyTileModels.put(TileColor.BLUE,
-				assetLoader.loadKeyTileModel(TileColor.BLUE));
-		keyTileModels.put(TileColor.YELLOW,
-				assetLoader.loadKeyTileModel(TileColor.YELLOW));
+		keyTileModel = assetLoader.loadKeyTileModel();
 
 		// Lock tile models
 		lockTileModels = new EnumMap<>(TileColor.class);
@@ -77,6 +70,16 @@ public class MyGame extends Game {
 				assetLoader.loadLockTileModel(TileColor.BLUE));
 		lockTileModels.put(TileColor.YELLOW,
 				assetLoader.loadLockTileModel(TileColor.YELLOW));
+
+		// Load key tile textures
+		Array<TextureAtlas.AtlasRegion> regions =
+				assetLoader.loadKeyTileTextures().getRegions();
+		keyTileTextures = new EnumMap<>(TileColor.class);
+		keyTileTextures.put(TileColor.RED, regions.get(0));
+		keyTileTextures.put(TileColor.GREEN, regions.get(1));
+		keyTileTextures.put(TileColor.BLUE, regions.get(2));
+		keyTileTextures.put(TileColor.YELLOW, regions.get(3));
+		keyTileTextures.put(TileColor.NONE, regions.get(4));
 
 		// Bitmap fonts
 		bitmapFonts = new HashMap<>();
@@ -134,8 +137,7 @@ public class MyGame extends Game {
 		playerModel.dispose();
 		tileModel.dispose();
 		exitTileModel.dispose();
-		for (Model model : keyTileModels.values())
-			model.dispose();
+		keyTileModel.dispose();
 		for (Model model : lockTileModels.values())
 			model.dispose();
 		for (TextureAtlas atlas : playerAnimations.values())
@@ -188,8 +190,8 @@ public class MyGame extends Game {
 		return tileModel;
 	}
 
-	public Model getKeyTileModel(TileColor color) {
-		return keyTileModels.get(color);
+	public Model getKeyTileModel() {
+		return keyTileModel;
 	}
 
 	public Model getLockTileModel(TileColor color) {
@@ -202,6 +204,10 @@ public class MyGame extends Game {
 
 	public TextureAtlas getPlayerAnimation(TileColor color) {
 		return playerAnimations.get(color);
+	}
+
+	public TextureAtlas.AtlasRegion getKeyTileTexture(TileColor color) {
+		return keyTileTextures.get(color);
 	}
 
 	public BitmapFont getBitmapFont(String name) {

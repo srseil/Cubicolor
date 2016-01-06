@@ -48,33 +48,10 @@ public class AssetLoader {
 		return model;
 	}
 
-	public Model loadKeyTileModel(TileColor color) {
+	public Model loadKeyTileModel() {
 		Model model = modelLoader.loadModel(Gdx.files.internal("KeyTile.g3db"));
 		model.materials.first().set(ColorAttribute.createDiffuse(Color.WHITE));
 		model.materials.first().set(new BlendingAttribute(true, 1.0f));
-		TextureAttribute textureAttribute = model.materials.first().get(
-				TextureAttribute.class, TextureAttribute.Diffuse);
-
-		String path = "tiles/";
-		switch (color) {
-			case RED:
-				path += "keytile_red.png";
-				break;
-			case GREEN:
-				path += "keytile_green.png";
-				break;
-			case BLUE:
-				path += "keytile_blue.png";
-				break;
-			case YELLOW:
-				path += "keytile_yellow.png";
-				break;
-			default:
-				path += "keytile_red.png";
-		}
-
-		Texture texture = new Texture(Gdx.files.internal(path));
-		textureAttribute.set(new TextureRegion(texture));
 		return model;
 	}
 
@@ -107,12 +84,19 @@ public class AssetLoader {
 		return new TextureAtlas(Gdx.files.internal(path));
 	}
 
+	public TextureAtlas loadKeyTileTextures() {
+		String path = "tiles/at/keytile.atlas";
+		return new TextureAtlas(Gdx.files.internal(path));
+	}
+
 	public BitmapFont loadBitmapFont(String fileName) {
-		return new BitmapFont(Gdx.files.internal("fonts/" + fileName + ".fnt"));
+		String path = "fonts/" + fileName + ".fnt";
+		return new BitmapFont(Gdx.files.internal(path));
 	}
 
 	public Skin loadSkin(String fileName) {
-		return new Skin(Gdx.files.internal("skins/" + fileName + ".json"));
+		String path = "skins/" + fileName + ".json";
+		return new Skin(Gdx.files.internal(path));
 	}
 
 }
