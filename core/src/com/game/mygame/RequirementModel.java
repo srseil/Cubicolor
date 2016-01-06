@@ -6,8 +6,10 @@ import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 public class RequirementModel extends ModelInstance
 		implements AnimationController.AnimationListener {
 
-	// The speed the model's fall animation is played at.
+	// The speeds and durations of the model's animations.
 	public static float FALL_SPEED = 2.0f;
+	public static float BLEND_SPEED = 1.0f;
+	public static float BLEND_DURATION = 0.6f;
 
 	/*
 	 * The possible states a RequirementModel can be in.
@@ -42,8 +44,8 @@ public class RequirementModel extends ModelInstance
 		moveAnimation = new AnimationController(this);
 		moveAnimation.allowSameAnimation = true;
 		moveAnimation.setAnimation("Cube|Fall2");
-		blendAnimation = new BlendAnimation(this, 0.6f, 1.0f);
-		blendAnimation.reset(0.0f, 1.0f);
+		blendAnimation = new BlendAnimation(this, BLEND_DURATION, BLEND_SPEED);
+		blendAnimation.reset(0.0f, BLEND_SPEED);
 		transform.setTranslation(x, (height+1) * TileModel.SIZE/2, z);
 		alive = false;
 		state = State.STILL;
@@ -133,7 +135,7 @@ public class RequirementModel extends ModelInstance
 	 */
 	public void destroy() {
 		if (alive) {
-			blendAnimation.reset(1.0f, 1.0f);
+			blendAnimation.reset(1.0f, BLEND_SPEED);
 			state = State.DESTROYING;
 		}
 	}
@@ -143,7 +145,7 @@ public class RequirementModel extends ModelInstance
 	 */
 	public void revive() {
 		if (!alive) {
-			blendAnimation.reset(0.0f, 1.0f);
+			blendAnimation.reset(0.0f, BLEND_SPEED);
 			state = State.REVIVING;
 		}
 	}

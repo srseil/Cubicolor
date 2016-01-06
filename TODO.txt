@@ -6,6 +6,7 @@ Bugs:
   korrekt gerendert; weiße Seite (ähnlich Problem bei Exit Tile Model mit
   ineinander schneidenden Modellen...).
   GENERELL RENDER PROBLEME (auch requirement models mit isVisible())
+ --> Gefixt, siehe libGDX Punkt unten.
 - Player Model wartet nach reset/setup möglicherweise nicht lange genug
   auf Exit Tile Animation. Kann sich durch Anpassungen an Animation ändern...
  --> Derzeit alles in Ordnung!
@@ -13,7 +14,7 @@ Bugs:
   Animationen geändert wird oder etwas schief geht?
  --> Derzeit alles in Ordnung!
 - Disposables in dispose()-Methoden eintragen.
-  -> Sollte alles getan sein, am besten gegen Ende nochmal überprüfen!
+ --> Sollte alles getan sein, am besten gegen Ende nochmal überprüfen!
 - Requirement Models werden entfernt, aber die verbleibenden darüber bewegen
   sich nicht nach unten. -> Batch-Spiraling
  --> Implementiert, möglicherweise jedoch fehlerhaftes Verhalten wenn während
@@ -30,9 +31,6 @@ Bugs:
 - Blendanimation von Tiles bei Setup hört ein wenig zu spät auf; noch ein wenig
   transparent wenn schon ganz oben.
  --> Gefixt! Geschwindigkeit oder Dauer anpassen, damit es noch besser aussieht?
-- Requirement model hat magic numbers für Blendanimation Dauer
-- TileModel update() überprüft nur, ob blendAnimation vorbei ist, nicht
-  auch fallAnimation. Potentiell gefährlich?
 
 Verbesserungen:
 - Player Model Indication bei Exit Model sieht potentiell eigenartig aus, da
@@ -42,7 +40,6 @@ Verbesserungen:
  --> Ansonsten attribute in key und lock Klassen entfernen.
       BESSER: Texture für alle Tiles, dann einfach wechseln!
 - Observer-Beziehung von Player und PlayerModel entfernen?
-- Escape-Menü auch aufrufbar machen, wenn man Spieler nicht kontrollieren kann.
 - Fonts (super sampling, etc. -> siehe BMFont Anleitung)
 - Assets besser im Dateisystem organisieren.
 - Player Model bei reset länger warten lassen, damit start Tile länger Zeit hat
