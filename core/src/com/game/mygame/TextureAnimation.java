@@ -22,7 +22,7 @@ public class TextureAnimation {
 		texture.set(regions.get(0));
 		region = 0;
 		transitionCurrentTime = 0.0f;
-		transitionTargetTime = duration/regions.size;
+		transitionTargetTime = duration / regions.size;
 		passed = 0.0f;
 		inAction = true;
 	}
@@ -37,18 +37,17 @@ public class TextureAnimation {
 
 		// Update texture if target time has passed.
 		transitionCurrentTime += Math.abs(delta);
-		if (transitionCurrentTime >= transitionTargetTime) {
+		while (transitionCurrentTime >= transitionTargetTime) {
 			region += Math.signum(delta);
+			texture.set(regions.get(region));
+			transitionCurrentTime -= transitionTargetTime;
 
 			// Stop animation if last texture is reached.
-			if (region >= regions.size || region < 0) {
+			if (region == regions.size - 1 || region == 0) {
 				inAction = false;
 				transitionCurrentTime = 0.0f;
 				return;
 			}
-
-			texture.set(regions.get(region));
-			transitionCurrentTime -= transitionTargetTime;
 		}
 
 		passed += delta;
