@@ -39,10 +39,11 @@ Verbesserungen:
       BESSER: Texture für alle Tiles, dann einfach wechseln!
 - Observer-Beziehung von Player und PlayerModel entfernen?
 - Fonts (super sampling, etc. -> siehe BMFont Anleitung)
-- Assets besser im Dateisystem organisieren.
+- Eingebettete Model-Texturen entfernen (s. models Ordner)
 - Player Model bei reset länger warten lassen, damit start Tile länger Zeit hat
   korrekt aufzutauchen?
 - Siehe libGDX Wiki: ModelBatch und BlendAttribute
+- AssetLoader loadTile -> loadKeyTile?
 - Blendanimation für Setup zu ExitTileModel hinzufügen?
 
 Einstellungen:

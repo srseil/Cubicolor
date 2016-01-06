@@ -24,7 +24,8 @@ public class AssetLoader {
 	}
 
 	public Model loadPlayerModel() {
-		Model model = modelLoader.loadModel(Gdx.files.internal("Player.g3db"));
+		String path = "models/Player.g3db";
+		Model model = modelLoader.loadModel(Gdx.files.internal(path));
 		model.materials.first().set(ColorAttribute.createDiffuse(Color.WHITE));
 		model.materials.first().set(new BlendingAttribute(true, 1.0f));
 		return model;
@@ -33,7 +34,8 @@ public class AssetLoader {
 	// Does a simple diffuse look different to a texture?
 	// If not, then simply call loadLockTileModel(NONE) here.
 	public Model loadTileModel() {
-		Model model = modelLoader.loadModel(Gdx.files.internal("Tile.g3db"));
+		String path = "models/Tile.g3db";
+		Model model = modelLoader.loadModel(Gdx.files.internal(path));
 		model.materials.first().set(ColorAttribute.createDiffuse(
 				TileColor.getGdxColor(TileColor.NONE)));
 		model.materials.first().set(new BlendingAttribute(true, 1.0f));
@@ -41,7 +43,8 @@ public class AssetLoader {
 	}
 
 	public Model loadLockTileModel(TileColor color) {
-		Model model = modelLoader.loadModel(Gdx.files.internal("Tile.g3db"));
+		String path = "models/Tile.g3db";
+		Model model = modelLoader.loadModel(Gdx.files.internal(path));
 		model.materials.first().set(ColorAttribute.createDiffuse(
 				TileColor.getGdxColor(color)));
 		model.materials.first().set(new BlendingAttribute(true, 1.0f));
@@ -49,14 +52,16 @@ public class AssetLoader {
 	}
 
 	public Model loadKeyTileModel() {
-		Model model = modelLoader.loadModel(Gdx.files.internal("KeyTile.g3db"));
+		String path = "models/KeyTile.g3db";
+		Model model = modelLoader.loadModel(Gdx.files.internal(path));
 		model.materials.first().set(ColorAttribute.createDiffuse(Color.WHITE));
 		model.materials.first().set(new BlendingAttribute(true, 1.0f));
 		return model;
 	}
 
 	public Model loadExitTileModel() {
-		Model model = modelLoader.loadModel(Gdx.files.internal("ExitTile.g3db"));
+		String path = "models/ExitTile.g3db";
+		Model model = modelLoader.loadModel(Gdx.files.internal(path));
 		model.materials.first().set(new BlendingAttribute(true, 1.0f));
 		model.materials.first().set(ColorAttribute.createDiffuse(
 				TileColor.getGdxColor(TileColor.NONE)));
@@ -85,7 +90,7 @@ public class AssetLoader {
 	}
 
 	public TextureAtlas loadKeyTileTextures() {
-		String path = "tiles/at/keytile.atlas";
+		String path = "textures/keytile/keytile.atlas";
 		return new TextureAtlas(Gdx.files.internal(path));
 	}
 

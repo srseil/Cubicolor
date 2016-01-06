@@ -23,7 +23,8 @@ public class SaveState {
 
 	// Loads a save state from disk.
 	public void load() throws IOException {
-		FileHandle handle = Gdx.files.internal("savestate.xml");
+		String path = "savestates/savestate.xml";
+		FileHandle handle = Gdx.files.internal(path);
 		XmlReader.Element root = reader.parse(handle);
 
 		try {
