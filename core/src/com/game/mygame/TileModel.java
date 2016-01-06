@@ -76,7 +76,7 @@ public class TileModel extends ModelInstance implements Observer {
 				blendAnimation.update(delta);
 				fallAnimation.update(delta);
 				if (!blendAnimation.isInAction() && fallAnimation.current.time
-						<= fallAnimation.current.duration) {
+						>= fallAnimation.current.duration) {
 					state = State.DEAD;
 				}
 				break;
@@ -89,8 +89,9 @@ public class TileModel extends ModelInstance implements Observer {
 							&& fallAnimation.current.time
 							<= fallAnimation.current.duration) {
 						state = State.ALIVE;
-						blendAnimation.reset(1.0f, REVIVING_SPEED);
-						fallAnimation.setAnimation("Cube|Fall");
+						blendAnimation.reset(1.0f, FALLING_SPEED);
+						fallAnimation.setAnimation(
+								"Cube|Fall", 1, FALLING_SPEED, null);
 					}
 				}
 		}
