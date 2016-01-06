@@ -59,8 +59,8 @@ public class TileModel extends ModelInstance implements Observer {
 	public void updateState(Object... args) {
 		if (data.isDead() && state == State.ALIVE) {
 			state = State.DYING;
-		} else if (!data.isDead() && (state == State.DEAD ||
-				state == State.DYING)) {
+		} else if (!data.isDead()
+				&& (state == State.DEAD || state == State.DYING)) {
 			state = State.REVIVING;
 		}
 	}

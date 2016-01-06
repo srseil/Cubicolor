@@ -39,3 +39,4 @@ public class DifficultyButtonGroup extends ButtonGroup<TextButton> {
 	}
 
 }
+

@@ -43,3 +43,4 @@ public class PauseDialog extends Dialog {
 	}
 
 }
+

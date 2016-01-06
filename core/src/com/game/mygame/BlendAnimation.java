@@ -23,7 +23,6 @@ public class BlendAnimation {
 		// Set animation to 30 frames per second and start it.
 		transitionCurrentTime = 0.0f;
 		transitionTargetTime = duration / 30.0f / speed;
-		System.out.println("anim " + duration + " " + speed + " " + transitionTargetTime);
 		opacityStep = 1.0f / 30.0f;
 		inAction = true;
 
@@ -61,36 +60,38 @@ public class BlendAnimation {
 
 	// For debugging purposes to check how long animations take.
 	public void update(float delta, boolean b) {
-			if (!inAction)
-				return;
+		if (!inAction)
+			return;
 
-			// Update opacity if target time has been reached.
-			sig = Math.signum(delta);
-			transitionCurrentTime += Math.abs(delta);
+		// Update opacity if target time has been reached.
+		sig = Math.signum(delta);
+		transitionCurrentTime += Math.abs(delta);
+
 		a += Math.abs(delta);
+
 		while (transitionCurrentTime >= transitionTargetTime) {
-				System.out.println("current: "  + transitionCurrentTime + ", target: " + transitionTargetTime);
+			System.out.println("current: "  + transitionCurrentTime + ", target: " + transitionTargetTime);
 
-					if (sig == 1.0f)
-						attribute.opacity -= opacityStep;
-					else
-						attribute.opacity += opacityStep;
+			if (sig == 1.0f)
+				attribute.opacity -= opacityStep;
+			else
+				attribute.opacity += opacityStep;
 
+			/*
+			System.out.println("BLENDANIMATION: " + attribute.opacity);
+			*/
 
-				/*
-				System.out.println("BLENDANIMATION: " + attribute.opacity);
-				*/
-				transitionCurrentTime -= transitionTargetTime;
+			transitionCurrentTime -= transitionTargetTime;
 
-				// Stop the animation if it has reached the end.
-				if ((sig == 1.0f && attribute.opacity <= 0.0f)
-						|| (sig == -1.0f && attribute.opacity >= 1.0f)) {
-					System.out.println("It took " + a);
-					transitionCurrentTime = 0.0f;
-					inAction = false;
-					break;
-				}
+			// Stop the animation if it has reached the end.
+			if ((sig == 1.0f && attribute.opacity <= 0.0f)
+					|| (sig == -1.0f && attribute.opacity >= 1.0f)) {
+				System.out.println("It took " + a);
+				transitionCurrentTime = 0.0f;
+				inAction = false;
+				break;
 			}
+		}
 	}
 
 	/*

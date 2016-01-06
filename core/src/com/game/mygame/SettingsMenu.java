@@ -131,3 +131,4 @@ public class SettingsMenu extends Table {
 	}
 
 }
+

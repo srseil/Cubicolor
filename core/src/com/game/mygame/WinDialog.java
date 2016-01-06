@@ -46,3 +46,4 @@ public class WinDialog extends Dialog {
 		}
 	}
 }
+

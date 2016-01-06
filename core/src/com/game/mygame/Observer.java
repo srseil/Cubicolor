@@ -5,3 +5,4 @@ public interface Observer {
 	void updateState(Object... args);
 
 }
+

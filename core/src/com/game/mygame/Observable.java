@@ -7,3 +7,4 @@ public interface Observable {
 	void notifyObserver(Object... args);
 
 }
+
