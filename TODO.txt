@@ -33,8 +33,6 @@ Bugs:
  --> Gefixt! Geschwindigkeit oder Dauer anpassen, damit es noch besser aussieht?
 
 Verbesserungen:
-- Player Model Indication bei Exit Model sieht potentiell eigenartig aus, da
-  die sich die Modelle möglicherweise ineinander bewegen.
 - Lock Tiles und Key Tiles könnten Farbe verlieren, wenn der Spieler mit
   richtiger Farbe auf sie tritt.
  --> Ansonsten attribute in key und lock Klassen entfernen.

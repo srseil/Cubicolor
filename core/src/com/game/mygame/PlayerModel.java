@@ -126,9 +126,16 @@ public class PlayerModel extends ModelInstance
 			state = State.MOVING;
 		} else {
 			updateTransform(0, 0);
-			moveAnimation.setAnimation(
-					"Cube|Indication", 1, INDICATION_SPEED, this);
-			state = State.INDICATING;
+			if (dataX + dx == exitModel.getColumn()
+					&& dataY + dy == exitModel.getRow()) {
+				// Target is exit tile, do not play indication animation.
+				controllable = true;
+			} else {
+				// Target is something else, play indication animation.
+				moveAnimation.setAnimation(
+						"Cube|Indication", 1, INDICATION_SPEED, this);
+				state = State.INDICATING;
+			}
 		}
 	}
 
