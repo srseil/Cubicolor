@@ -25,23 +25,38 @@ Bugs:
   wahrscheinlich nach setup/reset fall down; möglicherweise zu schnell nach
   nach vorne bewegen?
  --> Höchstwahrscheinlich gefixt, auf Dauer sehen ob etwas komisch aussieht!
+- !!! Zwei mal hintereinander einfärben -> Zuerst entfärben? Sonst eigenartig.
+ --> Implementiert, funktioniert hoffentlich problemlos!
+- Blendanimation von Tiles bei Setup hört ein wenig zu spät auf; noch ein wenig
+  transparent wenn schon ganz oben.
+
+- Requirement model hat magic numbers für Blendanimation Dauer
+- TileModel update() überprüft nur, ob blendAnimation vorbei ist, nicht
+  auch fallAnimation. Potentiell gefährlich?
+
+  PLAYER MODEL
+  auch transparenz visibiility immer noch problem
 
 Verbesserungen:
-- !!! Zwei mal hintereinander einfärben -> Zuerst entfärben? Sonst eigenartig.
 - Player Model Indication bei Exit Model sieht potentiell eigenartig aus, da
   die sich die Modelle möglicherweise ineinander bewegen.
 - Lock Tiles und Key Tiles könnten Farbe verlieren, wenn der Spieler mit
   richtiger Farbe auf sie tritt.
-  -> Ansonsten attribute in key und lock Klassen entfernen.
+ --> Ansonsten attribute in key und lock Klassen entfernen.
+      BESSER: Texture für alle Tiles, dann einfach wechseln!
 - Observer-Beziehung von Player und PlayerModel entfernen?
 - Escape-Menü auch aufrufbar machen, wenn man Spieler nicht kontrollieren kann.
 - Fonts (super sampling, etc. -> siehe BMFont Anleitung)
 - Assets besser im Dateisystem organisieren.
 - Player Model bei reset länger warten lassen, damit start Tile länger Zeit hat
   korrekt aufzutauchen?
+- Siehe libGDX Wiki: ModelBatch und BlendAttribute
+- Blendanimation für Setup zu ExitTileModel hinzufügen?
 
 Einstellungen:
 - Gedächtnisstütze:
   Resolution, full/windowed screen, language, (reset progress), brightness,
   (vsync), Music, SFX, Controls!, (colorblind? -> reddit), Tutorial
 
+libGDX:
+- animationController.inAction immer false?

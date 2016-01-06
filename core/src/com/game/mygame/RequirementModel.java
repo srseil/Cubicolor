@@ -42,8 +42,8 @@ public class RequirementModel extends ModelInstance
 		moveAnimation = new AnimationController(this);
 		moveAnimation.allowSameAnimation = true;
 		moveAnimation.setAnimation("Cube|Fall2");
-		blendAnimation = new BlendAnimation(this, 0.6f);
-		blendAnimation.reset(0.0f);
+		blendAnimation = new BlendAnimation(this, 0.6f, 1.0f);
+		blendAnimation.reset(0.0f, 1.0f);
 		transform.setTranslation(x, (height+1) * TileModel.SIZE/2, z);
 		alive = false;
 		state = State.STILL;
@@ -133,7 +133,7 @@ public class RequirementModel extends ModelInstance
 	 */
 	public void destroy() {
 		if (alive) {
-			blendAnimation.reset(1.0f);
+			blendAnimation.reset(1.0f, 1.0f);
 			state = State.DESTROYING;
 		}
 	}
@@ -143,7 +143,7 @@ public class RequirementModel extends ModelInstance
 	 */
 	public void revive() {
 		if (!alive) {
-			blendAnimation.reset(0.0f);
+			blendAnimation.reset(0.0f, 1.0f);
 			state = State.REVIVING;
 		}
 	}

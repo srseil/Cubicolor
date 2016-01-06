@@ -7,20 +7,27 @@ import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 public class BlendAnimation {
 
 	private BlendingAttribute attribute;
+	private float duration;
 	private float transitionCurrentTime, transitionTargetTime;
 	private float opacityStep;
 	private float sig;
 	private boolean inAction;
 
-	public BlendAnimation(ModelInstance model, float duration) {
+	private float a;
+
+	public BlendAnimation(ModelInstance model, float duration, float speed) {
+		this.duration = duration;
 		Material material = model.materials.first();
 		attribute = (BlendingAttribute) material.get(BlendingAttribute.Type);
 		attribute.blended = true;
 		// Set animation to 30 frames per second and start it.
 		transitionCurrentTime = 0.0f;
-		transitionTargetTime = duration/30.0f;
-		opacityStep = 1.0f/30.0f;
+		transitionTargetTime = duration / 30.0f / speed;
+		System.out.println("anim " + duration + " " + speed + " " + transitionTargetTime);
+		opacityStep = 1.0f / 30.0f;
 		inAction = true;
+
+		a = 0;
 	}
 
 	/*
@@ -34,7 +41,7 @@ public class BlendAnimation {
 		// Update opacity if target time has been reached.
 		sig = Math.signum(delta);
 		transitionCurrentTime += Math.abs(delta);
-		if (transitionCurrentTime >= transitionTargetTime) {
+		while (transitionCurrentTime >= transitionTargetTime) {
 			if (sig == 1.0f)
 				attribute.opacity -= opacityStep;
 			else
@@ -47,15 +54,51 @@ public class BlendAnimation {
 					|| (sig == -1.0f && attribute.opacity >= 1.0f)) {
 				transitionCurrentTime = 0.0f;
 				inAction = false;
+				break;
 			}
 		}
+	}
+
+	// For debugging purposes to check how long animations take.
+	public void update(float delta, boolean b) {
+			if (!inAction)
+				return;
+
+			// Update opacity if target time has been reached.
+			sig = Math.signum(delta);
+			transitionCurrentTime += Math.abs(delta);
+		a += Math.abs(delta);
+		while (transitionCurrentTime >= transitionTargetTime) {
+				System.out.println("current: "  + transitionCurrentTime + ", target: " + transitionTargetTime);
+
+					if (sig == 1.0f)
+						attribute.opacity -= opacityStep;
+					else
+						attribute.opacity += opacityStep;
+
+
+				/*
+				System.out.println("BLENDANIMATION: " + attribute.opacity);
+				*/
+				transitionCurrentTime -= transitionTargetTime;
+
+				// Stop the animation if it has reached the end.
+				if ((sig == 1.0f && attribute.opacity <= 0.0f)
+						|| (sig == -1.0f && attribute.opacity >= 1.0f)) {
+					System.out.println("It took " + a);
+					transitionCurrentTime = 0.0f;
+					inAction = false;
+					break;
+				}
+			}
 	}
 
 	/*
 	 * Reset the animation to the chosen opacity.
 	 */
-	public void reset(float opacity) {
+	public void reset(float opacity, float speed) {
 		attribute.opacity = opacity;
+		transitionTargetTime = duration / 30.0f / speed;
 		transitionCurrentTime = 0.0f;
 		inAction = true;
 	}

@@ -59,8 +59,8 @@ public class PlayerModel extends ModelInstance
 		moveAnimation.allowSameAnimation = true;
 		moveAnimation.setAnimation("Cube|Fall");
 		blendAnimation = new BlendAnimation(
-				this, moveAnimation.current.duration);
-		blendAnimation.reset(0.0f);
+				this, moveAnimation.current.duration, FALL_SPEED);
+		blendAnimation.reset(0.0f, FALL_SPEED);
 
 		// Build map of different texture animations.
 		TextureAttribute texture = materials.first().get(
@@ -198,10 +198,10 @@ public class PlayerModel extends ModelInstance
 				updateTransform(0, 0.5f);
 				textureAnimation.reset(false);
 				moveAnimation.setAnimation("Cube|Fall", 1, -1.0f, this);
-				blendAnimation.reset(0.0f);
+				blendAnimation.reset(0.0f, FALL_SPEED);
 			} else if (state == State.RESETTING_DOWN) {
 				// Player has hovered down; is ready and controllable again.
-				blendAnimation.reset(1.0f);
+				blendAnimation.reset(1.0f, FALL_SPEED);
 				state = State.STILL;
 				controllable = true;
 			}
@@ -282,7 +282,7 @@ public class PlayerModel extends ModelInstance
 		key = data.getKey();
 		// Start resetting animation and adjust state.
 		moveAnimation.setAnimation("Cube|Fall", 1, FALL_SPEED, this);
-		blendAnimation.reset(1.0f);
+		blendAnimation.reset(1.0f, FALL_SPEED);
 		state = State.RESETTING_UP;
 	}
 
@@ -295,7 +295,7 @@ public class PlayerModel extends ModelInstance
 		updateTransform(0, 0.5f);
 		// Reset animations and adjust state.
 		moveAnimation.setAnimation("Cube|Fall", 1, -FALL_SPEED, this);
-		blendAnimation.reset(0.0f);
+		blendAnimation.reset(0.0f, FALL_SPEED);
 		state = State.RESETTING_DOWN;
 	}
 

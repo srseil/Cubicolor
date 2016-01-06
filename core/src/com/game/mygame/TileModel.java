@@ -9,9 +9,14 @@ public class TileModel extends ModelInstance implements Observer {
 
 	// Remove model from constructor, add game and call getModel... directly
 
+	// The side length of the tile model.
 	public static final float SIZE = 2.0f;
+	// The delays for reviving the model based on its row and column.
 	public static final float ROW_REVIVE_DELAY = 0.3f;
 	public static final float COLUMN_REVIVE_DELAY = 0.15f;
+	// The speed the model's animations are being played at.
+	public static final float REVIVING_SPEED = 2.0f;
+	public static final float FALLING_SPEED = 1.0f;
 
 	private enum State {
 		ALIVE,
@@ -38,7 +43,7 @@ public class TileModel extends ModelInstance implements Observer {
 		fallAnimation.allowSameAnimation = true;
 		fallAnimation.setAnimation("Cube|Fall");
 		blendAnimation = new BlendAnimation(this,
-				fallAnimation.current.duration);
+				fallAnimation.current.duration, REVIVING_SPEED);
 		reviveDelta = 0.0f;
 		reviveDelay = 0;
 		//hold = false;
@@ -70,23 +75,21 @@ public class TileModel extends ModelInstance implements Observer {
 			case DYING:
 				blendAnimation.update(delta);
 				fallAnimation.update(delta);
-				if (!blendAnimation.isInAction())
+				if (!blendAnimation.isInAction() && fallAnimation.current.time
+						<= fallAnimation.current.duration) {
 					state = State.DEAD;
+				}
 				break;
 			case REVIVING:
 				reviveDelta += delta;
 				if (reviveDelta >= (reviveDelay)) {
-					//System.out.println("DELAY: " + reviveDelay);
-				//if (reviveDelta >= (reviveDelay) + column * 0.5f) {
-				//if (reviveDelta >= (row * 0.5f) + column * 0.5f) {
-					//if (row == 1 && (column == 2 || column == 3))
-						//System.out.println("TILE: " + row + " " + column + " " + System.currentTimeMillis());
 					blendAnimation.update(-delta);
 					fallAnimation.update(delta);
-					//System.out.println(fallAnimation.current.time + " " + fallAnimation.current.duration + " " + fallAnimation.current.speed);
-					if (!blendAnimation.isInAction()) {
+					if (!blendAnimation.isInAction()
+							&& fallAnimation.current.time
+							<= fallAnimation.current.duration) {
 						state = State.ALIVE;
-						blendAnimation.reset(1.0f);
+						blendAnimation.reset(1.0f, REVIVING_SPEED);
 						fallAnimation.setAnimation("Cube|Fall");
 					}
 				}
@@ -95,12 +98,11 @@ public class TileModel extends ModelInstance implements Observer {
 
 	public void reset() {
 		if (state == State.REVIVING) {
-			fallAnimation.setAnimation("Cube|Fall", 1, -2.0f, null);
-			blendAnimation.reset(0.0f);
+			fallAnimation.setAnimation("Cube|Fall", 1, -REVIVING_SPEED, null);
+			blendAnimation.reset(0.0f, REVIVING_SPEED);
 		} else {
-			fallAnimation.setAnimation("Cube|Fall", 1, 1.0f, null);
+			fallAnimation.setAnimation("Cube|Fall", 1, FALLING_SPEED, null);
 		}
-		//fallAnimation.update(Gdx.graphics.getDeltaTime());
 		reviveDelta = 0.0f;
 	}
 
@@ -135,3 +137,4 @@ public class TileModel extends ModelInstance implements Observer {
 	}
 
 }
+
