@@ -1,15 +1,15 @@
 <?xml version="1.1" encoding="UTF-8"?>
 <level>
 	<difficulty>easy</difficulty>
-	<optimal>16</optimal>
+	<optimal>21</optimal>
 	<start>0,2</start>
-	<requirements>RB</requirements>
-	<matrix rows="5" columns="4">
-		<line>N0N0</line>
-		<line>bNNN</line>
-		<line>NNRN</line>
-		<line>NBNN</line>
-		<line>ENNr</line>
+	<requirements>RBG</requirements>
+	<matrix rows="5" columns="5">
+		<line>NEGgN</line>
+		<line>BNNNR</line>
+		<line>NrNbN</line>
+		<line>NNNNN</line>
+		<line>NNNNN</line>
 	</matrix>
 </level>
 

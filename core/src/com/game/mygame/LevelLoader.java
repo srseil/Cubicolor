@@ -63,7 +63,7 @@ public class LevelLoader {
 			for (int i = lines.length - 1; i >= 0; i--) {
 				row = lines[i].getText().toCharArray();
 				for (int j = 0; j < row.length; j++) {
-					matrix[i][j] = parseTile(row[j], exitRequirements);
+					matrix[lines.length-1-i][j] = parseTile(row[j], exitRequirements);
 				}
 			}
 		} catch (GdxRuntimeException exception) {
