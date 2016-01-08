@@ -110,7 +110,8 @@ public class MenuScreen implements Screen {
 	@Override
 	public void render(float delta) {
 		//camera.update();
-		Gdx.gl.glClearColor(0.85f, 0.8f, 0.7f, 1);
+		//Gdx.gl.glClearColor(0.85f, 0.8f, 0.7f, 1);
+		Gdx.gl.glClearColor(0.949f, 0.941f, 0.925f, 1.0f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		// Update and draw menu content.
