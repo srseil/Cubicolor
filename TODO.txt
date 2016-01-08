@@ -54,3 +54,10 @@ Einstellungen:
 libGDX:
 - animationController.inAction immer false?
 - transparente Models schneiden sichtbare -> Weiße Stellen (s. Video)
+- AnimationController update() in draw() ist nicht Thread-safe?
+- AnimationController kann nicht einfach resettet werden, ohne Namen der
+  Animation zu kennen, auf null setzen und neu zuweisen geht auch nicht;
+  reset()-Methode wäre hilfreich.
+- PlayerModel hat bei Fall-Animation verrutschen Origin-Punkt
+- fb-conv lädt G3DJ nicht, Fehler bei der Skalierung (?)
+

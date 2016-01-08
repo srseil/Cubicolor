@@ -1,10 +1,8 @@
 package com.game.mygame;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider;
@@ -16,8 +14,6 @@ import java.util.EnumMap;
 import java.util.HashMap;
 
 public class MyGame extends Game {
-
-	// Error handling for getters. What happens if maps font have element?
 
 	private ModelBatch modelBatch;
 	private AssetLoader assetLoader;
@@ -182,7 +178,7 @@ public class MyGame extends Game {
 	}
 	// ---
 
-	public Model getPlayerModel(TileColor key) {
+	public Model getPlayerModel() {
 		return playerModel;
 	}
 

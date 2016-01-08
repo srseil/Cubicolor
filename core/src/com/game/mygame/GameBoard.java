@@ -14,17 +14,10 @@ import com.badlogic.gdx.utils.Timer;
 
 public class GameBoard extends Actor {
 
-	// animationcontroller update in draw: nicht thread safe? bessere lösung finden...
-	// animationcontroller kann man nicht resetten? null und neu zuweisen geht nicht.
-	// ---> geht schon, aber unnötig. einfach reset methode?
-	// player model hat bei fall animation verrutschten origin punkt
-	// fbx-conv g3dj lädt nicht, fehler mit skalierung
-
 	private MyGame game;
 	private OrthographicCamera camera;
 	private Environment environment;
 	private Level level;
-	private float width, height;
 	private TileModel[][] modelMatrix;
 	private ExitTileModel exitModel;
 	private PlayerModel playerModel;
@@ -35,12 +28,12 @@ public class GameBoard extends Actor {
 		this.camera = (OrthographicCamera) stageCamera;
 		this.level = level;
 
-		width = (float) level.getColumns() * TileModel.SIZE;
-		height = (float) level.getRows() * TileModel.SIZE;
+		float width = (float) level.getColumns() * TileModel.SIZE;
+		float height = (float) level.getRows() * TileModel.SIZE;
 		modelMatrix = parseModelMatrix(level.getMatrix());
 
 		playerModel = new PlayerModel(
-				game.getPlayerModel(TileColor.NONE), player, exitModel, game);
+				game.getPlayerModel(), player, exitModel, game);
 		player.addObserver(playerModel);
 
 		environment = new Environment();
