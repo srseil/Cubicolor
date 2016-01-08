@@ -72,12 +72,14 @@ public class PlayerModel extends ModelInstance
 		}
 		textureAnimation = textureAnimations.get(TileColor.RED);
 
-		// Position player and set to default state.
+		// Set player position and default state.
 		dataX = data.getX();
 		dataY = data.getY();
 		key = data.getKey();
-		updateTransform(0.0f, 0.0f);
 		state = State.STILL;
+
+		// Position model to in the air in order not to obstruct board.
+		transform.setTranslation(0.0f, 2.0f, 0.0f);
 	}
 
 	/*
