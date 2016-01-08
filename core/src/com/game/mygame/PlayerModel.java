@@ -42,16 +42,13 @@ public class PlayerModel extends ModelInstance
 	// Private data
 	private State state;
 	private TileColor key;
-	private float baseX, baseY;
 	private int dataX, dataY;
 	private boolean controllable;
 
-	public PlayerModel(Model model, Player data, float baseX, float baseY,
+	public PlayerModel(Model model, Player data,
 					   ExitTileModel exitModel, MyGame game) {
 		super(model);
 		this.data = data;
-		this.baseX = baseX;
-		this.baseY = baseY;
 		this.exitModel = exitModel;
 
 		// Setup move and blend animations.
@@ -88,9 +85,9 @@ public class PlayerModel extends ModelInstance
 	 */
 	private void updateTransform(float correctX, float correctY) {
 		transform.setTranslation(
-				0*baseX + (data.getX() + correctX) * TileModel.SIZE,
+				(data.getX() + correctX) * TileModel.SIZE,
 				0.75f * TileModel.SIZE,
-				0*baseY - (data.getY() + correctY) * TileModel.SIZE);
+				-(data.getY() + correctY) * TileModel.SIZE);
 	}
 
 	/*

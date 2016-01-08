@@ -39,8 +39,8 @@ public class GameBoard extends Actor {
 		height = (float) level.getRows() * TileModel.SIZE;
 		modelMatrix = parseModelMatrix(level.getMatrix());
 
-		playerModel = new PlayerModel(game.getPlayerModel(TileColor.NONE),
-				player, -width/2, height/2, exitModel, game);
+		playerModel = new PlayerModel(
+				game.getPlayerModel(TileColor.NONE), player, exitModel, game);
 		player.addObserver(playerModel);
 
 		environment = new Environment();
