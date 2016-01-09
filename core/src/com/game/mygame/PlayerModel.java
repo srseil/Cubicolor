@@ -76,7 +76,7 @@ public class PlayerModel extends ModelInstance
 		state = State.STILL;
 
 		// Position model to in the air in order not to obstruct board.
-		transform.setTranslation(0.0f, 2.0f, 0.0f);
+		transform.setTranslation(0.0f, -5.0f, 0.0f);
 	}
 
 	/*

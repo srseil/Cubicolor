@@ -2,11 +2,12 @@ Screenshots:
 - /
 
 Bugs:
-- Vorderseite von Tile (unten links im Test-Level) wird bei Blendanimation nicht
-  korrekt gerendert; weiße Seite (ähnlich Problem bei Exit Tile Model mit
+/- Vorderseite von Tile (unten links im Test-Level) wird bei Blendanimation
+  nicht korrekt gerendert; weiße Seite (ähnlich Problem bei Exit Tile Model mit
   ineinander schneidenden Modellen...).
   GENERELL RENDER PROBLEME (auch requirement models mit isVisible())
- --> Gefixt, siehe libGDX Punkt unten. TRITT IMMER NOCH AUF!
+ --> Gefixt, siehe libGDX Punkt unten
+      (möglicherweise exit requirements anpassen).
 /- Player Model wartet nach reset/setup möglicherweise nicht lange genug
   auf Exit Tile Animation. Kann sich durch Anpassungen an Animation ändern...
  --> Derzeit alles in Ordnung!
