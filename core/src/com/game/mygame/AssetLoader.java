@@ -24,7 +24,7 @@ public class AssetLoader {
 	}
 
 	public Model loadPlayerModel() {
-		String path = "models/Player.g3db";
+		String path = "models/player.g3db";
 		Model model = modelLoader.loadModel(Gdx.files.internal(path));
 		model.materials.first().set(ColorAttribute.createDiffuse(Color.WHITE));
 		model.materials.first().set(new BlendingAttribute(true, 1.0f));
@@ -34,7 +34,7 @@ public class AssetLoader {
 	// Does a simple diffuse look different to a texture?
 	// If not, then simply call loadLockTileModel(NONE) here.
 	public Model loadTileModel() {
-		String path = "models/Tile.g3db";
+		String path = "models/tile.g3db";
 		Model model = modelLoader.loadModel(Gdx.files.internal(path));
 		model.materials.first().set(ColorAttribute.createDiffuse(
 				TileColor.getGdxColor(TileColor.NONE)));
@@ -43,7 +43,7 @@ public class AssetLoader {
 	}
 
 	public Model loadLockTileModel(TileColor color) {
-		String path = "models/Tile.g3db";
+		String path = "models/tile.g3db";
 		Model model = modelLoader.loadModel(Gdx.files.internal(path));
 		model.materials.first().set(ColorAttribute.createDiffuse(
 				TileColor.getGdxColor(color)));
@@ -52,7 +52,7 @@ public class AssetLoader {
 	}
 
 	public Model loadKeyTileModel() {
-		String path = "models/KeyTile.g3db";
+		String path = "models/keytile.g3db";
 		Model model = modelLoader.loadModel(Gdx.files.internal(path));
 		model.materials.first().set(ColorAttribute.createDiffuse(Color.WHITE));
 		model.materials.first().set(new BlendingAttribute(true, 1.0f));
@@ -60,7 +60,7 @@ public class AssetLoader {
 	}
 
 	public Model loadExitTileModel() {
-		String path = "models/ExitTile.g3db";
+		String path = "models/exittile.g3db";
 		Model model = modelLoader.loadModel(Gdx.files.internal(path));
 		model.materials.first().set(new BlendingAttribute(true, 1.0f));
 		model.materials.first().set(ColorAttribute.createDiffuse(

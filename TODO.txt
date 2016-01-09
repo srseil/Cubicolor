@@ -44,7 +44,6 @@ Verbesserungen:
         BESSER: Texture für alle Tiles, dann einfach wechseln!
 - Observer-Beziehung von Player und PlayerModel entfernen?
 - Fonts (super sampling, etc. -> siehe BMFont Anleitung)
-- Eingebettete Model-Texturen entfernen (s. models Ordner)
 - Performance
 - Siehe libGDX Wiki: ModelBatch und BlendAttribute
 - AssetLoader loadTile -> loadKeyTile?
