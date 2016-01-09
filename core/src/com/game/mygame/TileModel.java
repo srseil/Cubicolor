@@ -137,5 +137,9 @@ public class TileModel extends ModelInstance implements Observer {
 			return false;
 	}
 
+	public float getReviveDelay() {
+		return reviveDelay;
+	}
+
 }
 

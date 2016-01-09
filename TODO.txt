@@ -33,15 +33,17 @@ Bugs:
  --> Gefixt! Geschwindigkeit oder Dauer anpassen, damit es noch besser aussieht?
 
 Verbesserungen:
+- Player Model bei reset länger warten lassen, damit start Tile länger Zeit hat
+  korrekt aufzutauchen?
+ --> Getan! Möglicherweise noch anpassen, sieht aber bereits sehr gut aus.
 - Lock Tiles und Key Tiles könnten Farbe verlieren, wenn der Spieler mit
   richtiger Farbe auf sie tritt.
- --> Ansonsten attribute in key und lock Klassen entfernen.
-      BESSER: Texture für alle Tiles, dann einfach wechseln!
+   ---> Ansonsten attribute in key und lock Klassen entfernen.
+         BESSER: Texture für alle Tiles, dann einfach wechseln!
 - Observer-Beziehung von Player und PlayerModel entfernen?
 - Fonts (super sampling, etc. -> siehe BMFont Anleitung)
 - Eingebettete Model-Texturen entfernen (s. models Ordner)
-- Player Model bei reset länger warten lassen, damit start Tile länger Zeit hat
-  korrekt aufzutauchen?
+- Performance
 - Siehe libGDX Wiki: ModelBatch und BlendAttribute
 - AssetLoader loadTile -> loadKeyTile?
 - Blendanimation für Setup zu ExitTileModel hinzufügen?

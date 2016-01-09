@@ -80,7 +80,10 @@ public class GameBoard extends Actor {
 		for (int i = 0; i < modelMatrix.length; i++) {
 			for (int j = 0; j < modelMatrix[i].length; j++) {
 				Model model;
-				if (matrix[i][j] instanceof ExitTile) {
+				if (matrix[i][j] instanceof EmptyTile) {
+					// Empty tile, entry is null.
+					continue;
+				}  else if (matrix[i][j] instanceof ExitTile) {
 					// Exit tile model
 					ExitTile exitTile = (ExitTile) matrix[i][j];
 					exitModel = new ExitTileModel(
@@ -174,12 +177,29 @@ public class GameBoard extends Actor {
 	public void setup() {
 		resetModelMatrix();
 		exitModel.setup();
+
+		// Get last tile reviving tile.
+		TileModel lastTile = null;
+		for (int i = 0; i < modelMatrix.length; i++) {
+			for (int j = modelMatrix[i].length - 1; j >= 0; j--) {
+				if (modelMatrix[i][j] != null) {
+					lastTile = modelMatrix[i][j];
+					System.out.println(i + " " + j);
+					break;
+				}
+			}
+			if (lastTile != null)
+				break;
+		}
+
+		// Delay player setup until board has finished setting up.
 		Timer.schedule(new Timer.Task() {
 			@Override
 			public void run() {
 				playerModel.setup();
 			}
-		}, (modelMatrix.length + 1) * TileModel.ROW_REVIVE_DELAY);
+		}, lastTile.getReviveDelay() + 0.5f);
+		// Old delay: (modelMatrix.length + 2) * TileModel.ROW_REVIVE_DELAY)
 	}
 
 	public void movePlayerModel(int dx, int dy) {
