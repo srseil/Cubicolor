@@ -6,47 +6,48 @@ Bugs:
   korrekt gerendert; weiße Seite (ähnlich Problem bei Exit Tile Model mit
   ineinander schneidenden Modellen...).
   GENERELL RENDER PROBLEME (auch requirement models mit isVisible())
- --> Gefixt, siehe libGDX Punkt unten.
-- Player Model wartet nach reset/setup möglicherweise nicht lange genug
+ --> Gefixt, siehe libGDX Punkt unten. TRITT IMMER NOCH AUF!
+/- Player Model wartet nach reset/setup möglicherweise nicht lange genug
   auf Exit Tile Animation. Kann sich durch Anpassungen an Animation ändern...
  --> Derzeit alles in Ordnung!
-- Möglicherweise Queuing von Exit Tile Animation notwendig, wenn Dauer der
+/- Möglicherweise Queuing von Exit Tile Animation notwendig, wenn Dauer der
   Animationen geändert wird oder etwas schief geht?
  --> Derzeit alles in Ordnung!
-- Disposables in dispose()-Methoden eintragen.
+/- Disposables in dispose()-Methoden eintragen.
  --> Sollte alles getan sein, am besten gegen Ende nochmal überprüfen!
-- Requirement Models werden entfernt, aber die verbleibenden darüber bewegen
+/- Requirement Models werden entfernt, aber die verbleibenden darüber bewegen
   sich nicht nach unten. -> Batch-Spiraling
  --> Implementiert, möglicherweise jedoch fehlerhaftes Verhalten wenn während
       der Animation resettet wird.
-- Kurz bevor Spieler auf blaues Lock Tile im Start-Level geht, resetten, danach
+/- Kurz bevor Spieler auf blaues Lock Tile im Start-Level geht, resetten, danach
   sind requirement Models falsch
  --> Scheint zu funktionieren!
-- Transparenz von Spieler manchmal zu schwach (nicht komplett opaque),
+/- Transparenz von Spieler manchmal zu schwach (nicht komplett opaque),
   wahrscheinlich nach setup/reset fall down; möglicherweise zu schnell nach
   nach vorne bewegen?
  --> Höchstwahrscheinlich gefixt, auf Dauer sehen ob etwas komisch aussieht!
-- !!! Zwei mal hintereinander einfärben -> Zuerst entfärben? Sonst eigenartig.
+/- !!! Zwei mal hintereinander einfärben -> Zuerst entfärben? Sonst eigenartig.
  --> Implementiert, funktioniert hoffentlich problemlos!
-- Blendanimation von Tiles bei Setup hört ein wenig zu spät auf; noch ein wenig
+/- Blendanimation von Tiles bei Setup hört ein wenig zu spät auf; noch ein wenig
   transparent wenn schon ganz oben.
  --> Gefixt! Geschwindigkeit oder Dauer anpassen, damit es noch besser aussieht?
 
 Verbesserungen:
-- Player Model bei reset länger warten lassen, damit start Tile länger Zeit hat
+/- Player Model bei reset länger warten lassen, damit start Tile länger Zeit hat
   korrekt aufzutauchen?
  --> Getan! Möglicherweise noch anpassen, sieht aber bereits sehr gut aus.
+/- Blendanimation für Setup zu ExitTileModel hinzufügen?
+ --> Implementiert. Möglicherweise Geschwindigkeit der Animation anpassen.
 - Lock Tiles und Key Tiles könnten Farbe verlieren, wenn der Spieler mit
   richtiger Farbe auf sie tritt.
-   ---> Ansonsten attribute in key und lock Klassen entfernen.
-         BESSER: Texture für alle Tiles, dann einfach wechseln!
+   --> Ansonsten attribute in key und lock Klassen entfernen.
+        BESSER: Texture für alle Tiles, dann einfach wechseln!
 - Observer-Beziehung von Player und PlayerModel entfernen?
 - Fonts (super sampling, etc. -> siehe BMFont Anleitung)
 - Eingebettete Model-Texturen entfernen (s. models Ordner)
 - Performance
 - Siehe libGDX Wiki: ModelBatch und BlendAttribute
 - AssetLoader loadTile -> loadKeyTile?
-- Blendanimation für Setup zu ExitTileModel hinzufügen?
 
 Feedback:
 - Exit Tile sollte mehr heraus stechen, sieht man nicht gut wenn ganz unten

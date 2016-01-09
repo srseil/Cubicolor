@@ -13,6 +13,7 @@ public class ExitTileModel extends ModelInstance
 	// The speed the model's animations are being played at.
 	public static final float SPIRAL_SPEED = 1.5f;
 	public static final float FALL_SPEED = 1.0f;
+	public static final float SETUP_SPEED = 1.5f;
 
 	/*
 	 * The possible states an ExitTileModel can be in.
@@ -21,12 +22,14 @@ public class ExitTileModel extends ModelInstance
 		STILL,
 		MOVING_DOWN,
 		MOVING_UP,
-		SNAPPING
+		SNAPPING,
+		SETUP
 	}
 
 	private ExitTile data;
 	private State state;
 	private AnimationController moveAnimation;
+	private BlendAnimation blendAnimation;
 	private ArrayList<RequirementModel> requirementModels;
 	// Index for removed model from requirementModels.
 	private int removedColor;
@@ -48,7 +51,9 @@ public class ExitTileModel extends ModelInstance
 		this.column = column;
 		moveAnimation = new AnimationController(this);
 		moveAnimation.allowSameAnimation = true;
-		moveAnimation.setAnimation("Cube|Spiral");
+		moveAnimation.setAnimation("Cube|Fall");
+		blendAnimation = new BlendAnimation(
+				this, moveAnimation.current.duration, FALL_SPEED);
 		height = 0;
 		state = State.STILL;
 
@@ -144,12 +149,13 @@ public class ExitTileModel extends ModelInstance
 				updateTransform(height);
 			}
 		} else if (animation.animation.id.equals("Cube|Fall")) {
-			if (state == State.MOVING_UP) {
+			if (state == State.MOVING_UP || state == State.SETUP) {
 				// Model snaps out of board height; spiral up.
 				height = 1;
 				moveAnimation.setAnimation(
 						"Cube|Spiral", 1, -SPIRAL_SPEED, this);
 				updateTransform(height);
+				state = State.MOVING_UP;
 			} else {
 				// Model snapped to board height; stop moving.
 				state = State.STILL;
@@ -167,10 +173,14 @@ public class ExitTileModel extends ModelInstance
 	 * Update the models' animations according to time passed since last frame.
 	 */
 	public void update(float delta) {
-		if (onHold)
+		if (onHold) {
 			return;
-		else if (state != State.STILL)
+		} else if (state == State.SETUP) {
+			blendAnimation.update(-delta);
 			moveAnimation.update(delta);
+		} else if (state != State.STILL) {
+			moveAnimation.update(delta);
+		}
 	}
 
 	/*
@@ -228,8 +238,9 @@ public class ExitTileModel extends ModelInstance
 	public void setup() {
 		height = 1;
 		livingModels = 0;
-		moveAnimation.setAnimation("Cube|Fall", 1, -FALL_SPEED, this);
-		state = State.MOVING_UP;
+		moveAnimation.setAnimation("Cube|Fall", 1, -SETUP_SPEED, this);
+		blendAnimation.reset(0.0f, SETUP_SPEED);
+		state = State.SETUP;
 	}
 
 	/*
