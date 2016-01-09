@@ -44,6 +44,19 @@ public class GameBoard extends Actor {
 		directionalLight.setColor(0.3f, 0.3f, 0.3f, 1.0f);
 		environment.add(directionalLight);
 
+		// Adjust the camera's position and angle for the corresponding level.
+		float correctY = 0.0f;
+		if (exitModel.getRow() == level.getRows() - 1
+				&& exitModel.getColumn() <= level.getRequirementsNumber()) {
+			// Exit tile is in upper row.
+			// Tweak this if some levels are too high/low.
+			correctY = 0.5f * (level.getRequirementsNumber() + 1
+					- exitModel.getColumn() * 1.75f);
+		} else if (exitModel.getRow() == level.getRows() - 2
+				&& exitModel.getColumn() == 0) {
+			// Exit tile is in second upper row on the far left.
+			correctY = 0.5f * Math.max(0, (level.getRequirementsNumber() - 2));
+		}
 		float viewportHeight = (float) (Math.cos(Math.toRadians(35.0f)) *
 				(Math.sqrt(Math.pow(2 * level.getRows(), 2) +
 						Math.pow(2 * level.getColumns(), 2))) + 1);
@@ -52,8 +65,8 @@ public class GameBoard extends Actor {
 		camera.rotate(-60.0f, 1.0f, 0.0f, 0.0f);
 		camera.rotate(20.0f, 0.0f, 1.0f, 0.0f);
 		camera.near = 1.0f;
-		camera.far = 20.0f;
-		camera.position.set(width/2, 10.0f, 0.5f);
+		camera.far = 30.0f;
+		camera.position.set(width/2, level.getRows() * 1.5f + correctY, 0.0f);
 		camera.zoom = 1.2f;
 		camera.update();
 

@@ -85,6 +85,13 @@ public class Level {
 		return (exit.getRequirements().size() == 0);
 	}
 
+	/*
+	 * Return the number of requirements to be fulfilled for the level.
+	 */
+	public int getRequirementsNumber() {
+		return exitRequirements.size();
+	}
+
 	public EnumSet<TileColor> getExitRequirements() {
 		return exitRequirements;
 	}

@@ -46,6 +46,11 @@ Verbesserungen:
 - AssetLoader loadTile -> loadKeyTile?
 - Blendanimation für Setup zu ExitTileModel hinzufügen?
 
+Feedback:
+- Exit Tile sollte mehr heraus stechen, sieht man nicht gut wenn ganz unten
+- Coloring-Animation dauert zu lange, hält Spielfluss auf
+- In-Game Schriftart sieht nicht gut aus, "spacing" (Kerning?) stört
+
 Einstellungen:
 - Gedächtnisstütze:
   Resolution, full/windowed screen, language, (reset progress), brightness,
