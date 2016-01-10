@@ -34,7 +34,6 @@ public class GameBoard extends Actor {
 
 		playerModel = new PlayerModel(
 				game.getPlayerModel(), player, exitModel, game);
-		player.addObserver(playerModel);
 
 		environment = new Environment();
 		environment.set(new ColorAttribute(

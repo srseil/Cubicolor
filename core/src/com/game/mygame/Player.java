@@ -1,9 +1,8 @@
 package com.game.mygame;
 
-public class Player implements Observable {
+public class Player {
 
 	private Level level;
-	private Observer observer;
 	private TileColor key;
 	private int x, y;
 	private int steps;
@@ -21,17 +20,6 @@ public class Player implements Observable {
 	 */
 	private void interact() {
 		level.getMatrix()[y][x].interact(this);
-		notifyObserver();
-	}
-
-	@Override
-	public void addObserver(Observer observer) {
-		this.observer = observer;
-	}
-
-	@Override
-	public void notifyObserver(Object... args) {
-		observer.updateState();
 	}
 
 	/*
@@ -44,8 +32,6 @@ public class Player implements Observable {
 		if (newX >= level.getColumns() || newX < 0
 				|| newY >= level.getRows() || newY < 0) {
 			// Target location is out of bounds.
-			// Model is notified to play indication animation.
-			notifyObserver();
 			return;
 		} else if (level.getMatrix()[this.y][this.x] instanceof ExitTile) {
 			// Player is standing on exit tile.
@@ -60,14 +46,8 @@ public class Player implements Observable {
 			level.getMatrix()[this.y][this.x].setDead(true);
 			this.x = newX;
 			this.y = newY;
-			notifyObserver();
 			steps++;
 			interact();
-			return;
-		} else {
-			// Player cannot move to tile.
-			notifyObserver();
-			return;
 		}
 	}
 
@@ -86,7 +66,6 @@ public class Player implements Observable {
 	 */
 	public void takeKey(TileColor color) {
 		key = color;
-		notifyObserver();
 	}
 
 	/*
@@ -94,7 +73,6 @@ public class Player implements Observable {
 	 */
 	public void removeKey() {
 		key = TileColor.NONE;
-		notifyObserver();
 	}
 
 	/*

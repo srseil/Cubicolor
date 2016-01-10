@@ -39,11 +39,10 @@ Verbesserungen:
  --> Getan! Möglicherweise noch anpassen, sieht aber bereits sehr gut aus.
 /- Blendanimation für Setup zu ExitTileModel hinzufügen?
  --> Implementiert. Möglicherweise Geschwindigkeit der Animation anpassen.
-- Lock Tiles und Key Tiles könnten Farbe verlieren, wenn der Spieler mit
+- Lock Tiles könnten Farbe verlieren, wenn der Spieler mit
   richtiger Farbe auf sie tritt.
    --> Ansonsten attribute in key und lock Klassen entfernen.
         BESSER: Texture für alle Tiles, dann einfach wechseln!
-- Observer-Beziehung von Player und PlayerModel entfernen?
 - Fonts (super sampling, etc. -> siehe BMFont Anleitung)
 - Performance
 - Siehe libGDX Wiki: ModelBatch und BlendAttribute

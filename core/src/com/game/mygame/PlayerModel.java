@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Vector3;
 import java.util.EnumMap;
 
 public class PlayerModel extends ModelInstance
-		implements Observer, AnimationController.AnimationListener {
+		implements AnimationController.AnimationListener {
 
 	// The time in seconds before the end of an animation the player can be
 	// controlled. This allows for smoother controls.
@@ -153,8 +153,6 @@ public class PlayerModel extends ModelInstance
 			state = State.COLORING;
 		}
 	}
-
-	@Override public void updateState(Object... args) {}
 
 	@Override
 	public void onEnd(AnimationController.AnimationDesc animation) {
