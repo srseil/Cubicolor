@@ -2,6 +2,7 @@ package com.game.mygame;
 
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
+import com.badlogic.gdx.utils.Timer;
 
 public class RequirementModel extends ModelInstance
 		implements AnimationController.AnimationListener {
@@ -117,6 +118,7 @@ public class RequirementModel extends ModelInstance
 				blendAnimation.update(-delta);
 				if (!blendAnimation.isInAction()) {
 					alive = true;
+					blendAnimation.setBlended(false);
 					state = State.STILL;
 				}
 		}
@@ -136,6 +138,7 @@ public class RequirementModel extends ModelInstance
 	public void destroy() {
 		if (alive) {
 			blendAnimation.reset(1.0f, BLEND_SPEED);
+			blendAnimation.setBlended(true);
 			state = State.DESTROYING;
 		}
 	}
@@ -172,7 +175,16 @@ public class RequirementModel extends ModelInstance
 	 * Release the model if it is on hold.
 	 */
 	public void release() {
-		onHold = false;
+		if (state == State.MOVING_DOWN) {
+			Timer.schedule(new Timer.Task() {
+				@Override
+				public void run() {
+					onHold = false;
+				}
+			}, BLEND_DURATION * BLEND_SPEED);
+		} else {
+			onHold = false;
+		}
 	}
 
 	public TileColor getColor() {
@@ -180,12 +192,7 @@ public class RequirementModel extends ModelInstance
 	}
 
 	public boolean isAlive() {
-		//return (state != State.DEAD);
 		return alive;
-	}
-
-	public boolean isVisible() {
-		return !(state == State.STILL && !alive);
 	}
 
 }

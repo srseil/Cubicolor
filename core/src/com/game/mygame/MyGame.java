@@ -109,7 +109,7 @@ public class MyGame extends Game {
 			menuScreen = new MenuScreen(this);
 			//this.setScreen(menuScreen);
 			//saveState.save();
-			openLevel("normal", 4);
+			openLevel("normal", 1);
 		} catch (IOException exception) {
 			System.out.println("Error while loading level.");
 			exception.printStackTrace();

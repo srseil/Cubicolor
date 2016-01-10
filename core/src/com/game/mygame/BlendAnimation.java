@@ -104,6 +104,13 @@ public class BlendAnimation {
 		inAction = true;
 	}
 
+	/*
+	 * Specify if the model of the animation is treated as blended.
+	 */
+	public void setBlended(boolean blended) {
+		attribute.blended = blended;
+	}
+
 	public boolean isInAction() {
 		return inAction;
 	}

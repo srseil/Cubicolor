@@ -83,7 +83,7 @@ public class GameBoard extends Actor {
 					// Empty tile, entry is null.
 					continue;
 				}  else if (matrix[i][j] instanceof ExitTile) {
-					// Exit tile model
+					// Exit tile model, entry is null.
 					ExitTile exitTile = (ExitTile) matrix[i][j];
 					exitModel = new ExitTileModel(
 							game.getExitTileModel(), exitTile,
@@ -151,14 +151,13 @@ public class GameBoard extends Actor {
 			}
 		}
 
-		exitModel.update(Gdx.graphics.getDeltaTime());
-		game.getModelBatch().render(exitModel, environment);
-
 		for (RequirementModel reqModel : exitModel.getRequirementModels()) {
 			reqModel.update(Gdx.graphics.getDeltaTime());
-			if (reqModel.isVisible())
-				game.getModelBatch().render(reqModel, environment);
+			game.getModelBatch().render(reqModel, environment);
 		}
+
+		exitModel.update(Gdx.graphics.getDeltaTime());
+		game.getModelBatch().render(exitModel, environment);
 
 		playerModel.update(Gdx.graphics.getDeltaTime());
 		game.getModelBatch().render(playerModel, environment);

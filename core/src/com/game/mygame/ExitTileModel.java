@@ -2,7 +2,9 @@ package com.game.mygame;
 
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
+import com.badlogic.gdx.utils.Timer;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -154,6 +156,8 @@ public class ExitTileModel extends ModelInstance
 				height = 1;
 				moveAnimation.setAnimation(
 						"Cube|Spiral", 1, -SPIRAL_SPEED, this);
+				blendAnimation.reset(1.0f, 1.0f);
+				blendAnimation.setBlended(false);
 				updateTransform(height);
 				state = State.MOVING_UP;
 			} else {
