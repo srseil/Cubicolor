@@ -41,12 +41,9 @@ Verbesserungen:
  --> Implementiert. Möglicherweise Geschwindigkeit der Animation anpassen.
 - Lock Tiles könnten Farbe verlieren, wenn der Spieler mit
   richtiger Farbe auf sie tritt.
-   --> Ansonsten attribute in key und lock Klassen entfernen.
-        BESSER: Texture für alle Tiles, dann einfach wechseln!
 - Fonts (super sampling, etc. -> siehe BMFont Anleitung)
 - Performance
 - Siehe libGDX Wiki: ModelBatch und BlendAttribute
-- AssetLoader loadTile -> loadKeyTile?
 
 Feedback:
 - Exit Tile sollte mehr heraus stechen, sieht man nicht gut wenn ganz unten
@@ -67,4 +64,9 @@ libGDX:
   reset()-Methode wäre hilfreich.
 - PlayerModel hat bei Fall-Animation verrutschen Origin-Punkt
 - fb-conv lädt G3DJ nicht, Fehler bei der Skalierung (?)
+
+Lektionen:
+- Observer zwischen Player und PlayerModel wäre sinnvoll gewesen, ist aber jetzt
+  zu aufwendig alles umzustellen. Daher am besten schon früher mit Modellierung
+  beschäftigen und solche Dinge vor der Implementierung festlegen.
 

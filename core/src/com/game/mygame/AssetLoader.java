@@ -31,15 +31,8 @@ public class AssetLoader {
 		return model;
 	}
 
-	// Does a simple diffuse look different to a texture?
-	// If not, then simply call loadLockTileModel(NONE) here.
 	public Model loadTileModel() {
-		String path = "models/tile.g3db";
-		Model model = modelLoader.loadModel(Gdx.files.internal(path));
-		model.materials.first().set(ColorAttribute.createDiffuse(
-				TileColor.getGdxColor(TileColor.NONE)));
-		model.materials.first().set(new BlendingAttribute(true, 1.0f));
-		return model;
+		return loadLockTileModel(TileColor.NONE);
 	}
 
 	public Model loadLockTileModel(TileColor color) {
