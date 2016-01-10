@@ -249,12 +249,12 @@ public class GameScreen implements Screen {
 		else
 			completeDialogOptimal.show(interfaceStage);
 
+		/*
 		game.getSaveState().update(
 				level.getDifficulty(), level.getNumber(), optimal);
-
-		//game.getSaveState().save();
-
+		game.getSaveState().save();
 		System.out.println(game.getSaveState().getSolveState(level.getDifficulty(), level.getNumber()));
+		*/
 	}
 
 	public void setPaused(boolean paused) {

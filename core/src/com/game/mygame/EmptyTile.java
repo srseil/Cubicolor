@@ -6,12 +6,8 @@ public class EmptyTile extends Tile {
         dead = true;
     }
 
-	/*
-	@Override
-	public void draw(SpriteBatch batch) {
-		// Do nothing, because this Tile is empty.
-	}
-	*/
+    @Override
+    public void setDead(boolean dead) {}
 
 }
 
