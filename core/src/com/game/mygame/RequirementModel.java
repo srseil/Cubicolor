@@ -8,9 +8,9 @@ public class RequirementModel extends ModelInstance
 		implements AnimationController.AnimationListener {
 
 	// The speeds and durations of the model's animations.
-	public static float FALL_SPEED = 2.0f;
+	public static float FALL_SPEED = 1.8f;
 	public static float BLEND_SPEED = 1.0f;
-	public static float BLEND_DURATION = 0.6f;
+	public static float BLEND_DURATION = 0.3f;
 
 	/*
 	 * The possible states a RequirementModel can be in.

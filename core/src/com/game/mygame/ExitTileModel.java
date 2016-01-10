@@ -13,8 +13,8 @@ public class ExitTileModel extends ModelInstance
 		implements Observer, AnimationController.AnimationListener {
 
 	// The speed the model's animations are being played at.
-	public static final float SPIRAL_SPEED = 1.5f;
-	public static final float FALL_SPEED = 1.0f;
+	public static final float SPIRAL_SPEED = 1.8f;
+	public static final float FALL_SPEED = 1.3f;
 	public static final float SETUP_SPEED = 1.5f;
 
 	/*

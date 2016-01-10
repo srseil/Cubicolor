@@ -16,7 +16,7 @@ public class TileModel extends ModelInstance implements Observer {
 	public static final float COLUMN_REVIVE_DELAY = 0.15f;
 	// The speed the model's animations are being played at.
 	public static final float REVIVING_SPEED = 2.0f;
-	public static final float FALLING_SPEED = 1.0f;
+	public static final float FALLING_SPEED = 1.3f;
 
 	private enum State {
 		ALIVE,
