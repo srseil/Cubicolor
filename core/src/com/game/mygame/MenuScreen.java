@@ -24,7 +24,8 @@ public class MenuScreen implements Screen {
 
 	public MenuScreen(MyGame game) {
 		this.game = game;
-		stage = new Stage(new ExtendViewport(800, 600));
+		stage = new Stage(new ExtendViewport(
+				Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 		camera = (OrthographicCamera) stage.getCamera();
 		skin = game.getSkin();
 

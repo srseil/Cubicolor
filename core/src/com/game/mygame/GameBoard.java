@@ -59,7 +59,8 @@ public class GameBoard extends Actor {
 		float viewportHeight = (float) (Math.cos(Math.toRadians(35.0f)) *
 				(Math.sqrt(Math.pow(2 * level.getRows(), 2) +
 						Math.pow(2 * level.getColumns(), 2))) + 1);
-		float viewportWidth = (4.0f/3.0f * viewportHeight);
+		float viewportWidth = ((float) Gdx.graphics.getWidth())
+				/ Gdx.graphics.getHeight() * viewportHeight;
 		camera.setToOrtho(false, viewportWidth, viewportHeight);
 		camera.rotate(-60.0f, 1.0f, 0.0f, 0.0f);
 		camera.rotate(20.0f, 0.0f, 1.0f, 0.0f);

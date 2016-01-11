@@ -42,6 +42,8 @@ Verbesserungen:
 - Fonts (super sampling, etc. -> siehe BMFont Anleitung)
 - Performance
 - Siehe libGDX Wiki: ModelBatch und BlendAttribute
+- PlayerModel Fall-Animation anpassen (kürzer!)
+- KeyTileModel Textur ändern
 
 Feedback:
 - Exit Tile sollte mehr heraus stechen, sieht man nicht gut wenn ganz unten
@@ -52,6 +54,8 @@ Einstellungen:
 - Gedächtnisstütze:
   Resolution, full/windowed screen, language, (reset progress), brightness,
   (vsync), Music, SFX, Controls!, (colorblind? -> reddit), Tutorial
+- SFX Slider sollte irgendeinen Soundeffekt dauerhaft spielen, damit man gleich
+  das Feedback für die Lautstärke erhält.
 
 libGDX:
 - animationController.inAction immer false?

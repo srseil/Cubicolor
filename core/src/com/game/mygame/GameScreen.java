@@ -54,8 +54,8 @@ public class GameScreen implements Screen {
 		player = new Player(level);
 		skin = game.getSkin();
 
-		interfaceStage = new Stage(new ExtendViewport(800, 600));
-		boardStage = new Stage(new ExtendViewport(800, 600));
+		interfaceStage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+		boardStage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 		gameBoard = new GameBoard(level, player, boardStage.getCamera(), game);
 		boardStage.addActor(gameBoard);
 
