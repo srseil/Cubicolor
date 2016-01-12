@@ -10,7 +10,7 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "MyGame";
-		cfg.width = 1920;
+		cfg.width = 1440;
 		cfg.height = 1080;
 		cfg.samples = 2;
 		//cfg.fullscreen = true;
@@ -36,6 +36,9 @@ public class DesktopLauncher {
 
 		TexturePacker.processIfModified(settings, "/home/stefan/libGDX/MyGame/android/assets/textures/keytile",
 				"/home/stefan/libGDX/MyGame/android/assets/textures/keytile", "keytile");
+
+		TexturePacker.processIfModified(settings, "/home/stefan/Bilder/MyGame/skin/ninepatches/",
+				"/home/stefan/libGDX/MyGame/android/assets/skins/", "uiskin");
 
 		new LwjglApplication(new MyGame(), cfg);
 	}

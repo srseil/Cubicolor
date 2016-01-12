@@ -10,6 +10,7 @@ public enum TileColor {
 	YELLOW,	// 255,204,102 ; ffcc66
 	NONE;	// 252,250,246 ; fcfaf6 -> colorless Tiles
 	// BACKGROUND WHITE: 0.949f, 0.941f, 0.925f
+	// PLAYER BLACK:
 
 	public static Color getGdxColor(TileColor color) {
 		switch (color) {

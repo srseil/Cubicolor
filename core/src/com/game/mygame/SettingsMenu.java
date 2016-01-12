@@ -1,6 +1,7 @@
 package com.game.mygame;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -52,7 +53,10 @@ public class SettingsMenu extends Table {
 
 	private void createGameSection() {
 		// Section label
-		add(new Label("Game", skin)).left();
+		Label l = new Label("Game", skin);
+		l.setFontScale(0.5f);
+		l.setColor(Color.BLACK);
+		add(l).left();
 		row();
 
 		// Language drop down menu

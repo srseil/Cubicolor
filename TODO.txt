@@ -44,11 +44,21 @@ Verbesserungen:
 - Siehe libGDX Wiki: ModelBatch und BlendAttribute
 - PlayerModel Fall-Animation anpassen (kürzer!)
 - KeyTileModel Textur ändern
+- Menü Funktionalität implementieren
+- Levels erstellen
+- Soundeffekte
 
 Feedback:
 - Exit Tile sollte mehr heraus stechen, sieht man nicht gut wenn ganz unten
 - Coloring-Animation dauert zu lange, hält Spielfluss auf
 - In-Game Schriftart sieht nicht gut aus, "spacing" (Kerning?) stört
+
+Greenlight:
+- PlayerModel Animationen
+- Schriftart ändern
+- Potentielle Renderprobleme beseitigen
+- Soundeffekte
+- Musik
 
 Einstellungen:
 - Gedächtnisstütze:

@@ -3,6 +3,7 @@ package com.game.mygame;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 
@@ -21,7 +22,10 @@ public class PauseDialog extends Dialog {
 		this.setResizable(false);
 		this.setModal(true);
 
-		this.button(new TextButton("Resume", skin), "");
+		TextButton tb = new TextButton("Resume", skin);
+		tb.getLabelCell().height(-20.0f);
+		tb.getLabelCell().padBottom(15.0f);
+		this.button(tb, "");
 		this.key(Input.Keys.ESCAPE, "");
 		this.key(Input.Keys.ENTER, "");
 		this.getButtonTable().row();
