@@ -56,28 +56,31 @@ public class MenuScreen implements Screen {
 		menuItems.fill();
 
 		// Play button
-		TextButton playButton = new TextButton("Play", skin);
-		playButton.setWidth(100.0f);
+		final TextButton playButton = new TextButton("Play", skin);
+		playButton.getLabelCell().width(100.0f);
+		playButton.getLabelCell().height(30.0f);
+		playButton.getLabelCell().padBottom(15f);
 		playButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				rootTable.removeActor(currentMenu);
-				rootTable.add(levelMenu);
-				currentMenu = levelMenu;
+				if (currentMenu != levelMenu) {
+					rootTable.getCell(currentMenu).setActor(levelMenu);
+					currentMenu = levelMenu;
+				}
 			}
 		});
 		menuItems.addActor(playButton);
 
 		// Settings button
-		TextButton settingsButton = new TextButton("Settings", skin);
+		final TextButton settingsButton = new TextButton("Settings", skin);
 		settingsButton.setWidth(100.0f);
 		settingsButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				rootTable.removeActor(currentMenu);
-				rootTable.add(settingsMenu);
-				currentMenu = settingsMenu;
-				System.out.println(rootTable.getRows());
+				if (currentMenu != settingsMenu) {
+					rootTable.getCell(currentMenu).setActor(settingsMenu);
+					currentMenu = settingsMenu;
+				}
 			}
 		});
 		menuItems.addActor(settingsButton);

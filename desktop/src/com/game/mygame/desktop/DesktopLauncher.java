@@ -10,6 +10,7 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "MyGame";
+		// 1440x1080 ist FullHD 4:3
 		cfg.width = 1440;
 		cfg.height = 1080;
 		cfg.samples = 2;

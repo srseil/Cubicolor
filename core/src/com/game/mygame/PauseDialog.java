@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.utils.Align;
 
 public class PauseDialog extends Dialog {
 
@@ -22,16 +23,28 @@ public class PauseDialog extends Dialog {
 		this.setResizable(false);
 		this.setModal(true);
 
+		this.getContentTable().padBottom(10.0f);
+		this.getTitleLabel().setAlignment(Align.center);
+
 		TextButton tb = new TextButton("Resume", skin);
-		tb.getLabelCell().height(-20.0f);
-		tb.getLabelCell().padBottom(15.0f);
+		tb.getLabelCell().height(28.0f);
+		tb.getLabelCell().padBottom(14.0f);
 		this.button(tb, "");
 		this.key(Input.Keys.ESCAPE, "");
 		this.key(Input.Keys.ENTER, "");
 		this.getButtonTable().row();
-		this.button(new TextButton("Restart", skin), "restart");
+
+		tb = new TextButton("Restart", skin);
+		tb.getLabelCell().height(28.0f);
+		tb.getLabelCell().padBottom(14.0f);
+		this.button(tb, "restart");
+		this.key(Input.Keys.R, "restart");
 		this.getButtonTable().row();
-		this.button(new TextButton("Main Menu", skin), "menu");
+
+		tb = new TextButton("Main Menu", skin);
+		tb.getLabelCell().height(28.0f);
+		tb.getLabelCell().padBottom(14.0f);
+		this.button(tb, "menu");
 	}
 
 	protected void result(Object object) {

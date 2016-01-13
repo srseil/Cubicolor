@@ -1,33 +1,65 @@
 
 uiskin.png
-size: 1024,1024
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+default
+  rotate: false
+  xy: 0, 0
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: -1
+
+uiskin2.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+default_old
+  rotate: false
+  xy: 0, 0
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: -1
+
+uiskin3.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+default_old26
+  rotate: false
+  xy: 0, 0
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: -1
+
+uiskin4.png
+size: 512,64
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
 check-off
   rotate: false
-  xy: 2, 10
+  xy: 236, 36
   size: 28, 28
   orig: 28, 28
   offset: 0, 0
   index: -1
 check-on
   rotate: false
-  xy: 100, 112
+  xy: 264, 36
   size: 28, 28
   orig: 28, 28
   offset: 0, 0
   index: -1
-default
-  rotate: false
-  xy: 2, 142
-  size: 512, 512
-  orig: 512, 512
-  offset: 0, 0
-  index: -1
 default-rect
   rotate: false
-  xy: 542, 606
+  xy: 6, 0
   size: 6, 6
   split: 2, 2, 2, 2
   orig: 6, 6
@@ -35,7 +67,7 @@ default-rect
   index: -1
 default-rect-down
   rotate: false
-  xy: 44, 74
+  xy: 0, 0
   size: 6, 6
   split: 2, 2, 2, 2
   orig: 6, 6
@@ -43,25 +75,25 @@ default-rect-down
   index: -1
 default-round
   rotate: false
-  xy: 572, 614
+  xy: 212, 24
   size: 24, 40
   split: 11, 11, 19, 19
-  pad: 6, 6, 2, 2
+  pad: 9, 9, 2, 2
   orig: 24, 40
   offset: 0, 0
   index: -1
 default-round-down
   rotate: false
-  xy: 516, 572
+  xy: 188, 24
   size: 24, 40
   split: 11, 11, 19, 19
-  pad: 5, 5, 1, 5
+  pad: 9, 9, 2, 2
   orig: 24, 40
   offset: 0, 0
   index: -1
 default-round-large
   rotate: false
-  xy: 2, 40
+  xy: 108, 24
   size: 40, 40
   split: 11, 6, 15, 16
   pad: 6, 6, 4, 4
@@ -70,7 +102,7 @@ default-round-large
   index: -1
 default-scroll
   rotate: false
-  xy: 58, 100
+  xy: 148, 24
   size: 40, 40
   split: 19, 19, 18, 20
   pad: 6, 6, 6, 6
@@ -79,7 +111,7 @@ default-scroll
   index: -1
 default-select
   rotate: false
-  xy: 516, 614
+  xy: 54, 24
   size: 54, 40
   split: 18, 34, 19, 19
   pad: 12, 34, 7, 7
@@ -88,14 +120,14 @@ default-select
   index: -1
 default-select-selection
   rotate: false
-  xy: 598, 648
+  xy: 12, 0
   size: 6, 6
   orig: 6, 6
   offset: 0, 0
   index: -1
 default-slider
   rotate: false
-  xy: 58, 82
+  xy: 292, 48
   size: 16, 16
   split: 7, 7, 7, 7
   pad: 5, 5, 5, 5
@@ -104,30 +136,30 @@ default-slider
   index: -1
 default-slider-knob
   rotate: false
-  xy: 516, 534
+  xy: 236, 0
   size: 18, 36
   orig: 18, 36
   offset: 0, 0
   index: -1
 default-window
   rotate: false
-  xy: 2, 82
+  xy: 0, 6
   size: 54, 58
   split: 11, 11, 38, 11
-  pad: 8, 8, 48, 8
+  pad: 8, 8, 27, 8
   orig: 54, 58
   offset: 0, 0
   index: -1
 selection
   rotate: false
-  xy: 32, 36
+  xy: 54, 22
   size: 2, 2
   orig: 2, 2
   offset: 0, 0
   index: -1
 white
   rotate: false
-  xy: 2, 2
+  xy: 18, 0
   size: 6, 6
   orig: 6, 6
   offset: 0, 0

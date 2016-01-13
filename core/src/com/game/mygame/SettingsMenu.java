@@ -14,6 +14,7 @@ public class SettingsMenu extends Table {
 	private final Dialog resetDialog;
 
 	public SettingsMenu(Skin skin, final Stage stage, final MyGame game) {
+		super(skin);
 		this.stage = stage;
 		this.skin = skin;
 
