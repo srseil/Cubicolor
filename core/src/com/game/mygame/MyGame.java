@@ -1,6 +1,7 @@
 package com.game.mygame;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g3d.Model;
@@ -29,6 +30,7 @@ public class MyGame extends Game {
 	private EnumMap<TileColor, Model> lockTileModels;
 	private EnumMap<TileColor, TextureAtlas> playerAnimations;
 	private EnumMap<TileColor, TextureAtlas.AtlasRegion> keyTileTextures;
+	private HashMap<String, Sound> sounds;
 	private HashMap<String, BitmapFont> bitmapFonts;
 	private Skin skin;
 
@@ -77,6 +79,10 @@ public class MyGame extends Game {
 		keyTileTextures.put(TileColor.YELLOW, regions.get(3));
 		keyTileTextures.put(TileColor.NONE, regions.get(4));
 
+		// Sounds
+		sounds = new HashMap<>();
+		sounds.put("Player-Step", assetLoader.loadSound("player_step"));
+
 		// Bitmap fonts
 		bitmapFonts = new HashMap<>();
 		bitmapFonts.put("OldStandard-Regular-30",
@@ -107,9 +113,9 @@ public class MyGame extends Game {
 		try {
 			saveState.load();
 			menuScreen = new MenuScreen(this);
-			//this.setScreen(menuScreen);
+			this.setScreen(menuScreen);
 			//saveState.save();
-			openLevel("normal", 1);
+			//openLevel("normal", 1);
 		} catch (IOException exception) {
 			System.out.println("Error while loading level.");
 			exception.printStackTrace();
@@ -204,6 +210,10 @@ public class MyGame extends Game {
 
 	public TextureAtlas.AtlasRegion getKeyTileTexture(TileColor color) {
 		return keyTileTextures.get(color);
+	}
+
+	public Sound getSound(String name) {
+		return sounds.get(name);
 	}
 
 	public BitmapFont getBitmapFont(String name) {

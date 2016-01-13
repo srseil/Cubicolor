@@ -2,6 +2,7 @@ package com.game.mygame;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.loaders.ModelLoader;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -85,6 +86,11 @@ public class AssetLoader {
 	public TextureAtlas loadKeyTileTextures() {
 		String path = "textures/keytile/keytile.atlas";
 		return new TextureAtlas(Gdx.files.internal(path));
+	}
+
+	public Sound loadSound(String fileName) {
+		String path = "sounds/" + fileName + ".wav";
+		return Gdx.audio.newSound(Gdx.files.internal(path));
 	}
 
 	public BitmapFont loadBitmapFont(String fileName) {

@@ -1,5 +1,6 @@
 package com.game.mygame;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
@@ -39,6 +40,8 @@ public class PlayerModel extends ModelInstance
 	private BlendAnimation blendAnimation;
 	private TextureAnimation textureAnimation;
 	private EnumMap<TileColor, TextureAnimation> textureAnimations;
+	// Sounds
+	private Sound stepSound;
 	// Private data
 	private State state;
 	private TileColor key;
@@ -50,6 +53,9 @@ public class PlayerModel extends ModelInstance
 		super(model);
 		this.data = data;
 		this.exitModel = exitModel;
+
+		// Reference sounds.
+		stepSound = game.getSound("Player-Step");
 
 		// Setup move and blend animations.
 		moveAnimation = new AnimationController(this);
@@ -164,6 +170,8 @@ public class PlayerModel extends ModelInstance
 			moveAnimation.current.time = 0.0f;
 			transform.setToRotation(0, 1, 0, 0);
 			updateTransform(0, 0);
+			// Play sound.
+			stepSound.play();
 
 			// Take key if model is standing on key tile.
 			if (data.getKey() != key) {
