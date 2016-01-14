@@ -2,12 +2,17 @@ package com.game.mygame;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 
 import java.io.IOException;
@@ -30,6 +35,7 @@ public class MyGame extends Game {
 	private EnumMap<TileColor, Model> lockTileModels;
 	private EnumMap<TileColor, TextureAtlas> playerAnimations;
 	private EnumMap<TileColor, TextureAtlas.AtlasRegion> keyTileTextures;
+	private TextureRegionDrawable menuBackground;
 	private HashMap<String, Sound> sounds;
 	private HashMap<String, BitmapFont> bitmapFonts;
 	private Skin skin;
@@ -79,12 +85,17 @@ public class MyGame extends Game {
 		keyTileTextures.put(TileColor.YELLOW, regions.get(3));
 		keyTileTextures.put(TileColor.NONE, regions.get(4));
 
+		// Menu background
+		menuBackground = assetLoader.loadMenuBackground();
+
 		// Sounds
 		sounds = new HashMap<>();
 		sounds.put("Player-Step", assetLoader.loadSound("player_step"));
 
 		// Bitmap fonts
 		bitmapFonts = new HashMap<>();
+		bitmapFonts.put("OldStandard-Regular-28",
+				assetLoader.loadBitmapFont("OldStandard-Regular-28"));
 		bitmapFonts.put("OldStandard-Regular-30",
 				assetLoader.loadBitmapFont("OldStandard-Regular-30"));
 		bitmapFonts.put("OldStandard-Regular-50",
@@ -210,6 +221,10 @@ public class MyGame extends Game {
 
 	public TextureAtlas.AtlasRegion getKeyTileTexture(TileColor color) {
 		return keyTileTextures.get(color);
+	}
+
+	public TextureRegionDrawable getMenuBackground() {
+		return menuBackground;
 	}
 
 	public Sound getSound(String name) {

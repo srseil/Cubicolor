@@ -20,7 +20,7 @@ public class LevelMenu extends Table {
 	 */
 
 	public LevelMenu(Skin skin, MyGame game) {
-		super();
+		super(skin);
 
 		this.game = game;
 

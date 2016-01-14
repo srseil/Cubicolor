@@ -54,12 +54,13 @@ public class MenuScreen implements Screen {
 		// Group of menu buttons
 		VerticalGroup menuItems = new VerticalGroup();
 		menuItems.fill();
+		menuItems.space(5.0f);
 
 		// Play button
 		final TextButton playButton = new TextButton("Play", skin);
-		playButton.getLabelCell().width(100.0f);
+		playButton.getLabelCell().width(120.0f);
 		playButton.getLabelCell().height(30.0f);
-		playButton.getLabelCell().padBottom(15f);
+		playButton.getLabelCell().padBottom(15.0f);
 		playButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
@@ -73,7 +74,9 @@ public class MenuScreen implements Screen {
 
 		// Settings button
 		final TextButton settingsButton = new TextButton("Settings", skin);
-		settingsButton.setWidth(100.0f);
+		settingsButton.setWidth(120.0f);
+		settingsButton.getLabelCell().height(30.0f);
+		settingsButton.getLabelCell().padBottom(15.0f);
 		settingsButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
@@ -87,7 +90,9 @@ public class MenuScreen implements Screen {
 
 		// Quit button
 		TextButton quitButton = new TextButton("Quit", skin);
-		quitButton.setWidth(100.0f);
+		quitButton.setWidth(120.0f);
+		quitButton.getLabelCell().height(30.0f);
+		quitButton.getLabelCell().padBottom(15.0f);
 		quitButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {

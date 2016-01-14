@@ -9,8 +9,8 @@ public enum TileColor {
 	BLUE,	// 102,153,204 ; 6699cc
 	YELLOW,	// 255,204,102 ; ffcc66
 	NONE;	// 252,250,246 ; fcfaf6 -> colorless Tiles
-	// BACKGROUND WHITE: 0.949f, 0.941f, 0.925f
-	// PLAYER BLACK:
+	//BLACK,	// 45,45,45    ; 2d2d2d
+	//BACKGROUND;	// 0.949f, 0.941f, 0.925f ; ...
 
 	public static Color getGdxColor(TileColor color) {
 		switch (color) {
@@ -24,6 +24,12 @@ public enum TileColor {
 				return new Color(1.0f, 0.8f, 0.4f, 1.0f);
 			case NONE:
 				return new Color(0.989f, 0.981f, 0.965f, 1.0f);
+			/*
+			case BLACK:
+				return new Color(0.176f, 0.176f, 0.176f, 1.0f);
+			case BACKGROUND:
+				return new Color(0.949f, 0.941f, 0.925f, 1.0f);
+				*/
 			default:
 				return new Color(0.0f, 0.0f, 0.0f, 1.0f);
 		}

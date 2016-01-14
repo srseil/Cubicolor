@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.UBJsonReader;
 
 public class AssetLoader {
@@ -86,6 +87,13 @@ public class AssetLoader {
 	public TextureAtlas loadKeyTileTextures() {
 		String path = "textures/keytile/keytile.atlas";
 		return new TextureAtlas(Gdx.files.internal(path));
+	}
+
+	public TextureRegionDrawable loadMenuBackground() {
+		String path = "textures/menu/background.png";
+		TextureRegionDrawable background = new TextureRegionDrawable(
+				new TextureRegion(new Texture(Gdx.files.internal(path))));
+		return background;
 	}
 
 	public Sound loadSound(String fileName) {
