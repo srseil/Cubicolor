@@ -19,6 +19,7 @@ public class GameBoard extends Actor {
 	private Environment environment;
 	private Level level;
 	private TileModel[][] modelMatrix;
+	private TileModel lastTile;
 	private ExitTileModel exitModel;
 	private PlayerModel playerModel;
 
@@ -31,9 +32,10 @@ public class GameBoard extends Actor {
 		float width = (float) level.getColumns() * TileModel.SIZE;
 		float height = (float) level.getRows() * TileModel.SIZE;
 		modelMatrix = parseModelMatrix(level.getMatrix());
+		lastTile = calculateLastRevivingTile();
 
 		playerModel = new PlayerModel(
-				game.getPlayerModel(), player, exitModel, game);
+				game.getPlayerModel(), player, exitModel, lastTile, this, game);
 
 		environment = new Environment();
 		environment.set(new ColorAttribute(
@@ -134,6 +136,21 @@ public class GameBoard extends Actor {
 		}
 	}
 
+	public TileModel calculateLastRevivingTile() {
+		TileModel lastTile = null;
+		for (int i = 0; i < modelMatrix.length; i++) {
+			for (int j = modelMatrix[i].length - 1; j >= 0; j--) {
+				if (modelMatrix[i][j] != null) {
+					lastTile = modelMatrix[i][j];
+					break;
+				}
+			}
+			if (lastTile != null)
+				break;
+		}
+		return lastTile;
+	}
+
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
 		// Batch end, begin necessary?
@@ -176,20 +193,6 @@ public class GameBoard extends Actor {
 	public void setup() {
 		resetModelMatrix();
 		exitModel.setup();
-
-		// Get last tile reviving tile.
-		TileModel lastTile = null;
-		for (int i = 0; i < modelMatrix.length; i++) {
-			for (int j = modelMatrix[i].length - 1; j >= 0; j--) {
-				if (modelMatrix[i][j] != null) {
-					lastTile = modelMatrix[i][j];
-					System.out.println(i + " " + j);
-					break;
-				}
-			}
-			if (lastTile != null)
-				break;
-		}
 
 		// Delay player setup until board has finished setting up.
 		Timer.schedule(new Timer.Task() {

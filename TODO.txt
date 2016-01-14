@@ -30,6 +30,7 @@ Bugs:
 /- Blendanimation von Tiles bei Setup hört ein wenig zu spät auf; noch ein wenig
   transparent wenn schon ganz oben.
  --> Gefixt! Geschwindigkeit oder Dauer anpassen, damit es noch besser aussieht?
+- Resetten auf Start-Tile: Player Model wartet zu lange.
 
 Verbesserungen:
 /- Player Model bei reset länger warten lassen, damit start Tile länger Zeit hat

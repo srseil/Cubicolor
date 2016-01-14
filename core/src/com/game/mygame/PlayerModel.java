@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Timer;
 
 import java.util.EnumMap;
 
@@ -18,7 +19,7 @@ public class PlayerModel extends ModelInstance
 	// The speed the model's animation are being played at.
 	public static final float MOVE_SPEED = 3.0f;
 	public static final float INDICATION_SPEED = 2.5f;
-	public static final float FALL_SPEED = 1.0f;
+	public static final float FALL_SPEED = 1.5f;
 
 	/*
 	 * The possible states the model can be in.
@@ -35,6 +36,8 @@ public class PlayerModel extends ModelInstance
 
 	private Player data;
 	private ExitTileModel exitModel;
+	private TileModel lastTile;
+	private GameBoard board;
 	// Animations
 	private AnimationController moveAnimation;
 	private BlendAnimation blendAnimation;
@@ -48,11 +51,13 @@ public class PlayerModel extends ModelInstance
 	private int dataX, dataY;
 	private boolean controllable;
 
-	public PlayerModel(Model model, Player data,
-					   ExitTileModel exitModel, MyGame game) {
+	public PlayerModel(Model model, Player data,  ExitTileModel exitModel,
+					   TileModel lastTile, GameBoard board, MyGame game) {
 		super(model);
 		this.data = data;
 		this.exitModel = exitModel;
+		this.lastTile = lastTile;
+		this.board = board;
 
 		// Reference sounds.
 		stepSound = game.getSound("Player-Step");
@@ -71,7 +76,7 @@ public class PlayerModel extends ModelInstance
 		textureAnimations = new EnumMap<>(TileColor.class);
 		for (TileColor color : TileColor.values()) {
 			textureAnimations.put(color, new TextureAnimation(
-					texture, game.getPlayerAnimation(color), 1.0f));
+					texture, game.getPlayerAnimation(color), 0.8f));
 		}
 		textureAnimation = textureAnimations.get(TileColor.RED);
 
@@ -160,6 +165,16 @@ public class PlayerModel extends ModelInstance
 		}
 	}
 
+	/*
+	 * Delay model updates until board has finished setting up.
+	 */
+	private void waitForLastTile() {
+		Timer.schedule(new Timer.Task() {
+			@Override
+			public void run() {System.out.println("yes");}
+		}, lastTile.getReviveDelay() + 0.5f);
+	}
+
 	@Override
 	public void onEnd(AnimationController.AnimationDesc animation) {
 		if (animation.animation.id.equals("Cube|Movement")) {
@@ -206,11 +221,18 @@ public class PlayerModel extends ModelInstance
 			// Falling/hovering has finished.
 			if (state == State.RESETTING_UP) {
 				// Player has hovered up; start hovering down on start tile.
-				state = State.RESETTING_DOWN;
+				state = State.STILL;
 				updateTransform(0, 0.5f);
 				textureAnimation.reset(false);
-				moveAnimation.setAnimation("Cube|Fall", 1, -1.0f, this);
+				moveAnimation.setAnimation("Cube|Fall", 1, -FALL_SPEED, this);
 				blendAnimation.reset(0.0f, FALL_SPEED);
+				System.out.println(lastTile.getReviveDelay());
+				Timer.schedule(new Timer.Task() {
+					@Override
+					public void run() {
+						state = State.RESETTING_DOWN;
+					}
+				}, lastTile.getReviveDelay() + 0.0f);
 			} else if (state == State.RESETTING_DOWN) {
 				// Player has hovered down; is ready and controllable again.
 				blendAnimation.reset(1.0f, FALL_SPEED);
@@ -278,6 +300,9 @@ public class PlayerModel extends ModelInstance
 	 */
 	public void reset() {
 		controllable = false;
+
+		// Re-calculate last reviving tile
+		lastTile = board.calculateLastRevivingTile();
 
 		// Update transform if player is not already at start tile.
 		// I don't actually know why this has to be done.
