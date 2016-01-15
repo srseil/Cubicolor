@@ -83,8 +83,8 @@ public class GameScreen implements Screen {
 
 		// FPS counter in the top right corner.
 		fps = new Label("FPS: ", skin);
-		rightUI.add(fps).expandY().top();
-		rightUI.row();
+		//rightUI.add(fps).expandY().top();
+		//rightUI.row();
 
 		// Steps label in the bottom right corner.
 		stepsLabel = new Label("00", skin);

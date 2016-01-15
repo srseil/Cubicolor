@@ -3,6 +3,7 @@ package com.game.mygame;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.utils.Timer;
 
@@ -51,6 +52,12 @@ public class ExitTileModel extends ModelInstance
 		this.z = z;
 		this.row = row;
 		this.column = column;
+
+		// Set texture.
+		TextureAttribute textureAttribute = materials.first().get(
+				TextureAttribute.class, TextureAttribute.Diffuse);
+		//textureAttribute.set(game.getExitTileTexture());
+
 		moveAnimation = new AnimationController(this);
 		moveAnimation.allowSameAnimation = true;
 		moveAnimation.setAnimation("Cube|Fall");

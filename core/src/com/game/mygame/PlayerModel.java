@@ -186,7 +186,7 @@ public class PlayerModel extends ModelInstance
 			transform.setToRotation(0, 1, 0, 0);
 			updateTransform(0, 0);
 			// Play sound.
-			stepSound.play();
+			//stepSound.play();
 
 			// Take key if model is standing on key tile.
 			if (data.getKey() != key) {

@@ -11,8 +11,8 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "MyGame";
 		// 1440x1080 ist FullHD 4:3
-		cfg.width = 1440;
-		cfg.height = 1080;
+		cfg.width = 800;
+		cfg.height = 600;
 		cfg.samples = 2;
 		//cfg.fullscreen = true;
 
@@ -37,6 +37,8 @@ public class DesktopLauncher {
 
 		TexturePacker.processIfModified(settings, "/home/stefan/libGDX/MyGame/android/assets/textures/keytile",
 				"/home/stefan/libGDX/MyGame/android/assets/textures/keytile", "keytile");
+		TexturePacker.processIfModified(settings, "/home/stefan/libGDX/MyGame/android/assets/textures/e/",
+				"/home/stefan/libGDX/MyGame/android/assets/textures/exittile/", "exittile");
 
 		TexturePacker.processIfModified(settings, "/home/stefan/Bilder/MyGame/skin/ninepatches/",
 				"/home/stefan/libGDX/MyGame/android/assets/skins/", "uiskin");

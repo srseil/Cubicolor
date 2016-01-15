@@ -35,6 +35,7 @@ public class MyGame extends Game {
 	private EnumMap<TileColor, Model> lockTileModels;
 	private EnumMap<TileColor, TextureAtlas> playerAnimations;
 	private EnumMap<TileColor, TextureAtlas.AtlasRegion> keyTileTextures;
+	private TextureAtlas.AtlasRegion exitTileTexture;
 	private TextureRegionDrawable menuBackground;
 	private HashMap<String, Sound> sounds;
 	private HashMap<String, BitmapFont> bitmapFonts;
@@ -84,6 +85,9 @@ public class MyGame extends Game {
 		keyTileTextures.put(TileColor.BLUE, regions.get(2));
 		keyTileTextures.put(TileColor.YELLOW, regions.get(3));
 		keyTileTextures.put(TileColor.NONE, regions.get(4));
+
+		// Exit tile texture
+		exitTileTexture = assetLoader.loadExitTileTexture();
 
 		// Menu background
 		menuBackground = assetLoader.loadMenuBackground();
@@ -221,6 +225,10 @@ public class MyGame extends Game {
 
 	public TextureAtlas.AtlasRegion getKeyTileTexture(TileColor color) {
 		return keyTileTextures.get(color);
+	}
+
+	public TextureAtlas.AtlasRegion getExitTileTexture() {
+		return exitTileTexture;
 	}
 
 	public TextureRegionDrawable getMenuBackground() {

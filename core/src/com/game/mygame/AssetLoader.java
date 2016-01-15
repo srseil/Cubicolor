@@ -57,9 +57,8 @@ public class AssetLoader {
 	public Model loadExitTileModel() {
 		String path = "models/exittile.g3db";
 		Model model = modelLoader.loadModel(Gdx.files.internal(path));
+		model.materials.first().set(ColorAttribute.createDiffuse(Color.WHITE));
 		model.materials.first().set(new BlendingAttribute(true, 1.0f));
-		model.materials.first().set(ColorAttribute.createDiffuse(
-				TileColor.getGdxColor(TileColor.NONE)));
 		return model;
 	}
 
@@ -87,6 +86,12 @@ public class AssetLoader {
 	public TextureAtlas loadKeyTileTextures() {
 		String path = "textures/keytile/keytile.atlas";
 		return new TextureAtlas(Gdx.files.internal(path));
+	}
+
+	public TextureAtlas.AtlasRegion loadExitTileTexture() {
+		String path = "textures/exittile/exittile.atlas";
+		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(path));
+		return atlas.getRegions().first();
 	}
 
 	public TextureRegionDrawable loadMenuBackground() {

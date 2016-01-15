@@ -12,8 +12,8 @@ public class TileModel extends ModelInstance implements Observer {
 	// The side length of the tile model.
 	public static final float SIZE = 2.0f;
 	// The delays for reviving the model based on its row and column.
-	public static final float ROW_REVIVE_DELAY = 0.3f;
-	public static final float COLUMN_REVIVE_DELAY = 0.15f;
+	public static final float ROW_REVIVE_DELAY = 0.2f;
+	public static final float COLUMN_REVIVE_DELAY = 0.1f;
 	// The speed the model's animations are being played at.
 	public static final float REVIVING_SPEED = 2.0f;
 	public static final float FALLING_SPEED = 1.3f;
