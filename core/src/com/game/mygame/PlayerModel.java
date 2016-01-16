@@ -226,13 +226,13 @@ public class PlayerModel extends ModelInstance
 				textureAnimation.reset(false);
 				moveAnimation.setAnimation("Cube|Fall", 1, -FALL_SPEED, this);
 				blendAnimation.reset(0.0f, FALL_SPEED);
-				System.out.println(lastTile.getReviveDelay());
+				//System.out.println(lastTile.row + " " + lastTile.column + " " + lastTile.getReviveDelay());
 				Timer.schedule(new Timer.Task() {
 					@Override
 					public void run() {
 						state = State.RESETTING_DOWN;
 					}
-				}, lastTile.getReviveDelay() + 0.0f);
+				}, lastTile.getReviveDelay() - 0.1f);
 			} else if (state == State.RESETTING_DOWN) {
 				// Player has hovered down; is ready and controllable again.
 				blendAnimation.reset(1.0f, FALL_SPEED);

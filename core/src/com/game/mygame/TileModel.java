@@ -26,12 +26,12 @@ public class TileModel extends ModelInstance implements Observer {
 	}
 
 	private Tile data;
-	private int row, column;
+	public int row, column;
 	private State state;
 	private AnimationController fallAnimation;
 	private BlendAnimation blendAnimation;
-	private float reviveDelta;
 	private float reviveDelay;
+	private float reviveDelta;
 	private boolean onHold;
 
 	public TileModel(Model model, Tile data, int row, int column) {
@@ -44,8 +44,8 @@ public class TileModel extends ModelInstance implements Observer {
 		fallAnimation.setAnimation("Cube|Fall");
 		blendAnimation = new BlendAnimation(this,
 				fallAnimation.current.duration, REVIVING_SPEED);
+		reviveDelay = 0.0f;
 		reviveDelta = 0.0f;
-		reviveDelay = 0;
 		//hold = false;
 
 		// Set living tiles to reviving for setup.
@@ -104,6 +104,7 @@ public class TileModel extends ModelInstance implements Observer {
 		} else {
 			fallAnimation.setAnimation("Cube|Fall", 1, FALLING_SPEED, null);
 		}
+		reviveDelay = 0.0f;
 		reviveDelta = 0.0f;
 	}
 
@@ -131,10 +132,11 @@ public class TileModel extends ModelInstance implements Observer {
 	}
 
 	public boolean isDead() {
-		if (state == State.DEAD)
-			return true;
-		else
-			return false;
+		return (state == State.DEAD);
+	}
+
+	public boolean isReviving() {
+		return (state == State.REVIVING);
 	}
 
 	public float getReviveDelay() {

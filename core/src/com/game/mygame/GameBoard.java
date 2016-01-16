@@ -137,10 +137,12 @@ public class GameBoard extends Actor {
 	}
 
 	public TileModel calculateLastRevivingTile() {
-		TileModel lastTile = null;
+		TileModel lastTile =
+				modelMatrix[level.getStartColumn()][level.getStartRow()];
 		for (int i = 0; i < modelMatrix.length; i++) {
 			for (int j = modelMatrix[i].length - 1; j >= 0; j--) {
-				if (modelMatrix[i][j] != null) {
+				if (modelMatrix[i][j] != null
+						&& modelMatrix[i][j].isReviving()) {
 					lastTile = modelMatrix[i][j];
 					break;
 				}
@@ -185,6 +187,7 @@ public class GameBoard extends Actor {
 	}
 
 	public void reset() {
+		lastTile = calculateLastRevivingTile();
 		resetModelMatrix();
 		exitModel.reset();
 		playerModel.reset();
@@ -195,6 +198,8 @@ public class GameBoard extends Actor {
 		exitModel.setup();
 
 		// Delay player setup until board has finished setting up.
+		TileModel startTile =
+				modelMatrix[level.getStartColumn()][level.getStartRow()];
 		Timer.schedule(new Timer.Task() {
 			@Override
 			public void run() {
