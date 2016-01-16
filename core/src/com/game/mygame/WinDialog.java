@@ -1,7 +1,9 @@
 package com.game.mygame;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 
@@ -20,16 +22,26 @@ public class WinDialog extends Dialog {
 		this.setResizable(false);
 		this.setModal(true);
 
-		this.text("You completed the level!");
+		Label label = new Label("You completed the level!", skin);
+		label.setColor(Color.BLACK);
+		this.text(label);
 		this.getContentTable().row();
-		this.button(new TextButton("Main Menu", skin), "menu");
+		TextButton tb = new TextButton("Main Menu", skin);
+		tb.getLabelCell().height(28.0f);
+		tb.getLabelCell().padBottom(14.0f);
+		this.button(tb, "menu");
 		this.key(Input.Keys.ENTER, "menu");
 
 		if (optimal) {
-			this.text("You found the optimal solution!");
+			label = new Label("You found the optimal solution!", skin);
+			label.setColor(Color.BLACK);
+			this.text(label);
 			this.getContentTable().row();
 		} else {
-			this.button(new TextButton("Retry", skin), "retry");
+			tb = new TextButton("Retry", skin);
+			tb.getLabelCell().height(28.0f);
+			tb.getLabelCell().padBottom(14.0f);
+			this.button(tb, "retry");
 			this.key(Input.Keys.ESCAPE, "retry");
 			this.key(Input.Keys.R, "retry");
 		}
