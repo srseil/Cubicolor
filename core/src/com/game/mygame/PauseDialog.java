@@ -50,7 +50,6 @@ public class PauseDialog extends Dialog {
 		this.getButtonTable().row();
 
 		this.button(menu, "menu");
-		System.out.println(menu.getWidth());
 	}
 
 	protected void result(Object object) {

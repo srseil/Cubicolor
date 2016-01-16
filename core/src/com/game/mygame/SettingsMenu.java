@@ -28,7 +28,9 @@ public class SettingsMenu extends Table {
 		final Dialog confirmResetDialog =
 				new Dialog("Reset Progress", skin);
 		confirmResetDialog.getTitleLabel().setAlignment(Align.center);
-		confirmResetDialog.text("Progress has been reset.");
+		Label confirmResetLabel = new Label("Progress has been reset.", skin);
+		confirmResetLabel.setColor(Color.BLACK);
+		confirmResetDialog.text(confirmResetLabel);
 		TextButton tb = new TextButton("OK", skin);
 		tb.getLabelCell().height(28.0f);
 		tb.getLabelCell().padBottom(14.0f);
@@ -54,8 +56,11 @@ public class SettingsMenu extends Table {
 			}
 		};
 		resetDialog.getTitleLabel().setAlignment(Align.center);
-		resetDialog.text("This will reset all your level progress and lock\n" +
-			"all the levels you have unlocked to far!");
+		Label resetLabel =
+				new Label("This will reset all your level progress and lock\n" +
+			"all the levels you have unlocked to far!", skin);
+		resetLabel.setColor(Color.BLACK);
+		resetDialog.text(resetLabel);
 		tb = new TextButton("Reset", skin);
 		tb.getLabelCell().height(28.0f);
 		tb.getLabelCell().padBottom(14.0f);
@@ -89,7 +94,7 @@ public class SettingsMenu extends Table {
 
 		// Reset progress button
 		TextButton resetButton = new TextButton("Reset Progress", skin);
-		resetButton.getLabelCell().height(28.0f);
+		resetButton.getLabelCell().height(20.0f);
 		resetButton.getLabelCell().padBottom(14.0f);
 		resetButton.addListener(new ChangeListener() {
 			@Override
@@ -97,7 +102,7 @@ public class SettingsMenu extends Table {
 				resetDialog.show(stage);
 			}
 		});
-		add(resetButton).left().padLeft(20.0f);
+		add(resetButton).left().padLeft(20.0f).padTop(14.0f);
 		row();
 	}
 
