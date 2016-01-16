@@ -3,12 +3,14 @@ package com.game.mygame;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class MenuScreen implements Screen {
@@ -45,9 +47,18 @@ public class MenuScreen implements Screen {
 					Gdx.app.exit();
 			}
 		};
-		quitDialog.text("Are you sure you want to quit?");
-		quitDialog.button("Quit", true);
-		quitDialog.button("Cancel", false);
+		quitDialog.getTitleLabel().setAlignment(Align.center);
+		Label quitLabel = new Label("Are you sure you want to quit?", skin);
+		quitLabel.setColor(Color.BLACK);
+		quitDialog.text(quitLabel);
+		TextButton quitQuit = new TextButton("Quit", skin);
+		quitQuit.getLabelCell().height(28.0f);
+		quitQuit.getLabelCell().padBottom(14.0f);
+		quitDialog.button(quitQuit, true);
+		TextButton quitCancel = new TextButton("Cancel", skin);
+		quitCancel.getLabelCell().height(28.0f);
+		quitCancel.getLabelCell().padBottom(14.0f);
+		quitDialog.button(quitCancel, false);
 		quitDialog.key(Input.Keys.ENTER, true);
 		quitDialog.key(Input.Keys.ESCAPE, false);
 

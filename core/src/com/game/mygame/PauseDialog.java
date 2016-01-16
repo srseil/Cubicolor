@@ -26,25 +26,31 @@ public class PauseDialog extends Dialog {
 		this.getContentTable().padBottom(10.0f);
 		this.getTitleLabel().setAlignment(Align.center);
 
-		TextButton tb = new TextButton("Resume", skin);
-		tb.getLabelCell().height(28.0f);
-		tb.getLabelCell().padBottom(14.0f);
-		this.button(tb, "");
+		TextButton menu = new TextButton("Main Menu", skin);
+		menu.getLabelCell().height(28.0f);
+		menu.getLabelCell().padBottom(14.0f);
+
+		TextButton resume = new TextButton("Resume", skin);
+		resume.getLabelCell().width(menu.getLabelCell().getPrefWidth());
+		resume.getLabelCell().height(28.0f);
+		resume.getLabelCell().padBottom(14.0f);
+
+		TextButton restart = new TextButton("Restart", skin);
+		restart.getLabelCell().width(menu.getLabelCell().getPrefWidth());
+		restart.getLabelCell().height(28.0f);
+		restart.getLabelCell().padBottom(14.0f);
+
+		this.button(resume, "");
 		this.key(Input.Keys.ESCAPE, "");
 		this.key(Input.Keys.ENTER, "");
 		this.getButtonTable().row();
 
-		tb = new TextButton("Restart", skin);
-		tb.getLabelCell().height(28.0f);
-		tb.getLabelCell().padBottom(14.0f);
-		this.button(tb, "restart");
+		this.button(restart, "restart");
 		this.key(Input.Keys.R, "restart");
 		this.getButtonTable().row();
 
-		tb = new TextButton("Main Menu", skin);
-		tb.getLabelCell().height(28.0f);
-		tb.getLabelCell().padBottom(14.0f);
-		this.button(tb, "menu");
+		this.button(menu, "menu");
+		System.out.println(menu.getWidth());
 	}
 
 	protected void result(Object object) {

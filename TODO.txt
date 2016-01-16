@@ -43,7 +43,6 @@ Verbesserungen:
 - Fonts (super sampling, etc. -> siehe BMFont Anleitung)
 - Performance
 - Siehe libGDX Wiki: ModelBatch und BlendAttribute
-- PlayerModel Fall-Animation anpassen (kürzer!)
 - KeyTileModel Textur ändern
 - Menü Funktionalität implementieren
 - Levels erstellen
