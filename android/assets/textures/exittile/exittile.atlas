@@ -7,7 +7,7 @@ repeat: none
 exittile
   rotate: false
   xy: 0, 0
-  size: 512, 512
-  orig: 512, 512
+  size: 384, 384
+  orig: 384, 384
   offset: 0, 0
   index: -1

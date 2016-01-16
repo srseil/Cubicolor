@@ -59,6 +59,12 @@ public class AssetLoader {
 		Model model = modelLoader.loadModel(Gdx.files.internal(path));
 		model.materials.first().set(ColorAttribute.createDiffuse(Color.WHITE));
 		model.materials.first().set(new BlendingAttribute(true, 1.0f));
+
+		path = "textures/exittile/exittile.atlas";
+		TextureAttribute textureAttribute = model.materials.first().get(
+				TextureAttribute.class, TextureAttribute.Diffuse);
+		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(path));
+		textureAttribute.set(atlas.getRegions().first());
 		return model;
 	}
 
