@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class SettingsMenu extends Table {
 
@@ -19,12 +20,17 @@ public class SettingsMenu extends Table {
 	private final Dialog resetDialog;
 	private Stage stage;
 	private Skin skin;
+	// Settings content
+	private String[] resolutions;
 
 	public SettingsMenu(Skin skin, final Stage stage, final MyGame game) {
 		super(skin);
 		this.game = game;
 		this.stage = stage;
 		this.skin = skin;
+
+		String[] res = {"1920x1080", "1440x1080", "1280x720", "800x600"};
+		resolutions = res;
 
 		// Draw background texture.
 		this.setBackground(game.getMenuBackground());
@@ -160,7 +166,7 @@ public class SettingsMenu extends Table {
 		add(label).left().padTop(20.0f);
 		row();
 
-		// Resolution drop down menu and fullscreen checkbox
+		// Resolution drop down menu
 		final CheckBox fullscreen = new CheckBox("Fullscreen", skin);
 		label = new Label("Resolution", skin);
 		label.setColor(Color.BLACK);
@@ -170,6 +176,10 @@ public class SettingsMenu extends Table {
 		resolutionDropdown.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				// Prevent event from firing at construction of object
+				if (actor.getParent() == null)
+					return;
+
 				try {
 					System.out.println("Changed.");
 					String resolution = resolutionDropdown.getSelected();
@@ -181,7 +191,8 @@ public class SettingsMenu extends Table {
 				// Show popup that says changes will be applied if you close and reopen
 			}
 		});
-		resolutionDropdown.setItems("800x600", "1440x1080", "1280x720", "800x600");
+		resolutionDropdown.setItems(resolutions);
+		resolutionDropdown.setSelected(game.getSettings().getResolution());
 		resolutionDropdown.getScrollPane().setColor(Color.BLACK);
 		resolutionDropdown.getScrollPane().setHeight(30.0f);
 		resolutionDropdown.getStyle().fontColor = Color.BLACK;
@@ -189,6 +200,28 @@ public class SettingsMenu extends Table {
 		resolutionDropdown.setSize(10.0f, 10.0f);
 		resolutionDropdown.sizeBy(10.0f, 10.0f);
 		add(resolutionDropdown).left();
+		// Fullscreen checkbox
+		fullscreen.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				CheckBox checkBox = (CheckBox) actor;
+				if (checkBox.isChecked()) {
+					Gdx.graphics.setDisplayMode(Gdx.graphics.getWidth(),
+							Gdx.graphics.getHeight(), true);
+					game.getSettings().setFullscreenEnabled(true);
+				} else {
+					Gdx.graphics.setDisplayMode(Gdx.graphics.getWidth(),
+							Gdx.graphics.getHeight(), false);
+					game.getSettings().setFullscreenEnabled(false);
+				}
+				try {
+					game.getSettings().save();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		fullscreen.setChecked(game.getSettings().getFullscreenEnabled());
 		fullscreen.getLabel().setColor(Color.BLACK);
 		add(fullscreen).left().padLeft(20.0f);
 		row();
@@ -207,6 +240,25 @@ public class SettingsMenu extends Table {
 
 		// VSync and colorblind mode checkboxes
 		CheckBox box = new CheckBox("VSync", skin);
+		box.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				CheckBox checkBox = (CheckBox) actor;
+				if (checkBox.isChecked()) {
+					Gdx.graphics.setVSync(true);
+					game.getSettings().setvSyncEnabled(true);
+				} else {
+					Gdx.graphics.setVSync(false);
+					game.getSettings().setvSyncEnabled(false);
+				}
+				try {
+					game.getSettings().save();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		box.setChecked(game.getSettings().getVSyncEnabled());
 		box.getLabel().setColor(Color.BLACK);
 		add(box).left();
 		box = new CheckBox("Colorblind Mode", skin);
