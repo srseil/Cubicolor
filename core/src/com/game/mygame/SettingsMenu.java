@@ -1,5 +1,6 @@
 package com.game.mygame;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -10,14 +11,18 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 
+import java.io.IOException;
+
 public class SettingsMenu extends Table {
 
+	private final MyGame game;
 	private final Dialog resetDialog;
 	private Stage stage;
 	private Skin skin;
 
 	public SettingsMenu(Skin skin, final Stage stage, final MyGame game) {
 		super(skin);
+		this.game = game;
 		this.stage = stage;
 		this.skin = skin;
 
@@ -165,13 +170,15 @@ public class SettingsMenu extends Table {
 		resolutionDropdown.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				/*
-				String[] res = resolutionDropdown.getSelected().split("x");
-				int width = Integer.parseInt(res[0]);
-				int height = Integer.parseInt(res[1]);
-				Gdx.graphics.setDisplayMode(
-						width, height, fullscreen.isChecked());
-						*/
+				try {
+					System.out.println("Changed.");
+					String resolution = resolutionDropdown.getSelected();
+					game.getSettings().setResolution(resolution);
+					game.getSettings().save();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				// Show popup that says changes will be applied if you close and reopen
 			}
 		});
 		resolutionDropdown.setItems("800x600", "1440x1080", "1280x720", "800x600");

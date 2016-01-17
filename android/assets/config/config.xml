@@ -1,0 +1,6 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<config>
+	<resolution>800x600</resolution>
+	<fullscreen>false</fullscreen>
+	<vsync>true</vsync>
+</config>

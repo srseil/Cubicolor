@@ -52,6 +52,11 @@ Feedback:
 - Exit Tile sollte mehr heraus stechen, sieht man nicht gut wenn ganz unten
 - Coloring-Animation dauert zu lange, hält Spielfluss auf
 - In-Game Schriftart sieht nicht gut aus, "spacing" (Kerning?) stört
+- Schrittzähler möglicherweise obsolet, da es nicht wirklich große Unterschiede
+  gibt, zumindest bisher
+
+Tutorial:
+- Klar machen, dass Requirements nicht in Reihenfolge beseitigt werden müssen
 
 Greenlight:
 - PlayerModel Animationen

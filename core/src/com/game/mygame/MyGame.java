@@ -21,6 +21,7 @@ import java.util.HashMap;
 
 public class MyGame extends Game {
 
+	private Settings settings;
 	private ModelBatch modelBatch;
 	private AssetLoader assetLoader;
 	private LevelLoader levelLoader;
@@ -41,7 +42,16 @@ public class MyGame extends Game {
 	private HashMap<String, BitmapFont> bitmapFonts;
 	private Skin skin;
 
-	public MyGame() {}
+	public MyGame() {
+		super();
+		// Load settings at construction.
+		settings = new Settings();
+		try {
+			settings.load();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	private void loadAssets() {
 		// Player model
@@ -124,7 +134,7 @@ public class MyGame extends Game {
 
 		// Create single instances of menu and game screen here?
 
-		// Load save state and switch to menu screen.
+		// Load settings & save state and switch to menu screen.
 		try {
 			saveState.load();
 			menuScreen = new MenuScreen(this);
@@ -175,6 +185,10 @@ public class MyGame extends Game {
 			System.out.println("Error while loading level.");
 			exception.printStackTrace();
 		}
+	}
+
+	public Settings getSettings() {
+		return settings;
 	}
 
 	// Change screen methods...
