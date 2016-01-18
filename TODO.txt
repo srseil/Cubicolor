@@ -50,7 +50,10 @@ Verbesserungen:
 
 Feedback:
 - Exit Tile sollte mehr heraus stechen, sieht man nicht gut wenn ganz unten
+ --> Geändert, möglicherweise bessere Alternative?
 - Coloring-Animation dauert zu lange, hält Spielfluss auf
+ --> Schneller, kann möglicherweise noch schneller, sieht aber bereits gut aus
+     Eher nicht ändern.
 - In-Game Schriftart sieht nicht gut aus, "spacing" (Kerning?) stört
 - Schrittzähler möglicherweise obsolet, da es nicht wirklich große Unterschiede
   gibt, zumindest bisher
@@ -59,9 +62,12 @@ Tutorial:
 - Klar machen, dass Requirements nicht in Reihenfolge beseitigt werden müssen
 
 Greenlight:
+- KeyTileModel Textur ändern
+- Licht/Shading verbessern
+ --> Specular geändert, möglicherweise noch Licht in GameBoard ändern
 - PlayerModel Animationen
 - Schriftart ändern
-- Potentielle Renderprobleme beseitigen
+- Potentielle Renderprobleme beseitigen (keine Tatsächlichen festgestellt)
 - Soundeffekte
 - Musik
 
@@ -86,4 +92,6 @@ Lektionen:
 - Observer zwischen Player und PlayerModel wäre sinnvoll gewesen, ist aber jetzt
   zu aufwendig alles umzustellen. Daher am besten schon früher mit Modellierung
   beschäftigen und solche Dinge vor der Implementierung festlegen.
+- In UI-Klassen werden viele Widgets mitten in Funktionen oder Konstruktoren
+  definiert und konfiguriert. Das ist sehr unübersichtlich und
 

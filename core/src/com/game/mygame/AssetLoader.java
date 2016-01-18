@@ -29,6 +29,7 @@ public class AssetLoader {
 		String path = "models/player.g3db";
 		Model model = modelLoader.loadModel(Gdx.files.internal(path));
 		model.materials.first().set(ColorAttribute.createDiffuse(Color.WHITE));
+		model.materials.first().set(ColorAttribute.createSpecular(0.7f, 0.7f, 0.7f, 1.0f));
 		model.materials.first().set(new BlendingAttribute(true, 1.0f));
 		return model;
 	}
@@ -42,6 +43,7 @@ public class AssetLoader {
 		Model model = modelLoader.loadModel(Gdx.files.internal(path));
 		model.materials.first().set(ColorAttribute.createDiffuse(
 				TileColor.getGdxColor(color)));
+		model.materials.first().set(ColorAttribute.createSpecular(0.7f, 0.7f, 0.7f, 1.0f));
 		model.materials.first().set(new BlendingAttribute(true, 1.0f));
 		return model;
 	}
@@ -50,6 +52,7 @@ public class AssetLoader {
 		String path = "models/keytile.g3db";
 		Model model = modelLoader.loadModel(Gdx.files.internal(path));
 		model.materials.first().set(ColorAttribute.createDiffuse(Color.WHITE));
+		model.materials.first().set(ColorAttribute.createSpecular(0.7f, 0.7f, 0.7f, 1.0f));
 		model.materials.first().set(new BlendingAttribute(true, 1.0f));
 		return model;
 	}
@@ -58,6 +61,7 @@ public class AssetLoader {
 		String path = "models/exittile.g3db";
 		Model model = modelLoader.loadModel(Gdx.files.internal(path));
 		model.materials.first().set(ColorAttribute.createDiffuse(Color.WHITE));
+		model.materials.first().set(ColorAttribute.createSpecular(0.7f, 0.7f, 0.7f, 1.0f));
 		model.materials.first().set(new BlendingAttribute(true, 1.0f));
 
 		path = "textures/exittile/exittile.atlas";
