@@ -108,6 +108,8 @@ public class MyGame extends Game {
 
 		// Bitmap fonts
 		bitmapFonts = new HashMap<>();
+		bitmapFonts = assetLoader.loadBitmapFonts();
+		/*
 		bitmapFonts.put("Vollkorn-Regular-32",
 				assetLoader.loadBitmapFont("Vollkorn-Regular-32"));
 		bitmapFonts.put("Vollkorn-Regular-50",
@@ -130,6 +132,7 @@ public class MyGame extends Game {
 				assetLoader.loadBitmapFont("OldStandard-Regular-40"));
 		bitmapFonts.put("OldStandard-Regular-60",
 				assetLoader.loadBitmapFont("OldStandard-Regular-60"));
+				*/
 
 		// Skin
 		skin = assetLoader.loadSkin("uiskin");
