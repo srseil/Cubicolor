@@ -63,6 +63,7 @@ Tutorial:
 
 Greenlight:
 - KeyTileModel Textur ändern
+ --> Derzeitige behalten? Andere Versuche waren nicht so gut
 - Licht/Shading verbessern
  --> Specular geändert, möglicherweise noch Licht in GameBoard ändern
 - PlayerModel Animationen

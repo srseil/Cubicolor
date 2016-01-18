@@ -23,22 +23,16 @@ public class PauseDialog extends Dialog {
 		this.setResizable(false);
 		this.setModal(true);
 
-		this.getContentTable().padBottom(10.0f);
+		//this.getContentTable().padBottom(10.0f);
 		this.getTitleLabel().setAlignment(Align.center);
 
 		TextButton menu = new TextButton("Main Menu", skin);
-		menu.getLabelCell().height(28.0f);
-		menu.getLabelCell().padBottom(14.0f);
 
 		TextButton resume = new TextButton("Resume", skin);
 		resume.getLabelCell().width(menu.getLabelCell().getPrefWidth());
-		resume.getLabelCell().height(28.0f);
-		resume.getLabelCell().padBottom(14.0f);
 
 		TextButton restart = new TextButton("Restart", skin);
 		restart.getLabelCell().width(menu.getLabelCell().getPrefWidth());
-		restart.getLabelCell().height(28.0f);
-		restart.getLabelCell().padBottom(14.0f);
 
 		this.button(resume, "");
 		this.key(Input.Keys.ESCAPE, "");

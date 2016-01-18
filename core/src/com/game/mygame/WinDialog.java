@@ -27,8 +27,6 @@ public class WinDialog extends Dialog {
 		this.text(label);
 		this.getContentTable().row();
 		TextButton tb = new TextButton("Main Menu", skin);
-		tb.getLabelCell().height(28.0f);
-		tb.getLabelCell().padBottom(14.0f);
 		this.button(tb, "menu");
 		this.key(Input.Keys.ENTER, "menu");
 
@@ -39,8 +37,6 @@ public class WinDialog extends Dialog {
 			this.getContentTable().row();
 		} else {
 			tb = new TextButton("Retry", skin);
-			tb.getLabelCell().height(28.0f);
-			tb.getLabelCell().padBottom(14.0f);
 			this.button(tb, "retry");
 			this.key(Input.Keys.ESCAPE, "retry");
 			this.key(Input.Keys.R, "retry");

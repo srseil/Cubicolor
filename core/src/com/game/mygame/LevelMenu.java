@@ -32,7 +32,7 @@ public class LevelMenu extends Table {
 		this.add(geniusButton);
 		this.row();
 
-		levelButtons = new TextButton[3];
+		levelButtons = new TextButton[4];
 		levelOverview = new Table();
 		for (int i = 0; i < levelButtons.length; i++) {
 			if (i % 4 == 0)

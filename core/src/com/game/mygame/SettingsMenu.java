@@ -43,8 +43,6 @@ public class SettingsMenu extends Table {
 		confirmResetLabel.setColor(Color.BLACK);
 		confirmResetDialog.text(confirmResetLabel);
 		TextButton tb = new TextButton("OK", skin);
-		tb.getLabelCell().height(28.0f);
-		tb.getLabelCell().padBottom(14.0f);
 		confirmResetDialog.button(tb, null);
 		confirmResetDialog.key(Input.Keys.ENTER, null);
 		confirmResetDialog.key(Input.Keys.ESCAPE, null);
@@ -73,12 +71,8 @@ public class SettingsMenu extends Table {
 		resetLabel.setColor(Color.BLACK);
 		resetDialog.text(resetLabel);
 		tb = new TextButton("Reset", skin);
-		tb.getLabelCell().height(28.0f);
-		tb.getLabelCell().padBottom(14.0f);
 		resetDialog.button(tb, true);
 		tb = new TextButton("Cancel", skin);
-		tb.getLabelCell().height(28.0f);
-		tb.getLabelCell().padBottom(14.0f);
 		resetDialog.button(tb, false);
 		resetDialog.key(Input.Keys.ESCAPE, false);
 
@@ -105,8 +99,6 @@ public class SettingsMenu extends Table {
 
 		// Reset progress button
 		TextButton resetButton = new TextButton("Reset Progress", skin);
-		resetButton.getLabelCell().height(20.0f);
-		resetButton.getLabelCell().padBottom(14.0f);
 		resetButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
@@ -172,7 +164,8 @@ public class SettingsMenu extends Table {
 		label.setColor(Color.BLACK);
 		add(label).left();
 		row();
-		final CustomSelectBox<String> resolutionDropdown = new CustomSelectBox<String>(skin);
+		final CustomSelectBox<String> resolutionDropdown
+				= new CustomSelectBox<>(skin);
 		resolutionDropdown.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
@@ -194,11 +187,7 @@ public class SettingsMenu extends Table {
 		resolutionDropdown.setItems(resolutions);
 		resolutionDropdown.setSelected(game.getSettings().getResolution());
 		resolutionDropdown.getScrollPane().setColor(Color.BLACK);
-		resolutionDropdown.getScrollPane().setHeight(30.0f);
 		resolutionDropdown.getStyle().fontColor = Color.BLACK;
-		resolutionDropdown.setHeight(30.0f);
-		resolutionDropdown.setSize(10.0f, 10.0f);
-		resolutionDropdown.sizeBy(10.0f, 10.0f);
 		add(resolutionDropdown).left();
 		// Fullscreen checkbox
 		fullscreen.addListener(new ChangeListener() {

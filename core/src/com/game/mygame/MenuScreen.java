@@ -33,14 +33,14 @@ public class MenuScreen implements Screen {
 
 		rootTable = new Table();
 		rootTable.setFillParent(true);
-		rootTable.setDebug(true);
+		rootTable.setDebug(false);
 		rootTable.left();
 		stage.addActor(rootTable);
 
 		final LevelMenu levelMenu = new LevelMenu(skin, game);
 		final SettingsMenu settingsMenu = new SettingsMenu(skin, stage, game);
 
-		// Quit dialog (Exit <-> Quit)
+		// Quit dialog
 		final Dialog quitDialog = new Dialog("Quit", skin) {
 			protected void result(Object object) {
 				if ((Boolean) object)
@@ -52,14 +52,10 @@ public class MenuScreen implements Screen {
 		quitLabel.setColor(Color.BLACK);
 		quitDialog.text(quitLabel);
 		TextButton quitQuit = new TextButton("Quit", skin);
-		quitQuit.getLabelCell().height(28.0f);
-		quitQuit.getLabelCell().padBottom(14.0f);
 		quitDialog.button(quitQuit, true);
-		TextButton quitCancel = new TextButton("Cancel", skin);
-		quitCancel.getLabelCell().height(28.0f);
-		quitCancel.getLabelCell().padBottom(14.0f);
-		quitDialog.button(quitCancel, false);
 		quitDialog.key(Input.Keys.ENTER, true);
+		TextButton quitCancel = new TextButton("Cancel", skin);
+		quitDialog.button(quitCancel, false);
 		quitDialog.key(Input.Keys.ESCAPE, false);
 
 		// Group of menu buttons
@@ -70,8 +66,6 @@ public class MenuScreen implements Screen {
 		// Play button
 		final TextButton playButton = new TextButton("Play", skin);
 		playButton.getLabelCell().width(120.0f);
-		playButton.getLabelCell().height(30.0f);
-		playButton.getLabelCell().padBottom(15.0f);
 		playButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
@@ -86,8 +80,6 @@ public class MenuScreen implements Screen {
 		// Settings button
 		final TextButton settingsButton = new TextButton("Settings", skin);
 		settingsButton.setWidth(120.0f);
-		settingsButton.getLabelCell().height(30.0f);
-		settingsButton.getLabelCell().padBottom(15.0f);
 		settingsButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
@@ -102,8 +94,6 @@ public class MenuScreen implements Screen {
 		// Quit button
 		TextButton quitButton = new TextButton("Quit", skin);
 		quitButton.setWidth(120.0f);
-		quitButton.getLabelCell().height(30.0f);
-		quitButton.getLabelCell().padBottom(15.0f);
 		quitButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {

@@ -12,13 +12,13 @@ public class CustomSelectBox<T> extends SelectBox<T> {
 
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-		getStyle().background.setBottomHeight(20.0f);
+		getStyle().background.setBottomHeight(10.0f);
 		super.draw(batch, parentAlpha);
 	}
 
 	@Override
 	public float getHeight() {
-		return (super.getHeight() - 14.0f);
+		return (super.getHeight() - 10.0f);
 	}
 
 }

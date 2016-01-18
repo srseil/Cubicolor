@@ -108,6 +108,18 @@ public class MyGame extends Game {
 
 		// Bitmap fonts
 		bitmapFonts = new HashMap<>();
+		bitmapFonts.put("Vollkorn-Regular-32",
+				assetLoader.loadBitmapFont("Vollkorn-Regular-32"));
+		bitmapFonts.put("Vollkorn-Regular-50",
+				assetLoader.loadBitmapFont("Vollkorn-Regular-50"));
+		bitmapFonts.put("Vollkorn-Regular-70",
+				assetLoader.loadBitmapFont("Vollkorn-Regular-70"));
+		bitmapFonts.put("Vollkorn-Regular-46",
+				assetLoader.loadBitmapFont("Vollkorn-Regular-46"));
+		bitmapFonts.put("Vollkorn-Regular-60",
+				assetLoader.loadBitmapFont("Vollkorn-Regular-60"));
+		bitmapFonts.put("Vollkorn-Regular-58",
+				assetLoader.loadBitmapFont("Vollkorn-Regular-58"));
 		bitmapFonts.put("OldStandard-Regular-28",
 				assetLoader.loadBitmapFont("OldStandard-Regular-28"));
 		bitmapFonts.put("OldStandard-Regular-30",

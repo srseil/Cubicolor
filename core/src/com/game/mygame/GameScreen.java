@@ -73,18 +73,19 @@ public class GameScreen implements Screen {
 		// Level number and difficulty labels in top left corner.
 		difficultyLabel = new Label(level.getDifficulty().toString(), skin);
 		difficultyLabel.setStyle(new Label.LabelStyle(
-				game.getBitmapFont("OldStandard-Regular-40"), Color.BLACK));
-		leftUI.add(difficultyLabel).top().padTop(-30.0f);
+				game.getBitmapFont("Vollkorn-Regular-58"), Color.BLACK));
+		leftUI.add(difficultyLabel).top().padTop(-45.0f);
 		leftUI.row();
 		levelLabel = new Label("Level " + level.getNumber(), skin);
 		levelLabel.setStyle(new Label.LabelStyle(
-				game.getBitmapFont("OldStandard-Regular-30"), Color.BLACK));
-		leftUI.add(levelLabel).expandY().top().left().padTop(-20.0f);
+				game.getBitmapFont("Vollkorn-Regular-46"), Color.BLACK));
+		leftUI.add(levelLabel).expandY().top().left().padTop(-40.0f);
 
 		// FPS counter in the top right corner.
 		fps = new Label("FPS: ", skin);
-		//rightUI.add(fps).expandY().top();
-		//rightUI.row();
+		fps.setColor(Color.BLACK);
+		rightUI.add(fps).expandY().top();
+		rightUI.row();
 
 		// Steps label in the bottom right corner.
 		stepsLabel = new Label("00", skin);

@@ -1,5 +1,5 @@
 info face="Vollkorn Regular" size=32 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=1 padding=1,1,1,1 spacing=2,2 outline=0
-common lineHeight=32 base=30 scaleW=512 scaleH=512 pages=1 packed=0 alphaChnl=1 redChnl=0 greenChnl=0 blueChnl=0
+common lineHeight=32 base=22 scaleW=512 scaleH=512 pages=1 packed=0 alphaChnl=1 redChnl=0 greenChnl=0 blueChnl=0
 page id=0 file="Vollkorn-Regular-32_0.png"
 chars count=188
 char id=32   x=506   y=180   width=2     height=34    xoffset=-1    yoffset=-1    xadvance=5     page=0  chnl=15
