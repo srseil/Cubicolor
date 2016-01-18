@@ -18,10 +18,10 @@ import java.util.ArrayList;
 public class SettingsMenu extends Table {
 
 	private final MyGame game;
-	private final Dialog resetDialog;
+	private final Dialog resetDialog, resolutionDialog;
 	private Stage stage;
 	private Skin skin;
-	private Label.LabelStyle headerStyle;
+	private Label.LabelStyle headerStyle, contentStyle;
 	// Settings content
 	private String[] resolutions;
 
@@ -33,12 +33,23 @@ public class SettingsMenu extends Table {
 
 		headerStyle = new Label.LabelStyle(
 				game.getBitmapFont("Vollkorn-Italic-32"), Color.BLACK);
+		contentStyle = new Label.LabelStyle(
+				game.getBitmapFont("Vollkorn-Regular-32"), Color.BLACK);
 
 		String[] res = {"1920x1080", "1440x1080", "1280x720", "800x600"};
 		resolutions = res;
 
 		// Draw background texture.
 		this.setBackground(game.getMenuBackground());
+
+		resolutionDialog = new Dialog("Resolution Changed", skin);
+		resolutionDialog.getTitleLabel().setAlignment(Align.center);
+		resolutionDialog.text(
+				"You need to restart the game\nto apply the resolution.",
+				contentStyle);
+		resolutionDialog.button(new TextButton("OK", skin), null);
+		resolutionDialog.key(Input.Keys.ENTER, null);
+		resolutionDialog.key(Input.Keys.ESCAPE, null);
 
 		// Confirmation dialog for resetting progress
 		final Dialog confirmResetDialog =
@@ -178,10 +189,11 @@ public class SettingsMenu extends Table {
 					return;
 
 				try {
-					System.out.println("Changed.");
+					System.out.println("Resolution changed.");
 					String resolution = resolutionDropdown.getSelected();
 					game.getSettings().setResolution(resolution);
 					game.getSettings().save();
+					resolutionDialog.show(stage);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
