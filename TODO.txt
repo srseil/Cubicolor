@@ -47,6 +47,9 @@ Verbesserungen:
 - Menü Funktionalität implementieren
 - Levels erstellen
 - Soundeffekte
+- Steuerungsmenü
+- Credits
+- Controller Support
 
 Feedback:
 - Exit Tile sollte mehr heraus stechen, sieht man nicht gut wenn ganz unten

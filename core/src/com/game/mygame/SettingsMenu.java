@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -44,9 +45,14 @@ public class SettingsMenu extends Table {
 
 		resolutionDialog = new Dialog("Resolution Changed", skin);
 		resolutionDialog.getTitleLabel().setAlignment(Align.center);
+		Label l = new Label("You need to restart the game\nto apply the resolution.", skin);
+		l.setColor(Color.BLACK);
+		resolutionDialog.text(l);
+		/*
 		resolutionDialog.text(
 				"You need to restart the game\nto apply the resolution.",
 				contentStyle);
+				*/
 		resolutionDialog.button(new TextButton("OK", skin), null);
 		resolutionDialog.key(Input.Keys.ENTER, null);
 		resolutionDialog.key(Input.Keys.ESCAPE, null);
