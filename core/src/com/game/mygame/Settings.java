@@ -14,6 +14,7 @@ public class Settings {
 	private XmlReader reader;
 	private String path;
 	// Settings values
+	private int musicVolume, soundVolume;
 	private String resolution;
 	private int resolutionWidth, resolutionHeight;
 	private boolean fullscreen;
@@ -31,6 +32,8 @@ public class Settings {
 		XmlReader.Element root = reader.parse(new FileHandle(path));
 
 		try {
+			musicVolume = Integer.parseInt(root.get("music"));
+			soundVolume = Integer.parseInt(root.get("sound"));
 			resolution = root.get("resolution");
 			String[] resParts = resolution.split("x");
 			resolutionWidth = Integer.parseInt(resParts[0]);
@@ -53,6 +56,8 @@ public class Settings {
 		XmlWriter xmlWriter = new XmlWriter(printWriter);
 		xmlWriter.element("config");
 
+		xmlWriter.element("music", musicVolume);
+		xmlWriter.element("sound", soundVolume);
 		xmlWriter.element("resolution", resolution);
 		xmlWriter.element("fullscreen", fullscreen);
 		xmlWriter.element("vsync", vSync);
@@ -60,6 +65,14 @@ public class Settings {
 		xmlWriter.pop();
 		xmlWriter.close();
 		printWriter.close();
+	}
+
+	public void setMusicVolume(int volume) {
+		musicVolume = volume;
+	}
+
+	public void setSoundVolume(int volume) {
+		soundVolume = volume;
 	}
 
 	public void setResolution(String resolution) {
@@ -72,6 +85,14 @@ public class Settings {
 
 	public void setvSyncEnabled(boolean vSync) {
 		this.vSync = vSync;
+	}
+
+	public int getMusicVolume() {
+		return musicVolume;
+	}
+
+	public int getSoundVolume() {
+		return soundVolume;
 	}
 
 	public String getResolution() {

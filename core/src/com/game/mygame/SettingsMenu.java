@@ -5,11 +5,11 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 
@@ -146,9 +146,60 @@ public class SettingsMenu extends Table {
 		label.setColor(Color.BLACK);
 		add(label).left().padLeft(20.0f);
 		row();
-		Slider musicSlider = new Slider(0.0f, 100.0f, 5.0f, false, skin);
+
+
+		final Label musicVolume = new Label(String.valueOf(game.getSettings().getMusicVolume()), skin);
+		musicVolume.setColor(Color.BLACK);
+		final Label soundVolume = new Label(String.valueOf(game.getSettings().getSoundVolume()), skin);
+		soundVolume.setColor(Color.BLACK);
+		final Slider musicSlider = new Slider(0.0f, 100.0f, 1.0f, false, skin);
+		musicSlider.setValue(game.getSettings().getMusicVolume());
+		musicSlider.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				System.out.println("Music");
+				musicVolume.setText(
+						String.valueOf((int) musicSlider.getValue()));
+			}
+		});
+		musicSlider.addListener(new ClickListener() {
+			@Override
+			public void touchUp(InputEvent event, float x, float y,
+								int pointer, int button) {
+				super.touchUp(event, x, y, pointer, button);
+				game.getSettings().setMusicVolume((int) musicSlider.getValue());
+				try {
+					game.getSettings().save();
+					System.out.println("Music Volume changed.");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 		add(musicSlider).padLeft(15.0f);
-		Slider soundSlider = new Slider(0.0f, 100.0f, 5.0f, false, skin);
+		final Slider soundSlider = new Slider(0.0f, 100.0f, 1.0f, false, skin);
+		soundSlider.setValue(game.getSettings().getSoundVolume());
+		soundSlider.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				soundVolume.setText(
+						String.valueOf((int) soundSlider.getValue()));
+			}
+		});
+		soundSlider.addListener(new ClickListener() {
+			@Override
+			public void touchUp(InputEvent event, float x, float y,
+								int pointer, int button) {
+				super.touchUp(event, x, y, pointer, button);
+				game.getSettings().setSoundVolume((int) soundSlider.getValue());
+				try {
+					game.getSettings().save();
+					System.out.println("Sound Volume changed.");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 		add(soundSlider).padLeft(20.0f);
 		row();
 
@@ -157,16 +208,12 @@ public class SettingsMenu extends Table {
 		CheckBox mute = new CheckBox("Mute", skin);
 		mute.getLabel().setColor(Color.BLACK);
 		musicTable.add(mute).expandX().left().padLeft(15.0f);
-		label = new Label("100", skin);
-		label.setColor(Color.BLACK);
-		musicTable.add(label).right();
+		musicTable.add(musicVolume).right();
 		Table soundTable = new Table();
 		mute = new CheckBox("Mute", skin);
 		mute.getLabel().setColor(Color.BLACK);
 		soundTable.add(mute).expandX().left().padLeft(20.0f);
-		label = new Label("100", skin);
-		label.setColor(Color.BLACK);
-		soundTable.add(label).right();
+		soundTable.add(soundVolume).right();
 		add(musicTable).fillX();
 		add(soundTable).fillX();
 		row();
