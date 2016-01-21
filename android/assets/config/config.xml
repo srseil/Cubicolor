@@ -4,5 +4,5 @@
 	<sound>100</sound>
 	<resolution>800x600</resolution>
 	<fullscreen>false</fullscreen>
-	<vsync>false</vsync>
+	<vsync>true</vsync>
 </config>

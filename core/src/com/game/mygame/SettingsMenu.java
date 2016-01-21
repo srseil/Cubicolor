@@ -235,13 +235,13 @@ public class SettingsMenu extends Table {
 		row();
 		final CustomSelectBox<String> resolutionDropdown
 				= new CustomSelectBox<>(skin);
+		resolutionDropdown.setItems(resolutions);
+		resolutionDropdown.setSelected(game.getSettings().getResolution());
+		resolutionDropdown.getScrollPane().setColor(Color.BLACK);
+		resolutionDropdown.getStyle().fontColor = Color.BLACK;
 		resolutionDropdown.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				// Prevent event from firing at construction of object
-				if (actor.getParent() == null)
-					return;
-
 				try {
 					System.out.println("Resolution changed.");
 					String resolution = resolutionDropdown.getSelected();
@@ -251,13 +251,8 @@ public class SettingsMenu extends Table {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				// Show popup that says changes will be applied if you close and reopen
 			}
 		});
-		resolutionDropdown.setItems(resolutions);
-		resolutionDropdown.setSelected(game.getSettings().getResolution());
-		resolutionDropdown.getScrollPane().setColor(Color.BLACK);
-		resolutionDropdown.getStyle().fontColor = Color.BLACK;
 		add(resolutionDropdown).left().padLeft(15.0f);
 		// Fullscreen checkbox
 		fullscreen.addListener(new ChangeListener() {
