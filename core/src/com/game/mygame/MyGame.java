@@ -5,6 +5,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Model;
@@ -12,6 +13,7 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 
@@ -37,7 +39,7 @@ public class MyGame extends Game {
 	private EnumMap<TileColor, TextureAtlas> playerAnimations;
 	private EnumMap<TileColor, TextureAtlas.AtlasRegion> keyTileTextures;
 	private TextureAtlas.AtlasRegion exitTileTexture;
-	private TextureRegionDrawable menuBackground;
+	private NinePatchDrawable menuBackground;
 	private HashMap<String, Sound> sounds;
 	private HashMap<String, BitmapFont> bitmapFonts;
 	private Skin skin;
@@ -99,9 +101,6 @@ public class MyGame extends Game {
 		// Exit tile texture
 		exitTileTexture = assetLoader.loadExitTileTexture();
 
-		// Menu background
-		menuBackground = assetLoader.loadMenuBackground();
-
 		// Sounds
 		sounds = new HashMap<>();
 		sounds.put("Player-Step", assetLoader.loadSound("player_step"));
@@ -136,6 +135,12 @@ public class MyGame extends Game {
 
 		// Skin
 		skin = assetLoader.loadSkin("uiskin");
+
+		/*
+		// Menu background
+		NinePatch patch = skin.get("menu-background", NinePatch.class);
+		menuBackground = new NinePatchDrawable(patch);
+		*/
 	}
 
 	@Override
@@ -260,7 +265,7 @@ public class MyGame extends Game {
 		return exitTileTexture;
 	}
 
-	public TextureRegionDrawable getMenuBackground() {
+	public NinePatchDrawable getMenuBackground() {
 		return menuBackground;
 	}
 

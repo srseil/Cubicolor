@@ -3,14 +3,12 @@ package com.game.mygame;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.Align;
 
 import java.io.IOException;
@@ -40,8 +38,11 @@ public class SettingsMenu extends Table {
 		String[] res = {"1920x1080", "1440x1080", "1280x720", "800x600"};
 		resolutions = res;
 
-		// Draw background texture.
-		this.setBackground(game.getMenuBackground());
+		// Set background texture.
+		NinePatch backgroundPatch =
+				game.getSkin().get("menu-background", NinePatch.class);
+		NinePatchDrawable background = new NinePatchDrawable(backgroundPatch);
+		this.setBackground(background);
 
 		resolutionDialog = new Dialog("Resolution Changed", skin);
 		resolutionDialog.getTitleLabel().setAlignment(Align.center);

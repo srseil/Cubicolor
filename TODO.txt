@@ -58,6 +58,7 @@ Feedback:
  --> Schneller, kann möglicherweise noch schneller, sieht aber bereits gut aus
      Eher nicht ändern.
 - In-Game Schriftart sieht nicht gut aus, "spacing" (Kerning?) stört
+ --> Schriftarten geändert.
 - Schrittzähler möglicherweise obsolet, da es nicht wirklich große Unterschiede
   gibt, zumindest bisher
 
@@ -70,7 +71,9 @@ Greenlight:
 - Licht/Shading verbessern
  --> Specular geändert, möglicherweise noch Licht in GameBoard ändern
 - PlayerModel Animationen
+ --> Bereits angepasst, nochmal genau anschauen.
 - Schriftart ändern
+ --> Verwende jetzt Vollkorn. Andere Schriftart für Zahlen?
 - Potentielle Renderprobleme beseitigen (keine Tatsächlichen festgestellt)
 - Soundeffekte
 - Musik

@@ -7,6 +7,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Model;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.UBJsonReader;
 
@@ -106,13 +108,6 @@ public class AssetLoader {
 		String path = "textures/exittile/exittile.atlas";
 		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(path));
 		return atlas.getRegions().first();
-	}
-
-	public TextureRegionDrawable loadMenuBackground() {
-		String path = "textures/menu/background.png";
-		TextureRegionDrawable background = new TextureRegionDrawable(
-				new TextureRegion(new Texture(Gdx.files.internal(path))));
-		return background;
 	}
 
 	public Sound loadSound(String fileName) {

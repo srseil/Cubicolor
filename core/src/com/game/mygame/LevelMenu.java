@@ -1,16 +1,21 @@
 package com.game.mygame;
 
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+
+import java.util.EnumMap;
 
 public class LevelMenu extends Table {
 
 	private MyGame game;
 	private Table levelOverview;
-	private TextButton[] levelButtons;
+	private EnumMap<Difficulty, Table> levelOverviews;
+	private TextButton[][] levelButtons;
 	private DifficultyButtonGroup difficultyButtons;
 
 	/*
@@ -24,6 +29,12 @@ public class LevelMenu extends Table {
 
 		this.game = game;
 
+		// Set background texture.
+		NinePatch backgroundPatch =
+				game.getSkin().get("menu-background", NinePatch.class);
+		NinePatchDrawable background = new NinePatchDrawable(backgroundPatch);
+		this.setBackground(background);
+
 		TextButton normalButton = new TextButton("Normal", skin);
 		TextButton smartButton = new TextButton("Smart", skin);
 		TextButton geniusButton = new TextButton("Genius", skin);
@@ -32,17 +43,28 @@ public class LevelMenu extends Table {
 		this.add(geniusButton);
 		this.row();
 
-		levelButtons = new TextButton[4];
-		levelOverview = new Table();
-		for (int i = 0; i < levelButtons.length; i++) {
-			if (i % 4 == 0)
-				levelOverview.row();
-			levelButtons[i] = new TextButton("", skin);
-			levelButtons[i].addListener(createChangeListener(i+1));
-			levelOverview.add(levelButtons[i]);
-		}
-		this.add(levelOverview);
+		//levelOverview = new Table();
+		levelOverviews = new EnumMap<>(Difficulty.class);
 
+		// Level buttons
+		//levelButtons = new TextButton[Difficulty.values().length][4];
+		//for (int i = 0; i < levelButtons.length; i++) {
+		for (Difficulty difficulty : Difficulty.values()) {
+			levelOverviews.put(difficulty, new Table());
+			for (int i = 0; i < 4; i++) {
+				if (i % 4 == 0)
+					levelOverviews.get(difficulty).row();
+				TextButton button = new TextButton(String.valueOf(i + 1), skin);
+				button.getLabelCell().width(36.0f);
+				button.addListener(createChangeListener(i + 1));
+				levelOverviews.get(difficulty).add(button).padLeft(10.0f);
+				System.out.println(button.getLabelCell().getMinHeight());
+			}
+		}
+		levelOverview = levelOverviews.get(Difficulty.NORMAL);
+		this.add(levelOverview).padTop(15.0f);
+
+		// Level difficulty buttons
 		difficultyButtons = new DifficultyButtonGroup(this);
 		difficultyButtons.add(normalButton);
 		difficultyButtons.add(smartButton);
@@ -51,6 +73,8 @@ public class LevelMenu extends Table {
 		difficultyButtons.setMaxCheckCount(1);
 		difficultyButtons.setUncheckLast(true);
 		difficultyButtons.setChecked("Normal");
+
+		updateLevelButtons();
 	}
 
 	private ChangeListener createChangeListener(final int n) {
@@ -66,6 +90,7 @@ public class LevelMenu extends Table {
 	}
 
 	public void switchToOverview(Difficulty difficulty) {
+		/*
 		levelButtons[0].setText(Integer.toString(1));
 
 		// Set lock of first smart and genius level.
@@ -99,6 +124,10 @@ public class LevelMenu extends Table {
 				levelButtons[i].setDisabled(false);
 			}
 		}
+		*/
+	}
+
+	public void updateLevelButtons() {
 	}
 
 }
