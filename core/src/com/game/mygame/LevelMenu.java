@@ -2,9 +2,7 @@ package com.game.mygame;
 
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 
@@ -18,15 +16,8 @@ public class LevelMenu extends Table {
 	private TextButton[][] levelButtons;
 	private DifficultyButtonGroup difficultyButtons;
 
-	/*
-	Bug: in switchToOverview(), wenn setText() aufgerufen wird, wird das
-	Layout der gesamten Hierarchie zerschossen. (SettingsMenu wird in neue
-	Zeile verschoben).
-	 */
-
 	public LevelMenu(Skin skin, MyGame game) {
 		super(skin);
-
 		this.game = game;
 
 		// Set background texture.
@@ -35,30 +26,37 @@ public class LevelMenu extends Table {
 		NinePatchDrawable background = new NinePatchDrawable(backgroundPatch);
 		this.setBackground(background);
 
+		// Difficulty buttons
 		TextButton normalButton = new TextButton("Normal", skin);
 		TextButton smartButton = new TextButton("Smart", skin);
 		TextButton geniusButton = new TextButton("Genius", skin);
-		this.add(normalButton);
-		this.add(smartButton);
-		this.add(geniusButton);
+
+		// Difficulty button group on top of level buttons
+		HorizontalGroup buttons = new HorizontalGroup();
+		buttons.space(5.0f);
+		buttons.addActor(normalButton);
+		buttons.addActor(smartButton);
+		buttons.addActor(geniusButton);
+		this.add(buttons);
 		this.row();
 
-		//levelOverview = new Table();
-		levelOverviews = new EnumMap<>(Difficulty.class);
-
 		// Level buttons
-		//levelButtons = new TextButton[Difficulty.values().length][4];
-		//for (int i = 0; i < levelButtons.length; i++) {
+		levelOverviews = new EnumMap<>(Difficulty.class);
 		for (Difficulty difficulty : Difficulty.values()) {
 			levelOverviews.put(difficulty, new Table());
-			for (int i = 0; i < 4; i++) {
+			for (int i = 0; i < 16; i++) {
 				if (i % 4 == 0)
 					levelOverviews.get(difficulty).row();
 				TextButton button = new TextButton(String.valueOf(i + 1), skin);
-				button.getLabelCell().width(36.0f);
 				button.addListener(createChangeListener(i + 1));
-				levelOverviews.get(difficulty).add(button).padLeft(10.0f);
-				System.out.println(button.getLabelCell().getMinHeight());
+				Cell cell = levelOverviews.get(difficulty)
+						.add(button).width(50.0f).height(50.0f);
+				if (i % 4 != 0)
+					cell.padLeft(10.0f);
+				if (i >= 4)
+					cell.padTop(10.0f);
+				if (i >= 12)
+					cell.padBottom(10.0f);
 			}
 		}
 		levelOverview = levelOverviews.get(Difficulty.NORMAL);

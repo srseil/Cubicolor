@@ -50,6 +50,7 @@ Verbesserungen:
 - Steuerungsmenü
 - Credits
 - Controller Support
+- GameBoard Kamera manchmal zu nah, Model wird abgeschnitten. Zoom?
 
 Feedback:
 - Exit Tile sollte mehr heraus stechen, sieht man nicht gut wenn ganz unten
