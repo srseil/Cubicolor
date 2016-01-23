@@ -19,12 +19,7 @@ public class LevelMenu extends Table {
 	public LevelMenu(Skin skin, MyGame game) {
 		super(skin);
 		this.game = game;
-
-		// Set background texture.
-		NinePatch backgroundPatch =
-				game.getSkin().get("menu-background", NinePatch.class);
-		NinePatchDrawable background = new NinePatchDrawable(backgroundPatch);
-		this.setBackground(background);
+		this.setBackground("menu-background");
 
 		// Difficulty buttons
 		TextButton normalButton = new TextButton("Normal", skin);
@@ -63,7 +58,7 @@ public class LevelMenu extends Table {
 		this.add(levelOverview).padTop(15.0f);
 
 		// Level difficulty buttons
-		difficultyButtons = new DifficultyButtonGroup(this);
+		difficultyButtons = new DifficultyButtonGroup(this, skin);
 		difficultyButtons.add(normalButton);
 		difficultyButtons.add(smartButton);
 		difficultyButtons.add(geniusButton);
@@ -79,7 +74,7 @@ public class LevelMenu extends Table {
 		return new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				System.out.println(n);
+				System.out.println("Starting: " + n);
 				game.openLevel(difficultyButtons.getCheckedLabel(), n);
 				// Switch again to update buttons:
 				//switchToOverview();

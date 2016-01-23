@@ -40,16 +40,15 @@ Verbesserungen:
  --> Implementiert. Möglicherweise Geschwindigkeit der Animation anpassen.
 - Lock Tiles könnten Farbe verlieren, wenn der Spieler mit
   richtiger Farbe auf sie tritt.
+ --> Eher nicht.
 - Fonts (super sampling, etc. -> siehe BMFont Anleitung)
-- Performance
-- Siehe libGDX Wiki: ModelBatch und BlendAttribute
-- KeyTileModel Textur ändern
+- Performance (siehe libGDX Wiki: ModelBatch und BlendAttribute)
 - Menü Funktionalität implementieren
 - Levels erstellen
-- Soundeffekte
+- Musik & Soundeffekte
 - Steuerungsmenü
-- Credits
 - Controller Support
+- Credits
 - GameBoard Kamera manchmal zu nah, Model wird abgeschnitten. Zoom?
 
 Feedback:

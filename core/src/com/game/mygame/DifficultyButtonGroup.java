@@ -1,15 +1,18 @@
 package com.game.mygame;
 
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 
 public class DifficultyButtonGroup extends ButtonGroup<TextButton> {
 
-	LevelMenu levelMenu;
+	private LevelMenu levelMenu;
+	private Skin skin;
 
-	public DifficultyButtonGroup(LevelMenu levelMenu) {
+	public DifficultyButtonGroup(LevelMenu levelMenu, Skin skin) {
 		super();
 		this.levelMenu = levelMenu;
+		this.skin = skin;
 	}
 
 	@Override
@@ -18,6 +21,10 @@ public class DifficultyButtonGroup extends ButtonGroup<TextButton> {
 
 		if (getChecked() != null) {
 			System.out.println(this.getChecked().getLabel());
+
+			button.setStyle(
+					skin.get("toggle", TextButton.TextButtonStyle.class));
+
 			Difficulty difficulty;
 			switch (this.getChecked().getLabel().getText().toString()) {
 				case "Normal": difficulty = Difficulty.NORMAL; break;
@@ -26,6 +33,10 @@ public class DifficultyButtonGroup extends ButtonGroup<TextButton> {
 				default: difficulty = Difficulty.NORMAL;
 			}
 			levelMenu.switchToOverview(difficulty);
+		} else {
+			System.out.println("old changed");
+			button.setStyle(
+					skin.get("default", TextButton.TextButtonStyle.class));
 		}
 
 		return ret;
