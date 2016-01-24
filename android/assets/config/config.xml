@@ -1,7 +1,9 @@
 <?xml version="1.1" encoding="UTF-8"?>
 <config>
-	<music>100</music>
-	<sound>100</sound>
+	<music-muted>false</music-muted>
+	<music-volume>100</music-volume>
+	<sound-muted>false</sound-muted>
+	<sound-volume>100</sound-volume>
 	<resolution>800x600</resolution>
 	<fullscreen>false</fullscreen>
 	<vsync>true</vsync>

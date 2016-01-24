@@ -50,6 +50,7 @@ Verbesserungen:
 - Controller Support
 - Credits
 - GameBoard Kamera manchmal zu nah, Model wird abgeschnitten. Zoom?
+- Button down Farbe doch wieder zurück ändern.
 
 Feedback:
 - Exit Tile sollte mehr heraus stechen, sieht man nicht gut wenn ganz unten

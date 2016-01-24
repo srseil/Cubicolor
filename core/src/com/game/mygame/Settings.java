@@ -14,6 +14,7 @@ public class Settings {
 	private XmlReader reader;
 	private String path;
 	// Settings values
+	private boolean musicMuted, soundMuted;
 	private int musicVolume, soundVolume;
 	private String resolution;
 	private int resolutionWidth, resolutionHeight;
@@ -32,8 +33,10 @@ public class Settings {
 		XmlReader.Element root = reader.parse(new FileHandle(path));
 
 		try {
-			musicVolume = Integer.parseInt(root.get("music"));
-			soundVolume = Integer.parseInt(root.get("sound"));
+			musicMuted = root.getBoolean("music-muted");
+			musicVolume = Integer.parseInt(root.get("music-volume"));
+			soundMuted = root.getBoolean("sound-muted");
+			soundVolume = Integer.parseInt(root.get("sound-volume"));
 			resolution = root.get("resolution");
 			String[] resParts = resolution.split("x");
 			resolutionWidth = Integer.parseInt(resParts[0]);
@@ -56,8 +59,10 @@ public class Settings {
 		XmlWriter xmlWriter = new XmlWriter(printWriter);
 		xmlWriter.element("config");
 
-		xmlWriter.element("music", musicVolume);
-		xmlWriter.element("sound", soundVolume);
+		xmlWriter.element("music-muted", musicMuted);
+		xmlWriter.element("music-volume", musicVolume);
+		xmlWriter.element("sound-muted", soundMuted);
+		xmlWriter.element("sound-volume", soundVolume);
 		xmlWriter.element("resolution", resolution);
 		xmlWriter.element("fullscreen", fullscreen);
 		xmlWriter.element("vsync", vSync);
@@ -67,8 +72,16 @@ public class Settings {
 		printWriter.close();
 	}
 
+	public void setMusicMuted(boolean muted) {
+		musicMuted = muted;
+	}
+
 	public void setMusicVolume(int volume) {
 		musicVolume = volume;
+	}
+
+	public void setSoundMuted(boolean muted) {
+		soundMuted = muted;
 	}
 
 	public void setSoundVolume(int volume) {
@@ -87,8 +100,16 @@ public class Settings {
 		this.vSync = vSync;
 	}
 
+	public boolean getMusicMuted() {
+		return musicMuted;
+	}
+
 	public int getMusicVolume() {
 		return musicVolume;
+	}
+
+	public boolean getSoundMuted() {
+		return soundMuted;
 	}
 
 	public int getSoundVolume() {

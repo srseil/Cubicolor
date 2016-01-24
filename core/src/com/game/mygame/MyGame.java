@@ -1,6 +1,7 @@
 package com.game.mygame;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -41,8 +42,14 @@ public class MyGame extends Game {
 	private TextureAtlas.AtlasRegion exitTileTexture;
 	private NinePatchDrawable menuBackground;
 	private HashMap<String, Sound> sounds;
+	private Music music;
 	private HashMap<String, BitmapFont> bitmapFonts;
 	private Skin skin;
+	/*
+	// Control attributes
+	private boolean soundMuted;
+	private float soundVolume;
+	*/
 
 	public MyGame() {
 		super();
@@ -104,34 +111,17 @@ public class MyGame extends Game {
 		// Sounds
 		sounds = new HashMap<>();
 		sounds.put("Player-Step", assetLoader.loadSound("player_step"));
+		/*
+		soundMuted = settings.getSoundMuted();
+		soundVolume = settings.getSoundVolume() / 100.0f;
+		*/
+
+		// Music
+		music = assetLoader.loadMusic("soundtrack");
 
 		// Bitmap fonts
 		bitmapFonts = new HashMap<>();
 		bitmapFonts = assetLoader.loadBitmapFonts();
-		/*
-		bitmapFonts.put("Vollkorn-Regular-32",
-				assetLoader.loadBitmapFont("Vollkorn-Regular-32"));
-		bitmapFonts.put("Vollkorn-Regular-50",
-				assetLoader.loadBitmapFont("Vollkorn-Regular-50"));
-		bitmapFonts.put("Vollkorn-Regular-70",
-				assetLoader.loadBitmapFont("Vollkorn-Regular-70"));
-		bitmapFonts.put("Vollkorn-Regular-46",
-				assetLoader.loadBitmapFont("Vollkorn-Regular-46"));
-		bitmapFonts.put("Vollkorn-Regular-60",
-				assetLoader.loadBitmapFont("Vollkorn-Regular-60"));
-		bitmapFonts.put("Vollkorn-Regular-58",
-				assetLoader.loadBitmapFont("Vollkorn-Regular-58"));
-		bitmapFonts.put("OldStandard-Regular-28",
-				assetLoader.loadBitmapFont("OldStandard-Regular-28"));
-		bitmapFonts.put("OldStandard-Regular-30",
-				assetLoader.loadBitmapFont("OldStandard-Regular-30"));
-		bitmapFonts.put("OldStandard-Regular-50",
-				assetLoader.loadBitmapFont("OldStandard-Regular-50"));
-		bitmapFonts.put("OldStandard-Regular-40",
-				assetLoader.loadBitmapFont("OldStandard-Regular-40"));
-		bitmapFonts.put("OldStandard-Regular-60",
-				assetLoader.loadBitmapFont("OldStandard-Regular-60"));
-				*/
 
 		// Skin
 		skin = assetLoader.loadSkin("uiskin");
@@ -153,6 +143,10 @@ public class MyGame extends Game {
 		loadAssets();
 
 		// Create single instances of menu and game screen here?
+
+		// Start playing music.
+		if (!settings.getMusicMuted())
+			music.play();
 
 		// Load settings & save state and switch to menu screen.
 		try {
@@ -185,6 +179,9 @@ public class MyGame extends Game {
 		tileModel.dispose();
 		exitTileModel.dispose();
 		keyTileModel.dispose();
+		music.dispose();
+		for (Sound sound : sounds.values())
+			sound.dispose();
 		for (Model model : lockTileModels.values())
 			model.dispose();
 		for (TextureAtlas atlas : playerAnimations.values())
@@ -206,6 +203,16 @@ public class MyGame extends Game {
 			exception.printStackTrace();
 		}
 	}
+
+	/*
+	public void setSoundMuted(boolean muted) {
+		soundMuted = muted;
+	}
+
+	public void setSoundVolume(float volume) {
+		soundVolume = volume;
+	}
+	*/
 
 	public Settings getSettings() {
 		return settings;
@@ -271,6 +278,10 @@ public class MyGame extends Game {
 
 	public Sound getSound(String name) {
 		return sounds.get(name);
+	}
+
+	public Music getMusic() {
+		return music;
 	}
 
 	public BitmapFont getBitmapFont(String name) {

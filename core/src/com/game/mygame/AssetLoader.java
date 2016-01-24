@@ -2,6 +2,7 @@ package com.game.mygame;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.loaders.ModelLoader;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -113,6 +114,11 @@ public class AssetLoader {
 	public Sound loadSound(String fileName) {
 		String path = "sounds/" + fileName + ".wav";
 		return Gdx.audio.newSound(Gdx.files.internal(path));
+	}
+
+	public Music loadMusic(String fileName) {
+		String path = "music/" + fileName + ".mp3";
+		return Gdx.audio.newMusic(Gdx.files.internal(path));
 	}
 
 	public BitmapFont loadBitmapFont(String fileName) {

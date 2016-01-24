@@ -158,7 +158,7 @@ public class SettingsMenu extends Table {
 		musicSlider.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				System.out.println("Music");
+				game.getMusic().setVolume(musicSlider.getValue() / 100.0f);
 				musicVolume.setText(
 						String.valueOf((int) musicSlider.getValue()));
 			}
@@ -183,6 +183,9 @@ public class SettingsMenu extends Table {
 		soundSlider.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				game.getSound("Player-Step").play(
+						soundSlider.getValue() / 100.0f);
+				//game.setSoundVolume(soundSlider.getValue() / 100.0f);
 				soundVolume.setText(
 						String.valueOf((int) soundSlider.getValue()));
 			}
@@ -206,14 +209,45 @@ public class SettingsMenu extends Table {
 
 		// Music and sound mute buttons and value labels
 		Table musicTable = new Table();
-		CheckBox mute = new CheckBox("Mute", skin);
-		mute.getLabel().setColor(Color.BLACK);
-		musicTable.add(mute).expandX().left().padLeft(15.0f);
+		final CheckBox musicMute = new CheckBox("Mute", skin);
+		musicMute.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				boolean muted = musicMute.isChecked();
+				if (muted)
+					game.getMusic().pause();
+				else
+					game.getMusic().play();
+				game.getSettings().setMusicMuted(muted);
+				try {
+					game.getSettings().save();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		musicMute.setChecked(game.getSettings().getMusicMuted());
+		musicMute.getLabel().setColor(Color.BLACK);
+		musicTable.add(musicMute).expandX().left().padLeft(15.0f);
 		musicTable.add(musicVolume).right();
 		Table soundTable = new Table();
-		mute = new CheckBox("Mute", skin);
-		mute.getLabel().setColor(Color.BLACK);
-		soundTable.add(mute).expandX().left().padLeft(20.0f);
+		final CheckBox soundMute = new CheckBox("Mute", skin);
+		soundMute.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				boolean muted = soundMute.isChecked();
+				//game.setSoundMuted(muted);
+				game.getSettings().setSoundMuted(muted);
+				try {
+					game.getSettings().save();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		soundMute.setChecked(game.getSettings().getSoundMuted());
+		soundMute.getLabel().setColor(Color.BLACK);
+		soundTable.add(soundMute).expandX().left().padLeft(20.0f);
 		soundTable.add(soundVolume).right();
 		add(musicTable).fillX();
 		add(soundTable).fillX();
