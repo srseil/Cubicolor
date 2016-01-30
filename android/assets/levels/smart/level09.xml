@@ -1,0 +1,16 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<level>
+	<difficulty>smart</difficulty>
+	<start>6,5</start>
+	<requirements>RGBY</requirements>
+	<matrix rows="7" columns="6">
+		<line>NGNNNN</line>
+		<line>NNNBNN</line>
+		<line>yNNNyN</line>
+		<line>NNgNNN</line>
+		<line>NNNNbY</line>
+		<line>NYRNNN</line>
+		<line>NNNENr</line>
+	</matrix>
+</level>
+

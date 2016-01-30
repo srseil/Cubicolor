@@ -1,0 +1,14 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<level>
+	<difficulty>normal</difficulty>
+	<start>0,2</start>
+	<requirements>RGB</requirements>
+	<matrix rows="5" columns="5">
+		<line>ENRNN</line>
+		<line>gNNNr</line>
+		<line>NNGbN</line>
+		<line>NNNNN</line>
+		<line>BNNNN</line>
+	</matrix>
+</level>
+
