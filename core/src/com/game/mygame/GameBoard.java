@@ -69,6 +69,21 @@ public class GameBoard extends Actor {
 		camera.near = 1.0f;
 		camera.far = 30.0f;
 		camera.position.set(width/2, level.getRows() * 1.5f + correctY, 0.0f);
+		//camera.zoom = 1.2f;
+		camera.update();
+
+		if (exitModel.getRow() == level.getRows() - 1
+				&& exitModel.getColumn() <= level.getRequirementsNumber()) {
+			// Exit tile is in upper row.
+			// Tweak this if some levels are too high/low.
+			correctY = 0.5f * (level.getRequirementsNumber()
+					- exitModel.getColumn() * 1.5f);
+		} else if (exitModel.getRow() == level.getRows() - 2
+				&& exitModel.getColumn() == 0) {
+			// Exit tile is in second upper row on the far left.
+			correctY = 0.5f * Math.max(0, (level.getRequirementsNumber() - 2));
+		}
+		camera.position.set(width/2, 10.0f + correctY*0, -height/2 + 6.6f - correctY);
 		camera.zoom = 1.2f;
 		camera.update();
 
@@ -106,12 +121,12 @@ public class GameBoard extends Actor {
 					LockTile lockTile = (LockTile) matrix[i][j];
 					model = game.getLockTileModel(lockTile.getLockColor());
 					modelMatrix[i][j] = new TileModel(
-							model, matrix[i][j], i, j);
+							model, matrix[i][j], i, j, game);
 				} else {
 					// Tile model
 					model = game.getTileModel();
 					modelMatrix[i][j] = new TileModel(
-							model, matrix[i][j], i, j);
+							model, matrix[i][j], i, j, game);
 				}
 				modelMatrix[i][j].transform.setTranslation(
 						j * TileModel.SIZE, 0.0f,
@@ -138,7 +153,7 @@ public class GameBoard extends Actor {
 
 	public TileModel calculateLastRevivingTile() {
 		TileModel lastTile =
-				modelMatrix[level.getStartColumn()][level.getStartRow()];
+				modelMatrix[level.getStartRow()][level.getStartColumn()];
 		for (int i = 0; i < modelMatrix.length; i++) {
 			for (int j = modelMatrix[i].length - 1; j >= 0; j--) {
 				if (modelMatrix[i][j] != null
@@ -199,7 +214,7 @@ public class GameBoard extends Actor {
 
 		// Delay player setup until board has finished setting up.
 		TileModel startTile =
-				modelMatrix[level.getStartColumn()][level.getStartRow()];
+				modelMatrix[level.getStartRow()][level.getStartColumn()];
 		Timer.schedule(new Timer.Task() {
 			@Override
 			public void run() {
