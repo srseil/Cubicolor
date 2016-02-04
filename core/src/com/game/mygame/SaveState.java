@@ -18,7 +18,10 @@ public class SaveState {
 
 	public SaveState() {
 		reader = new XmlReader();
-		levels = new SolveState[3][3];
+		int n = Gdx.files.internal("levels/"
+				+ Difficulty.NORMAL.toString().toLowerCase()).list().length;
+		System.out.println("levels: " + n);
+		levels = new SolveState[Difficulty.values().length][n];
 	}
 
 	// Loads a save state from disk.
@@ -41,11 +44,20 @@ public class SaveState {
 					//default: root.getChildByName("normal");
 				}
 				for (int j = 0; j < levels[i].length; j++) {
-					switch (diffElement.get("level" + Integer.toString(i+1))) {
-						case "unsolved":
+					boolean solved = diffElement.getBoolean(
+							"level" + Integer.toString((j + 1)));
+					if (solved)
+						levels[i][j] = SolveState.SOLVED;
+					else
+						levels[i][j] = SolveState.UNSOLVED;
+					/*
+					switch (diffElement.getBoolean(
+							"level" + Integer.toString(i + 1))) {
+					//switch (diffElement.get("level" + Integer.toString(i+1))) {
+						case false:
 							levels[i][j] = SolveState.UNSOLVED;
 							break;
-						case "solved":
+						case true:
 							levels[i][j] = SolveState.SOLVED;
 							break;
 						case "optimal":
@@ -54,6 +66,7 @@ public class SaveState {
 						default:
 							throw new IOException();
 					}
+					*/
 				}
 			}
 		} catch (GdxRuntimeException exception) {
