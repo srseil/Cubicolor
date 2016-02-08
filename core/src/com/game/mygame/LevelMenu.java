@@ -121,7 +121,22 @@ public class LevelMenu extends Table {
 		for (Difficulty difficulty : Difficulty.values()) {
 			for (int i = 0; i < 16; i++) {
 				TextButton button = levelButtons.get(difficulty)[i];
-				if (game.getSaveState().getSolveState(difficulty, i+1)
+				if (game.getSaveState().isUnlocked(difficulty, i+1)) {
+					button.setTouchable(Touchable.enabled);
+					button.setStyle(unlockedStyle);
+				} else {
+					button.setTouchable(Touchable.disabled);
+					button.setStyle(lockedStyle);
+				}
+				/*
+				if (i == 0) {
+					if (difficulty == Difficulty.NORMAL
+							|) {
+						button.setTouchable(Touchable.enabled);
+						button.setStyle(unlockedStyle);
+					}
+				}
+				if (game.getSaveState().getSolveState(difficulty, i)
 						== SolveState.UNSOLVED) {
 					button.setTouchable(Touchable.disabled);
 					button.setStyle(lockedStyle);
@@ -129,6 +144,7 @@ public class LevelMenu extends Table {
 					button.setTouchable(Touchable.enabled);
 					button.setStyle(unlockedStyle);
 				}
+				*/
 			}
 		}
 	}

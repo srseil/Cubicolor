@@ -140,5 +140,19 @@ public class SaveState {
 			default: return levels[0][number-1];
 		}
 	}
+
+	public boolean isUnlocked(Difficulty difficulty, int number) {
+		if (number == 1) {
+			switch (difficulty) {
+				case NORMAL: return true;
+				case SMART: return isUnlocked(Difficulty.NORMAL, 16);
+				case GENIUS: return isUnlocked(Difficulty.SMART, 16);
+				default: return false;
+			}
+		} else {
+			return (getSolveState(difficulty, number-1) == SolveState.SOLVED);
+		}
+	}
+
 }
 
