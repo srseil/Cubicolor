@@ -23,6 +23,7 @@ public class MenuScreen implements Screen {
 	private Skin skin;
 	private Table rootTable;
 	private Table currentMenu;
+	private final LevelMenu levelMenu;
 
 	public MenuScreen(MyGame game) {
 		this.game = game;
@@ -37,7 +38,7 @@ public class MenuScreen implements Screen {
 		rootTable.left();
 		stage.addActor(rootTable);
 
-		final LevelMenu levelMenu = new LevelMenu(skin, game);
+		levelMenu = new LevelMenu(skin, game);
 		final SettingsMenu settingsMenu = new SettingsMenu(skin, stage, game);
 
 		// Quit dialog
@@ -70,6 +71,7 @@ public class MenuScreen implements Screen {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				if (currentMenu != levelMenu) {
+					levelMenu.updateLevelButtons();
 					rootTable.getCell(currentMenu).setActor(levelMenu);
 					currentMenu = levelMenu;
 				}
@@ -152,6 +154,10 @@ public class MenuScreen implements Screen {
 	@Override
 	public void dispose() {
 		stage.dispose();
+	}
+
+	public LevelMenu getLevelMenu() {
+		return levelMenu;
 	}
 
 }

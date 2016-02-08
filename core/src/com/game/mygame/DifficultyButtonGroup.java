@@ -25,6 +25,7 @@ public class DifficultyButtonGroup extends ButtonGroup<TextButton> {
 			button.setStyle(
 					skin.get("toggle", TextButton.TextButtonStyle.class));
 
+			/*
 			Difficulty difficulty;
 			switch (this.getChecked().getLabel().getText().toString()) {
 				case "Normal": difficulty = Difficulty.NORMAL; break;
@@ -33,6 +34,7 @@ public class DifficultyButtonGroup extends ButtonGroup<TextButton> {
 				default: difficulty = Difficulty.NORMAL;
 			}
 			levelMenu.switchToOverview(difficulty);
+			*/
 		} else {
 			System.out.println("old changed");
 			button.setStyle(

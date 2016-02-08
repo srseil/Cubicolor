@@ -33,8 +33,11 @@ public class LevelMenu extends Table {
 
 		// Difficulty buttons
 		TextButton normalButton = new TextButton("Normal", skin);
+		normalButton.addListener(createDifficultyListener(Difficulty.NORMAL));
 		TextButton smartButton = new TextButton("Smart", skin);
+		smartButton.addListener(createDifficultyListener(Difficulty.SMART));
 		TextButton geniusButton = new TextButton("Genius", skin);
+		geniusButton.addListener(createDifficultyListener(Difficulty.GENIUS));
 
 		// Difficulty button group on top of level buttons
 		HorizontalGroup buttons = new HorizontalGroup();
@@ -56,7 +59,7 @@ public class LevelMenu extends Table {
 					levelOverviews.get(difficulty).row();
 				TextButton button = new TextButton(String.valueOf(i + 1), skin);
 				levelButtons.get(difficulty)[i] = button;
-				button.addListener(createChangeListener(i + 1));
+				button.addListener(createLevelListener(i + 1));
 				Cell cell = levelOverviews.get(difficulty)
 						.add(button).width(50.0f).height(50.0f);
 				if (i % 4 != 0)
@@ -83,15 +86,24 @@ public class LevelMenu extends Table {
 		updateLevelButtons();
 	}
 
-	private ChangeListener createChangeListener(final int n) {
+	private ChangeListener createLevelListener(final int n) {
 		return new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				System.out.println("Starting: " + n + " ("
 						+ game.getSaveState().getSolveState(Difficulty.NORMAL, n) + ")");
 				game.openLevel(difficultyButtons.getCheckedLabel(), n);
-				// Switch again to update buttons:
-				//switchToOverview();
+			}
+		};
+	}
+
+	private ChangeListener createDifficultyListener(final Difficulty diff) {
+		return new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				Table overview = levelOverviews.get(diff);
+				getCell(levelOverview).setActor(overview);
+				levelOverview = overview;
 			}
 		};
 	}
@@ -99,7 +111,8 @@ public class LevelMenu extends Table {
 	/*
 	 * Deactivate buttons for locked levels and activate unlocked ones.
 	 */
-	private void updateLevelButtons() {
+	public void updateLevelButtons() {
+		System.out.println(game.getSaveState().getSolveState(Difficulty.SMART, 8));
 		for (Difficulty difficulty : Difficulty.values()) {
 			for (int i = 0; i < 16; i++) {
 				TextButton button = levelButtons.get(difficulty)[i];
@@ -113,44 +126,6 @@ public class LevelMenu extends Table {
 				}
 			}
 		}
-	}
-
-	public void switchToOverview(Difficulty difficulty) {
-		/*
-		levelButtons[0].setText(Integer.toString(1));
-
-		// Set lock of first smart and genius level.
-		if (difficulty == Difficulty.SMART) {
-			if (game.getSaveState().getSolveState(Difficulty.NORMAL,
-					levelButtons.length) == SolveState.UNSOLVED)
-				levelButtons[0].setDisabled(true);
-			else
-				levelButtons[0].setDisabled(false);
-			System.out.println(levelButtons[0].isDisabled());
-		} else if (difficulty == Difficulty.GENIUS) {
-			if (game.getSaveState().getSolveState(Difficulty.SMART,
-					levelButtons.length) == SolveState.UNSOLVED)
-				levelButtons[0].setDisabled(true);
-			else
-				levelButtons[0].setDisabled(false);
-		} else {
-			levelButtons[0].setDisabled(false);
-			System.out.println("normal false");
-		}
-
-
-		// Set lock for all other levels.
-		for (int i = 1; i < levelButtons.length; i++) {
-			levelButtons[i].setText(Integer.toString(i+1) + difficulty);
-			// Check if previous level (i instead of i+1) is solved.
-			if (game.getSaveState().getSolveState(difficulty, i)
-					== SolveState.UNSOLVED) {
-				levelButtons[i].setDisabled(true);
-			} else {
-				levelButtons[i].setDisabled(false);
-			}
-		}
-		*/
 	}
 
 }

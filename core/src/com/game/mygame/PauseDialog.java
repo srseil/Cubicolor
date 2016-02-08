@@ -52,7 +52,8 @@ public class PauseDialog extends Dialog {
 				gameScreen.resetLevel();
 				break;
 			case "menu":
-				game.setScreen(game.getMenuScreen());
+				game.toMenuScreen();
+				//game.setScreen(game.getMenuScreen());
 		}
 		gameScreen.setPaused(false);
 		gameScreen.setPauseClosed(true);

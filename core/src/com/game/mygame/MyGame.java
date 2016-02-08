@@ -111,6 +111,9 @@ public class MyGame extends Game {
 		// Sounds
 		sounds = new HashMap<>();
 		sounds.put("Player-Step", assetLoader.loadSound("player_step"));
+		sounds.put("Player-Coloring", assetLoader.loadSound("coloring"));
+		sounds.put("Player-Decoloring", assetLoader.loadSound("decoloring"));
+		sounds.put("Tile-Reviving", assetLoader.loadSound("reviving"));
 		/*
 		soundMuted = settings.getSoundMuted();
 		soundVolume = settings.getSoundVolume() / 100.0f;
@@ -213,6 +216,11 @@ public class MyGame extends Game {
 		soundVolume = volume;
 	}
 	*/
+
+	public void toMenuScreen() {
+		menuScreen.getLevelMenu().updateLevelButtons();
+		setScreen(menuScreen);
+	}
 
 	public Settings getSettings() {
 		return settings;
