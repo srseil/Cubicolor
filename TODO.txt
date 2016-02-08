@@ -42,8 +42,8 @@ Verbesserungen:
   richtiger Farbe auf sie tritt.
  --> Eher nicht.
 - Fonts (super sampling, etc. -> siehe BMFont Anleitung)
-- Performance (siehe libGDX Wiki: ModelBatch und BlendAttribute)
-- Menü Funktionalität implementieren
+- Performance -> Profiling?
+- Menü Funktionalität implementieren (Reset Progress)
 - Levels erstellen
 - Musik & Soundeffekte
 - Steuerungsmenü

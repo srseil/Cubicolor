@@ -148,6 +148,7 @@ public class MyGame extends Game {
 		// Create single instances of menu and game screen here?
 
 		// Start playing music.
+		music.setLooping(true);
 		if (!settings.getMusicMuted())
 			music.play();
 
