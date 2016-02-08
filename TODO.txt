@@ -43,14 +43,12 @@ Verbesserungen:
  --> Eher nicht.
 - Fonts (super sampling, etc. -> siehe BMFont Anleitung)
 - Performance -> Profiling?
-- Menü Funktionalität implementieren (Reset Progress)
 - Levels erstellen
 - Musik & Soundeffekte
 - Steuerungsmenü
 - Controller Support
 - Credits
 - GameBoard Kamera manchmal zu nah, Model wird abgeschnitten. Zoom?
-- Level korrekt freischaltbar machen
 
 Feedback:
 - Exit Tile sollte mehr heraus stechen, sieht man nicht gut wenn ganz unten

@@ -11,6 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
+import java.io.IOException;
+
 public class GameScreen implements Screen {
 
 	private class Move {
@@ -245,17 +247,21 @@ public class GameScreen implements Screen {
 
 	public void completeLevel(boolean optimal) {
 		completed = true;
+		/*
 		if (optimal)
 			completeDialogNormal.show(interfaceStage);
 		else
 			completeDialogOptimal.show(interfaceStage);
-
-		/*
-		game.getSaveState().update(
-				level.getDifficulty(), level.getNumber(), optimal);
-		game.getSaveState().save();
-		System.out.println(game.getSaveState().getSolveState(level.getDifficulty(), level.getNumber()));
 		*/
+		completeDialogNormal.show(interfaceStage);
+		game.getSaveState().setSolved(level.getDifficulty(), level.getNumber());
+
+		try {
+			game.getSaveState().save();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println(game.getSaveState().getSolveState(level.getDifficulty(), level.getNumber()));
 	}
 
 	public void setPaused(boolean paused) {

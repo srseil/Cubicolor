@@ -110,6 +110,7 @@ public class SaveState {
 		printWriter.close();
 	}
 
+	/*
 	// Updates the save state with the corresponding completed level.
 	public void update(Difficulty difficulty, int number, boolean optimal) {
 		SolveState state;
@@ -125,6 +126,7 @@ public class SaveState {
 			default: levels[0][number-1] = state;
 		}
 	}
+	*/
 
 	// Resets a save state to no completed levels.
 	public void reset() {
@@ -132,6 +134,15 @@ public class SaveState {
 			for (int j = 0; j < levels[i].length; j++) {
 				levels[i][j] = SolveState.UNSOLVED;
 			}
+		}
+	}
+
+	// Sets the respective level to solved.
+	public void setSolved(Difficulty difficulty, int number) {
+		switch (difficulty) {
+			case NORMAL: levels[0][number-1] = SolveState.SOLVED;
+			case SMART: levels[1][number-1] = SolveState.SOLVED;
+			case GENIUS: levels[2][number-1] = SolveState.SOLVED;
 		}
 	}
 

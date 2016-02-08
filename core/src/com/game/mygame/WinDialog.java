@@ -46,7 +46,8 @@ public class WinDialog extends Dialog {
 	protected void result(Object object) {
 		switch ((String) object) {
 			case "menu":
-				game.setScreen(game.getMenuScreen());
+				//game.setScreen(game.getMenuScreen());
+				game.toMenuScreen();
 				gameScreen.resetLevel();
 				break;
 			case "retry":
