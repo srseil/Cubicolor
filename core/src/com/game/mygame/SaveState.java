@@ -75,10 +75,10 @@ public class SaveState {
 		}
 	}
 
-	/*
 	// Saves a save state to disk.
 	public void save() throws IOException {
-		File saveFile = Gdx.files.internal("savestate.xml").file();
+		String path = "savestates/savestate.xml";
+		File saveFile = Gdx.files.internal(path).file();
 		PrintWriter printWriter = new PrintWriter(saveFile);
 		printWriter.write("<?xml version=\"1.1\" encoding=\"UTF-8\"?>\n");
 		XmlWriter xmlWriter = new XmlWriter(printWriter);
@@ -92,11 +92,15 @@ public class SaveState {
 			}
 			for (int j = 0; j < levels[i].length; j++) {
 				xmlWriter.element("level" + Integer.toString(j+1));
+				xmlWriter.text(levels[i][j] == SolveState.SOLVED);
+				/*
+				if (levels[i][j] == SolveState.SOLVED)
+					xmlWriter.text("solved");
 				switch (levels[i][j]) {
 					case UNSOLVED: xmlWriter.text("unsolved"); break;
 					case SOLVED: xmlWriter.text("solved"); break;
-					case OPTIMAL: xmlWriter.text("optimal");
 				}
+				*/
 				xmlWriter.pop();
 			}
 			xmlWriter.pop();
@@ -105,7 +109,6 @@ public class SaveState {
 		xmlWriter.close();
 		printWriter.close();
 	}
-	*/
 
 	// Updates the save state with the corresponding completed level.
 	public void update(Difficulty difficulty, int number, boolean optimal) {

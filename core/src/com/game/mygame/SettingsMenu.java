@@ -76,13 +76,11 @@ public class SettingsMenu extends Table {
 			protected void result(Object object) {
 				if ((Boolean) object) {
 					game.getSaveState().reset();
-					/*
 					try {
 						game.getSaveState().save();
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					*/
 					confirmResetDialog.show(stage);
 				}
 			}
