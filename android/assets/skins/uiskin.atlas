@@ -19,14 +19,14 @@ filter: Nearest,Nearest
 repeat: none
 check-off
   rotate: false
-  xy: 268, 36
+  xy: 292, 36
   size: 28, 28
   orig: 28, 28
   offset: 0, 0
   index: -1
 check-on
   rotate: false
-  xy: 296, 36
+  xy: 320, 36
   size: 28, 28
   orig: 28, 28
   offset: 0, 0
@@ -49,7 +49,7 @@ default-rect-down
   index: -1
 default-round
   rotate: false
-  xy: 212, 24
+  xy: 236, 24
   size: 24, 40
   split: 11, 11, 19, 19
   pad: 9, 9, 2, 2
@@ -72,6 +72,15 @@ default-round-large
   split: 11, 6, 15, 16
   pad: 6, 6, 4, 4
   orig: 40, 40
+  offset: 0, 0
+  index: -1
+default-round-select
+  rotate: false
+  xy: 212, 24
+  size: 24, 40
+  split: 11, 11, 19, 19
+  pad: 9, 9, 2, 2
+  orig: 24, 40
   offset: 0, 0
   index: -1
 default-scroll
@@ -110,7 +119,7 @@ default-slider
   index: -1
 default-slider-knob
   rotate: false
-  xy: 324, 28
+  xy: 348, 28
   size: 18, 36
   orig: 18, 36
   offset: 0, 0
@@ -126,7 +135,7 @@ default-window
   index: -1
 menu-background
   rotate: false
-  xy: 236, 32
+  xy: 260, 32
   size: 32, 32
   split: 15, 15, 15, 15
   pad: 8, 8, 8, 8
@@ -135,7 +144,7 @@ menu-background
   index: -1
 selection
   rotate: false
-  xy: 236, 30
+  xy: 260, 30
   size: 2, 2
   orig: 2, 2
   offset: 0, 0

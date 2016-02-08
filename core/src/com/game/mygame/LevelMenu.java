@@ -16,7 +16,7 @@ public class LevelMenu extends Table {
 	private EnumMap<Difficulty, Table> levelOverviews;
 	private EnumMap<Difficulty, TextButton[]> levelButtons;
 	private DifficultyButtonGroup difficultyButtons;
-	private TextButton.TextButtonStyle unlockedStyle, lockedStyle;
+	private TextButton.TextButtonStyle unlockedStyle, lockedStyle, selectStyle;
 
 	public LevelMenu(Skin skin, MyGame game) {
 		super(skin);
@@ -24,6 +24,8 @@ public class LevelMenu extends Table {
 		this.setBackground("menu-background");
 
 		// Level button styles
+		selectStyle = game.getSkin().get(
+				"select", TextButton.TextButtonStyle.class);
 		unlockedStyle = game.getSkin().get(
 				"default", TextButton.TextButtonStyle.class);
 		lockedStyle = new TextButton.TextButtonStyle(unlockedStyle);
@@ -32,11 +34,11 @@ public class LevelMenu extends Table {
 		lockedStyle.up = new NinePatchDrawable(backgroundPatch);
 
 		// Difficulty buttons
-		TextButton normalButton = new TextButton("Normal", skin);
+		TextButton normalButton = new TextButton("Normal", selectStyle);
 		normalButton.addListener(createDifficultyListener(Difficulty.NORMAL));
-		TextButton smartButton = new TextButton("Smart", skin);
+		TextButton smartButton = new TextButton("Smart", selectStyle);
 		smartButton.addListener(createDifficultyListener(Difficulty.SMART));
-		TextButton geniusButton = new TextButton("Genius", skin);
+		TextButton geniusButton = new TextButton("Genius", selectStyle);
 		geniusButton.addListener(createDifficultyListener(Difficulty.GENIUS));
 
 		// Difficulty button group on top of level buttons
@@ -86,13 +88,16 @@ public class LevelMenu extends Table {
 		updateLevelButtons();
 	}
 
-	private ChangeListener createLevelListener(final int n) {
+	private ChangeListener createLevelListener(final int number) {
 		return new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				System.out.println("Starting: " + n + " ("
-						+ game.getSaveState().getSolveState(Difficulty.NORMAL, n) + ")");
-				game.openLevel(difficultyButtons.getCheckedLabel(), n);
+				System.out.println("Starting: " + number + " ("
+						+ game.getSaveState().getSolveState(Difficulty.NORMAL, number) + ")");
+
+				game.openLevel(
+						difficultyButtons.getChecked().getLabel().toString(),
+						number);
 			}
 		};
 	}
