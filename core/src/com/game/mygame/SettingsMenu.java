@@ -2,6 +2,7 @@ package com.game.mygame;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -21,6 +22,7 @@ public class SettingsMenu extends Table {
 	private Stage stage;
 	private Skin skin;
 	private Label.LabelStyle headerStyle, contentStyle;
+	private Sound buttonSound;
 	// Settings content
 	private String[] resolutions;
 
@@ -29,6 +31,7 @@ public class SettingsMenu extends Table {
 		this.game = game;
 		this.stage = stage;
 		this.skin = skin;
+		buttonSound = game.getSound("Button-Click");
 
 		headerStyle = new Label.LabelStyle(
 				game.getBitmapFont("Vollkorn-Italic-32"), Color.BLACK);
@@ -92,8 +95,10 @@ public class SettingsMenu extends Table {
 		resetLabel.setColor(Color.BLACK);
 		resetDialog.text(resetLabel);
 		tb = new TextButton("Reset", skin);
+		tb.addListener(game.createClickListener());
 		resetDialog.button(tb, true);
 		tb = new TextButton("Cancel", skin);
+		tb.addListener(game.createClickListener());
 		resetDialog.button(tb, false);
 		resetDialog.key(Input.Keys.ESCAPE, false);
 
@@ -124,6 +129,7 @@ public class SettingsMenu extends Table {
 		resetButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				buttonSound.play(game.getSettings().getSoundVolume()/100f);
 				resetDialog.show(stage);
 			}
 		});
@@ -208,9 +214,11 @@ public class SettingsMenu extends Table {
 		// Music and sound mute buttons and value labels
 		Table musicTable = new Table();
 		final CheckBox musicMute = new CheckBox("Mute", skin);
+		musicMute.setChecked(game.getSettings().getMusicMuted());
 		musicMute.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				buttonSound.play(game.getSettings().getSoundVolume()/100f);
 				boolean muted = musicMute.isChecked();
 				if (muted)
 					game.getMusic().pause();
@@ -224,15 +232,16 @@ public class SettingsMenu extends Table {
 				}
 			}
 		});
-		musicMute.setChecked(game.getSettings().getMusicMuted());
 		musicMute.getLabel().setColor(Color.BLACK);
 		musicTable.add(musicMute).expandX().left().padLeft(15.0f);
 		musicTable.add(musicVolume).right();
 		Table soundTable = new Table();
 		final CheckBox soundMute = new CheckBox("Mute", skin);
+		soundMute.setChecked(game.getSettings().getSoundMuted());
 		soundMute.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				buttonSound.play(game.getSettings().getSoundVolume()/100f);
 				boolean muted = soundMute.isChecked();
 				//game.setSoundMuted(muted);
 				game.getSettings().setSoundMuted(muted);
@@ -243,7 +252,6 @@ public class SettingsMenu extends Table {
 				}
 			}
 		});
-		soundMute.setChecked(game.getSettings().getSoundMuted());
 		soundMute.getLabel().setColor(Color.BLACK);
 		soundTable.add(soundMute).expandX().left().padLeft(20.0f);
 		soundTable.add(soundVolume).right();
@@ -275,6 +283,7 @@ public class SettingsMenu extends Table {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				try {
+					buttonSound.play(game.getSettings().getSoundVolume()/100f);
 					System.out.println("Resolution changed.");
 					String resolution = resolutionDropdown.getSelected();
 					game.getSettings().setResolution(resolution);
@@ -287,9 +296,11 @@ public class SettingsMenu extends Table {
 		});
 		add(resolutionDropdown).left().padLeft(15.0f);
 		// Fullscreen checkbox
+		fullscreen.setChecked(game.getSettings().getFullscreenEnabled());
 		fullscreen.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				buttonSound.play(game.getSettings().getSoundVolume()/100f);
 				CheckBox checkBox = (CheckBox) actor;
 				if (checkBox.isChecked()) {
 					Gdx.graphics.setDisplayMode(Gdx.graphics.getWidth(),
@@ -307,7 +318,6 @@ public class SettingsMenu extends Table {
 				}
 			}
 		});
-		fullscreen.setChecked(game.getSettings().getFullscreenEnabled());
 		fullscreen.getLabel().setColor(Color.BLACK);
 		add(fullscreen).left().padLeft(20.0f);
 		row();
@@ -328,9 +338,11 @@ public class SettingsMenu extends Table {
 
 		// VSync and colorblind mode checkboxes
 		CheckBox box = new CheckBox("VSync", skin);
+		box.setChecked(game.getSettings().getVSyncEnabled());
 		box.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				buttonSound.play(game.getSettings().getSoundVolume()/100f);
 				CheckBox checkBox = (CheckBox) actor;
 				if (checkBox.isChecked()) {
 					Gdx.graphics.setVSync(true);
@@ -346,7 +358,6 @@ public class SettingsMenu extends Table {
 				}
 			}
 		});
-		box.setChecked(game.getSettings().getVSyncEnabled());
 		box.getLabel().setColor(Color.BLACK);
 		add(box).left().padLeft(15.0f);
 		box = new CheckBox("Colorblind Mode", skin);

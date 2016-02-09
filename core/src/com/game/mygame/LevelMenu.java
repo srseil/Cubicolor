@@ -1,7 +1,10 @@
 package com.game.mygame;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -17,11 +20,13 @@ public class LevelMenu extends Table {
 	private EnumMap<Difficulty, TextButton[]> levelButtons;
 	private DifficultyButtonGroup difficultyButtons;
 	private TextButton.TextButtonStyle unlockedStyle, lockedStyle, selectStyle;
+	private Sound buttonSound;
 
 	public LevelMenu(Skin skin, MyGame game) {
 		super(skin);
 		this.game = game;
 		this.setBackground("menu-background");
+		buttonSound = game.getSound("Button-Click");
 
 		// Level button styles
 		selectStyle = game.getSkin().get(
@@ -35,11 +40,8 @@ public class LevelMenu extends Table {
 
 		// Difficulty buttons
 		TextButton normalButton = new TextButton("Normal", selectStyle);
-		normalButton.addListener(createDifficultyListener(Difficulty.NORMAL));
 		TextButton smartButton = new TextButton("Smart", selectStyle);
-		smartButton.addListener(createDifficultyListener(Difficulty.SMART));
 		TextButton geniusButton = new TextButton("Genius", selectStyle);
-		geniusButton.addListener(createDifficultyListener(Difficulty.GENIUS));
 
 		// Difficulty button group on top of level buttons
 		HorizontalGroup buttons = new HorizontalGroup();
@@ -85,6 +87,10 @@ public class LevelMenu extends Table {
 		difficultyButtons.setUncheckLast(true);
 		difficultyButtons.setChecked("Normal");
 
+		normalButton.addListener(createDifficultyListener(Difficulty.NORMAL));
+		smartButton.addListener(createDifficultyListener(Difficulty.SMART));
+		geniusButton.addListener(createDifficultyListener(Difficulty.GENIUS));
+
 		updateLevelButtons();
 	}
 
@@ -95,6 +101,7 @@ public class LevelMenu extends Table {
 				System.out.println("Starting: " + number + " ("
 						+ game.getSaveState().getSolveState(Difficulty.NORMAL, number) + ")");
 
+				buttonSound.play(game.getSettings().getSoundVolume()/100f);
 				game.openLevel(
 						difficultyButtons.getChecked().getLabel().toString(),
 						number);
@@ -106,6 +113,10 @@ public class LevelMenu extends Table {
 		return new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				TextButton button = (TextButton) actor;
+				if (button.isChecked())
+					buttonSound.play(game.getSettings().getSoundVolume() / 100f);
+
 				Table overview = levelOverviews.get(diff);
 				getCell(levelOverview).setActor(overview);
 				levelOverview = overview;

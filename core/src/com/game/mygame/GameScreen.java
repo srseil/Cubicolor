@@ -246,6 +246,8 @@ public class GameScreen implements Screen {
 	}
 
 	public void completeLevel(boolean optimal) {
+		game.getSound("Level-Solve").play(
+				game.getSettings().getSoundVolume() / 100.0f);
 		completed = true;
 		/*
 		if (optimal)

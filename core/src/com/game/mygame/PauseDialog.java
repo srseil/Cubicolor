@@ -27,11 +27,14 @@ public class PauseDialog extends Dialog {
 		this.getTitleLabel().setAlignment(Align.center);
 
 		TextButton menu = new TextButton("Main Menu", skin);
+		menu.addListener(game.createClickListener());
 
 		TextButton resume = new TextButton("Resume", skin);
+		resume.addListener(game.createClickListener());
 		resume.getLabelCell().width(menu.getLabelCell().getPrefWidth());
 
 		TextButton restart = new TextButton("Restart", skin);
+		restart.addListener(game.createClickListener());
 		restart.getLabelCell().width(menu.getLabelCell().getPrefWidth());
 
 		this.button(resume, "");

@@ -45,6 +45,9 @@ public class PlayerModel extends ModelInstance
 	private EnumMap<TileColor, TextureAnimation> textureAnimations;
 	// Sounds
 	private Sound stepSound;
+	private Sound coloringSound;
+	private Sound decoloringSound;
+	private Sound whooshSound;
 	// Private data
 	private State state;
 	private TileColor key;
@@ -61,6 +64,9 @@ public class PlayerModel extends ModelInstance
 
 		// Reference sounds.
 		stepSound = game.getSound("Player-Step");
+		coloringSound = game.getSound("Player-Coloring");
+		decoloringSound = game.getSound("Player-Decoloring");
+		whooshSound = game.getSound("Player-Whoosh");
 
 		// Setup move and blend animations.
 		moveAnimation = new AnimationController(this);
@@ -147,6 +153,7 @@ public class PlayerModel extends ModelInstance
 				state = State.INDICATING;
 			}
 		}
+		//whooshSound.play(1.0f);
 	}
 
 	/*
@@ -156,11 +163,13 @@ public class PlayerModel extends ModelInstance
 		if (toColor == TileColor.NONE) {
 			// Decolor the model.
 			textureAnimation.resetReverse(true);
+			decoloringSound.play(1.0f);
 			state = State.DECOLORING;
 		} else {
 			// Color the model with the specified color.
 			textureAnimation = textureAnimations.get(toColor);
 			textureAnimation.reset(true);
+			coloringSound.play(1.0f);
 			state = State.COLORING;
 		}
 	}
@@ -186,7 +195,7 @@ public class PlayerModel extends ModelInstance
 			transform.setToRotation(0, 1, 0, 0);
 			updateTransform(0, 0);
 			// Play sound.
-			//stepSound.play();
+			stepSound.play();
 
 			// Take key if model is standing on key tile.
 			if (data.getKey() != key) {

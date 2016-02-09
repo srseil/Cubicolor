@@ -45,7 +45,7 @@ public class DesktopLauncher {
 		TexturePacker.processIfModified(tsettings, "/home/stefan/libGDX/MyGame/android/assets/textures/e/",
 				"/home/stefan/libGDX/MyGame/android/assets/textures/exittile/", "exittile");
 
-		TexturePacker.processIfModified(tsettings, "/home/stefan/Bilder/MyGame/skin/ninepatches/",
+		TexturePacker.process(tsettings, "/home/stefan/Bilder/MyGame/skin/ninepatches/",
 				"/home/stefan/libGDX/MyGame/android/assets/skins/", "uiskin");
 
 		new LwjglApplication(myGame, cfg);

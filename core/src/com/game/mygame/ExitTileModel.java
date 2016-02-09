@@ -1,5 +1,6 @@
 package com.game.mygame;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
@@ -42,6 +43,8 @@ public class ExitTileModel extends ModelInstance
 	private int height;
 	private int livingModels;
 	private boolean onHold;
+	// Sounds
+	private Sound revivingSound;
 
 	public ExitTileModel(Model model, ExitTile data,
 						 EnumSet<TileColor> requirements,
@@ -52,6 +55,9 @@ public class ExitTileModel extends ModelInstance
 		this.z = z;
 		this.row = row;
 		this.column = column;
+
+		// Set sounds
+		revivingSound = game.getSound("Tile-Reviving");
 
 		// Set texture.
 		TextureAttribute textureAttribute = materials.first().get(
@@ -161,6 +167,7 @@ public class ExitTileModel extends ModelInstance
 			if (state == State.MOVING_UP || state == State.SETUP) {
 				// Model snaps out of board height; spiral up.
 				height = 1;
+				revivingSound.play(0.6f);
 				moveAnimation.setAnimation(
 						"Cube|Spiral", 1, -SPIRAL_SPEED, this);
 				blendAnimation.reset(1.0f, 1.0f);

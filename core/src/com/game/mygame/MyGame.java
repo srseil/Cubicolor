@@ -12,8 +12,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
@@ -114,6 +116,9 @@ public class MyGame extends Game {
 		sounds.put("Player-Coloring", assetLoader.loadSound("coloring"));
 		sounds.put("Player-Decoloring", assetLoader.loadSound("decoloring"));
 		sounds.put("Tile-Reviving", assetLoader.loadSound("reviving"));
+		sounds.put("Button-Click", assetLoader.loadSound("button_click"));
+		sounds.put("Level-Solve", assetLoader.loadSound("level_solve"));
+		sounds.put("Player-Whoosh", assetLoader.loadSound("player_whoosh"));
 		/*
 		soundMuted = settings.getSoundMuted();
 		soundVolume = settings.getSoundVolume() / 100.0f;
@@ -221,6 +226,16 @@ public class MyGame extends Game {
 	public void toMenuScreen() {
 		menuScreen.getLevelMenu().updateLevelButtons();
 		setScreen(menuScreen);
+	}
+
+	public ChangeListener createClickListener() {
+		return new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				getSound("Button-Click").play(
+						getSettings().getSoundVolume() / 100.0f);
+			}
+		};
 	}
 
 	public Settings getSettings() {

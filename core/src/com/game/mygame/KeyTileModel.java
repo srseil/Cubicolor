@@ -12,7 +12,7 @@ public class KeyTileModel extends TileModel {
 
 	public KeyTileModel(Model model, KeyTile data, int row, int column,
 						MyGame game) {
-		super(model, data, row, column);
+		super(model, data, row, column, game);
 		this.data = data;
 		textureAttribute = materials.first().get(
 				TextureAttribute.class, TextureAttribute.Diffuse);

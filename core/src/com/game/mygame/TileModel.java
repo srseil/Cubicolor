@@ -1,5 +1,6 @@
 package com.game.mygame;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
@@ -33,12 +34,15 @@ public class TileModel extends ModelInstance implements Observer {
 	private float reviveDelay;
 	private float reviveDelta;
 	private boolean onHold;
+	// Sounds
+	private Sound revivingSound;
 
-	public TileModel(Model model, Tile data, int row, int column) {
+	public TileModel(Model model, Tile data, int row, int column, MyGame game) {
 		super(model);
 		this.data = data;
 		this.row = row;
 		this.column = column;
+		revivingSound = game.getSound("Tile-Reviving");
 		fallAnimation = new AnimationController(this);
 		fallAnimation.allowSameAnimation = true;
 		fallAnimation.setAnimation("Cube|Fall");
@@ -88,6 +92,7 @@ public class TileModel extends ModelInstance implements Observer {
 					if (!blendAnimation.isInAction()
 							&& fallAnimation.current.time
 							<= fallAnimation.current.duration) {
+						revivingSound.play(0.6f);
 						state = State.ALIVE;
 						blendAnimation.reset(1.0f, FALLING_SPEED);
 						fallAnimation.setAnimation(

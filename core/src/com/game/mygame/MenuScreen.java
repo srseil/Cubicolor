@@ -3,6 +3,7 @@ package com.game.mygame;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -17,20 +18,25 @@ public class MenuScreen implements Screen {
 
 	// DISPOSE! -> Documentation
 
-	private MyGame game;
+	private final MyGame game;
 	private Stage stage;
 	private OrthographicCamera camera;
 	private Skin skin;
 	private Table rootTable;
 	private Table currentMenu;
 	private final LevelMenu levelMenu;
+	private Sound buttonSound;
 
-	public MenuScreen(MyGame game) {
+	public MenuScreen(final MyGame game) {
 		this.game = game;
 		stage = new Stage(new ExtendViewport(
 				Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 		camera = (OrthographicCamera) stage.getCamera();
 		skin = game.getSkin();
+		buttonSound = game.getSound("Button-Click");
+
+		TextButton.TextButtonStyle buttonStyle = skin.get(
+				"select", TextButton.TextButtonStyle.class);
 
 		rootTable = new Table();
 		rootTable.setFillParent(true);
@@ -53,9 +59,11 @@ public class MenuScreen implements Screen {
 		quitLabel.setColor(Color.BLACK);
 		quitDialog.text(quitLabel);
 		TextButton quitQuit = new TextButton("Quit", skin);
+		quitQuit.addListener(game.createClickListener());
 		quitDialog.button(quitQuit, true);
 		quitDialog.key(Input.Keys.ENTER, true);
 		TextButton quitCancel = new TextButton("Cancel", skin);
+		quitCancel.addListener(game.createClickListener());
 		quitDialog.button(quitCancel, false);
 		quitDialog.key(Input.Keys.ESCAPE, false);
 
@@ -66,11 +74,14 @@ public class MenuScreen implements Screen {
 
 		// Play button
 		final TextButton playButton = new TextButton("Play", skin);
+		playButton.setStyle(buttonStyle);
 		playButton.getLabelCell().width(120.0f);
 		playButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				if (currentMenu != levelMenu) {
+					System.out.println(game.getSettings().getSoundVolume());
+					buttonSound.play(game.getSettings().getSoundVolume()/100f);
 					levelMenu.updateLevelButtons();
 					rootTable.getCell(currentMenu).setActor(levelMenu);
 					currentMenu = levelMenu;
@@ -81,11 +92,13 @@ public class MenuScreen implements Screen {
 
 		// Settings button
 		final TextButton settingsButton = new TextButton("Settings", skin);
+		settingsButton.setStyle(buttonStyle);
 		settingsButton.setWidth(120.0f);
 		settingsButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				if (currentMenu != settingsMenu) {
+					buttonSound.play(game.getSettings().getSoundVolume()/100f);
 					rootTable.getCell(currentMenu).setActor(settingsMenu);
 					currentMenu = settingsMenu;
 				}
@@ -99,6 +112,7 @@ public class MenuScreen implements Screen {
 		quitButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				buttonSound.play(game.getSettings().getSoundVolume()/100f);
 				quitDialog.show(stage);
 			}
 		});
@@ -108,6 +122,14 @@ public class MenuScreen implements Screen {
 		rootTable.add(levelMenu).expandY().padLeft(50.0f);
 		currentMenu = levelMenu;
 		//stage.addActor(currentMenu);
+
+		ButtonGroup<TextButton> menuButtons = new ButtonGroup<>();
+		menuButtons.add(playButton);
+		menuButtons.add(settingsButton);
+		menuButtons.setMaxCheckCount(1);
+		menuButtons.setMinCheckCount(1);
+		menuButtons.setUncheckLast(true);
+		menuButtons.setChecked("Play");
 	}
 
 
