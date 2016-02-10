@@ -49,6 +49,9 @@ Verbesserungen:
 - Controller Support
 - Credits
 - GameBoard Kamera manchmal zu nah, Model wird abgeschnitten. Zoom?
+- Musik Bass ajustieren
+- Soundeffekte normalisieren
+- Menü-Hintergrund verbessern (schwarzer Rand)
 
 Feedback:
 - Exit Tile sollte mehr heraus stechen, sieht man nicht gut wenn ganz unten

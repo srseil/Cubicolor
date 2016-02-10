@@ -46,6 +46,7 @@ public class MenuScreen implements Screen {
 
 		levelMenu = new LevelMenu(skin, game);
 		final SettingsMenu settingsMenu = new SettingsMenu(skin, stage, game);
+		final CreditsMenu creditsMenu = new CreditsMenu(skin, game);
 
 		// Quit dialog
 		final Dialog quitDialog = new Dialog("Quit", skin) {
@@ -106,6 +107,22 @@ public class MenuScreen implements Screen {
 		});
 		menuItems.addActor(settingsButton);
 
+		// Credits button
+		final TextButton creditsButton = new TextButton("Credits", skin);
+		creditsButton.setStyle(buttonStyle);
+		creditsButton.setWidth(120.0f);
+		creditsButton.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				if (currentMenu != creditsMenu) {
+					buttonSound.play(game.getSettings().getSoundVolume()/100f);
+					rootTable.getCell(currentMenu).setActor(creditsMenu);
+					currentMenu = creditsMenu;
+				}
+			}
+		});
+		menuItems.addActor(creditsButton);
+
 		// Quit button
 		TextButton quitButton = new TextButton("Quit", skin);
 		quitButton.setWidth(120.0f);
@@ -126,6 +143,7 @@ public class MenuScreen implements Screen {
 		ButtonGroup<TextButton> menuButtons = new ButtonGroup<>();
 		menuButtons.add(playButton);
 		menuButtons.add(settingsButton);
+		menuButtons.add(creditsButton);
 		menuButtons.setMaxCheckCount(1);
 		menuButtons.setMinCheckCount(1);
 		menuButtons.setUncheckLast(true);
