@@ -1,6 +1,7 @@
 package com.game.mygame;
 
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -35,8 +36,9 @@ public class LevelMenu extends Table {
 				"default", TextButton.TextButtonStyle.class);
 		lockedStyle = new TextButton.TextButtonStyle(unlockedStyle);
 		NinePatch backgroundPatch =
-				game.getSkin().get("menu-background", NinePatch.class);
+				game.getSkin().get("level-locked", NinePatch.class);
 		lockedStyle.up = new NinePatchDrawable(backgroundPatch);
+		lockedStyle.fontColor = Color.CLEAR;
 
 		// Difficulty buttons
 		TextButton normalButton = new TextButton("Normal", selectStyle);
