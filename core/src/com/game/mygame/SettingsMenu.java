@@ -214,6 +214,7 @@ public class SettingsMenu extends Table {
 		// Music and sound mute buttons and value labels
 		Table musicTable = new Table();
 		final CheckBox musicMute = new CheckBox("Mute", skin);
+		musicMute.getLabelCell().padLeft(5.0f);
 		musicMute.setChecked(game.getSettings().getMusicMuted());
 		musicMute.addListener(new ChangeListener() {
 			@Override
@@ -237,6 +238,7 @@ public class SettingsMenu extends Table {
 		musicTable.add(musicVolume).right();
 		Table soundTable = new Table();
 		final CheckBox soundMute = new CheckBox("Mute", skin);
+		soundMute.getLabelCell().padLeft(5.0f);
 		soundMute.setChecked(game.getSettings().getSoundMuted());
 		soundMute.addListener(new ChangeListener() {
 			@Override
@@ -269,6 +271,7 @@ public class SettingsMenu extends Table {
 
 		// Resolution drop down menu
 		final CheckBox fullscreen = new CheckBox("Fullscreen", skin);
+		fullscreen.getLabelCell().padLeft(5.0f);
 		label = new Label("Resolution", skin);
 		label.setColor(Color.BLACK);
 		add(label).left().padLeft(15.0f);
@@ -338,6 +341,7 @@ public class SettingsMenu extends Table {
 
 		// VSync and colorblind mode checkboxes
 		CheckBox box = new CheckBox("VSync", skin);
+		box.getLabelCell().padLeft(5.0f);
 		box.setChecked(game.getSettings().getVSyncEnabled());
 		box.addListener(new ChangeListener() {
 			@Override
@@ -362,7 +366,7 @@ public class SettingsMenu extends Table {
 		add(box).left().padLeft(15.0f);
 		box = new CheckBox("Colorblind Mode", skin);
 		box.getLabel().setColor(Color.BLACK);
-		add(box).left().padLeft(20.0f);
+		//add(box).left().padLeft(20.0f);
 	}
 
 }
