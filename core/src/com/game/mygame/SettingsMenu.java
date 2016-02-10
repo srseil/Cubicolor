@@ -57,7 +57,9 @@ public class SettingsMenu extends Table {
 				"You need to restart the game\nto apply the resolution.",
 				contentStyle);
 				*/
-		resolutionDialog.button(new TextButton("OK", skin), null);
+		TextButton rdtb = new TextButton("OK", skin);
+		rdtb.addListener(game.createClickListener());
+		resolutionDialog.button(rdtb, null);
 		resolutionDialog.key(Input.Keys.ENTER, null);
 		resolutionDialog.key(Input.Keys.ESCAPE, null);
 
