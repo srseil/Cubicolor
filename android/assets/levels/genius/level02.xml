@@ -1,0 +1,16 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<level>
+	<difficulty>genius</difficulty>
+	<start>0,0</start>
+	<requirements>RGBYRG</requirements>
+	<matrix rows="7" columns="7">
+		<line>NYNNNGE</line>
+		<line>NNrNNNN</line>
+		<line>NNNBNRN</line>
+		<line>yNNNNNN</line>
+		<line>GNNNNgN</line>
+		<line>NNgNbNR</line>
+		<line>NNNrNNN</line>
+	</matrix>
+</level>
+

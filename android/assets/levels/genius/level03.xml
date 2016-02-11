@@ -1,0 +1,17 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<level>
+	<difficulty>genius</difficulty>
+	<start>0,5</start>
+	<requirements>RGBYRGY</requirements>
+	<matrix rows="8" columns="7">
+		<line>gNNyENN</line>
+		<line>NNGNNNY</line>
+		<line>NNNNNNr</line>
+		<line>NRNNNYN</line>
+		<line>NyNBNNN</line>
+		<line>NNgNNNb</line>
+		<line>NNNNNrN</line>
+		<line>GNNRNNN</line>
+	</matrix>
+</level>
+

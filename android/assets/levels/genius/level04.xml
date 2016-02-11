@@ -1,0 +1,16 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<level>
+	<difficulty>genius</difficulty>
+	<start>0,5</start>
+	<requirements>RGBYRBY</requirements>
+	<matrix rows="7" columns="8">
+		<line>bNEYNGNN</line>
+		<line>NNNNNNNN</line>
+		<line>NNBNyNNg</line>
+		<line>RNYNNNyN</line>
+		<line>NNNNrbNN</line>
+		<line>NNNNNNNN</line>
+		<line>NrNRNNNB</line>
+	</matrix>
+</level>
+
