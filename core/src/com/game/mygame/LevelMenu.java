@@ -4,8 +4,6 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -21,6 +19,7 @@ public class LevelMenu extends Table {
 	private EnumMap<Difficulty, TextButton[]> levelButtons;
 	private DifficultyButtonGroup difficultyButtons;
 	private TextButton.TextButtonStyle unlockedStyle, lockedStyle, selectStyle;
+	private NinePatchDrawable lockedBackground;
 	private Sound buttonSound;
 
 	public LevelMenu(Skin skin, MyGame game) {
@@ -37,7 +36,11 @@ public class LevelMenu extends Table {
 		lockedStyle = new TextButton.TextButtonStyle(unlockedStyle);
 		NinePatch backgroundPatch =
 				game.getSkin().get("level-locked", NinePatch.class);
-		lockedStyle.up = new NinePatchDrawable(backgroundPatch);
+		lockedBackground = new NinePatchDrawable(backgroundPatch);
+		lockedStyle.up = lockedBackground;
+		lockedStyle.checked = lockedBackground;
+		//lockedStyle.down = lockedBackground;
+		//lockedStyle.disabled = lockedBackground;
 		lockedStyle.fontColor = Color.CLEAR;
 
 		// Difficulty buttons
@@ -104,9 +107,9 @@ public class LevelMenu extends Table {
 						+ game.getSaveState().getSolveState(Difficulty.NORMAL, number) + ")");
 
 				buttonSound.play(game.getSettings().getSoundVolume()/100f);
-				game.openLevel(
-						difficultyButtons.getChecked().getLabel().toString(),
-						number);
+				System.out.println(difficultyButtons.getChecked().getLabel().getText());
+				game.openLevel(Difficulty.valueOf(difficultyButtons.getChecked()
+						.getLabel().getText().toString().toUpperCase()), number);
 			}
 		};
 	}
@@ -137,9 +140,27 @@ public class LevelMenu extends Table {
 				if (game.getSaveState().isUnlocked(difficulty, i+1)) {
 					button.setTouchable(Touchable.enabled);
 					button.setStyle(unlockedStyle);
+					if (i == 1 && difficulty == Difficulty.NORMAL) {
+						System.out.println("ERROR");
+
+					}
 				} else {
 					button.setTouchable(Touchable.disabled);
 					button.setStyle(lockedStyle);
+					button.setBackground(lockedBackground);
+					button.setBackground("menu-background");
+					button.layout();
+					button.pack();
+					if (i == 1 && difficulty == Difficulty.NORMAL) {
+						System.out.println("level " + i + " is locked "
+						+ button.getLabel().getText().toString());
+						System.out.println(button.getBackground().equals(
+								levelButtons.get(difficulty)[i + 1].getBackground()
+						));
+						System.out.println("\nstate = " + button.isChecked() + "\n");
+						System.out.println("\nstate = " + button.isDisabled() + "\n");
+						System.out.println("\nstate = " + button.isOver() + "\n");
+					}
 				}
 				/*
 				if (i == 0) {

@@ -38,20 +38,25 @@ Verbesserungen:
  --> Getan! Möglicherweise noch anpassen, sieht aber bereits sehr gut aus.
 /- Blendanimation für Setup zu ExitTileModel hinzufügen?
  --> Implementiert. Möglicherweise Geschwindigkeit der Animation anpassen.
-- Lock Tiles könnten Farbe verlieren, wenn der Spieler mit
+/- Lock Tiles könnten Farbe verlieren, wenn der Spieler mit
   richtiger Farbe auf sie tritt.
  --> Eher nicht.
+/- Musik Bass ajustieren
+ --> Fertig.
+/- Soundeffekte normalisieren
+ --> Fertig.
 - Fonts (super sampling, etc. -> siehe BMFont Anleitung)
 - Performance -> Profiling?
 - Levels erstellen
-- Musik & Soundeffekte
 - Steuerungsmenü
 - Controller Support
 - Credits
 - GameBoard Kamera manchmal zu nah, Model wird abgeschnitten. Zoom?
-- Musik Bass ajustieren
-- Soundeffekte normalisieren
-- Menü-Hintergrund verbessern (schwarzer Rand)
+- GUI Kleinigkeiten anpassen (Abstände zwischen Widgets, ajustieren)
+- Soundeffekte muten lassen
+- Progress reset -> ok -> confirm kein sound
+- Man sieht nicht direkt, ob man ein Level schon geschafft hat
+- Nach Level Beendigung -> Button für nächstes Level?
 
 Feedback:
 - Exit Tile sollte mehr heraus stechen, sieht man nicht gut wenn ganz unten

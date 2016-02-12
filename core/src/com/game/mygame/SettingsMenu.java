@@ -66,6 +66,7 @@ public class SettingsMenu extends Table {
 		// Confirmation dialog for resetting progress
 		final Dialog confirmResetDialog =
 				new Dialog("Reset Progress", skin);
+		confirmResetDialog.addListener(game.createClickListener());
 		confirmResetDialog.getTitleLabel().setAlignment(Align.center);
 		Label confirmResetLabel = new Label("Progress has been reset.", skin);
 		confirmResetLabel.setColor(Color.BLACK);
@@ -114,7 +115,7 @@ public class SettingsMenu extends Table {
 		Label label = new Label("Game", headerStyle);
 		//label.setStyle(italicStyle);
 		//label.setColor(Color.BLACK);
-		add(label).left();
+		add(label).left().padTop(-18.0f);
 		row();
 
 		// Language drop down menu
@@ -324,7 +325,7 @@ public class SettingsMenu extends Table {
 			}
 		});
 		fullscreen.getLabel().setColor(Color.BLACK);
-		add(fullscreen).left().padLeft(20.0f);
+		add(fullscreen).left().padLeft(20.0f).padTop(8.0f);
 		row();
 
 		/*

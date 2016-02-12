@@ -140,8 +140,8 @@ public class SaveState {
 	// Sets the respective level to solved.
 	public void setSolved(Difficulty difficulty, int number) {
 		switch (difficulty) {
-			case NORMAL: levels[0][number-1] = SolveState.SOLVED;
-			case SMART: levels[1][number-1] = SolveState.SOLVED;
+			case NORMAL: levels[0][number-1] = SolveState.SOLVED; break;
+			case SMART: levels[1][number-1] = SolveState.SOLVED; break;
 			case GENIUS: levels[2][number-1] = SolveState.SOLVED;
 		}
 	}
@@ -159,8 +159,10 @@ public class SaveState {
 		if (number == 1) {
 			switch (difficulty) {
 				case NORMAL: return true;
-				case SMART: return isUnlocked(Difficulty.NORMAL, 16);
-				case GENIUS: return isUnlocked(Difficulty.SMART, 16);
+				case SMART: return getSolveState(Difficulty.NORMAL, 16)
+								== SolveState.SOLVED;
+				case GENIUS: return getSolveState(Difficulty.SMART, 16)
+								== SolveState.SOLVED;
 				default: return false;
 			}
 		} else {

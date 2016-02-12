@@ -16,25 +16,28 @@ public class LevelLoader {
 		reader = new XmlReader();
 	}
 
-	public Level load(String difficult, int number) throws IOException {
-		String filename = "levels/level" + Integer.toString(number) + ".xml";
+	public Level load(Difficulty diff, int number) throws IOException {
+		String filename = "levels/" + diff.toString().toLowerCase() + "/level";
+		if (number < 10)
+			filename += "0";
+		filename += Integer.toString(number) + ".xml";
 		FileHandle handle = Gdx.files.internal(filename);
 		XmlReader.Element root = reader.parse(handle);
 
 		Difficulty difficulty;
-		int optimal, startRow, startColumn;
+		int optimal = 0, startRow, startColumn;
 		EnumSet<TileColor> exitRequirements;
 		Tile[][] matrix;
 
 		try {
-			String diff = root.get("difficulty");
-			switch (diff) {
-				case "Normal": difficulty = Difficulty.NORMAL; break;
-				case "Smart": difficulty = Difficulty.SMART; break;
-				case "Genius": difficulty = Difficulty.GENIUS; break;
+			String d = root.get("difficulty");
+			switch (d) {
+				case "normal": difficulty = Difficulty.NORMAL; break;
+				case "smart": difficulty = Difficulty.SMART; break;
+				case "genius": difficulty = Difficulty.GENIUS; break;
 				default: difficulty = Difficulty.NORMAL;
 			}
-			optimal = Integer.parseInt(root.get("optimal"));
+			//optimal = Integer.parseInt(root.get("optimal"));
 
 			String[] parts = root.get("start").split(",");
 			startRow = Integer.parseInt(parts[0]);

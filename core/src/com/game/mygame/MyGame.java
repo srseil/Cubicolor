@@ -118,7 +118,7 @@ public class MyGame extends Game {
 		sounds.put("Tile-Reviving", assetLoader.loadSound("reviving"));
 		sounds.put("Button-Click", assetLoader.loadSound("button_click"));
 		sounds.put("Level-Solve", assetLoader.loadSound("level_solve"));
-		sounds.put("Player-Whoosh", assetLoader.loadSound("player_whoosh"));
+		//sounds.put("Player-Whoosh", assetLoader.loadSound("player_whoosh"));
 		/*
 		soundMuted = settings.getSoundMuted();
 		soundVolume = settings.getSoundVolume() / 100.0f;
@@ -202,7 +202,7 @@ public class MyGame extends Game {
 	/*
 	 * Open the level with the specified difficulty and number.
 	 */
-	public void openLevel(String difficulty, int n) {
+	public void openLevel(Difficulty difficulty, int n) {
 		try {
 			Level level = levelLoader.load(difficulty, n);
 			gameScreen = new GameScreen(level, this);
