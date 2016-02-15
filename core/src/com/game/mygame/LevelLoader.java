@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.XmlReader;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.EnumSet;
 
 public class LevelLoader {
@@ -26,7 +27,8 @@ public class LevelLoader {
 
 		Difficulty difficulty;
 		int optimal = 0, startRow, startColumn;
-		EnumSet<TileColor> exitRequirements;
+		//EnumSet<TileColor> exitRequirements;
+		ArrayList<TileColor> exitRequirements;
 		Tile[][] matrix;
 
 		try {
@@ -44,11 +46,13 @@ public class LevelLoader {
 			startColumn = Integer.parseInt(parts[1]);
 
 			char[] chars = root.get("requirements").toCharArray();
-			exitRequirements = EnumSet.noneOf(TileColor.class);
+			//exitRequirements = EnumSet.noneOf(TileColor.class);
+			exitRequirements = new ArrayList<>();
 			for (int i = 0; i < chars.length; i++) {
 				TileColor color = parseColor(chars[i]);
 				exitRequirements.add(color);
 			}
+			System.out.println("size: " + chars.length + " " + exitRequirements.size());
 
 			XmlReader.Element matrixElement = root.getChildByName("matrix");
 			if (matrixElement == null)
@@ -94,14 +98,16 @@ public class LevelLoader {
 		}
 	}
 
-	private Tile parseTile(char identifier, EnumSet<TileColor> exitReqs) throws IOException {
+	//private Tile parseTile(char identifier, EnumSet<TileColor> exitReqs) throws IOException {
+	private Tile parseTile(char identifier, ArrayList<TileColor> exitReqs) throws IOException {
 		switch (identifier) {
 			case '0':
 				return new EmptyTile();
 			case 'N':
 				return new Tile();
 			case 'E':
-				return new ExitTile(exitReqs.clone());
+				//return new ExitTile(exitReqs.clone());
+				return new ExitTile(new ArrayList<>(exitReqs));
 			case 'R':
 				return new LockTile(TileColor.RED);
 			case 'r':

@@ -47,7 +47,8 @@ public class ExitTileModel extends ModelInstance
 	private Sound revivingSound;
 
 	public ExitTileModel(Model model, ExitTile data,
-						 EnumSet<TileColor> requirements,
+						 //EnumSet<TileColor> requirements,
+						 ArrayList<TileColor> requirements,
 						 float x, float z, int row, int column, MyGame game) {
 		super(model);
 		this.data = data;
