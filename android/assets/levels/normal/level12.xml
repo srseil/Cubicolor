@@ -4,8 +4,8 @@
 	<start>0,4</start>
 	<requirements>RGB</requirements>
 	<matrix rows="6" columns="5">
-		<line>GNNNN</line>
-		<line>NrbNN</line>
+		<line>GNbNN</line>
+		<line>NrNNN</line>
 		<line>NNENN</line>
 		<line>NRNNN</line>
 		<line>NNBNN</line>

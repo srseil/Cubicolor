@@ -2,7 +2,7 @@
 <level>
 	<difficulty>smart</difficulty>
 	<start>4,5</start>
-	<requirements>RGBY</requirements>
+	<requirements>RGBYR</requirements>
 	<matrix rows="7" columns="7">
 		<line>rNNbNNN</line>
 		<line>NNNNgNN</line>

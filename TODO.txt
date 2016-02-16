@@ -57,6 +57,13 @@ Verbesserungen:
 - Progress reset -> ok -> confirm kein sound
 - Man sieht nicht direkt, ob man ein Level schon geschafft hat
 - Nach Level Beendigung -> Button für nächstes Level?
+- Kleine Level zu groß bei hoher Auflösung (erstes Level bei 1080p?)
+- Kleinere Schrift für Versionslabel
+
+Trailer:
+- Glocken-Soundeffekt entfernen
+- Labels in Gamescreen entfernen
+- Dialog nach Lösung entfernen
 
 Feedback:
 - Exit Tile sollte mehr heraus stechen, sieht man nicht gut wenn ganz unten
