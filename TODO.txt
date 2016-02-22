@@ -56,7 +56,6 @@ Verbesserungen:
 - Man sieht nicht direkt, ob man ein Level schon geschafft hat
 - Nach Level Beendigung -> Button für nächstes Level?
 - Kleine Level zu groß bei hoher Auflösung (erstes Level bei 1080p?)
-- Kleinere Schrift für Versionslabel
 - Potentielle Renderprobleme beseitigen (keine Tatsächlichen festgestellt)
 
 Feedback:
