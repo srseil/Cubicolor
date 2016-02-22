@@ -2,13 +2,13 @@
 <level>
 	<difficulty>normal</difficulty>
 	<start>0,2</start>
-	<requirements>RGB</requirements>
+	<requirements>RGY</requirements>
 	<matrix rows="5" columns="5">
 		<line>ENRNN</line>
 		<line>gNNNr</line>
-		<line>NNGbN</line>
+		<line>NNGyN</line>
 		<line>NNNNN</line>
-		<line>BNNNN</line>
+		<line>YNNNN</line>
 	</matrix>
 </level>
 

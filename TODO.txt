@@ -47,50 +47,36 @@ Verbesserungen:
  --> Fertig.
 - Fonts (super sampling, etc. -> siehe BMFont Anleitung)
 - Performance -> Profiling?
-- Levels erstellen
 - Steuerungsmenü
 - Controller Support
 - Credits
 - GameBoard Kamera manchmal zu nah, Model wird abgeschnitten. Zoom?
 - GUI Kleinigkeiten anpassen (Abstände zwischen Widgets, ajustieren)
 - Soundeffekte muten lassen
-- Progress reset -> ok -> confirm kein sound
 - Man sieht nicht direkt, ob man ein Level schon geschafft hat
 - Nach Level Beendigung -> Button für nächstes Level?
 - Kleine Level zu groß bei hoher Auflösung (erstes Level bei 1080p?)
 - Kleinere Schrift für Versionslabel
-
-Trailer:
-- Glocken-Soundeffekt entfernen
-- Labels in Gamescreen entfernen
-- Dialog nach Lösung entfernen
+- Potentielle Renderprobleme beseitigen (keine Tatsächlichen festgestellt)
 
 Feedback:
-- Exit Tile sollte mehr heraus stechen, sieht man nicht gut wenn ganz unten
- --> Geändert, möglicherweise bessere Alternative?
-- Coloring-Animation dauert zu lange, hält Spielfluss auf
- --> Schneller, kann möglicherweise noch schneller, sieht aber bereits gut aus
-     Eher nicht ändern.
-- In-Game Schriftart sieht nicht gut aus, "spacing" (Kerning?) stört
- --> Schriftarten geändert.
 - Schrittzähler möglicherweise obsolet, da es nicht wirklich große Unterschiede
   gibt, zumindest bisher
+
+Sprachen:
+- Englisch
+- Deutsch
+- Französisch
+- Spanisch
+- Italienisch
 
 Tutorial:
 - Klar machen, dass Requirements nicht in Reihenfolge beseitigt werden müssen
 
-Greenlight:
-- KeyTileModel Textur ändern
- --> Derzeitige behalten? Andere Versuche waren nicht so gut
-- Licht/Shading verbessern
- --> Specular geändert, möglicherweise noch Licht in GameBoard ändern
-- PlayerModel Animationen
- --> Bereits angepasst, nochmal genau anschauen.
-- Schriftart ändern
- --> Verwende jetzt Vollkorn. Andere Schriftart für Zahlen?
-- Potentielle Renderprobleme beseitigen (keine Tatsächlichen festgestellt)
-- Soundeffekte
-- Musik
+Release:
+- Vollkorn-Lizenz als Textdatei mitliefern
+  http://friedrichalthausen.de/vollkorn-2-1/
+  http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL_web
 
 libGDX:
 - animationController.inAction immer false?

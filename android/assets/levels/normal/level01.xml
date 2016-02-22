@@ -1,11 +1,11 @@
 <?xml version="1.1" encoding="UTF-8"?>
 <level>
 	<difficulty>normal</difficulty>
-	<start>0,3</start>
-	<requirements>B</requirements>
-	<matrix rows="2" columns="4">
-		<line>ENbN</line>
-		<line>NBNN</line>
+	<start>1,4</start>
+	<requirements>G</requirements>
+	<matrix rows="2" columns="5">
+		<line>0NGNN</line>
+		<line>ENNg0</line>
 	</matrix>
 </level>
 

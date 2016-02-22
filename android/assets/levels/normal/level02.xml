@@ -2,11 +2,11 @@
 <level>
 	<difficulty>normal</difficulty>
 	<start>0,2</start>
-	<requirements>R</requirements>
+	<requirements>G</requirements>
 	<matrix rows="3" columns="3">
-		<line>ENr</line>
+		<line>ENg</line>
 		<line>NNN</line>
-		<line>RNN</line>
+		<line>GNN</line>
 	</matrix>
 </level>
 
