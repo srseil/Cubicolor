@@ -52,11 +52,11 @@ Verbesserungen:
 - Credits
 - GameBoard Kamera manchmal zu nah, Model wird abgeschnitten. Zoom?
 - GUI Kleinigkeiten anpassen (Abstände zwischen Widgets, ajustieren)
-- Soundeffekte muten lassen
 - Man sieht nicht direkt, ob man ein Level schon geschafft hat
 - Nach Level Beendigung -> Button für nächstes Level?
 - Kleine Level zu groß bei hoher Auflösung (erstes Level bei 1080p?)
 - Potentielle Renderprobleme beseitigen (keine Tatsächlichen festgestellt)
+- Soundeffekte normalisieren
 
 Feedback:
 - Schrittzähler möglicherweise obsolet, da es nicht wirklich große Unterschiede

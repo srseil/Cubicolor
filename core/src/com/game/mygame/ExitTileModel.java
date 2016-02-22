@@ -31,6 +31,7 @@ public class ExitTileModel extends ModelInstance
 	}
 
 	private ExitTile data;
+	private Settings settings;
 	private State state;
 	private AnimationController moveAnimation;
 	private BlendAnimation blendAnimation;
@@ -56,6 +57,7 @@ public class ExitTileModel extends ModelInstance
 		this.z = z;
 		this.row = row;
 		this.column = column;
+		settings = game.getSettings();
 
 		// Set sounds
 		revivingSound = game.getSound("Tile-Reviving");
@@ -168,7 +170,8 @@ public class ExitTileModel extends ModelInstance
 			if (state == State.MOVING_UP || state == State.SETUP) {
 				// Model snaps out of board height; spiral up.
 				height = 1;
-				revivingSound.play(0.6f);
+				if (!settings.getSoundMuted())
+					revivingSound.play(settings.getSoundVolume()/100f);
 				moveAnimation.setAnimation(
 						"Cube|Spiral", 1, -SPIRAL_SPEED, this);
 				blendAnimation.reset(1.0f, 1.0f);

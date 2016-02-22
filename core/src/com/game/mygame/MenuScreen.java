@@ -82,7 +82,8 @@ public class MenuScreen implements Screen {
 			public void changed(ChangeEvent event, Actor actor) {
 				if (currentMenu != levelMenu) {
 					System.out.println(game.getSettings().getSoundVolume());
-					buttonSound.play(game.getSettings().getSoundVolume()/100f);
+					if (!game.getSettings().getSoundMuted())
+						buttonSound.play(game.getSettings().getSoundVolume()/100f);
 					levelMenu.updateLevelButtons();
 					rootTable.getCell(currentMenu).setActor(levelMenu);
 					currentMenu = levelMenu;
@@ -99,7 +100,8 @@ public class MenuScreen implements Screen {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				if (currentMenu != settingsMenu) {
-					buttonSound.play(game.getSettings().getSoundVolume()/100f);
+					if (!game.getSettings().getSoundMuted())
+						buttonSound.play(game.getSettings().getSoundVolume()/100f);
 					rootTable.getCell(currentMenu).setActor(settingsMenu);
 					currentMenu = settingsMenu;
 				}
@@ -115,7 +117,8 @@ public class MenuScreen implements Screen {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				if (currentMenu != creditsMenu) {
-					buttonSound.play(game.getSettings().getSoundVolume()/100f);
+					if (!game.getSettings().getSoundMuted())
+						buttonSound.play(game.getSettings().getSoundVolume()/100f);
 					rootTable.getCell(currentMenu).setActor(creditsMenu);
 					currentMenu = creditsMenu;
 				}
@@ -129,7 +132,8 @@ public class MenuScreen implements Screen {
 		quitButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				buttonSound.play(game.getSettings().getSoundVolume()/100f);
+				if (!game.getSettings().getSoundMuted())
+					buttonSound.play(game.getSettings().getSoundVolume()/100f);
 				quitDialog.show(stage);
 			}
 		});

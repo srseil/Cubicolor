@@ -106,7 +106,8 @@ public class LevelMenu extends Table {
 				System.out.println("Starting: " + number + " ("
 						+ game.getSaveState().getSolveState(Difficulty.NORMAL, number) + ")");
 
-				buttonSound.play(game.getSettings().getSoundVolume()/100f);
+				if (!game.getSettings().getSoundMuted())
+					buttonSound.play(game.getSettings().getSoundVolume()/100f);
 				System.out.println(difficultyButtons.getChecked().getLabel().getText());
 				game.openLevel(Difficulty.valueOf(difficultyButtons.getChecked()
 						.getLabel().getText().toString().toUpperCase()), number);
@@ -119,8 +120,8 @@ public class LevelMenu extends Table {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				TextButton button = (TextButton) actor;
-				if (button.isChecked())
-					buttonSound.play(game.getSettings().getSoundVolume() / 100f);
+				if (button.isChecked() && !game.getSettings().getSoundMuted())
+					buttonSound.play(game.getSettings().getSoundVolume()/100f);
 
 				Table overview = levelOverviews.get(diff);
 				getCell(levelOverview).setActor(overview);

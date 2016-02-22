@@ -27,6 +27,7 @@ public class TileModel extends ModelInstance implements Observer {
 	}
 
 	private Tile data;
+	private Settings settings;
 	public int row, column;
 	private State state;
 	private AnimationController fallAnimation;
@@ -42,6 +43,7 @@ public class TileModel extends ModelInstance implements Observer {
 		this.data = data;
 		this.row = row;
 		this.column = column;
+		settings = game.getSettings();
 		revivingSound = game.getSound("Tile-Reviving");
 		fallAnimation = new AnimationController(this);
 		fallAnimation.allowSameAnimation = true;
@@ -92,7 +94,8 @@ public class TileModel extends ModelInstance implements Observer {
 					if (!blendAnimation.isInAction()
 							&& fallAnimation.current.time
 							<= fallAnimation.current.duration) {
-						revivingSound.play(0.6f);
+						if (!settings.getSoundMuted())
+							revivingSound.play(settings.getSoundVolume()/100f);
 						state = State.ALIVE;
 						blendAnimation.reset(1.0f, FALLING_SPEED);
 						fallAnimation.setAnimation(

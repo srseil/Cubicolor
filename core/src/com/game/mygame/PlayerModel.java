@@ -38,6 +38,7 @@ public class PlayerModel extends ModelInstance
 	private ExitTileModel exitModel;
 	private TileModel lastTile;
 	private GameBoard board;
+	private Settings settings;
 	// Animations
 	private AnimationController moveAnimation;
 	private BlendAnimation blendAnimation;
@@ -61,6 +62,7 @@ public class PlayerModel extends ModelInstance
 		this.exitModel = exitModel;
 		this.lastTile = lastTile;
 		this.board = board;
+		settings = game.getSettings();
 
 		// Reference sounds.
 		stepSound = game.getSound("Player-Step");
@@ -163,13 +165,15 @@ public class PlayerModel extends ModelInstance
 		if (toColor == TileColor.NONE) {
 			// Decolor the model.
 			textureAnimation.resetReverse(true);
-			decoloringSound.play(1.0f);
+			if (!settings.getSoundMuted())
+				decoloringSound.play(settings.getSoundVolume()/100f);
 			state = State.DECOLORING;
 		} else {
 			// Color the model with the specified color.
 			textureAnimation = textureAnimations.get(toColor);
 			textureAnimation.reset(true);
-			coloringSound.play(1.0f);
+			if (!settings.getSoundMuted())
+				coloringSound.play(settings.getSoundVolume()/100f);
 			state = State.COLORING;
 		}
 	}
@@ -195,7 +199,8 @@ public class PlayerModel extends ModelInstance
 			transform.setToRotation(0, 1, 0, 0);
 			updateTransform(0, 0);
 			// Play sound.
-			stepSound.play();
+			if (!settings.getSoundMuted())
+				stepSound.play(settings.getSoundVolume()/100f);
 
 			// Take key if model is standing on key tile.
 			if (data.getKey() != key) {

@@ -234,8 +234,10 @@ public class MyGame extends Game {
 		return new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				getSound("Button-Click").play(
-						getSettings().getSoundVolume() / 100.0f);
+				if (!getSettings().getSoundMuted()) {
+					getSound("Button-Click").play(
+							getSettings().getSoundVolume() / 100.0f);
+				}
 			}
 		};
 	}

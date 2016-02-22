@@ -132,7 +132,8 @@ public class SettingsMenu extends Table {
 		resetButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				buttonSound.play(game.getSettings().getSoundVolume()/100f);
+				if (!game.getSettings().getSoundMuted())
+					buttonSound.play(game.getSettings().getSoundVolume()/100f);
 				resetDialog.show(stage);
 			}
 		});
@@ -190,8 +191,10 @@ public class SettingsMenu extends Table {
 		soundSlider.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				game.getSound("Player-Step").play(
-						soundSlider.getValue() / 100.0f);
+				if (!game.getSettings().getSoundMuted()) {
+					game.getSound("Player-Step").play(
+							soundSlider.getValue() / 100.0f);
+				}
 				//game.setSoundVolume(soundSlider.getValue() / 100.0f);
 				soundVolume.setText(
 						String.valueOf((int) soundSlider.getValue()));
@@ -222,7 +225,8 @@ public class SettingsMenu extends Table {
 		musicMute.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				buttonSound.play(game.getSettings().getSoundVolume()/100f);
+				if (!game.getSettings().getSoundMuted())
+					buttonSound.play(game.getSettings().getSoundVolume()/100f);
 				boolean muted = musicMute.isChecked();
 				if (muted)
 					game.getMusic().pause();
@@ -289,7 +293,8 @@ public class SettingsMenu extends Table {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				try {
-					buttonSound.play(game.getSettings().getSoundVolume()/100f);
+					if (!game.getSettings().getSoundMuted())
+						buttonSound.play(game.getSettings().getSoundVolume()/100f);
 					System.out.println("Resolution changed.");
 					String resolution = resolutionDropdown.getSelected();
 					game.getSettings().setResolution(resolution);
@@ -306,7 +311,8 @@ public class SettingsMenu extends Table {
 		fullscreen.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				buttonSound.play(game.getSettings().getSoundVolume()/100f);
+				if (!game.getSettings().getSoundMuted())
+					buttonSound.play(game.getSettings().getSoundVolume()/100f);
 				CheckBox checkBox = (CheckBox) actor;
 				if (checkBox.isChecked()) {
 					Gdx.graphics.setDisplayMode(Gdx.graphics.getWidth(),
@@ -349,7 +355,8 @@ public class SettingsMenu extends Table {
 		box.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				buttonSound.play(game.getSettings().getSoundVolume()/100f);
+				if (!game.getSettings().getSoundMuted())
+					buttonSound.play(game.getSettings().getSoundVolume()/100f);
 				CheckBox checkBox = (CheckBox) actor;
 				if (checkBox.isChecked()) {
 					Gdx.graphics.setVSync(true);
