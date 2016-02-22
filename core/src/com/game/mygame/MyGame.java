@@ -26,6 +26,8 @@ import java.util.HashMap;
 
 public class MyGame extends Game {
 
+	public static final String GAME_VERSION = "v1.0";
+
 	private Settings settings;
 	private ModelBatch modelBatch;
 	private AssetLoader assetLoader;

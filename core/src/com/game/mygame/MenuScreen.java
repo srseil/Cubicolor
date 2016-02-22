@@ -135,8 +135,15 @@ public class MenuScreen implements Screen {
 		});
 		menuItems.addActor(quitButton);
 
+		// Version label
+		Label version = new Label("Cubicolor " + MyGame.GAME_VERSION, skin);
+		version.setColor(Color.BLACK);
+		version.setStyle(new Label.LabelStyle(
+				game.getBitmapFont("Vollkorn-Regular-24"), Color.BLACK));
+
 		rootTable.add(menuItems).expandY().padLeft(50.0f);
 		rootTable.add(levelMenu).expandY().padLeft(50.0f);
+		rootTable.add(version).expandX().right().bottom().padBottom(2.0f).padRight(5.0f);
 		currentMenu = levelMenu;
 		//stage.addActor(currentMenu);
 
