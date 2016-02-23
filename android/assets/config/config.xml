@@ -1,10 +1,20 @@
 <?xml version="1.1" encoding="UTF-8"?>
 <config>
-	<music-muted>false</music-muted>
-	<music-volume>100</music-volume>
-	<sound-muted>false</sound-muted>
-	<sound-volume>100</sound-volume>
-	<resolution>800x600</resolution>
-	<fullscreen>false</fullscreen>
-	<vsync>true</vsync>
+	<settings>
+		<music-muted>true</music-muted>
+		<music-volume>100</music-volume>
+		<sound-muted>false</sound-muted>
+		<sound-volume>100</sound-volume>
+		<resolution>800x600</resolution>
+		<fullscreen>false</fullscreen>
+		<vsync>true</vsync>
+	</settings>
+	<controls>
+		<forwards>19</forwards>
+		<backwards>20</backwards>
+		<left>21</left>
+		<right>22</right>
+		<restart>46</restart>
+		<pause>131</pause>
+	</controls>
 </config>

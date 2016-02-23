@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -25,6 +27,7 @@ public class MenuScreen implements Screen {
 	private Table rootTable;
 	private Table currentMenu;
 	private final LevelMenu levelMenu;
+	private final ControlsMenu controlsMenu;
 	private Sound buttonSound;
 
 	public MenuScreen(final MyGame game) {
@@ -45,6 +48,7 @@ public class MenuScreen implements Screen {
 		stage.addActor(rootTable);
 
 		levelMenu = new LevelMenu(skin, game);
+		controlsMenu = new ControlsMenu(skin, stage, game);
 		final SettingsMenu settingsMenu = new SettingsMenu(skin, stage, game);
 		final CreditsMenu creditsMenu = new CreditsMenu(skin, game);
 
@@ -91,6 +95,23 @@ public class MenuScreen implements Screen {
 			}
 		});
 		menuItems.addActor(playButton);
+
+		// Controls button
+		final TextButton controlsButton = new TextButton("Controls", skin);
+		controlsButton.setStyle(buttonStyle);
+		controlsButton.setWidth(120.0f);
+		controlsButton.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				if (currentMenu != controlsMenu) {
+					if (!game.getSettings().getSoundMuted())
+						buttonSound.play(game.getSettings().getSoundVolume() / 100f);
+					rootTable.getCell(currentMenu).setActor(controlsMenu);
+					currentMenu = controlsMenu;
+				}
+			}
+		});
+		menuItems.addActor(controlsButton);
 
 		// Settings button
 		final TextButton settingsButton = new TextButton("Settings", skin);
@@ -153,6 +174,7 @@ public class MenuScreen implements Screen {
 
 		ButtonGroup<TextButton> menuButtons = new ButtonGroup<>();
 		menuButtons.add(playButton);
+		menuButtons.add(controlsButton);
 		menuButtons.add(settingsButton);
 		menuButtons.add(creditsButton);
 		menuButtons.setMaxCheckCount(1);

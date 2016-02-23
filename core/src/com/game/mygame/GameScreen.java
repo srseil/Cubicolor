@@ -25,6 +25,7 @@ public class GameScreen implements Screen {
 	}
 
 	private MyGame game;
+	private Settings settings;
 	private Level level;
 	private Player player;
 	private GameBoard gameBoard;
@@ -53,6 +54,7 @@ public class GameScreen implements Screen {
 		this.level = level;
 		this.game = game;
 
+		settings = game.getSettings();
 		player = new Player(level);
 		skin = game.getSkin();
 
@@ -180,7 +182,7 @@ public class GameScreen implements Screen {
 		// Only process in-game input if game is (still) running.
 		if (!paused && !completed) {
 			// Escape to open pause menu.
-			if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+			if (Gdx.input.isKeyJustPressed(settings.getPauseButton())) {
 				paused = true;
 				pauseDialog.show(interfaceStage);
 				return;
@@ -201,29 +203,29 @@ public class GameScreen implements Screen {
 
 			// Queue player move if it is occupied; else move or restart.
 			if (gameBoard.isOccupied()) {
-				if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+				if (Gdx.input.isKeyJustPressed(settings.getForwardsButton())) {
 					queuedMove = new Move(0, 1);
-				} else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+				} else if (Gdx.input.isKeyJustPressed(settings.getBackwardsButton())) {
 					queuedMove = new Move(0, -1);
-				} else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+				} else if (Gdx.input.isKeyJustPressed(settings.getRightButton())) {
 					queuedMove = new Move(1, 0);
-				} else if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+				} else if (Gdx.input.isKeyJustPressed(settings.getLeftButton())) {
 					queuedMove = new Move(-1, 0);
 				}
 			} else {
-				if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+				if (Gdx.input.isKeyJustPressed(settings.getForwardsButton())) {
 					player.move(0, 1);
 					gameBoard.movePlayerModel(0, 1);
-				} else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+				} else if (Gdx.input.isKeyJustPressed(settings.getBackwardsButton())) {
 					player.move(0, -1);
 					gameBoard.movePlayerModel(0, -1);
-				} else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+				} else if (Gdx.input.isKeyJustPressed(settings.getRightButton())) {
 					player.move(1, 0);
 					gameBoard.movePlayerModel(1, 0);
-				} else if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+				} else if (Gdx.input.isKeyJustPressed(settings.getLeftButton())) {
 					player.move(-1, 0);
 					gameBoard.movePlayerModel(-1, 0);
-				} else if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+				} else if (Gdx.input.isKeyJustPressed(settings.getRestartButton())) {
 					resetLevel();
 				}
 			}

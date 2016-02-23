@@ -1,5 +1,6 @@
 package com.game.mygame;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.XmlReader;
@@ -20,6 +21,8 @@ public class Settings {
 	private int resolutionWidth, resolutionHeight;
 	private boolean fullscreen;
 	private boolean vSync;
+	// Control values
+	private int forwards, backwards, left, right, restart, pause;
 
 	public Settings() {
 		reader = new XmlReader();
@@ -33,6 +36,8 @@ public class Settings {
 		XmlReader.Element root = reader.parse(new FileHandle(path));
 
 		try {
+			// Game settings
+			root = root.getChildByName("settings");
 			musicMuted = root.getBoolean("music-muted");
 			musicVolume = Integer.parseInt(root.get("music-volume"));
 			soundMuted = root.getBoolean("sound-muted");
@@ -43,6 +48,14 @@ public class Settings {
 			resolutionHeight = Integer.parseInt(resParts[1]);
 			fullscreen = root.getBoolean("fullscreen");
 			vSync = root.getBoolean("vsync");
+			// Controls settings
+			root = root.getParent().getChildByName("controls");
+			forwards = root.getInt("forwards");
+			backwards = root.getInt("backwards");
+			left = root.getInt("left");
+			right = root.getInt("right");
+			restart = root.getInt("restart");
+			pause = root.getInt("pause");
 		} catch (GdxRuntimeException exception) {
 			exception.printStackTrace();
 			throw new IOException();
@@ -59,6 +72,8 @@ public class Settings {
 		XmlWriter xmlWriter = new XmlWriter(printWriter);
 		xmlWriter.element("config");
 
+		// Game settings
+		xmlWriter.element("settings");
 		xmlWriter.element("music-muted", musicMuted);
 		xmlWriter.element("music-volume", musicVolume);
 		xmlWriter.element("sound-muted", soundMuted);
@@ -66,6 +81,16 @@ public class Settings {
 		xmlWriter.element("resolution", resolution);
 		xmlWriter.element("fullscreen", fullscreen);
 		xmlWriter.element("vsync", vSync);
+		xmlWriter.pop();
+		// Controls settings
+		xmlWriter.element("controls");
+		xmlWriter.element("forwards", forwards);
+		xmlWriter.element("backwards", backwards);
+		xmlWriter.element("left", left);
+		xmlWriter.element("right", right);
+		xmlWriter.element("restart", restart);
+		xmlWriter.element("pause", pause);
+		xmlWriter.pop();
 
 		xmlWriter.pop();
 		xmlWriter.close();
@@ -99,6 +124,32 @@ public class Settings {
 	public void setvSyncEnabled(boolean vSync) {
 		this.vSync = vSync;
 	}
+
+	public void setForwardsButtons(int forwards) {
+		this.forwards = forwards;
+	}
+
+	public void setBackwardsButton(int backwards) {
+		this.backwards = backwards;
+	}
+
+	public void setLeftButton(int left) {
+		this.left = left;
+	}
+
+	public void setRightButton(int right) {
+		this.right = right;
+	}
+
+	public void setRestartButton(int restart) {
+		this.restart = restart;
+	}
+
+	public void setPauseButton(int pause) {
+		this.pause = pause;
+	}
+
+	// Getters:
 
 	public boolean getMusicMuted() {
 		return musicMuted;
@@ -134,6 +185,30 @@ public class Settings {
 
 	public boolean getVSyncEnabled() {
 		return vSync;
+	}
+
+	public int getForwardsButton() {
+		return forwards;
+	}
+
+	public int getBackwardsButton() {
+		return backwards;
+	}
+
+	public int getLeftButton() {
+		return left;
+	}
+
+	public int getRightButton() {
+		return right;
+	}
+
+	public int getRestartButton() {
+		return restart;
+	}
+
+	public int getPauseButton() {
+		return pause;
 	}
 
 }
