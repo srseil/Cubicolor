@@ -50,12 +50,10 @@ Verbesserungen:
 - Controller Support
 - Credits
 - GameBoard Kamera manchmal zu nah, Model wird abgeschnitten. Zoom?
-- GUI Kleinigkeiten anpassen (Abstände zwischen Widgets, ajustieren)
-- Man sieht nicht direkt, ob man ein Level schon geschafft hat
- --> Eher andere Buttonfarbe als Stern oben links...
 - Nach Level Beendigung -> Button für nächstes Level?
 - Kleine Level zu groß bei hoher Auflösung (erstes Level bei 1080p?)
 - Potentielle Renderprobleme beseitigen (keine Tatsächlichen festgestellt)
+- Sprachen?
 
 Feedback:
 - Schrittzähler möglicherweise obsolet, da es nicht wirklich große Unterschiede

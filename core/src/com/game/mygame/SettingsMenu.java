@@ -108,6 +108,8 @@ public class SettingsMenu extends Table {
 		createGameSection();
 		createAudioSection();
 		createVideoSection();
+
+		//debug();
 	}
 
 	private void createGameSection() {
@@ -185,7 +187,7 @@ public class SettingsMenu extends Table {
 				}
 			}
 		});
-		add(musicSlider).padLeft(15.0f);
+		add(musicSlider).left().padLeft(15.0f);
 		final Slider soundSlider = new Slider(0.0f, 100.0f, 1.0f, false, skin);
 		soundSlider.setValue(game.getSettings().getSoundVolume());
 		soundSlider.addListener(new ChangeListener() {
@@ -214,7 +216,7 @@ public class SettingsMenu extends Table {
 				}
 			}
 		});
-		add(soundSlider).padLeft(20.0f);
+		add(soundSlider).left().padLeft(20.0f);
 		row();
 
 		// Music and sound mute buttons and value labels
@@ -242,7 +244,7 @@ public class SettingsMenu extends Table {
 		});
 		musicMute.getLabel().setColor(Color.BLACK);
 		musicTable.add(musicMute).expandX().left().padLeft(15.0f);
-		musicTable.add(musicVolume).right();
+		musicTable.add(musicVolume).left().padRight(10.0f);
 		Table soundTable = new Table();
 		final CheckBox soundMute = new CheckBox("Mute", skin);
 		soundMute.getLabelCell().padLeft(5.0f);
@@ -263,7 +265,7 @@ public class SettingsMenu extends Table {
 		});
 		soundMute.getLabel().setColor(Color.BLACK);
 		soundTable.add(soundMute).expandX().left().padLeft(20.0f);
-		soundTable.add(soundVolume).right();
+		soundTable.add(soundVolume).left().padRight(20.0f);
 		add(musicTable).fillX();
 		add(soundTable).fillX();
 		row();
@@ -373,7 +375,7 @@ public class SettingsMenu extends Table {
 			}
 		});
 		box.getLabel().setColor(Color.BLACK);
-		add(box).left().padLeft(15.0f);
+		add(box).colspan(2).left().padLeft(193.0f);
 		box = new CheckBox("Colorblind Mode", skin);
 		box.getLabel().setColor(Color.BLACK);
 		//add(box).left().padLeft(20.0f);
