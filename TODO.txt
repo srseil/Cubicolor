@@ -56,7 +56,6 @@ Verbesserungen:
 - Nach Level Beendigung -> Button für nächstes Level?
 - Kleine Level zu groß bei hoher Auflösung (erstes Level bei 1080p?)
 - Potentielle Renderprobleme beseitigen (keine Tatsächlichen festgestellt)
-- Soundeffekte normalisieren
 
 Feedback:
 - Schrittzähler möglicherweise obsolet, da es nicht wirklich große Unterschiede

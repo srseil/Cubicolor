@@ -18,7 +18,7 @@ public class LevelMenu extends Table {
 	private EnumMap<Difficulty, Table> levelOverviews;
 	private EnumMap<Difficulty, TextButton[]> levelButtons;
 	private DifficultyButtonGroup difficultyButtons;
-	private TextButton.TextButtonStyle unlockedStyle, lockedStyle, selectStyle;
+	private TextButton.TextButtonStyle unlockedStyle, completedStyle, lockedStyle, selectStyle;
 	private NinePatchDrawable lockedBackground;
 	private Sound buttonSound;
 
@@ -33,6 +33,23 @@ public class LevelMenu extends Table {
 				"select", TextButton.TextButtonStyle.class);
 		unlockedStyle = game.getSkin().get(
 				"default", TextButton.TextButtonStyle.class);
+		NinePatch unlockedPatch = game.getSkin().get(
+				"default-round", NinePatch.class);
+		NinePatchDrawable unlockedBackground  =
+				new NinePatchDrawable(unlockedPatch);
+		unlockedStyle.up = unlockedBackground;
+		unlockedStyle.checked = unlockedBackground;
+		completedStyle = new TextButton.TextButtonStyle(unlockedStyle);
+		NinePatch completedPatch = game.getSkin().get(
+				"default-round-completed", NinePatch.class);
+		NinePatchDrawable completedBackground  =
+				new NinePatchDrawable(completedPatch);
+		completedStyle.up = completedBackground;
+		completedStyle.checked = completedBackground;
+		NinePatch completedDownPatch = game.getSkin().get(
+				"default-round-down-completed", NinePatch.class);
+		completedStyle.down = new NinePatchDrawable(completedDownPatch);
+
 		lockedStyle = new TextButton.TextButtonStyle(unlockedStyle);
 		NinePatch backgroundPatch =
 				game.getSkin().get("level-locked", NinePatch.class);
@@ -138,7 +155,11 @@ public class LevelMenu extends Table {
 		for (Difficulty difficulty : Difficulty.values()) {
 			for (int i = 0; i < 16; i++) {
 				TextButton button = levelButtons.get(difficulty)[i];
-				if (game.getSaveState().isUnlocked(difficulty, i+1)) {
+				if (game.getSaveState().isUnlocked(difficulty, i+2)) {
+					button.setTouchable(Touchable.enabled);
+					button.setStyle(completedStyle);
+					//button.setBackground("default-round-down-completed");
+				} else if (game.getSaveState().isUnlocked(difficulty, i+1)) {
 					button.setTouchable(Touchable.enabled);
 					button.setStyle(unlockedStyle);
 					if (i == 1 && difficulty == Difficulty.NORMAL) {
