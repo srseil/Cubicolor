@@ -53,6 +53,7 @@ public class GameBoard extends Actor {
 			// Tweak this if some levels are too high/low.
 			correctY = 0.5f * (level.getRequirementsNumber() + 1
 					- exitModel.getColumn() * 1.75f);
+			correctY = Math.max(correctY, 0.0f);
 		} else if (exitModel.getRow() == level.getRows() - 2
 				&& exitModel.getColumn() == 0) {
 			// Exit tile is in second upper row on the far left.
@@ -63,14 +64,28 @@ public class GameBoard extends Actor {
 						Math.pow(2 * level.getColumns(), 2))) + 1);
 		float viewportWidth = ((float) Gdx.graphics.getWidth())
 				/ Gdx.graphics.getHeight() * viewportHeight;
+
+
+
+		// posX = horizontal width/2 of board in camera angle
+		float posX = (float) (Math.cos(Math.toRadians(20.0f))
+				* Math.sqrt(Math.pow(level.getRows(), 2.0f)
+				+ Math.pow(level.getColumns(), 2.0f)));
+		float r = posX / (float) Math.cos(Math.toRadians(20.0f));
+		float b = (float) Math.sin(Math.toRadians(20.0f)) * posX;
+
+
+
 		camera.setToOrtho(false, viewportWidth, viewportHeight);
 		camera.rotate(-60.0f, 1.0f, 0.0f, 0.0f);
 		camera.rotate(20.0f, 0.0f, 1.0f, 0.0f);
 		camera.near = 1.0f;
 		camera.far = 30.0f;
+		System.out.println("posX: " + posX + ", r: " + r + ", width/2: " + width/2);
 		camera.position.set(width/2, level.getRows() * 1.5f + correctY, 0.0f);
 		//camera.zoom = 1.2f;
 		camera.update();
+
 
 		if (exitModel.getRow() == level.getRows() - 1
 				&& exitModel.getColumn() <= level.getRequirementsNumber()) {
@@ -78,12 +93,18 @@ public class GameBoard extends Actor {
 			// Tweak this if some levels are too high/low.
 			correctY = 0.5f * (level.getRequirementsNumber()
 					- exitModel.getColumn() * 1.5f);
+			if (level.getDifficulty() == Difficulty.SMART)
+				correctY -= 0.6f;
+			if (level.getDifficulty() == Difficulty.GENIUS && level.getNumber() == 4)
+				correctY -= 0.3f;
+			correctY = Math.max(correctY, 0.0f);
 		} else if (exitModel.getRow() == level.getRows() - 2
 				&& exitModel.getColumn() == 0) {
 			// Exit tile is in second upper row on the far left.
-			correctY = 0.5f * Math.max(0, (level.getRequirementsNumber() - 2));
+			correctY = 0.5f * Math.max(0, (level.getRequirementsNumber() - 3));
 		}
 		camera.position.set(width/2, 10.0f + correctY*0, -height/2 + 6.6f - correctY);
+		//camera.position.set(posX, 10.0f + correctY*0, -height/2 + 6.6f - correctY);
 		camera.zoom = 1.2f;
 		camera.update();
 
@@ -107,7 +128,7 @@ public class GameBoard extends Actor {
 							game.getExitTileModel(), exitTile,
 							level.getExitRequirements(),
 							j * TileModel.SIZE, -i * TileModel.SIZE,
-							i, j, game);
+							i, j, level, game);
 					exitTile.addObserver(exitModel);
 					continue;
 				} else if (matrix[i][j] instanceof KeyTile) {
@@ -115,18 +136,18 @@ public class GameBoard extends Actor {
 					KeyTile keyTile = (KeyTile) matrix[i][j];
 					model = game.getKeyTileModel();
 					modelMatrix[i][j] = new KeyTileModel(
-							model, keyTile, i, j, game);
+							model, keyTile, i, j, level, game);
 				} else if (matrix[i][j] instanceof LockTile) {
 					// Lock tile model
 					LockTile lockTile = (LockTile) matrix[i][j];
 					model = game.getLockTileModel(lockTile.getLockColor());
 					modelMatrix[i][j] = new TileModel(
-							model, matrix[i][j], i, j, game);
+							model, matrix[i][j], i, j, level, game);
 				} else {
 					// Tile model
 					model = game.getTileModel();
 					modelMatrix[i][j] = new TileModel(
-							model, matrix[i][j], i, j, game);
+							model, matrix[i][j], i, j, level, game);
 				}
 				modelMatrix[i][j].transform.setTranslation(
 						j * TileModel.SIZE, 0.0f,
