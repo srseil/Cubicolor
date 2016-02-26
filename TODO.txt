@@ -53,6 +53,7 @@ Verbesserungen:
 - Nach Level Beendigung -> Button für nächstes Level?
 - Kleine Level zu groß bei hoher Auflösung (erstes Level bei 1080p?)
 - Potentielle Renderprobleme beseitigen (keine Tatsächlichen festgestellt)
+- Tutorial
 - UI Skalierung? Vielleicht 1x, 1.5x und 2x
 - Sprachen?
 
