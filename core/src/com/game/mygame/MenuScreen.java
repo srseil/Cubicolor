@@ -43,9 +43,10 @@ public class MenuScreen implements Screen {
 
 		rootTable = new Table();
 		rootTable.setFillParent(true);
-		rootTable.setDebug(false);
-		rootTable.left();
+		//rootTable.setDebug(true);
 		stage.addActor(rootTable);
+
+		final Table contentTable = new Table();
 
 		levelMenu = new LevelMenu(skin, game);
 		controlsMenu = new ControlsMenu(skin, stage, game);
@@ -89,7 +90,7 @@ public class MenuScreen implements Screen {
 					if (!game.getSettings().getSoundMuted())
 						buttonSound.play(game.getSettings().getSoundVolume()/100f);
 					levelMenu.updateLevelButtons();
-					rootTable.getCell(currentMenu).setActor(levelMenu);
+					contentTable.getCell(currentMenu).setActor(levelMenu);
 					currentMenu = levelMenu;
 				}
 			}
@@ -106,7 +107,7 @@ public class MenuScreen implements Screen {
 				if (currentMenu != controlsMenu) {
 					if (!game.getSettings().getSoundMuted())
 						buttonSound.play(game.getSettings().getSoundVolume() / 100f);
-					rootTable.getCell(currentMenu).setActor(controlsMenu);
+					contentTable.getCell(currentMenu).setActor(controlsMenu);
 					currentMenu = controlsMenu;
 				}
 			}
@@ -123,7 +124,7 @@ public class MenuScreen implements Screen {
 				if (currentMenu != settingsMenu) {
 					if (!game.getSettings().getSoundMuted())
 						buttonSound.play(game.getSettings().getSoundVolume()/100f);
-					rootTable.getCell(currentMenu).setActor(settingsMenu);
+					contentTable.getCell(currentMenu).setActor(settingsMenu);
 					currentMenu = settingsMenu;
 				}
 			}
@@ -140,7 +141,7 @@ public class MenuScreen implements Screen {
 				if (currentMenu != creditsMenu) {
 					if (!game.getSettings().getSoundMuted())
 						buttonSound.play(game.getSettings().getSoundVolume()/100f);
-					rootTable.getCell(currentMenu).setActor(creditsMenu);
+					contentTable.getCell(currentMenu).setActor(creditsMenu);
 					currentMenu = creditsMenu;
 				}
 			}
@@ -166,9 +167,12 @@ public class MenuScreen implements Screen {
 		version.setStyle(new Label.LabelStyle(
 				game.getBitmapFont("Vollkorn-Regular-24"), Color.BLACK));
 
-		rootTable.add(menuItems).expandY().padLeft(50.0f);
-		rootTable.add(levelMenu).expandY().padLeft(50.0f);
-		rootTable.add(version).expandX().right().bottom().padBottom(2.0f).padRight(5.0f);
+		contentTable.left();
+		contentTable.add(levelMenu).left();
+		rootTable.add(menuItems).expand().right().padRight(50.0f);//.padLeft(50.0f);
+		rootTable.add(contentTable).size(0.45f*Gdx.graphics.getWidth(),
+				Gdx.graphics.getHeight()).left().padRight(50.0f);
+		rootTable.add(version).expandY().right().bottom().padBottom(2.0f).padRight(5.0f);
 		currentMenu = levelMenu;
 		//stage.addActor(currentMenu);
 
