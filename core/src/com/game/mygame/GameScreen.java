@@ -89,7 +89,7 @@ public class GameScreen implements Screen {
 		difficultyLabel = new Label(level.getDifficulty().toString(), skin);
 		difficultyLabel.setStyle(new Label.LabelStyle(
 				game.getBitmapFont("Vollkorn-Regular-58"), Color.BLACK));
-		leftUI.add(difficultyLabel).top().padTop(-45.0f);
+		leftUI.add(difficultyLabel).top().left().padTop(-45.0f);
 		leftUI.row();
 		levelLabel = new Label("Level " + level.getNumber(), skin);
 		levelLabel.setStyle(new Label.LabelStyle(
@@ -121,9 +121,24 @@ public class GameScreen implements Screen {
 		steps = player.getSteps();
 
 		if (level.getDifficulty() == Difficulty.NORMAL) {
-			if (level.getNumber() == 1)
+			if (level.getNumber() == 1) {
 				tutorial1 = game.getTutorialTexture(settings.getResolution());
-			// Add labels for 2 and 3
+			} else if (level.getNumber() == 2) {
+				String button = Input.Keys.toString(settings.getRestartButton());
+				Label message = new Label("You can restart the level by pressing "
+								+ button + ".", skin);
+				message.setStyle(new Label.LabelStyle(
+						game.getBitmapFont("Vollkorn-Regular-32"), Color.BLACK));
+				leftUI.row();
+				leftUI.add(message).left().bottom();
+			} else if (level.getNumber() == 3) {
+				Label message = new Label("The order in which you match the "
+						+ "different colors is irrelevant.", skin);
+				message.setStyle(new Label.LabelStyle(
+						game.getBitmapFont("Vollkorn-Regular-32"), Color.BLACK));
+				leftUI.row();
+				leftUI.add(message).left().bottom();
+			}
 		}
 	}
 
