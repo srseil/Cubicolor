@@ -44,6 +44,7 @@ public class MyGame extends Game {
 	private EnumMap<TileColor, TextureAtlas> playerAnimations;
 	private EnumMap<TileColor, TextureAtlas.AtlasRegion> keyTileTextures;
 	private TextureAtlas.AtlasRegion exitTileTexture;
+	private HashMap<String, TextureAtlas.AtlasRegion> tutorialTextures;
 	private NinePatchDrawable menuBackground;
 	private HashMap<String, Sound> sounds;
 	private Music music;
@@ -111,6 +112,23 @@ public class MyGame extends Game {
 
 		// Exit tile texture
 		exitTileTexture = assetLoader.loadExitTileTexture();
+
+		// Tutorial textures
+		Array<TextureAtlas.AtlasRegion> tutorial =
+				assetLoader.loadTutorialTextures().getRegions();
+		tutorialTextures = new HashMap<>();
+		tutorialTextures.put("1600x900",  tutorial.get(0));
+		tutorialTextures.put("1920x1080", tutorial.get(1));
+		tutorialTextures.put("1536x864",  tutorial.get(2));
+		tutorialTextures.put("1680x1050", tutorial.get(3));
+		tutorialTextures.put("1280x1024", tutorial.get(4));
+		tutorialTextures.put("1440x900",  tutorial.get(5));
+		tutorialTextures.put("1024x768",  tutorial.get(6));
+		tutorialTextures.put("1280x720",  tutorial.get(7));
+		tutorialTextures.put("800x600",   tutorial.get(8));
+		tutorialTextures.put("1360x768",  tutorial.get(9));
+		tutorialTextures.put("1366x768",  tutorial.get(10));
+		tutorialTextures.put("1280x800",  tutorial.get(11));
 
 		// Sounds
 		sounds = new HashMap<>();
@@ -298,6 +316,10 @@ public class MyGame extends Game {
 
 	public TextureAtlas.AtlasRegion getExitTileTexture() {
 		return exitTileTexture;
+	}
+
+	public TextureRegion getTutorialTexture(String name) {
+		return tutorialTextures.get(name);
 	}
 
 	public NinePatchDrawable getMenuBackground() {

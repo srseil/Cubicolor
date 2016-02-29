@@ -5,10 +5,15 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import java.io.IOException;
@@ -24,15 +29,18 @@ public class GameScreen implements Screen {
 		}
 	}
 
+	//public static final float TUT_RESIZE = 1/
 	private MyGame game;
 	private Settings settings;
 	private Level level;
 	private Player player;
 	private GameBoard gameBoard;
 
+	private Table rootTable;
 	private Stage boardStage;
 	private Stage interfaceStage;
 	private Skin skin;
+	private SpriteBatch spriteBatch;
 
 	private Label fps;
 	private Label levelLabel;
@@ -40,6 +48,7 @@ public class GameScreen implements Screen {
 	private Label stepsLabel;
 	private String stepsText;
 	private int steps;
+	private TextureRegion tutorial1;
 
 	private PauseDialog pauseDialog;
 	private WinDialog completeDialogNormal;
@@ -50,10 +59,12 @@ public class GameScreen implements Screen {
 	private boolean pauseClosed;
 	private boolean completed;
 
+
 	public GameScreen(Level level, MyGame game) {
 		this.level = level;
 		this.game = game;
 
+		spriteBatch = new SpriteBatch();
 		settings = game.getSettings();
 		player = new Player(level);
 		skin = game.getSkin();
@@ -63,7 +74,7 @@ public class GameScreen implements Screen {
 		gameBoard = new GameBoard(level, player, boardStage.getCamera(), game);
 		boardStage.addActor(gameBoard);
 
-		Table rootTable = new Table();
+		rootTable = new Table();
 		rootTable.setFillParent(true);
 		//rootTable.setDebug(true);
 		interfaceStage.addActor(rootTable);
@@ -88,19 +99,19 @@ public class GameScreen implements Screen {
 		// FPS counter in the top right corner.
 		fps = new Label("FPS: ", skin);
 		fps.setColor(Color.BLACK);
-		rightUI.add(fps).expandY().top();
+		//rightUI.add(fps).expandY().top();
 		rightUI.row();
 
 		// Steps label in the bottom right corner.
 		stepsLabel = new Label("00", skin);
 		stepsLabel.setStyle(new Label.LabelStyle(
 				game.getBitmapFont("OldStandard-Regular-60"), Color.BLACK));
-		rightUI.add(stepsLabel).expandY().bottom().padBottom(-30.0f);
+		//rightUI.add(stepsLabel).expandY().bottom().padBottom(-30.0f);
 		rightUI.row();
 		Label stepsCaption = new Label("steps", skin);
 		stepsCaption.setStyle(new Label.LabelStyle(
 				game.getBitmapFont("OldStandard-Regular-30"), Color.BLACK));
-		rightUI.add(stepsCaption).bottom();
+		//rightUI.add(stepsCaption).bottom();
 
 		// Dialog windows for pausing and completing the level.
 		pauseDialog = new PauseDialog(skin, this, game);
@@ -108,6 +119,12 @@ public class GameScreen implements Screen {
 		completeDialogOptimal = new WinDialog(true, skin, this, game);
 
 		steps = player.getSteps();
+
+		if (level.getDifficulty() == Difficulty.NORMAL) {
+			if (level.getNumber() == 1)
+				tutorial1 = game.getTutorialTexture(settings.getResolution());
+			// Add labels for 2 and 3
+		}
 	}
 
 	// The render() method is being used as a hook into the game loop.
@@ -137,6 +154,14 @@ public class GameScreen implements Screen {
 		boardStage.draw();
 		interfaceStage.act();
 		interfaceStage.draw();
+
+		// Display tutorial texture if necessary.
+		if (level.getDifficulty() == Difficulty.NORMAL
+				&& level.getNumber() == 1) {
+			spriteBatch.begin();
+			spriteBatch.draw(tutorial1, 0f, 0f);
+			spriteBatch.end();
+		}
 	}
 
 	@Override

@@ -38,7 +38,9 @@ public class SettingsMenu extends Table {
 		contentStyle = new Label.LabelStyle(
 				game.getBitmapFont("Vollkorn-Regular-32"), Color.BLACK);
 
-		String[] res = {"1920x1080", "1440x1080", "1280x720", "800x600"};
+		String[] res = {"1920x1080", "1680x1050", "1600x900", "1536x864",
+				"1440x900", "1366x768", "1360x768", "1280x1024",
+				"1280x800", "1280x720", "1024x768", "800x600"};
 		resolutions = res;
 
 		// Set background texture.

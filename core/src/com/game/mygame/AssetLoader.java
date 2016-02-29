@@ -111,6 +111,11 @@ public class AssetLoader {
 		return atlas.getRegions().first();
 	}
 
+	public TextureAtlas loadTutorialTextures() {
+		String path = "textures/tutorial/tutorial.atlas";
+		return new TextureAtlas(Gdx.files.internal(path));
+	}
+
 	public Sound loadSound(String fileName) {
 		String path = "sounds/normalized/" + fileName + ".wav";
 		return Gdx.audio.newSound(Gdx.files.internal(path));

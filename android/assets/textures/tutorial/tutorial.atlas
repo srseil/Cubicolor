@@ -1,0 +1,120 @@
+
+tutorial.png
+size: 2048,2048
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+1600x900
+  rotate: false
+  xy: 0, 0
+  size: 1600, 900
+  orig: 1600, 900
+  offset: 0, 0
+  index: -1
+1920x1080
+  rotate: false
+  xy: 0, 900
+  size: 1920, 1080
+  orig: 1920, 1080
+  offset: 0, 0
+  index: -1
+
+tutorial2.png
+size: 2048,2048
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+1536x864
+  rotate: false
+  xy: 0, 0
+  size: 1536, 864
+  orig: 1536, 864
+  offset: 0, 0
+  index: -1
+1680x1050
+  rotate: false
+  xy: 0, 864
+  size: 1680, 1050
+  orig: 1680, 1050
+  offset: 0, 0
+  index: -1
+
+tutorial3.png
+size: 2048,2048
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+1280x1024
+  rotate: false
+  xy: 0, 0
+  size: 1280, 1024
+  orig: 1280, 1024
+  offset: 0, 0
+  index: -1
+1440x900
+  rotate: false
+  xy: 0, 1024
+  size: 1440, 900
+  orig: 1440, 900
+  offset: 0, 0
+  index: -1
+
+tutorial4.png
+size: 2048,2048
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+1024x768
+  rotate: false
+  xy: 800, 720
+  size: 1024, 768
+  orig: 1024, 768
+  offset: 0, 0
+  index: -1
+1280x720
+  rotate: false
+  xy: 0, 0
+  size: 1280, 720
+  orig: 1280, 720
+  offset: 0, 0
+  index: -1
+800x600
+  rotate: false
+  xy: 0, 888
+  size: 800, 600
+  orig: 800, 600
+  offset: 0, 0
+  index: -1
+
+tutorial5.png
+size: 2048,2048
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+1360x768
+  rotate: false
+  xy: 0, 0
+  size: 1360, 768
+  orig: 1360, 768
+  offset: 0, 0
+  index: -1
+1366x768
+  rotate: false
+  xy: 0, 768
+  size: 1366, 768
+  orig: 1366, 768
+  offset: 0, 0
+  index: -1
+
+tutorial6.png
+size: 2048,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+1280x800
+  rotate: false
+  xy: 0, 0
+  size: 1280, 800
+  orig: 1280, 800
+  offset: 0, 0
+  index: -1
