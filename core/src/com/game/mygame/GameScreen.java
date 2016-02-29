@@ -115,8 +115,8 @@ public class GameScreen implements Screen {
 
 		// Dialog windows for pausing and completing the level.
 		pauseDialog = new PauseDialog(skin, this, game);
-		completeDialogNormal = new WinDialog(false, skin, this, game);
-		completeDialogOptimal = new WinDialog(true, skin, this, game);
+		completeDialogNormal = new WinDialog(false, skin, level, this, game);
+		completeDialogOptimal = new WinDialog(true, skin, level, this, game);
 
 		steps = player.getSteps();
 

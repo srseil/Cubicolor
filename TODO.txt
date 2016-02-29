@@ -49,15 +49,15 @@ Verbesserungen:
 - Controller Support? Eher nicht...
 - Credits
 - GameBoard Kamera manchmal zu nah, Model wird abgeschnitten. Zoom?
-- Nach Level Beendigung -> Button für nächstes Level?
 - Kleine Level zu groß bei hoher Auflösung (erstes Level bei 1080p?)
 - Potentielle Renderprobleme beseitigen (keine Tatsächlichen festgestellt)
-- Tutorial -> Komplette Überlagen für Fenster für verschiedene Auflösungen
 - UI Skalierung? Vielleicht 1x, 1.5x und 2x. Eher nicht...
 - Sprachen? Eher nicht...
-- Reset Config
+- Reset Config? Wozu?
 - Local -> Internal file handling
 - Assets Ordner nicht in JAR aufnehmen
+- Hide UI Checkbox in Optionen
+- Heller Rand um Fenster (Quit, Complete, Pause)?
 
 Feedback:
 - Schrittzähler möglicherweise obsolet, da es nicht wirklich große Unterschiede
