@@ -140,6 +140,11 @@ public class GameScreen implements Screen {
 				leftUI.add(message).left().bottom();
 			}
 		}
+
+		if (settings.getUIHidden()) {
+			rightUI.setVisible(false);
+			leftUI.setVisible(false);
+		}
 	}
 
 	// The render() method is being used as a hook into the game loop.
@@ -171,7 +176,8 @@ public class GameScreen implements Screen {
 		interfaceStage.draw();
 
 		// Display tutorial texture if necessary.
-		if (level.getDifficulty() == Difficulty.NORMAL
+		if (!game.getSettings().getUIHidden()
+				&& level.getDifficulty() == Difficulty.NORMAL
 				&& level.getNumber() == 1) {
 			spriteBatch.begin();
 			spriteBatch.draw(tutorial1, 0f, 0f);

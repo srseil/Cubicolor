@@ -1,6 +1,5 @@
 package com.game.mygame;
 
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.XmlReader;
@@ -15,12 +14,12 @@ public class Settings {
 	private XmlReader reader;
 	private String path;
 	// Settings values
+	private boolean uiHidden;
 	private boolean musicMuted, soundMuted;
 	private int musicVolume, soundVolume;
 	private String resolution;
 	private int resolutionWidth, resolutionHeight;
-	private boolean fullscreen;
-	private boolean vSync;
+	private boolean fullscreen, vSync;
 	// Control values
 	private int forwards, backwards, left, right, restart, pause;
 
@@ -38,6 +37,7 @@ public class Settings {
 		try {
 			// Game settings
 			root = root.getChildByName("settings");
+			uiHidden = root.getBoolean("ui-hidden");
 			musicMuted = root.getBoolean("music-muted");
 			musicVolume = Integer.parseInt(root.get("music-volume"));
 			soundMuted = root.getBoolean("sound-muted");
@@ -74,6 +74,7 @@ public class Settings {
 
 		// Game settings
 		xmlWriter.element("settings");
+		xmlWriter.element("ui-hidden", uiHidden);
 		xmlWriter.element("music-muted", musicMuted);
 		xmlWriter.element("music-volume", musicVolume);
 		xmlWriter.element("sound-muted", soundMuted);
@@ -95,6 +96,10 @@ public class Settings {
 		xmlWriter.pop();
 		xmlWriter.close();
 		printWriter.close();
+	}
+
+	public void setUIHidden(boolean hidden) {
+		uiHidden = hidden;
 	}
 
 	public void setMusicMuted(boolean muted) {
@@ -150,6 +155,10 @@ public class Settings {
 	}
 
 	// Getters:
+
+	public boolean getUIHidden() {
+		return uiHidden;
+	}
 
 	public boolean getMusicMuted() {
 		return musicMuted;

@@ -49,19 +49,10 @@ Verbesserungen:
 - Controller Support? Eher nicht...
 - Credits
 - GameBoard Kamera manchmal zu nah, Model wird abgeschnitten. Zoom?
-- Kleine Level zu groß bei hoher Auflösung (erstes Level bei 1080p?)
 - Potentielle Renderprobleme beseitigen (keine Tatsächlichen festgestellt)
 - UI Skalierung? Vielleicht 1x, 1.5x und 2x. Eher nicht...
-- Sprachen? Eher nicht...
-- Reset Config? Wozu?
-- Local -> Internal file handling
-- Assets Ordner nicht in JAR aufnehmen
-- Hide UI Checkbox in Optionen
 - Heller Rand um Fenster (Quit, Complete, Pause)?
-
-Feedback:
-- Schrittzähler möglicherweise obsolet, da es nicht wirklich große Unterschiede
-  gibt, zumindest bisher
+- Unnötigen Code entfernen (Schrittzähler, etc.)
 
 Sprachen:
 - Englisch
@@ -70,13 +61,11 @@ Sprachen:
 - Spanisch
 - Italienisch
 
-Tutorial:
-- Klar machen, dass Requirements nicht in Reihenfolge beseitigt werden müssen
-
 Release:
 - Vollkorn-Lizenz als Textdatei mitliefern
   http://friedrichalthausen.de/vollkorn-2-1/
   http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL_web
+- Assets Ordner nicht in JAR aufnehmen
 
 libGDX:
 - animationController.inAction immer false?

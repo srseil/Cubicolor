@@ -150,7 +150,20 @@ public class SettingsMenu extends Table {
 		add(resetButton).left().padLeft(15.0f).padTop(10.0f);//.padRight(5.0f);//.padLeft(15.0f);//.padTop(10.0f);
 
 		// Hide UI checkbox
-		CheckBox hide = new CheckBox("Hide UI", skin);
+		final CheckBox hide = new CheckBox("Hide UI", skin);
+		hide.setChecked(game.getSettings().getUIHidden());
+		hide.addListener(game.createClickListener());
+		hide.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				game.getSettings().setUIHidden(hide.isChecked());
+				try {
+					game.getSettings().save();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 		hide.getLabelCell().padLeft(5.0f);
 		hide.getLabel().setColor(Color.BLACK);
 		add(hide).left().padLeft(20.0f).padTop(10.0f);
