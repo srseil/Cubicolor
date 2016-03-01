@@ -9,9 +9,12 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.Align;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -122,6 +125,7 @@ public class SettingsMenu extends Table {
 		add(label).left().padTop(-18.0f);
 		row();
 
+		/*
 		// Language drop down menu
 		label = new Label("Language", skin);
 		label.setColor(Color.BLACK);
@@ -130,6 +134,8 @@ public class SettingsMenu extends Table {
 		CustomSelectBox<String> languageDropdown = new CustomSelectBox<String>(skin);
 		languageDropdown.setItems("English", "Deutsch", "Espanol", "Russian");
 		add(languageDropdown).left().padLeft(15.0f);
+		*/
+
 
 		// Reset progress button
 		TextButton resetButton = new TextButton("Reset Progress", skin);
@@ -141,7 +147,14 @@ public class SettingsMenu extends Table {
 				resetDialog.show(stage);
 			}
 		});
-		add(resetButton).left().padLeft(20.0f).padTop(10.0f);
+		add(resetButton).left().padLeft(15.0f).padTop(10.0f);//.padRight(5.0f);//.padLeft(15.0f);//.padTop(10.0f);
+
+		// Hide UI checkbox
+		CheckBox hide = new CheckBox("Hide UI", skin);
+		hide.getLabelCell().padLeft(5.0f);
+		hide.getLabel().setColor(Color.BLACK);
+		add(hide).left().padLeft(20.0f).padTop(10.0f);
+
 		row();
 	}
 
@@ -157,7 +170,7 @@ public class SettingsMenu extends Table {
 		add(label).left().padLeft(15.0f);
 		label = new Label("Sound Volume", skin);
 		label.setColor(Color.BLACK);
-		add(label).left().padLeft(20.0f);
+		add(label).left().padLeft(20.0f).padRight(5.0f);
 		row();
 
 
@@ -246,7 +259,7 @@ public class SettingsMenu extends Table {
 		});
 		musicMute.getLabel().setColor(Color.BLACK);
 		musicTable.add(musicMute).expandX().left().padLeft(15.0f);
-		musicTable.add(musicVolume).left().padRight(10.0f);
+		musicTable.add(musicVolume).left().padRight(22.0f);
 		Table soundTable = new Table();
 		final CheckBox soundMute = new CheckBox("Mute", skin);
 		soundMute.getLabelCell().padLeft(5.0f);
@@ -267,7 +280,7 @@ public class SettingsMenu extends Table {
 		});
 		soundMute.getLabel().setColor(Color.BLACK);
 		soundTable.add(soundMute).expandX().left().padLeft(20.0f);
-		soundTable.add(soundVolume).left().padRight(20.0f);
+		soundTable.add(soundVolume).right().padRight(5.0f);//.left().padRight(20.0f);
 		add(musicTable).fillX();
 		add(soundTable).fillX();
 		row();
@@ -377,7 +390,7 @@ public class SettingsMenu extends Table {
 			}
 		});
 		box.getLabel().setColor(Color.BLACK);
-		add(box).colspan(2).left().padLeft(193.0f);
+		add(box).colspan(2).left().padLeft(202.0f);
 		box = new CheckBox("Colorblind Mode", skin);
 		box.getLabel().setColor(Color.BLACK);
 		//add(box).left().padLeft(20.0f);
