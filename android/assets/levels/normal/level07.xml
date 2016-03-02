@@ -1,14 +1,14 @@
 <?xml version="1.1" encoding="UTF-8"?>
 <level>
 	<difficulty>normal</difficulty>
-	<start>4,4</start>
-	<requirements>RB</requirements>
-	<matrix rows="5" columns="5">
-		<line>BNNNN</line>
-		<line>NNNNN</line>
-		<line>ENbNR</line>
-		<line>NrNNN</line>
-		<line>NNNNN</line>
+	<start>4,5</start>
+	<requirements>RY</requirements>
+	<matrix rows="5" columns="6">
+		<line>YNNNNN</line>
+		<line>NNNNNR</line>
+		<line>ENyNNN</line>
+		<line>NrNNNN</line>
+		<line>NNNNNN</line>
 	</matrix>
 </level>
 

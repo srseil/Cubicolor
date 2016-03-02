@@ -2,10 +2,10 @@
 <level>
 	<difficulty>normal</difficulty>
 	<start>0,2</start>
-	<requirements>RGY</requirements>
+	<requirements>GBY</requirements>
 	<matrix rows="5" columns="5">
-		<line>ENRNN</line>
-		<line>gNNNr</line>
+		<line>ENBNN</line>
+		<line>gNNNb</line>
 		<line>NNGyN</line>
 		<line>NNNNN</line>
 		<line>YNNNN</line>

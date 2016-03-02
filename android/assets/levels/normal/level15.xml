@@ -2,12 +2,12 @@
 <level>
 	<difficulty>normal</difficulty>
 	<start>0,5</start>
-	<requirements>RGB</requirements>
+	<requirements>RGY</requirements>
 	<matrix rows="4" columns="6">
-		<line>NGNBNE</line>
-		<line>NNNrNN</line>
-		<line>gNbNNN</line>
-		<line>NNNNRN</line>
+		<line>NNGNNE</line>
+		<line>NNNNNR</line>
+		<line>gNrNyN</line>
+		<line>YNNNNN</line>
 	</matrix>
 </level>
 
