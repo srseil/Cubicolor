@@ -51,7 +51,6 @@ Verbesserungen:
 - GameBoard Kamera manchmal zu nah, Model wird abgeschnitten. Zoom?
 - Potentielle Renderprobleme beseitigen (keine Tatsächlichen festgestellt)
 - UI Skalierung? Vielleicht 1x, 1.5x und 2x. Eher nicht...
-- Heller Rand um Fenster (Quit, Complete, Pause)?
 - Unnötigen Code entfernen (Schrittzähler, etc.)
 
 Sprachen:
