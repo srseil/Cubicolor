@@ -19,21 +19,21 @@ filter: Nearest,Nearest
 repeat: none
 check-off
   rotate: false
-  xy: 54, 0
+  xy: 56, 0
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 check-on
   rotate: false
-  xy: 78, 0
+  xy: 80, 0
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 default-rect
   rotate: false
-  xy: 6, 0
+  xy: 382, 58
   size: 6, 6
   split: 2, 2, 2, 2
   orig: 6, 6
@@ -41,7 +41,7 @@ default-rect
   index: -1
 default-rect-down
   rotate: false
-  xy: 0, 0
+  xy: 366, 26
   size: 6, 6
   split: 2, 2, 2, 2
   orig: 6, 6
@@ -49,7 +49,7 @@ default-rect-down
   index: -1
 default-round
   rotate: false
-  xy: 308, 24
+  xy: 310, 24
   size: 24, 40
   split: 11, 11, 19, 19
   pad: 9, 9, 2, 2
@@ -58,7 +58,7 @@ default-round
   index: -1
 default-round-completed
   rotate: false
-  xy: 188, 24
+  xy: 190, 24
   size: 24, 40
   split: 11, 11, 19, 19
   pad: 9, 9, 2, 2
@@ -67,7 +67,7 @@ default-round-completed
   index: -1
 default-round-down
   rotate: false
-  xy: 236, 24
+  xy: 238, 24
   size: 24, 40
   split: 11, 11, 19, 19
   pad: 9, 9, 2, 2
@@ -76,7 +76,7 @@ default-round-down
   index: -1
 default-round-down-completed
   rotate: false
-  xy: 212, 24
+  xy: 214, 24
   size: 24, 40
   split: 11, 11, 19, 19
   pad: 9, 9, 2, 2
@@ -85,7 +85,7 @@ default-round-down-completed
   index: -1
 default-round-large
   rotate: false
-  xy: 108, 24
+  xy: 110, 24
   size: 40, 40
   split: 11, 6, 15, 16
   pad: 6, 6, 4, 4
@@ -94,7 +94,7 @@ default-round-large
   index: -1
 default-round-new
   rotate: false
-  xy: 260, 24
+  xy: 262, 24
   size: 24, 40
   split: 11, 11, 19, 19
   pad: 9, 9, 2, 2
@@ -103,7 +103,7 @@ default-round-new
   index: -1
 default-round-select
   rotate: false
-  xy: 284, 24
+  xy: 286, 24
   size: 24, 40
   split: 11, 11, 19, 19
   pad: 9, 9, 2, 2
@@ -112,7 +112,7 @@ default-round-select
   index: -1
 default-scroll
   rotate: false
-  xy: 148, 24
+  xy: 150, 24
   size: 40, 40
   split: 19, 19, 18, 20
   pad: 6, 6, 6, 6
@@ -121,7 +121,7 @@ default-scroll
   index: -1
 default-select
   rotate: false
-  xy: 54, 24
+  xy: 56, 24
   size: 54, 40
   split: 18, 34, 19, 19
   pad: 12, 34, 7, 7
@@ -130,14 +130,14 @@ default-select
   index: -1
 default-select-selection
   rotate: false
-  xy: 12, 0
+  xy: 104, 2
   size: 6, 6
   orig: 6, 6
   offset: 0, 0
   index: -1
 default-slider
   rotate: false
-  xy: 102, 8
+  xy: 104, 8
   size: 16, 16
   split: 7, 7, 7, 7
   pad: 5, 5, 5, 5
@@ -146,23 +146,23 @@ default-slider
   index: -1
 default-slider-knob
   rotate: false
-  xy: 364, 32
+  xy: 366, 32
   size: 16, 32
   orig: 16, 32
   offset: 0, 0
   index: -1
 default-window
   rotate: false
-  xy: 0, 6
-  size: 54, 58
-  split: 11, 11, 38, 11
-  pad: 8, 8, 37, 8
-  orig: 54, 58
+  xy: 0, 4
+  size: 56, 60
+  split: 12, 12, 39, 12
+  pad: 9, 9, 38, 9
+  orig: 56, 60
   offset: 0, 0
   index: -1
 level-locked
   rotate: false
-  xy: 332, 32
+  xy: 334, 32
   size: 32, 32
   split: 15, 15, 15, 15
   pad: 8, 8, 8, 8
@@ -171,14 +171,14 @@ level-locked
   index: -1
 list-background
   rotate: false
-  xy: 18, 0
+  xy: 120, 18
   size: 6, 6
   orig: 6, 6
   offset: 0, 0
   index: -1
 menu-background
   rotate: false
-  xy: 332, 0
+  xy: 334, 0
   size: 32, 32
   split: 15, 15, 15, 15
   pad: 8, 8, 8, 8
@@ -187,14 +187,14 @@ menu-background
   index: -1
 selection
   rotate: false
-  xy: 364, 30
+  xy: 104, 0
   size: 2, 2
   orig: 2, 2
   offset: 0, 0
   index: -1
 white
   rotate: false
-  xy: 24, 0
+  xy: 366, 20
   size: 6, 6
   orig: 6, 6
   offset: 0, 0
