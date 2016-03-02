@@ -117,12 +117,12 @@ public class AssetLoader {
 	}
 
 	public Sound loadSound(String fileName) {
-		String path = "sounds/normalized/" + fileName + ".wav";
+		String path = "sounds/" + fileName + ".ogg";
 		return Gdx.audio.newSound(Gdx.files.internal(path));
 	}
 
 	public Music loadMusic(String fileName) {
-		String path = "music/" + fileName + ".wav";
+		String path = "music/" + fileName + ".ogg";
 		return Gdx.audio.newMusic(Gdx.files.internal(path));
 	}
 
