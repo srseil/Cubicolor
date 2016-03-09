@@ -31,6 +31,7 @@ public class ExitTileModel extends ModelInstance
 	}
 
 	private ExitTile data;
+	private Level level;
 	private Settings settings;
 	private State state;
 	private AnimationController moveAnimation;
@@ -48,15 +49,16 @@ public class ExitTileModel extends ModelInstance
 	private Sound revivingSound;
 
 	public ExitTileModel(Model model, ExitTile data,
-						 //EnumSet<TileColor> requirements,
 						 ArrayList<TileColor> requirements,
-						 float x, float z, int row, int column, MyGame game) {
+						 float x, float z, int row, int column,
+						 Level level, MyGame game) {
 		super(model);
 		this.data = data;
 		this.x = x;
 		this.z = z;
 		this.row = row;
 		this.column = column;
+		this.level = level;
 		settings = game.getSettings();
 
 		// Set sounds
@@ -170,8 +172,12 @@ public class ExitTileModel extends ModelInstance
 			if (state == State.MOVING_UP || state == State.SETUP) {
 				// Model snaps out of board height; spiral up.
 				height = 1;
-				if (!settings.getSoundMuted())
-					revivingSound.play(settings.getSoundVolume()/100f);
+				/*
+				if ((row == level.getRows() - 1 || (level.getColumns() - column) <= 2)
+						&& !settings.getSoundMuted()) {
+					revivingSound.play(settings.getSoundVolume() / 100f);
+				}
+				*/
 				moveAnimation.setAnimation(
 						"Cube|Spiral", 1, -SPIRAL_SPEED, this);
 				blendAnimation.reset(1.0f, 1.0f);
@@ -262,6 +268,7 @@ public class ExitTileModel extends ModelInstance
 		livingModels = 0;
 		moveAnimation.setAnimation("Cube|Fall", 1, -SETUP_SPEED, this);
 		blendAnimation.reset(0.0f, SETUP_SPEED);
+		blendAnimation.setBlended(true);
 		state = State.SETUP;
 	}
 

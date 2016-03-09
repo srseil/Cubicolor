@@ -250,6 +250,7 @@ public class PlayerModel extends ModelInstance
 			} else if (state == State.RESETTING_DOWN) {
 				// Player has hovered down; is ready and controllable again.
 				blendAnimation.reset(1.0f, FALL_SPEED);
+				blendAnimation.setBlended(false);
 				state = State.STILL;
 				controllable = true;
 			}
@@ -334,6 +335,7 @@ public class PlayerModel extends ModelInstance
 		// Start resetting animation and adjust state.
 		moveAnimation.setAnimation("Cube|Fall", 1, FALL_SPEED, this);
 		blendAnimation.reset(1.0f, FALL_SPEED);
+		blendAnimation.setBlended(true);
 		state = State.RESETTING_UP;
 	}
 
