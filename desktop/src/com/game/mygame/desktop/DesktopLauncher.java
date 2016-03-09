@@ -14,16 +14,12 @@ public class DesktopLauncher {
 		Settings settings = myGame.getSettings();
 
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
-		cfg.title = "MyGame";
-		cfg.samples = 2;
-
+		cfg.title = "Cubicolor";
+		cfg.samples = 6;
 		cfg.width = settings.getResolutionWidth();
 		cfg.height = settings.getResolutionHeight();
 		cfg.fullscreen = settings.getFullscreenEnabled();
 		cfg.vSyncEnabled = settings.getVSyncEnabled();
-
-		//cfg.foregroundFPS = 0;
-		//cfg.backgroundFPS = 0;
 
 		TexturePacker.Settings tsettings = new TexturePacker.Settings();
 		tsettings.paddingX = 0;
@@ -48,7 +44,14 @@ public class DesktopLauncher {
 		TexturePacker.process(tsettings, "/home/stefan/Bilder/MyGame/skin/ninepatches/",
 				"/home/stefan/libGDX/MyGame/android/assets/skins/", "uiskin");
 
+		tsettings.maxHeight = 2048;
+		tsettings.maxWidth = 2048;
+
+		TexturePacker.processIfModified(tsettings, "/home/stefan/libGDX/MyGame/android/assets/textures/tutorial/",
+				"/home/stefan/libGDX/MyGame/android/assets/textures/tutorial/", "tutorial");
+
 		new LwjglApplication(myGame, cfg);
 	}
 
 }
+
