@@ -6,22 +6,16 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.UBJsonReader;
 
-import java.io.File;
 import java.util.HashMap;
 
 public class AssetLoader {
@@ -124,11 +118,6 @@ public class AssetLoader {
 	public Music loadMusic(String fileName) {
 		String path = "music/" + fileName + ".ogg";
 		return Gdx.audio.newMusic(Gdx.files.internal(path));
-	}
-
-	public BitmapFont loadBitmapFont(String fileName) {
-		String path = "fonts/" + fileName + ".fnt";
-		return new BitmapFont(Gdx.files.internal(path));
 	}
 
 	public HashMap<String, BitmapFont> loadBitmapFonts() {

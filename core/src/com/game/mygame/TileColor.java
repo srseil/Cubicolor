@@ -24,29 +24,8 @@ public enum TileColor {
 				return new Color(1.0f, 0.8f, 0.4f, 1.0f);
 			case NONE:
 				return new Color(0.989f, 0.981f, 0.965f, 1.0f);
-			/*
-			case BLACK:
-				return new Color(0.176f, 0.176f, 0.176f, 1.0f);
-			case BACKGROUND:
-				return new Color(0.949f, 0.941f, 0.925f, 1.0f);
-				*/
 			default:
 				return new Color(0.0f, 0.0f, 0.0f, 1.0f);
-		}
-	}
-
-	public static String getKeyTileTexturePath(TileColor color) {
-		switch (color) {
-			case RED:
-				return "keytile_red.png";
-			case GREEN:
-				return "keytile_green.png";
-			case BLUE:
-				return "keytile_blue.png";
-			case YELLOW:
-				return "keytile_yellow.png";
-			default:
-				return "keytile_red.png";
 		}
 	}
 

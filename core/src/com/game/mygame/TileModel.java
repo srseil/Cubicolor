@@ -4,7 +4,6 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
-import com.badlogic.gdx.utils.Timer;
 
 public class TileModel extends ModelInstance implements Observer {
 
@@ -34,7 +33,6 @@ public class TileModel extends ModelInstance implements Observer {
 	private BlendAnimation blendAnimation;
 	private float reviveDelay;
 	private float reviveDelta;
-	private boolean onHold;
 	// Sounds
 	private Sound revivingSound;
 
@@ -52,7 +50,6 @@ public class TileModel extends ModelInstance implements Observer {
 				fallAnimation.current.duration, REVIVING_SPEED);
 		reviveDelay = 0.0f;
 		reviveDelta = 0.0f;
-		//hold = false;
 
 		// Set living tiles to reviving for setup.
 		if (data.isDead())
@@ -72,9 +69,6 @@ public class TileModel extends ModelInstance implements Observer {
 	}
 
 	public void update(float delta) {
-		if (onHold)
-			return;
-
 		switch (state) {
 			case DEAD:
 				break;
@@ -94,8 +88,10 @@ public class TileModel extends ModelInstance implements Observer {
 					if (!blendAnimation.isInAction()
 							&& fallAnimation.current.time
 							<= fallAnimation.current.duration) {
-						if (!settings.getSoundMuted())
-							revivingSound.play(settings.getSoundVolume()/100f);
+						if (!settings.getSoundMuted()) {
+							revivingSound.play(
+									settings.getSoundVolume() / 100f * 0.5f);
+						}
 						state = State.ALIVE;
 						blendAnimation.reset(1.0f, FALLING_SPEED);
 						fallAnimation.setAnimation(
@@ -129,14 +125,6 @@ public class TileModel extends ModelInstance implements Observer {
 		} else {
 			return firstRowRevived;
 		}
-	}
-
-	public void hold() {
-		onHold = true;
-	}
-
-	public void release() {
-		onHold = false;
 	}
 
 	public boolean isDead() {

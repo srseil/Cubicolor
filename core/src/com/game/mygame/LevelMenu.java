@@ -17,7 +17,7 @@ public class LevelMenu extends Table {
 	private Table levelOverview;
 	private EnumMap<Difficulty, Table> levelOverviews;
 	private EnumMap<Difficulty, TextButton[]> levelButtons;
-	private DifficultyButtonGroup difficultyButtons;
+	private ButtonGroup<TextButton> difficultyButtons;
 	private TextButton.TextButtonStyle unlockedStyle, completedStyle, lockedStyle, selectStyle;
 	private NinePatchDrawable lockedBackground;
 	private Sound buttonSound;
@@ -56,8 +56,6 @@ public class LevelMenu extends Table {
 		lockedBackground = new NinePatchDrawable(backgroundPatch);
 		lockedStyle.up = lockedBackground;
 		lockedStyle.checked = lockedBackground;
-		//lockedStyle.down = lockedBackground;
-		//lockedStyle.disabled = lockedBackground;
 		lockedStyle.fontColor = Color.CLEAR;
 
 		// Difficulty buttons
@@ -100,7 +98,7 @@ public class LevelMenu extends Table {
 		this.add(levelOverview).padTop(15.0f);
 
 		// Level difficulty buttons
-		difficultyButtons = new DifficultyButtonGroup(this, skin);
+		difficultyButtons = new ButtonGroup<>();
 		difficultyButtons.add(normalButton);
 		difficultyButtons.add(smartButton);
 		difficultyButtons.add(geniusButton);
@@ -120,12 +118,8 @@ public class LevelMenu extends Table {
 		return new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				System.out.println("Starting: " + number + " ("
-						+ game.getSaveState().getSolveState(Difficulty.NORMAL, number) + ")");
-
 				if (!game.getSettings().getSoundMuted())
 					buttonSound.play(game.getSettings().getSoundVolume()/100f);
-				System.out.println(difficultyButtons.getChecked().getLabel().getText());
 				game.openLevel(Difficulty.valueOf(difficultyButtons.getChecked()
 						.getLabel().getText().toString().toUpperCase()), number);
 			}
@@ -151,56 +145,19 @@ public class LevelMenu extends Table {
 	 * Deactivate buttons for locked levels and activate unlocked ones.
 	 */
 	public void updateLevelButtons() {
-		System.out.println(game.getSaveState().getSolveState(Difficulty.SMART, 8));
 		for (Difficulty difficulty : Difficulty.values()) {
 			for (int i = 0; i < 16; i++) {
 				TextButton button = levelButtons.get(difficulty)[i];
 				if (game.getSaveState().isUnlocked(difficulty, i+2)) {
 					button.setTouchable(Touchable.enabled);
 					button.setStyle(completedStyle);
-					//button.setBackground("default-round-down-completed");
 				} else if (game.getSaveState().isUnlocked(difficulty, i+1)) {
 					button.setTouchable(Touchable.enabled);
 					button.setStyle(unlockedStyle);
-					if (i == 1 && difficulty == Difficulty.NORMAL) {
-						System.out.println("ERROR");
-
-					}
 				} else {
 					button.setTouchable(Touchable.disabled);
 					button.setStyle(lockedStyle);
-					button.setBackground(lockedBackground);
-					button.setBackground("menu-background");
-					button.layout();
-					button.pack();
-					if (i == 1 && difficulty == Difficulty.NORMAL) {
-						System.out.println("level " + i + " is locked "
-						+ button.getLabel().getText().toString());
-						System.out.println(button.getBackground().equals(
-								levelButtons.get(difficulty)[i + 1].getBackground()
-						));
-						System.out.println("\nstate = " + button.isChecked() + "\n");
-						System.out.println("\nstate = " + button.isDisabled() + "\n");
-						System.out.println("\nstate = " + button.isOver() + "\n");
-					}
 				}
-				/*
-				if (i == 0) {
-					if (difficulty == Difficulty.NORMAL
-							|) {
-						button.setTouchable(Touchable.enabled);
-						button.setStyle(unlockedStyle);
-					}
-				}
-				if (game.getSaveState().getSolveState(difficulty, i)
-						== SolveState.UNSOLVED) {
-					button.setTouchable(Touchable.disabled);
-					button.setStyle(lockedStyle);
-				} else {
-					button.setTouchable(Touchable.enabled);
-					button.setStyle(unlockedStyle);
-				}
-				*/
 			}
 		}
 	}

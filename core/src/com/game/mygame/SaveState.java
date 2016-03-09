@@ -9,7 +9,6 @@ import com.badlogic.gdx.utils.XmlWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 
 public class SaveState {
 
@@ -18,10 +17,7 @@ public class SaveState {
 
 	public SaveState() {
 		reader = new XmlReader();
-		int n = Gdx.files.internal("levels/"
-				+ Difficulty.NORMAL.toString().toLowerCase()).list().length;
-		System.out.println("levels: " + n);
-		levels = new SolveState[Difficulty.values().length][n];
+		levels = new SolveState[Difficulty.values().length][16];
 	}
 
 	// Loads a save state from disk.
@@ -31,9 +27,6 @@ public class SaveState {
 		XmlReader.Element root = reader.parse(handle);
 
 		try {
-			XmlReader.Element normal = root.getChildByName("normal");
-			XmlReader.Element smart = root.getChildByName("smart");
-			XmlReader.Element genius = root.getChildByName("genius");
 			XmlReader.Element diffElement = null;
 
 			for (int i = 0; i < levels.length; i++) {
@@ -41,7 +34,6 @@ public class SaveState {
 					case 0: diffElement = root.getChildByName("normal"); break;
 					case 1: diffElement = root.getChildByName("smart"); break;
 					case 2: diffElement = root.getChildByName("genius"); break;
-					//default: root.getChildByName("normal");
 				}
 				for (int j = 0; j < levels[i].length; j++) {
 					boolean solved = diffElement.getBoolean(
@@ -50,23 +42,6 @@ public class SaveState {
 						levels[i][j] = SolveState.SOLVED;
 					else
 						levels[i][j] = SolveState.UNSOLVED;
-					/*
-					switch (diffElement.getBoolean(
-							"level" + Integer.toString(i + 1))) {
-					//switch (diffElement.get("level" + Integer.toString(i+1))) {
-						case false:
-							levels[i][j] = SolveState.UNSOLVED;
-							break;
-						case true:
-							levels[i][j] = SolveState.SOLVED;
-							break;
-						case "optimal":
-							levels[i][j] = SolveState.OPTIMAL;
-							break;
-						default:
-							throw new IOException();
-					}
-					*/
 				}
 			}
 		} catch (GdxRuntimeException exception) {
@@ -93,14 +68,6 @@ public class SaveState {
 			for (int j = 0; j < levels[i].length; j++) {
 				xmlWriter.element("level" + Integer.toString(j+1));
 				xmlWriter.text(levels[i][j] == SolveState.SOLVED);
-				/*
-				if (levels[i][j] == SolveState.SOLVED)
-					xmlWriter.text("solved");
-				switch (levels[i][j]) {
-					case UNSOLVED: xmlWriter.text("unsolved"); break;
-					case SOLVED: xmlWriter.text("solved"); break;
-				}
-				*/
 				xmlWriter.pop();
 			}
 			xmlWriter.pop();
@@ -109,24 +76,6 @@ public class SaveState {
 		xmlWriter.close();
 		printWriter.close();
 	}
-
-	/*
-	// Updates the save state with the corresponding completed level.
-	public void update(Difficulty difficulty, int number, boolean optimal) {
-		SolveState state;
-		if (optimal)
-			state = SolveState.OPTIMAL;
-		else
-			state = SolveState.SOLVED;
-
-		switch (difficulty) {
-			case NORMAL: levels[0][number-1] = state;
-			case SMART: levels[1][number-1] = state;
-			case GENIUS: levels[2][number-1] = state;
-			default: levels[0][number-1] = state;
-		}
-	}
-	*/
 
 	// Resets a save state to no completed levels.
 	public void reset() {

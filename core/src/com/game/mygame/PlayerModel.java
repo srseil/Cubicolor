@@ -48,7 +48,6 @@ public class PlayerModel extends ModelInstance
 	private Sound stepSound;
 	private Sound coloringSound;
 	private Sound decoloringSound;
-	private Sound whooshSound;
 	// Private data
 	private State state;
 	private TileColor key;
@@ -68,7 +67,6 @@ public class PlayerModel extends ModelInstance
 		stepSound = game.getSound("Player-Step");
 		coloringSound = game.getSound("Player-Coloring");
 		decoloringSound = game.getSound("Player-Decoloring");
-		whooshSound = game.getSound("Player-Whoosh");
 
 		// Setup move and blend animations.
 		moveAnimation = new AnimationController(this);
@@ -155,7 +153,6 @@ public class PlayerModel extends ModelInstance
 				state = State.INDICATING;
 			}
 		}
-		//whooshSound.play(1.0f);
 	}
 
 	/*
@@ -176,16 +173,6 @@ public class PlayerModel extends ModelInstance
 				coloringSound.play(settings.getSoundVolume()/100f);
 			state = State.COLORING;
 		}
-	}
-
-	/*
-	 * Delay model updates until board has finished setting up.
-	 */
-	private void waitForLastTile() {
-		Timer.schedule(new Timer.Task() {
-			@Override
-			public void run() {System.out.println("yes");}
-		}, lastTile.getReviveDelay() + 0.5f);
 	}
 
 	@Override
@@ -240,7 +227,6 @@ public class PlayerModel extends ModelInstance
 				textureAnimation.reset(false);
 				moveAnimation.setAnimation("Cube|Fall", 1, -FALL_SPEED, this);
 				blendAnimation.reset(0.0f, FALL_SPEED);
-				//System.out.println(lastTile.row + " " + lastTile.column + " " + lastTile.getReviveDelay());
 				Timer.schedule(new Timer.Task() {
 					@Override
 					public void run() {

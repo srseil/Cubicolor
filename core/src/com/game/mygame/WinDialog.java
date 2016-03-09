@@ -14,7 +14,7 @@ public class WinDialog extends Dialog {
 	GameScreen gameScreen;
 	Level level;
 
-	public WinDialog(boolean optimal, Skin skin, Level level, GameScreen gameScreen, MyGame game) {
+	public WinDialog(Skin skin, Level level, GameScreen gameScreen, MyGame game) {
 		super("Completed", skin);
 
 		this.game = game;
@@ -30,17 +30,6 @@ public class WinDialog extends Dialog {
 		Label label = new Label("You completed the level!", skin);
 		label.setColor(Color.BLACK);
 		text(label);
-		//getContentTable().row();
-
-		/*
-		if (optimal) {
-			label = new Label("You found the optimal solution!", skin);
-			label.setColor(Color.BLACK);
-			this.text(label);
-			this.getContentTable().row();
-		} else {
-		}
-		*/
 
 		TextButton tb = new TextButton("Main Menu", skin);
 		tb.addListener(game.createClickListener());
@@ -63,9 +52,7 @@ public class WinDialog extends Dialog {
 	protected void result(Object object) {
 		switch ((String) object) {
 			case "menu":
-				//game.setScreen(game.getMenuScreen());
 				game.toMenuScreen();
-				//gameScreen.resetLevel();
 				break;
 			case "retry":
 				gameScreen.resetLevel();

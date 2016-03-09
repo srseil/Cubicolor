@@ -3,21 +3,15 @@ package com.game.mygame;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 
 import java.io.IOException;
@@ -34,7 +28,6 @@ public class MyGame extends Game {
 	private LevelLoader levelLoader;
 	private SaveState saveState;
 	private MenuScreen menuScreen;
-	private GameScreen gameScreen;
 	// Assets
 	private Model playerModel;
 	private Model tileModel;
@@ -43,18 +36,11 @@ public class MyGame extends Game {
 	private EnumMap<TileColor, Model> lockTileModels;
 	private EnumMap<TileColor, TextureAtlas> playerAnimations;
 	private EnumMap<TileColor, TextureAtlas.AtlasRegion> keyTileTextures;
-	private TextureAtlas.AtlasRegion exitTileTexture;
 	private HashMap<String, TextureAtlas.AtlasRegion> tutorialTextures;
-	private NinePatchDrawable menuBackground;
 	private HashMap<String, Sound> sounds;
 	private Music music;
 	private HashMap<String, BitmapFont> bitmapFonts;
 	private Skin skin;
-	/*
-	// Control attributes
-	private boolean soundMuted;
-	private float soundVolume;
-	*/
 
 	public MyGame() {
 		super();
@@ -110,9 +96,6 @@ public class MyGame extends Game {
 		keyTileTextures.put(TileColor.YELLOW, regions.get(3));
 		keyTileTextures.put(TileColor.NONE, regions.get(4));
 
-		// Exit tile texture
-		exitTileTexture = assetLoader.loadExitTileTexture();
-
 		// Tutorial textures
 		Array<TextureAtlas.AtlasRegion> tutorial =
 				assetLoader.loadTutorialTextures().getRegions();
@@ -138,11 +121,6 @@ public class MyGame extends Game {
 		sounds.put("Tile-Reviving", assetLoader.loadSound("reviving"));
 		sounds.put("Button-Click", assetLoader.loadSound("button_click"));
 		sounds.put("Level-Solve", assetLoader.loadSound("level_solve"));
-		//sounds.put("Player-Whoosh", assetLoader.loadSound("player_whoosh"));
-		/*
-		soundMuted = settings.getSoundMuted();
-		soundVolume = settings.getSoundVolume() / 100.0f;
-		*/
 
 		// Music
 		music = assetLoader.loadMusic("soundtrack");
@@ -153,12 +131,6 @@ public class MyGame extends Game {
 
 		// Skin
 		skin = assetLoader.loadSkin("uiskin");
-
-		/*
-		// Menu background
-		NinePatch patch = skin.get("menu-background", NinePatch.class);
-		menuBackground = new NinePatchDrawable(patch);
-		*/
 	}
 
 	@Override
@@ -170,8 +142,6 @@ public class MyGame extends Game {
 
 		loadAssets();
 
-		// Create single instances of menu and game screen here?
-
 		// Start playing music.
 		music.setLooping(true);
 		if (!settings.getMusicMuted())
@@ -182,17 +152,10 @@ public class MyGame extends Game {
 			saveState.load();
 			menuScreen = new MenuScreen(this);
 			this.setScreen(menuScreen);
-			//saveState.save();
-			//openLevel("normal", 1);
 		} catch (IOException exception) {
 			System.out.println("Error while loading level.");
 			exception.printStackTrace();
 		}
-
-		// For debugging purposes
-		System.out.println("Level 1 solve state: " + saveState.getSolveState(Difficulty.NORMAL, 1));
-		System.out.println("Level 2 solve state: " + saveState.getSolveState(Difficulty.NORMAL, 2));
-		System.out.println("Level 3 solve state: " + saveState.getSolveState(Difficulty.NORMAL, 3));
 	}
 
 	@Override
@@ -225,23 +188,13 @@ public class MyGame extends Game {
 	public void openLevel(Difficulty difficulty, int n) {
 		try {
 			Level level = levelLoader.load(difficulty, n);
-			gameScreen = new GameScreen(level, this);
+			GameScreen gameScreen = new GameScreen(level, this);
 			this.setScreen(gameScreen);
 		} catch (IOException exception) {
 			System.out.println("Error while loading level.");
 			exception.printStackTrace();
 		}
 	}
-
-	/*
-	public void setSoundMuted(boolean muted) {
-		soundMuted = muted;
-	}
-
-	public void setSoundVolume(float volume) {
-		soundVolume = volume;
-	}
-	*/
 
 	public void toMenuScreen() {
 		menuScreen.getLevelMenu().updateLevelButtons();
@@ -264,27 +217,13 @@ public class MyGame extends Game {
 		return settings;
 	}
 
-	// Change screen methods...
-	public void toGameScreen() {
-		this.setScreen(gameScreen);
-	}
-
-	public MenuScreen getMenuScreen() {
-		return menuScreen;
-	}
-	// ---
-
-	// Change to save() and load() or something?
 	public SaveState getSaveState() {
 		return saveState;
 	}
-	// ---
 
-	// Change to start & end methods?
 	public ModelBatch getModelBatch() {
 		return modelBatch;
 	}
-	// ---
 
 	public Model getPlayerModel() {
 		return playerModel;
@@ -314,16 +253,8 @@ public class MyGame extends Game {
 		return keyTileTextures.get(color);
 	}
 
-	public TextureAtlas.AtlasRegion getExitTileTexture() {
-		return exitTileTexture;
-	}
-
 	public TextureRegion getTutorialTexture(String name) {
 		return tutorialTextures.get(name);
-	}
-
-	public NinePatchDrawable getMenuBackground() {
-		return menuBackground;
 	}
 
 	public Sound getSound(String name) {

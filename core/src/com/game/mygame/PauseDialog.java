@@ -1,9 +1,7 @@
 package com.game.mygame;
 
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Align;
@@ -23,7 +21,6 @@ public class PauseDialog extends Dialog {
 		this.setResizable(false);
 		this.setModal(true);
 
-		//this.getContentTable().padBottom(10.0f);
 		this.getTitleLabel().setAlignment(Align.center);
 
 		TextButton menu = new TextButton("Main Menu", skin);
@@ -56,7 +53,6 @@ public class PauseDialog extends Dialog {
 				break;
 			case "menu":
 				game.toMenuScreen();
-				//game.setScreen(game.getMenuScreen());
 		}
 		gameScreen.setPaused(false);
 		gameScreen.setPauseClosed(true);

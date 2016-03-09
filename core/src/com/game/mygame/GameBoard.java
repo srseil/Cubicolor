@@ -46,47 +46,17 @@ public class GameBoard extends Actor {
 		environment.add(directionalLight);
 
 		// Adjust the camera's position and angle for the corresponding level.
-		float correctY = 0.0f;
-		if (exitModel.getRow() == level.getRows() - 1
-				&& exitModel.getColumn() <= level.getRequirementsNumber()) {
-			// Exit tile is in upper row.
-			// Tweak this if some levels are too high/low.
-			correctY = 0.5f * (level.getRequirementsNumber() + 1
-					- exitModel.getColumn() * 1.75f);
-			correctY = Math.max(correctY, 0.0f);
-		} else if (exitModel.getRow() == level.getRows() - 2
-				&& exitModel.getColumn() == 0) {
-			// Exit tile is in second upper row on the far left.
-			correctY = 0.5f * Math.max(0, (level.getRequirementsNumber() - 2));
-		}
 		float viewportHeight = (float) (Math.cos(Math.toRadians(35.0f)) *
 				(Math.sqrt(Math.pow(2 * level.getRows(), 2) +
 						Math.pow(2 * level.getColumns(), 2))) + 1);
 		float viewportWidth = ((float) Gdx.graphics.getWidth())
 				/ Gdx.graphics.getHeight() * viewportHeight;
-
-
-
-		// posX = horizontal width/2 of board in camera angle
-		float posX = (float) (Math.cos(Math.toRadians(20.0f))
-				* Math.sqrt(Math.pow(level.getRows(), 2.0f)
-				+ Math.pow(level.getColumns(), 2.0f)));
-		float r = posX / (float) Math.cos(Math.toRadians(20.0f));
-		float b = (float) Math.sin(Math.toRadians(20.0f)) * posX;
-
-
-
 		camera.setToOrtho(false, viewportWidth, viewportHeight);
 		camera.rotate(-60.0f, 1.0f, 0.0f, 0.0f);
 		camera.rotate(20.0f, 0.0f, 1.0f, 0.0f);
 		camera.near = 1.0f;
 		camera.far = 30.0f;
-		System.out.println("posX: " + posX + ", r: " + r + ", width/2: " + width/2);
-		camera.position.set(width/2, level.getRows() * 1.5f + correctY, 0.0f);
-		//camera.zoom = 1.2f;
-		camera.update();
-
-
+		float correctY = 0.0f;
 		if (exitModel.getRow() == level.getRows() - 1
 				&& exitModel.getColumn() <= level.getRequirementsNumber()) {
 			// Exit tile is in upper row.
@@ -104,7 +74,6 @@ public class GameBoard extends Actor {
 			correctY = 0.5f * Math.max(0, (level.getRequirementsNumber() - 3));
 		}
 		camera.position.set(width/2, 10.0f + correctY*0, -height/2 + 6.6f - correctY);
-		//camera.position.set(posX, 10.0f + correctY*0, -height/2 + 6.6f - correctY);
 		camera.zoom = 1.2f;
 		camera.update();
 
@@ -128,7 +97,7 @@ public class GameBoard extends Actor {
 							game.getExitTileModel(), exitTile,
 							level.getExitRequirements(),
 							j * TileModel.SIZE, -i * TileModel.SIZE,
-							i, j, level, game);
+							i, j, game);
 					exitTile.addObserver(exitModel);
 					continue;
 				} else if (matrix[i][j] instanceof KeyTile) {
@@ -136,18 +105,18 @@ public class GameBoard extends Actor {
 					KeyTile keyTile = (KeyTile) matrix[i][j];
 					model = game.getKeyTileModel();
 					modelMatrix[i][j] = new KeyTileModel(
-							model, keyTile, i, j, level, game);
+							model, keyTile, i, j, game);
 				} else if (matrix[i][j] instanceof LockTile) {
 					// Lock tile model
 					LockTile lockTile = (LockTile) matrix[i][j];
 					model = game.getLockTileModel(lockTile.getLockColor());
 					modelMatrix[i][j] = new TileModel(
-							model, matrix[i][j], i, j, level, game);
+							model, matrix[i][j], i, j, game);
 				} else {
 					// Tile model
 					model = game.getTileModel();
 					modelMatrix[i][j] = new TileModel(
-							model, matrix[i][j], i, j, level, game);
+							model, matrix[i][j], i, j, game);
 				}
 				modelMatrix[i][j].transform.setTranslation(
 						j * TileModel.SIZE, 0.0f,
@@ -191,10 +160,10 @@ public class GameBoard extends Actor {
 
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-		// Batch end, begin necessary?
 		batch.end();
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
 		game.getModelBatch().begin(camera);
 
 		for (int i = 0; i < modelMatrix.length; i++) {
@@ -234,15 +203,12 @@ public class GameBoard extends Actor {
 		exitModel.setup();
 
 		// Delay player setup until board has finished setting up.
-		TileModel startTile =
-				modelMatrix[level.getStartRow()][level.getStartColumn()];
 		Timer.schedule(new Timer.Task() {
 			@Override
 			public void run() {
 				playerModel.setup();
 			}
 		}, lastTile.getReviveDelay() + 0.5f);
-		// Old delay: (modelMatrix.length + 2) * TileModel.ROW_REVIVE_DELAY)
 	}
 
 	public void movePlayerModel(int dx, int dy) {

@@ -1,16 +1,13 @@
 package com.game.mygame;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 
 public class Level {
 
 	// Properties of level file.
 	private Difficulty difficulty;
 	private int number;
-	private int optimal;
 	private int startRow, startColumn;
-	//private EnumSet<TileColor> exitRequirements;
 	private ArrayList<TileColor> exitRequirements;
 
 	public int rows, columns;
@@ -19,12 +16,10 @@ public class Level {
 
 	public Level(Difficulty difficulty, int number, int optimal,
 				 int startRow, int startColumn,
-				 //EnumSet<TileColor> exitRequirements,
 				 ArrayList<TileColor> exitRequirements,
 				 Tile[][] matrix) {
 		this.difficulty = difficulty;
 		this.number = number;
-		this.optimal = optimal;
 		this.startRow = startRow;
 		this.startColumn = startColumn;
 		this.exitRequirements = exitRequirements;
@@ -49,7 +44,6 @@ public class Level {
 	public void reset() {
 		// Reset the exit tile to its default requirements.
 		ArrayList<TileColor> reqs = new ArrayList<>(exitRequirements);
-		//exit.reset(exitRequirements.clone());
 		exit.reset(reqs);
 
 		// Reset individual tiles in matrix.
@@ -97,7 +91,6 @@ public class Level {
 		return exitRequirements.size();
 	}
 
-	//public EnumSet<TileColor> getExitRequirements() {
 	public ArrayList<TileColor> getExitRequirements() {
 		return exitRequirements;
 	}
@@ -108,10 +101,6 @@ public class Level {
 
 	public int getNumber() {
 		return number;
-	}
-
-	public int getOptimalSteps() {
-		return optimal;
 	}
 
 	public Tile[][] getMatrix() {

@@ -1,15 +1,10 @@
 package com.game.mygame;
 
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
-import com.badlogic.gdx.utils.Timer;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 
 public class ExitTileModel extends ModelInstance
 		implements Observer, AnimationController.AnimationListener {
@@ -31,8 +26,6 @@ public class ExitTileModel extends ModelInstance
 	}
 
 	private ExitTile data;
-	private Level level;
-	private Settings settings;
 	private State state;
 	private AnimationController moveAnimation;
 	private BlendAnimation blendAnimation;
@@ -45,29 +38,16 @@ public class ExitTileModel extends ModelInstance
 	private int height;
 	private int livingModels;
 	private boolean onHold;
-	// Sounds
-	private Sound revivingSound;
 
 	public ExitTileModel(Model model, ExitTile data,
 						 ArrayList<TileColor> requirements,
-						 float x, float z, int row, int column,
-						 Level level, MyGame game) {
+						 float x, float z, int row, int column, MyGame game) {
 		super(model);
 		this.data = data;
 		this.x = x;
 		this.z = z;
 		this.row = row;
 		this.column = column;
-		this.level = level;
-		settings = game.getSettings();
-
-		// Set sounds
-		revivingSound = game.getSound("Tile-Reviving");
-
-		// Set texture.
-		TextureAttribute textureAttribute = materials.first().get(
-				TextureAttribute.class, TextureAttribute.Diffuse);
-		//textureAttribute.set(game.getExitTileTexture());
 
 		moveAnimation = new AnimationController(this);
 		moveAnimation.allowSameAnimation = true;
@@ -172,12 +152,6 @@ public class ExitTileModel extends ModelInstance
 			if (state == State.MOVING_UP || state == State.SETUP) {
 				// Model snaps out of board height; spiral up.
 				height = 1;
-				/*
-				if ((row == level.getRows() - 1 || (level.getColumns() - column) <= 2)
-						&& !settings.getSoundMuted()) {
-					revivingSound.play(settings.getSoundVolume() / 100f);
-				}
-				*/
 				moveAnimation.setAnimation(
 						"Cube|Spiral", 1, -SPIRAL_SPEED, this);
 				blendAnimation.reset(1.0f, 1.0f);
@@ -300,13 +274,6 @@ public class ExitTileModel extends ModelInstance
 	public void releaseRequirements() {
 		for (RequirementModel model : requirementModels)
 			model.release();
-	}
-
-	/*
-	 * Check if the model is at the bottom and can be traversed by the player.
-	 */
-	public boolean isTraversable() {
-		return (height == 0 && state == State.STILL);
 	}
 
 	public ArrayList<RequirementModel> getRequirementModels() {

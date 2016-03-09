@@ -1,16 +1,13 @@
 package com.game.mygame;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 
 public class ExitTile extends Tile {
 
 	private int height;
 	private int defaultHeight;
-	//private EnumSet<TileColor> requirements;
 	private ArrayList<TileColor> requirements;
 
-	//public ExitTile(EnumSet<TileColor> requirements) {
 	public ExitTile(ArrayList<TileColor> requirements) {
 		super();
 		this.requirements = requirements;
@@ -38,7 +35,6 @@ public class ExitTile extends Tile {
 	 * Resets the tile to default height and requirements.
 	 * Does not notify observer, because resetting is also calling the models.
 	 */
-	//public void reset(EnumSet<TileColor> requirements) {
 	public void reset(ArrayList<TileColor> requirements) {
 		this.requirements = requirements;
 		height = defaultHeight;

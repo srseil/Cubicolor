@@ -5,15 +5,12 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import java.io.IOException;
@@ -29,30 +26,21 @@ public class GameScreen implements Screen {
 		}
 	}
 
-	//public static final float TUT_RESIZE = 1/
 	private MyGame game;
 	private Settings settings;
 	private Level level;
 	private Player player;
 	private GameBoard gameBoard;
 
-	private Table rootTable;
 	private Stage boardStage;
 	private Stage interfaceStage;
-	private Skin skin;
 	private SpriteBatch spriteBatch;
 
 	private Label fps;
-	private Label levelLabel;
-	private Label difficultyLabel;
-	private Label stepsLabel;
-	private String stepsText;
-	private int steps;
 	private TextureRegion tutorial1;
 
 	private PauseDialog pauseDialog;
 	private WinDialog completeDialogNormal;
-	private WinDialog completeDialogOptimal;
 
 	private Move queuedMove;
 	private boolean paused;
@@ -67,16 +55,15 @@ public class GameScreen implements Screen {
 		spriteBatch = new SpriteBatch();
 		settings = game.getSettings();
 		player = new Player(level);
-		skin = game.getSkin();
+		Skin skin = game.getSkin();
 
 		interfaceStage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 		boardStage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 		gameBoard = new GameBoard(level, player, boardStage.getCamera(), game);
 		boardStage.addActor(gameBoard);
 
-		rootTable = new Table();
+		Table rootTable = new Table();
 		rootTable.setFillParent(true);
-		//rootTable.setDebug(true);
 		interfaceStage.addActor(rootTable);
 
 		// Left and right part of the interface.
@@ -86,12 +73,12 @@ public class GameScreen implements Screen {
 		rootTable.add(rightUI).fillY().right().padRight(15.0f).padBottom(10.0f).width(65.0f);
 
 		// Level number and difficulty labels in top left corner.
-		difficultyLabel = new Label(level.getDifficulty().toString(), skin);
+		Label difficultyLabel = new Label(level.getDifficulty().toString(), skin);
 		difficultyLabel.setStyle(new Label.LabelStyle(
 				game.getBitmapFont("Vollkorn-Regular-58"), Color.BLACK));
 		leftUI.add(difficultyLabel).top().left().padTop(-45.0f);
 		leftUI.row();
-		levelLabel = new Label("Level " + level.getNumber(), skin);
+		Label levelLabel = new Label("Level " + level.getNumber(), skin);
 		levelLabel.setStyle(new Label.LabelStyle(
 				game.getBitmapFont("Vollkorn-Regular-46"), Color.BLACK));
 		leftUI.add(levelLabel).expandY().top().left().padTop(-40.0f);
@@ -102,23 +89,9 @@ public class GameScreen implements Screen {
 		//rightUI.add(fps).expandY().top();
 		rightUI.row();
 
-		// Steps label in the bottom right corner.
-		stepsLabel = new Label("00", skin);
-		stepsLabel.setStyle(new Label.LabelStyle(
-				game.getBitmapFont("OldStandard-Regular-60"), Color.BLACK));
-		//rightUI.add(stepsLabel).expandY().bottom().padBottom(-30.0f);
-		rightUI.row();
-		Label stepsCaption = new Label("steps", skin);
-		stepsCaption.setStyle(new Label.LabelStyle(
-				game.getBitmapFont("OldStandard-Regular-30"), Color.BLACK));
-		//rightUI.add(stepsCaption).bottom();
-
 		// Dialog windows for pausing and completing the level.
 		pauseDialog = new PauseDialog(skin, this, game);
-		completeDialogNormal = new WinDialog(false, skin, level, this, game);
-		completeDialogOptimal = new WinDialog(true, skin, level, this, game);
-
-		steps = player.getSteps();
+		completeDialogNormal = new WinDialog(skin, level, this, game);
 
 		if (level.getDifficulty() == Difficulty.NORMAL) {
 			if (level.getNumber() == 1) {
@@ -155,16 +128,6 @@ public class GameScreen implements Screen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
 		fps.setText("FPS: " + Gdx.graphics.getFramesPerSecond());
-
-		// Update steps variable and label.
-		if (player.getSteps() != steps) {
-			steps = player.getSteps();
-			stepsText = Integer.toString(steps);
-			if (stepsText.length() == 1)
-				stepsLabel.setText("0" + stepsText);
-			else
-				stepsLabel.setText(stepsText);
-		}
 
 		// Process user input and execute game logic.
 		processInput();
@@ -278,12 +241,8 @@ public class GameScreen implements Screen {
 		}
 
 		// Show completion dialog if level is completed.
-		if (!completed && gameBoard.isCompleted()) {
-			if (player.getSteps() <= level.getOptimalSteps())
-				completeLevel(true);
-			else
-				completeLevel(false);
-		}
+		if (!completed && gameBoard.isCompleted())
+			completeLevel();
 	}
 
 	public void resetLevel() {
@@ -293,18 +252,12 @@ public class GameScreen implements Screen {
 		completed = false;
 	}
 
-	public void completeLevel(boolean optimal) {
+	public void completeLevel() {
 		if (!game.getSettings().getSoundMuted()) {
 			game.getSound("Level-Solve").play(
 					game.getSettings().getSoundVolume() / 100.0f);
 		}
 		completed = true;
-		/*
-		if (optimal)
-			completeDialogNormal.show(interfaceStage);
-		else
-			completeDialogOptimal.show(interfaceStage);
-		*/
 		completeDialogNormal.show(interfaceStage);
 		game.getSaveState().setSolved(level.getDifficulty(), level.getNumber());
 
@@ -313,7 +266,6 @@ public class GameScreen implements Screen {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println(game.getSaveState().getSolveState(level.getDifficulty(), level.getNumber()));
 	}
 
 	public void setPaused(boolean paused) {

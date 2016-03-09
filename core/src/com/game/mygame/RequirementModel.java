@@ -101,7 +101,6 @@ public class RequirementModel extends ModelInstance
 
 		switch (state) {
 			case STILL:
-				// Particles?
 				break;
 			case MOVING_DOWN: case MOVING_UP:
 				moveAnimation.update(delta);

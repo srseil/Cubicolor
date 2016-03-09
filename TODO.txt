@@ -46,12 +46,11 @@ Verbesserungen:
 /- Soundeffekte normalisieren
  --> Fertig.
 - Fonts (super sampling, etc. -> siehe BMFont Anleitung)
-- Controller Support? Eher nicht...
 - Credits
 - GameBoard Kamera manchmal zu nah, Model wird abgeschnitten. Zoom?
 - Potentielle Renderprobleme beseitigen (keine Tatsächlichen festgestellt)
 - UI Skalierung? Vielleicht 1x, 1.5x und 2x. Eher nicht...
-- Unnötigen Code entfernen (Schrittzähler, etc.)
+- Windialog ist einmal nicht aufgetaucht; ESC hat aber Button bestätigt.
 
 Sprachen:
 - Englisch
@@ -64,7 +63,10 @@ Release:
 - Vollkorn-Lizenz als Textdatei mitliefern
   http://friedrichalthausen.de/vollkorn-2-1/
   http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL_web
+- Unnötige Assets entfernen
 - Assets Ordner nicht in JAR aufnehmen
+- S-Funktion (setup()) entfernen
+- Musik Lizenz hinzufügen?
 
 libGDX:
 - animationController.inAction immer false?

@@ -5,8 +5,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
@@ -14,9 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.Align;
 
-import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class SettingsMenu extends Table {
 
@@ -24,7 +20,7 @@ public class SettingsMenu extends Table {
 	private final Dialog resetDialog, resolutionDialog;
 	private Stage stage;
 	private Skin skin;
-	private Label.LabelStyle headerStyle, contentStyle;
+	private Label.LabelStyle headerStyle;
 	private Sound buttonSound;
 	// Settings content
 	private String[] resolutions;
@@ -38,8 +34,6 @@ public class SettingsMenu extends Table {
 
 		headerStyle = new Label.LabelStyle(
 				game.getBitmapFont("Vollkorn-Italic-32"), Color.BLACK);
-		contentStyle = new Label.LabelStyle(
-				game.getBitmapFont("Vollkorn-Regular-32"), Color.BLACK);
 
 		String[] res = {"1920x1080", "1680x1050", "1600x900", "1536x864",
 				"1440x900", "1366x768", "1360x768", "1280x1024",
@@ -57,11 +51,7 @@ public class SettingsMenu extends Table {
 		Label l = new Label("You need to restart the game\nto apply the resolution.", skin);
 		l.setColor(Color.BLACK);
 		resolutionDialog.text(l);
-		/*
-		resolutionDialog.text(
-				"You need to restart the game\nto apply the resolution.",
-				contentStyle);
-				*/
+
 		TextButton rdtb = new TextButton("OK", skin);
 		rdtb.addListener(game.createClickListener());
 		resolutionDialog.button(rdtb, null);
@@ -113,15 +103,11 @@ public class SettingsMenu extends Table {
 		createGameSection();
 		createAudioSection();
 		createVideoSection();
-
-		//debug();
 	}
 
 	private void createGameSection() {
 		// Section label
 		Label label = new Label("Game", headerStyle);
-		//label.setStyle(italicStyle);
-		//label.setColor(Color.BLACK);
 		add(label).left().padTop(-18.0f);
 		row();
 
@@ -209,7 +195,6 @@ public class SettingsMenu extends Table {
 				game.getSettings().setMusicVolume((int) musicSlider.getValue());
 				try {
 					game.getSettings().save();
-					System.out.println("Music Volume changed.");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -238,7 +223,6 @@ public class SettingsMenu extends Table {
 				game.getSettings().setSoundVolume((int) soundSlider.getValue());
 				try {
 					game.getSettings().save();
-					System.out.println("Sound Volume changed.");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -325,7 +309,6 @@ public class SettingsMenu extends Table {
 				try {
 					if (!game.getSettings().getSoundMuted())
 						buttonSound.play(game.getSettings().getSoundVolume()/100f);
-					System.out.println("Resolution changed.");
 					String resolution = resolutionDropdown.getSelected();
 					game.getSettings().setResolution(resolution);
 					game.getSettings().save();
@@ -336,6 +319,7 @@ public class SettingsMenu extends Table {
 			}
 		});
 		add(resolutionDropdown).left().padLeft(15.0f);
+
 		// Fullscreen checkbox
 		fullscreen.setChecked(game.getSettings().getFullscreenEnabled());
 		fullscreen.addListener(new ChangeListener() {
@@ -363,20 +347,6 @@ public class SettingsMenu extends Table {
 		fullscreen.getLabel().setColor(Color.BLACK);
 		add(fullscreen).left().padLeft(20.0f).padTop(8.0f);
 		row();
-
-		/*
-		// Brightness and contrast sliders
-		label = new Label("Brightness", skin);
-		label.setColor(Color.BLACK);
-		add(label).left().padLeft(15.0f);
-		label = new Label("Contrast", skin);
-		label.setColor(Color.BLACK);
-		add(label).left().padLeft(20.0f);
-		row();
-		add(new Slider(0.0f, 100.0f, 5.0f, false, skin));
-		add(new Slider(0.0f, 100.0f, 5.0f, false, skin)).padLeft(20.0f);
-		row();
-		*/
 
 		// VSync and colorblind mode checkboxes
 		CheckBox box = new CheckBox("VSync", skin);
@@ -406,7 +376,6 @@ public class SettingsMenu extends Table {
 		add(box).colspan(2).left().padLeft(202.0f);
 		box = new CheckBox("Colorblind Mode", skin);
 		box.getLabel().setColor(Color.BLACK);
-		//add(box).left().padLeft(20.0f);
 	}
 
 }

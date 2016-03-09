@@ -4,12 +4,11 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Align;
 
 public class CreditsMenu extends Table {
 
-	public CreditsMenu(Skin skin, MyGame game) {
+	public CreditsMenu(Skin skin) {
 		super(skin);
 		setBackground("menu-background");
 

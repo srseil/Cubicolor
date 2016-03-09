@@ -8,8 +8,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -18,32 +16,25 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class MenuScreen implements Screen {
 
-	// DISPOSE! -> Documentation
-
-	private final MyGame game;
 	private Stage stage;
 	private OrthographicCamera camera;
-	private Skin skin;
-	private Table rootTable;
 	private Table currentMenu;
 	private final LevelMenu levelMenu;
 	private final ControlsMenu controlsMenu;
 	private Sound buttonSound;
 
 	public MenuScreen(final MyGame game) {
-		this.game = game;
 		stage = new Stage(new ExtendViewport(
 				Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 		camera = (OrthographicCamera) stage.getCamera();
-		skin = game.getSkin();
+		Skin skin = game.getSkin();
 		buttonSound = game.getSound("Button-Click");
 
 		TextButton.TextButtonStyle buttonStyle = skin.get(
 				"select", TextButton.TextButtonStyle.class);
 
-		rootTable = new Table();
+		Table rootTable = new Table();
 		rootTable.setFillParent(true);
-		//rootTable.setDebug(true);
 		stage.addActor(rootTable);
 
 		final Table contentTable = new Table();
@@ -51,7 +42,7 @@ public class MenuScreen implements Screen {
 		levelMenu = new LevelMenu(skin, game);
 		controlsMenu = new ControlsMenu(skin, stage, game);
 		final SettingsMenu settingsMenu = new SettingsMenu(skin, stage, game);
-		final CreditsMenu creditsMenu = new CreditsMenu(skin, game);
+		final CreditsMenu creditsMenu = new CreditsMenu(skin);
 
 		// Quit dialog
 		final Dialog quitDialog = new Dialog("Quit", skin) {
@@ -86,7 +77,6 @@ public class MenuScreen implements Screen {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				if (currentMenu != levelMenu) {
-					System.out.println(game.getSettings().getSoundVolume());
 					if (!game.getSettings().getSoundMuted())
 						buttonSound.play(game.getSettings().getSoundVolume()/100f);
 					levelMenu.updateLevelButtons();
@@ -174,7 +164,6 @@ public class MenuScreen implements Screen {
 				Gdx.graphics.getHeight()).left().padRight(50.0f);
 		rootTable.add(version).expandY().right().bottom().padBottom(2.0f).padRight(5.0f);
 		currentMenu = levelMenu;
-		//stage.addActor(currentMenu);
 
 		ButtonGroup<TextButton> menuButtons = new ButtonGroup<>();
 		menuButtons.add(playButton);
@@ -191,15 +180,11 @@ public class MenuScreen implements Screen {
 	@Override
 	public void show() {
 		camera.setToOrtho(false, 800, 600);
-		//stage.getViewport().setCamera(camera);
-		//camera.update();
 		Gdx.input.setInputProcessor(stage);
 	}
 
 	@Override
 	public void render(float delta) {
-		//camera.update();
-		//Gdx.gl.glClearColor(0.85f, 0.8f, 0.7f, 1);
 		Gdx.gl.glClearColor(0.949f, 0.941f, 0.925f, 1.0f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 

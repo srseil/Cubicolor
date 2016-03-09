@@ -5,14 +5,12 @@ public class Player {
 	private Level level;
 	private TileColor key;
 	private int x, y;
-	private int steps;
 
 	public Player(Level level) {
 		this.level = level;
 		x = level.getStartColumn();
 		y = level.getStartRow();
 		key = TileColor.NONE;
-		steps = 0;
 	}
 
 	/*
@@ -46,7 +44,6 @@ public class Player {
 			level.getMatrix()[this.y][this.x].setDead(true);
 			this.x = newX;
 			this.y = newY;
-			steps++;
 			interact();
 		}
 	}
@@ -57,7 +54,6 @@ public class Player {
 	public void reset() {
 		x = level.getStartColumn();
 		y = level.getStartRow();
-		steps = 0;
 		key = TileColor.NONE;
 	}
 
@@ -80,10 +76,6 @@ public class Player {
 	 */
 	public void fulfillRequirement(TileColor color) {
 		level.fulfillRequirement(color);
-	}
-
-	public int getSteps() {
-		return steps;
 	}
 
 	public TileColor getKey() {

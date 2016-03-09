@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Align;
 
 import java.io.IOException;
 
@@ -20,7 +19,6 @@ public class ControlsMenu extends Table implements InputProcessor {
 
 	private MyGame game;
 	private Stage stage;
-	private Skin skin;
 	private InputProcessor inputProcessor;
 	private Settings settings;
 	private Label.LabelStyle headerStyle, contentStyle;
@@ -32,26 +30,18 @@ public class ControlsMenu extends Table implements InputProcessor {
 		super(skin);
 		this.game = game;
 		this.stage = stage;
-		this.skin = skin;
 		inputProcessor = this;
 		settings = game.getSettings();
 		setBackground("menu-background");
 
 		headerStyle = new Label.LabelStyle(
 				skin.get("default", Label.LabelStyle.class));
-		headerStyle.font = skin.get("default-font", BitmapFont.class);
 		headerStyle.font = game.getBitmapFont("Vollkorn-Italic-32");
 		headerStyle.fontColor = Color.BLACK;
 		contentStyle = new Label.LabelStyle(
 				skin.get("default", Label.LabelStyle.class));
 		contentStyle.font = skin.get("default-font", BitmapFont.class);
 		contentStyle.fontColor = Color.BLACK;
-		/*
-		headerStyle = new Label.LabelStyle(
-				game.getBitmapFont("Vollkorn-Italic-32"), Color.BLACK);
-		contentStyle = new Label.LabelStyle(
-				game.getBitmapFont("Vollkorn-Regular-32"), Color.BLACK);
-				*/
 		buttonStyle = skin.get("select", TextButton.TextButtonStyle.class);
 
 		addMovementSection();
