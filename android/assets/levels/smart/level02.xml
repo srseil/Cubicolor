@@ -4,10 +4,10 @@
 	<start>2,4</start>
 	<requirements>RGBY</requirements>
 	<matrix rows="5" columns="6">
-		<line>NENBNN</line>
-		<line>GNYNrN</line>
-		<line>NNbNNN</line>
-		<line>NNNyNR</line>
+		<line>NENYNN</line>
+		<line>GNBNrN</line>
+		<line>NNyNNN</line>
+		<line>NNNbNR</line>
 		<line>NNgNNN</line>
 	</matrix>
 </level>

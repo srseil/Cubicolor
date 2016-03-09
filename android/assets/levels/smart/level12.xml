@@ -2,10 +2,10 @@
 <level>
 	<difficulty>smart</difficulty>
 	<start>0,6</start>
-	<requirements>RGBYR</requirements>
+	<requirements>RGBYB</requirements>
 	<matrix rows="6" columns="7">
-		<line>rNNNENy</line>
-		<line>NNNRNNN</line>
+		<line>bNNNENy</line>
+		<line>NNNBNNN</line>
 		<line>NNNNGNN</line>
 		<line>BNNNYNR</line>
 		<line>NgNNNNN</line>
