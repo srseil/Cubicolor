@@ -16,7 +16,15 @@ import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.UBJsonReader;
 
-import java.util.HashMap;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class AssetLoader {
 
@@ -123,7 +131,26 @@ public class AssetLoader {
 	public HashMap<String, BitmapFont> loadBitmapFonts() {
 		HashMap<String, BitmapFont> fonts = new HashMap<>();
 		String path = "fonts/";
-		FileHandle[] files = Gdx.files.internal("fonts/").list(".fnt");
+		List<FileHandle> files = new ArrayList<>();
+
+		File jarFile = new File(getClass().getProtectionDomain()
+				.getCodeSource().getLocation().getPath());
+		if (jarFile.isFile()) {
+			try {
+				JarFile jar = new JarFile(jarFile);
+				Enumeration<JarEntry> entries = jar.entries();
+				while (entries.hasMoreElements()) {
+					String name = entries.nextElement().getName();
+					if (name.startsWith(path) && name.endsWith(".fnt"))
+						files.add(new FileHandle(name));
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			Collections.addAll(files, Gdx.files.internal(path).list(".fnt"));
+		}
+
 		BitmapFont font;
 		String name;
 		for (FileHandle fileHandle : files) {
