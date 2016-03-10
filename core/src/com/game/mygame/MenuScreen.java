@@ -69,8 +69,22 @@ public class MenuScreen implements Screen {
 		menuItems.fill();
 		menuItems.space(5.0f);
 
-		// Play button
 		final TextButton playButton = new TextButton("Play", skin);
+		final TextButton controlsButton = new TextButton("Controls", skin);
+		final TextButton settingsButton = new TextButton("Settings", skin);
+		final TextButton creditsButton = new TextButton("Credits", skin);
+
+		ButtonGroup<TextButton> menuButtons = new ButtonGroup<>();
+		menuButtons.add(playButton);
+		menuButtons.add(controlsButton);
+		menuButtons.add(settingsButton);
+		menuButtons.add(creditsButton);
+		menuButtons.setMaxCheckCount(1);
+		menuButtons.setMinCheckCount(1);
+		menuButtons.setUncheckLast(true);
+		menuButtons.setChecked("Credits");
+
+		// Play button
 		playButton.setStyle(buttonStyle);
 		playButton.getLabelCell().width(120.0f);
 		playButton.addListener(new ChangeListener() {
@@ -88,7 +102,6 @@ public class MenuScreen implements Screen {
 		menuItems.addActor(playButton);
 
 		// Controls button
-		final TextButton controlsButton = new TextButton("Controls", skin);
 		controlsButton.setStyle(buttonStyle);
 		controlsButton.setWidth(120.0f);
 		controlsButton.addListener(new ChangeListener() {
@@ -105,7 +118,6 @@ public class MenuScreen implements Screen {
 		menuItems.addActor(controlsButton);
 
 		// Settings button
-		final TextButton settingsButton = new TextButton("Settings", skin);
 		settingsButton.setStyle(buttonStyle);
 		settingsButton.setWidth(120.0f);
 		settingsButton.addListener(new ChangeListener() {
@@ -122,7 +134,6 @@ public class MenuScreen implements Screen {
 		menuItems.addActor(settingsButton);
 
 		// Credits button
-		final TextButton creditsButton = new TextButton("Credits", skin);
 		creditsButton.setStyle(buttonStyle);
 		creditsButton.setWidth(120.0f);
 		creditsButton.addListener(new ChangeListener() {
@@ -158,22 +169,13 @@ public class MenuScreen implements Screen {
 				game.getBitmapFont("Vollkorn-Regular-24"), Color.BLACK));
 
 		contentTable.left();
-		contentTable.add(levelMenu).left();
+		contentTable.add(creditsMenu).left();
 		rootTable.add(menuItems).expand().right().padRight(50.0f);//.padLeft(50.0f);
 		rootTable.add(contentTable).size(0.45f*Gdx.graphics.getWidth(),
 				Gdx.graphics.getHeight()).left().padRight(50.0f);
 		rootTable.add(version).expandY().right().bottom().padBottom(2.0f).padRight(5.0f);
-		currentMenu = levelMenu;
+		currentMenu = creditsMenu;
 
-		ButtonGroup<TextButton> menuButtons = new ButtonGroup<>();
-		menuButtons.add(playButton);
-		menuButtons.add(controlsButton);
-		menuButtons.add(settingsButton);
-		menuButtons.add(creditsButton);
-		menuButtons.setMaxCheckCount(1);
-		menuButtons.setMinCheckCount(1);
-		menuButtons.setUncheckLast(true);
-		menuButtons.setChecked("Play");
 	}
 
 
