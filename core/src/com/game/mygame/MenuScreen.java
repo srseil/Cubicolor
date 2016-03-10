@@ -42,7 +42,7 @@ public class MenuScreen implements Screen {
 		levelMenu = new LevelMenu(skin, game);
 		controlsMenu = new ControlsMenu(skin, stage, game);
 		final SettingsMenu settingsMenu = new SettingsMenu(skin, stage, game);
-		final CreditsMenu creditsMenu = new CreditsMenu(skin);
+		final CreditsMenu creditsMenu = new CreditsMenu(skin, game);
 
 		// Quit dialog
 		final Dialog quitDialog = new Dialog("Quit", skin) {

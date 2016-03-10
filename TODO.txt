@@ -45,8 +45,6 @@ Verbesserungen:
  --> Fertig.
 /- Soundeffekte normalisieren
  --> Fertig.
-- Fonts (super sampling, etc. -> siehe BMFont Anleitung)
-- Credits
 - GameBoard Kamera manchmal zu nah, Model wird abgeschnitten. Zoom?
 - Potentielle Renderprobleme beseitigen (keine Tatsächlichen festgestellt)
 - UI Skalierung? Vielleicht 1x, 1.5x und 2x. Eher nicht...

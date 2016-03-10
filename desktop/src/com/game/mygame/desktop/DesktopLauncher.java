@@ -20,12 +20,12 @@ public class DesktopLauncher {
 		cfg.height = settings.getResolutionHeight();
 		cfg.fullscreen = settings.getFullscreenEnabled();
 		cfg.vSyncEnabled = settings.getVSyncEnabled();
-
+/*
 		TexturePacker.Settings tsettings = new TexturePacker.Settings();
 		tsettings.paddingX = 0;
 		tsettings.paddingY = 0;
-		tsettings.maxHeight = 512;
-		tsettings.maxWidth = 512;
+		tsettings.maxHeight = 1024;
+		tsettings.maxWidth = 1024;
 
 		TexturePacker.processIfModified(tsettings, "/home/stefan/libGDX/MyGame/android/assets/animations/player_red",
 				"/home/stefan/libGDX/MyGame/android/assets/animations/player_red", "player_red");
@@ -50,6 +50,7 @@ public class DesktopLauncher {
 		TexturePacker.processIfModified(tsettings, "/home/stefan/libGDX/MyGame/android/assets/textures/tutorial/",
 				"/home/stefan/libGDX/MyGame/android/assets/textures/tutorial/", "tutorial");
 
+*/
 		new LwjglApplication(myGame, cfg);
 	}
 
