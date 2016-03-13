@@ -1,5 +1,6 @@
 package com.game.mygame.desktop;
 
+import com.badlogic.gdx.Files;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
@@ -15,6 +16,9 @@ public class DesktopLauncher {
 
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "Cubicolor";
+		cfg.addIcon("icons/128.png", Files.FileType.Internal);
+		cfg.addIcon("icons/32.png", Files.FileType.Internal);
+		cfg.addIcon("icons/16.png", Files.FileType.Internal);
 		cfg.samples = 6;
 		cfg.width = settings.getResolutionWidth();
 		cfg.height = settings.getResolutionHeight();
