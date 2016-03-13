@@ -13,6 +13,9 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
+import com.codedisaster.steamworks.SteamAPI;
+import com.codedisaster.steamworks.SteamUserStats;
+import com.codedisaster.steamworks.SteamUserStatsCallback;
 
 import java.io.IOException;
 import java.util.EnumMap;
@@ -41,10 +44,32 @@ public class MyGame extends Game {
 	private Music music;
 	private HashMap<String, BitmapFont> bitmapFonts;
 	private Skin skin;
+	// Steam
+	private boolean steamLoaded;
+	private SteamUserStats steamUserStats;
 
 	public MyGame() {
 		super();
-		// Load settings at construction.
+
+		// Hook into Steam if appropriate.
+		if (SteamAPI.init()) {
+			steamLoaded = true;
+			steamUserStats = new SteamUserStats(new AchievementsCallback());
+			steamUserStats.requestCurrentStats();
+		} else {
+			steamLoaded = false;
+		}
+
+		/*
+		// Remove achievements for debugging purposes.
+		if (isSteamLoaded()) {
+			steamUserStats.clearAchievement("COMPLETE_SMART");
+			steamUserStats.clearAchievement("COMPLETE_GENIUS");
+			steamUserStats.storeStats();
+		}
+		*/
+
+		// Load settings
 		settings = new Settings();
 		try {
 			settings.load();
@@ -161,6 +186,11 @@ public class MyGame extends Game {
 	@Override
 	public void render() {
 		super.render();
+
+		// Get Steam callbacks
+		if (steamLoaded) {
+			SteamAPI.runCallbacks();
+		}
 	}
 
 	@Override
@@ -180,6 +210,9 @@ public class MyGame extends Game {
 			atlas.dispose();
 		for (BitmapFont font : bitmapFonts.values())
 			font.dispose();
+
+		// Steam
+		SteamAPI.shutdown();
 	}
 
 	/*
@@ -271,6 +304,14 @@ public class MyGame extends Game {
 
 	public Skin getSkin() {
 		return skin;
+	}
+
+	public boolean isSteamLoaded() {
+		return steamLoaded;
+	}
+
+	public SteamUserStats getSteamUserStats() {
+		return steamUserStats;
 	}
 
 }

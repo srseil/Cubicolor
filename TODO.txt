@@ -46,8 +46,10 @@ Verbesserungen:
 /- Soundeffekte normalisieren
  --> Fertig.
 - GameBoard Kamera manchmal zu nah, Model wird abgeschnitten. Zoom?
+  s. Genius 16
 - Potentielle Renderprobleme beseitigen (keine Tatsächlichen festgestellt)
 - Windialog ist einmal nicht aufgetaucht; ESC hat aber Button bestätigt.
+- ProGuard?
 
 Sprachen:
 - Englisch

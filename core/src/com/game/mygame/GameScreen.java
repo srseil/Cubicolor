@@ -12,6 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.codedisaster.steamworks.SteamAPI;
+import com.codedisaster.steamworks.SteamAPICall;
 
 import java.io.IOException;
 
@@ -265,6 +267,23 @@ public class GameScreen implements Screen {
 			game.getSaveState().save();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+
+		// Set Achievements if last level of difficulty
+		if (level.getNumber() == 16 && game.isSteamLoaded()) {
+			switch (level.getDifficulty()) {
+				case NORMAL:
+					game.getSteamUserStats().setAchievement("COMPLETE_NORMAL");
+					game.getSteamUserStats().storeStats();
+					break;
+				case SMART:
+					game.getSteamUserStats().setAchievement("COMPLETE_SMART");
+					game.getSteamUserStats().storeStats();
+					break;
+				case GENIUS:
+					game.getSteamUserStats().setAchievement("COMPLETE_GENIUS");
+					game.getSteamUserStats().storeStats();
+			}
 		}
 	}
 
