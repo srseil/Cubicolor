@@ -1,8 +1,8 @@
 <?xml version="1.1" encoding="UTF-8"?>
 <savestate>
 	<normal>
-		<level1>true</level1>
-		<level2>true</level2>
+		<level1>false</level1>
+		<level2>false</level2>
 		<level3>false</level3>
 		<level4>false</level4>
 		<level5>false</level5>
@@ -19,14 +19,14 @@
 		<level16>false</level16>
 	</normal>
 	<smart>
-		<level1>true</level1>
-		<level2>true</level2>
-		<level3>true</level3>
-		<level4>true</level4>
-		<level5>true</level5>
-		<level6>true</level6>
-		<level7>true</level7>
-		<level8>true</level8>
+		<level1>false</level1>
+		<level2>false</level2>
+		<level3>false</level3>
+		<level4>false</level4>
+		<level5>false</level5>
+		<level6>false</level6>
+		<level7>false</level7>
+		<level8>false</level8>
 		<level9>false</level9>
 		<level10>false</level10>
 		<level11>false</level11>
@@ -37,14 +37,14 @@
 		<level16>false</level16>
 	</smart>
 	<genius>
-		<level1>true</level1>
-		<level2>true</level2>
-		<level3>true</level3>
-		<level4>true</level4>
-		<level5>true</level5>
-		<level6>true</level6>
-		<level7>true</level7>
-		<level8>true</level8>
+		<level1>false</level1>
+		<level2>false</level2>
+		<level3>false</level3>
+		<level4>false</level4>
+		<level5>false</level5>
+		<level6>false</level6>
+		<level7>false</level7>
+		<level8>false</level8>
 		<level9>false</level9>
 		<level10>false</level10>
 		<level11>false</level11>
@@ -55,4 +55,3 @@
 		<level16>false</level16>
 	</genius>
 </savestate>
-
