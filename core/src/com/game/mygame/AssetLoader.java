@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.ProtectionDomain;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -107,12 +108,6 @@ public class AssetLoader {
 		return new TextureAtlas(Gdx.files.internal(path));
 	}
 
-	public TextureAtlas.AtlasRegion loadExitTileTexture() {
-		String path = "textures/exittile/exittile.atlas";
-		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(path));
-		return atlas.getRegions().first();
-	}
-
 	public TextureAtlas loadTutorialTextures() {
 		String path = "textures/tutorial/tutorial.atlas";
 		return new TextureAtlas(Gdx.files.internal(path));
@@ -133,9 +128,11 @@ public class AssetLoader {
 		String path = "fonts/";
 		List<FileHandle> files = new ArrayList<>();
 
+		/*
 		File jarFile = new File(getClass().getProtectionDomain()
 				.getCodeSource().getLocation().getPath());
 		if (jarFile.isFile()) {
+			System.out.println("We are in a JAR file.");
 			try {
 				JarFile jar = new JarFile(jarFile);
 				Enumeration<JarEntry> entries = jar.entries();
@@ -148,8 +145,18 @@ public class AssetLoader {
 				e.printStackTrace();
 			}
 		} else {
+			System.out.println("We are not in a JAR file.");
+			System.out.println("isDirectory: " + jarFile.isDirectory());
 			Collections.addAll(files, Gdx.files.internal(path).list(".fnt"));
 		}
+		*/
+
+		files.add(Gdx.files.internal(path + "Vollkorn-Italic-32.fnt"));
+		files.add(Gdx.files.internal(path + "Vollkorn-Regular-16.fnt"));
+		files.add(Gdx.files.internal(path + "Vollkorn-Regular-24.fnt"));
+		files.add(Gdx.files.internal(path + "Vollkorn-Regular-32.fnt"));
+		files.add(Gdx.files.internal(path + "Vollkorn-Regular-46.fnt"));
+		files.add(Gdx.files.internal(path + "Vollkorn-Regular-58.fnt"));
 
 		BitmapFont font;
 		String name;
