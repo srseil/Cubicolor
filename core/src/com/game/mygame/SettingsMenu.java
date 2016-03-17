@@ -88,8 +88,8 @@ public class SettingsMenu extends Table {
 		};
 		resetDialog.getTitleLabel().setAlignment(Align.center);
 		Label resetLabel =
-				new Label("This will reset all your level progress and lock\n" +
-			"all the levels you have unlocked to far!", skin);
+				new Label("This will reset your level progress and relock\n" +
+			"all the levels you have unlocked so far!", skin);
 		resetLabel.setColor(Color.BLACK);
 		resetDialog.text(resetLabel);
 		tb = new TextButton("Reset", skin);
