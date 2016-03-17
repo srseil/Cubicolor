@@ -24,6 +24,9 @@ public class DesktopLauncher {
 		cfg.height = settings.getResolutionHeight();
 		cfg.fullscreen = settings.getFullscreenEnabled();
 		cfg.vSyncEnabled = settings.getVSyncEnabled();
+
+		System.setProperty("org.lwjgl.opengl.Display.allowSoftwareOpenGL", "true");
+
 /*
 		TexturePacker.Settings tsettings = new TexturePacker.Settings();
 		tsettings.paddingX = 0;
