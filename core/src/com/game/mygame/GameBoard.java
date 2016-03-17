@@ -54,8 +54,8 @@ public class GameBoard extends Actor {
 		camera.setToOrtho(false, viewportWidth, viewportHeight);
 		camera.rotate(-60.0f, 1.0f, 0.0f, 0.0f);
 		camera.rotate(20.0f, 0.0f, 1.0f, 0.0f);
-		camera.near = 1.0f;
-		camera.far = 30.0f;
+		camera.near = 0.2f;
+		camera.far = 20.0f;
 		float correctY = 0.0f;
 		if (exitModel.getRow() == level.getRows() - 1
 				&& exitModel.getColumn() <= level.getRequirementsNumber()) {
