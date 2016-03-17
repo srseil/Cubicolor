@@ -45,27 +45,11 @@ Verbesserungen:
  --> Fertig.
 /- Soundeffekte normalisieren
  --> Fertig.
-- GameBoard Kamera manchmal zu nah, Model wird abgeschnitten. Zoom?
-  s. Genius 16
-- Potentielle Renderprobleme beseitigen (keine Tatsächlichen festgestellt)
-- Windialog ist einmal nicht aufgetaucht; ESC hat aber Button bestätigt.
 - ProGuard?
 
-Sprachen:
-- Englisch
-- Deutsch
-- Französisch
-- Spanisch
-- Italienisch
-
 Release:
-- Vollkorn-Lizenz als Textdatei mitliefern
-  http://friedrichalthausen.de/vollkorn-2-1/
-  http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL_web
-- Unnötige Assets entfernen
-- Assets Ordner nicht in JAR aufnehmen
 - S-Funktion (setup()) entfernen
-- Musik Lizenz hinzufügen?
+- config, savestates und TODO.txt aus JAR entfernen
 
 libGDX:
 - animationController.inAction immer false?
