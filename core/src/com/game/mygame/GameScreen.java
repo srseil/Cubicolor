@@ -185,10 +185,12 @@ public class GameScreen implements Screen {
 			return;
 		}
 
+		/*
 		// DEBUGGING: Re-setup level
 		if (Gdx.input.isKeyJustPressed(Input.Keys.S))
 			game.openLevel(level.getDifficulty(), level.getNumber());
 		// DEBUGGING ---------------
+		*/
 
 		// Only process in-game input if game is (still) running.
 		if (!paused && !completed) {
