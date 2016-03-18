@@ -4,11 +4,11 @@
 	<start>6,6</start>
 	<requirements>RGBYRG</requirements>
 	<matrix rows="7" columns="7">
-		<line>YNNNNNN</line>
-		<line>NNNygNN</line>
-		<line>NNbNNNG</line>
+		<line>BNNNNNN</line>
+		<line>NNNbgNN</line>
+		<line>NNyNNNG</line>
 		<line>NRNNNNr</line>
-		<line>NNNNNBN</line>
+		<line>NNNNNYN</line>
 		<line>ENNrgNN</line>
 		<line>NGNNNRN</line>
 	</matrix>

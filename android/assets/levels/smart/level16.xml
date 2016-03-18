@@ -2,15 +2,15 @@
 <level>
 	<difficulty>smart</difficulty>
 	<start>3,6</start>
-	<requirements>RGBYRG</requirements>
+	<requirements>RGBYRB</requirements>
 	<matrix rows="7" columns="7">
-		<line>NYNNNNg</line>
+		<line>NYNNNNb</line>
 		<line>rNNNrNN</line>
-		<line>NNNGNRN</line>
+		<line>NNNBNRN</line>
 		<line>ENNNNNN</line>
-		<line>NNNyNbN</line>
-		<line>NRNNgNN</line>
-		<line>NNGNNNB</line>
+		<line>NNNyNgN</line>
+		<line>NRNNbNN</line>
+		<line>NNBNNNG</line>
 	</matrix>
 </level>
 

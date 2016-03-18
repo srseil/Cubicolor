@@ -4,11 +4,11 @@
 	<start>0,3</start>
 	<requirements>RGB</requirements>
 	<matrix rows="5" columns="6">
-		<line>NNNgNN</line>
-		<line>NGNNNE</line>
-		<line>NNNNRN</line>
+		<line>NNNrNN</line>
+		<line>NRNNNE</line>
+		<line>NNNNGN</line>
 		<line>NNbNNN</line>
-		<line>BNNNNr</line>
+		<line>BNNNNg</line>
 	</matrix>
 </level>
 
