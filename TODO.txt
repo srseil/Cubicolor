@@ -45,7 +45,6 @@ Verbesserungen:
  --> Fertig.
 /- Soundeffekte normalisieren
  --> Fertig.
-- ProGuard?
 
 Release:
 - S-Funktion (setup()) entfernen
@@ -69,4 +68,5 @@ Lektionen:
   definiert und konfiguriert. Das ist sehr unübersichtlich.
 - Am Anfang Gedanken über UI- und Ingame-Skalierung machen. Freetype-Schriften
   helfen hier. Derzeit ist die Oberfläche für alle Auflösungen gleich groß.
+- Nächstes mal Proguard ausprobieren, um Dateivolumen klein zu halten.
 

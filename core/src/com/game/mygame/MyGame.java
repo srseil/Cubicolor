@@ -60,14 +60,13 @@ public class MyGame extends Game {
 			steamLoaded = false;
 		}
 
-		/*
 		// Remove achievements for debugging purposes.
 		if (isSteamLoaded()) {
+			steamUserStats.clearAchievement("COMPLETE_NORMAL");
 			steamUserStats.clearAchievement("COMPLETE_SMART");
 			steamUserStats.clearAchievement("COMPLETE_GENIUS");
 			steamUserStats.storeStats();
 		}
-		*/
 
 		// Load settings
 		settings = new Settings();
@@ -169,6 +168,7 @@ public class MyGame extends Game {
 
 		// Start playing music.
 		music.setLooping(true);
+		music.setVolume(settings.getMusicVolume());
 		if (!settings.getMusicMuted())
 			music.play();
 
