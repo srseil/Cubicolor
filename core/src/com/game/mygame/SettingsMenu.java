@@ -153,6 +153,26 @@ public class SettingsMenu extends Table {
 		hide.getLabelCell().padLeft(5.0f);
 		hide.getLabel().setColor(Color.BLACK);
 		add(hide).left().padLeft(20.0f).padTop(10.0f);
+		row();
+
+		// Dark Background checkbox
+		final CheckBox dark = new CheckBox("Dark Background", skin);
+		dark.setChecked(game.getSettings().getDarkBackground());
+		dark.addListener(game.createClickListener());
+		dark.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				game.getSettings().setDarkBackground(dark.isChecked());
+				try {
+					game.getSettings().save();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		dark.getLabelCell().padLeft(5.0f);
+		dark.getLabel().setColor(Color.BLACK);
+		add(dark).colspan(2).left().padLeft(15.0f).padTop(10.0f);
 
 		row();
 	}

@@ -108,8 +108,13 @@ public class AssetLoader {
 		return new TextureAtlas(Gdx.files.internal(path));
 	}
 
-	public TextureAtlas loadTutorialTextures() {
-		String path = "textures/tutorial/tutorial.atlas";
+	public TextureAtlas loadTutorialTexturesLight() {
+		String path = "textures/tutorial/light/tutorial.atlas";
+		return new TextureAtlas(Gdx.files.internal(path));
+	}
+
+	public TextureAtlas loadTutorialTexturesDark() {
+		String path = "textures/tutorial/dark/tutorial.atlas";
 		return new TextureAtlas(Gdx.files.internal(path));
 	}
 

@@ -3,6 +3,8 @@ package com.game.mygame;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -40,6 +42,7 @@ public class GameScreen implements Screen {
 
 	private Label fps;
 	private TextureRegion tutorial1;
+	private Color background;
 
 	private PauseDialog pauseDialog;
 	private WinDialog completeDialogNormal;
@@ -76,13 +79,9 @@ public class GameScreen implements Screen {
 
 		// Level number and difficulty labels in top left corner.
 		Label difficultyLabel = new Label(level.getDifficulty().toString(), skin);
-		difficultyLabel.setStyle(new Label.LabelStyle(
-				game.getBitmapFont("Vollkorn-Regular-58"), Color.BLACK));
 		leftUI.add(difficultyLabel).top().left().padTop(-45.0f);
 		leftUI.row();
 		Label levelLabel = new Label("Level " + level.getNumber(), skin);
-		levelLabel.setStyle(new Label.LabelStyle(
-				game.getBitmapFont("Vollkorn-Regular-46"), Color.BLACK));
 		leftUI.add(levelLabel).expandY().top().left().padTop(-40.0f);
 
 		// FPS counter in the top right corner.
@@ -95,22 +94,23 @@ public class GameScreen implements Screen {
 		pauseDialog = new PauseDialog(skin, this, game);
 		completeDialogNormal = new WinDialog(skin, level, this, game);
 
+		// Tutorial textures and labels.
+		Label message = null;
 		if (level.getDifficulty() == Difficulty.NORMAL) {
 			if (level.getNumber() == 1) {
-				tutorial1 = game.getTutorialTexture(settings.getResolution());
+				if (settings.getDarkBackground())
+					tutorial1 = game.getTutorialTextureDark(settings.getResolution());
+				else
+					tutorial1 = game.getTutorialTextureLight(settings.getResolution());
 			} else if (level.getNumber() == 2) {
 				String button = Input.Keys.toString(settings.getRestartButton());
-				Label message = new Label("You can restart the level by pressing "
+				message = new Label("You can restart the level by pressing "
 								+ button + ".", skin);
-				message.setStyle(new Label.LabelStyle(
-						game.getBitmapFont("Vollkorn-Regular-32"), Color.BLACK));
 				leftUI.row();
 				leftUI.add(message).left().bottom();
 			} else if (level.getNumber() == 3) {
-				Label message = new Label("The order in which you match the "
+				message = new Label("The order in which you match the "
 						+ "different colors is irrelevant.", skin);
-				message.setStyle(new Label.LabelStyle(
-						game.getBitmapFont("Vollkorn-Regular-32"), Color.BLACK));
 				leftUI.row();
 				leftUI.add(message).left().bottom();
 			}
@@ -120,12 +120,51 @@ public class GameScreen implements Screen {
 			rightUI.setVisible(false);
 			leftUI.setVisible(false);
 		}
+
+		if (settings.getDarkBackground()) {
+			background = new Color(0.224f, 0.224f, 0.224f, 1.0f);
+			difficultyLabel.setStyle(new Label.LabelStyle(
+					game.getBitmapFont("Vollkorn-Regular-58"), new Color(0.949f, 0.941f, 0.925f, 1.0f)));
+			levelLabel.setStyle(new Label.LabelStyle(
+					game.getBitmapFont("Vollkorn-Regular-46"), new Color(0.949f, 0.941f, 0.925f, 1.0f)));
+			if (message != null) {
+				message.setStyle(new Label.LabelStyle(
+							game.getBitmapFont("Vollkorn-Regular-32"), Color.WHITE));
+			}
+		} else {
+			background = new Color(0.949f, 0.941f, 0.925f, 1.0f);
+			difficultyLabel.setStyle(new Label.LabelStyle(
+					game.getBitmapFont("Vollkorn-Regular-58"), Color.BLACK));
+			levelLabel.setStyle(new Label.LabelStyle(
+					game.getBitmapFont("Vollkorn-Regular-46"), Color.BLACK));
+			if (message != null) {
+				message.setStyle(new Label.LabelStyle(
+							game.getBitmapFont("Vollkorn-Regular-32"), Color.BLACK));
+			}
+		}
 	}
+
+	private boolean isButtonPressed(int keyCode) {
+		return Gdx.input.isKeyJustPressed(keyCode);
+	}
+
+	/*
+	// Poll keyboard and controllers for press on button indicated by keyCode
+	private boolean isButtonPressed(int keyCode) {
+		if (Gdx.input.isKeyJustPressed(keyCode))
+			return true;
+		for (Controller controller : Controllers.getControllers()) {
+			if (controller.getButton(keyCode - 1000))
+				return true;
+		}
+		return false;
+	}
+	*/
 
 	// The render() method is being used as a hook into the game loop.
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(0.949f, 0.941f, 0.925f, 1.0f);
+		Gdx.gl.glClearColor(background.r, background.g, background.b, background.a);
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
@@ -195,7 +234,7 @@ public class GameScreen implements Screen {
 		// Only process in-game input if game is (still) running.
 		if (!paused && !completed) {
 			// Escape to open pause menu.
-			if (Gdx.input.isKeyJustPressed(settings.getPauseButton())) {
+			if (isButtonPressed(settings.getPauseButton())) {
 				paused = true;
 				pauseDialog.show(interfaceStage);
 				return;
@@ -238,7 +277,7 @@ public class GameScreen implements Screen {
 				} else if (Gdx.input.isKeyJustPressed(settings.getLeftButton())) {
 					player.move(-1, 0);
 					gameBoard.movePlayerModel(-1, 0);
-				} else if (Gdx.input.isKeyJustPressed(settings.getRestartButton())) {
+				} else if (isButtonPressed(settings.getRestartButton())) {
 					resetLevel();
 				}
 			}

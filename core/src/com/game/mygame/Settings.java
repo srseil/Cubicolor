@@ -14,7 +14,7 @@ public class Settings {
 	private XmlReader reader;
 	private String path;
 	// Settings values
-	private boolean uiHidden;
+	private boolean darkBackground, uiHidden;
 	private boolean musicMuted, soundMuted;
 	private int musicVolume, soundVolume;
 	private String resolution;
@@ -37,6 +37,7 @@ public class Settings {
 		try {
 			// Game settings
 			root = root.getChildByName("settings");
+			darkBackground = root.getBoolean("dark-background");
 			uiHidden = root.getBoolean("ui-hidden");
 			musicMuted = root.getBoolean("music-muted");
 			musicVolume = Integer.parseInt(root.get("music-volume"));
@@ -74,6 +75,7 @@ public class Settings {
 
 		// Game settings
 		xmlWriter.element("settings");
+		xmlWriter.element("dark-background", darkBackground);
 		xmlWriter.element("ui-hidden", uiHidden);
 		xmlWriter.element("music-muted", musicMuted);
 		xmlWriter.element("music-volume", musicVolume);
@@ -96,6 +98,10 @@ public class Settings {
 		xmlWriter.pop();
 		xmlWriter.close();
 		printWriter.close();
+	}
+
+	public void setDarkBackground(boolean dark) {
+		darkBackground = dark;
 	}
 
 	public void setUIHidden(boolean hidden) {
@@ -130,7 +136,7 @@ public class Settings {
 		this.vSync = vSync;
 	}
 
-	public void setForwardsButtons(int forwards) {
+	public void setForwardsButton(int forwards) {
 		this.forwards = forwards;
 	}
 
@@ -155,6 +161,10 @@ public class Settings {
 	}
 
 	// Getters:
+
+	public boolean getDarkBackground() {
+		return darkBackground;
+	}
 
 	public boolean getUIHidden() {
 		return uiHidden;

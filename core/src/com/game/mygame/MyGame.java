@@ -39,7 +39,7 @@ public class MyGame extends Game {
 	private EnumMap<TileColor, Model> lockTileModels;
 	private EnumMap<TileColor, TextureAtlas> playerAnimations;
 	private EnumMap<TileColor, TextureAtlas.AtlasRegion> keyTileTextures;
-	private HashMap<String, TextureAtlas.AtlasRegion> tutorialTextures;
+	private HashMap<String, TextureAtlas.AtlasRegion> tutorialTexturesLight, tutorialTexturesDark;
 	private HashMap<String, Sound> sounds;
 	private Music music;
 	private HashMap<String, BitmapFont> bitmapFonts;
@@ -120,22 +120,39 @@ public class MyGame extends Game {
 		keyTileTextures.put(TileColor.YELLOW, regions.get(3));
 		keyTileTextures.put(TileColor.NONE, regions.get(4));
 
-		// Tutorial textures
-		Array<TextureAtlas.AtlasRegion> tutorial =
-				assetLoader.loadTutorialTextures().getRegions();
-		tutorialTextures = new HashMap<>();
-		tutorialTextures.put("1600x900",  tutorial.get(0));
-		tutorialTextures.put("1920x1080", tutorial.get(1));
-		tutorialTextures.put("1536x864",  tutorial.get(2));
-		tutorialTextures.put("1680x1050", tutorial.get(3));
-		tutorialTextures.put("1280x1024", tutorial.get(4));
-		tutorialTextures.put("1440x900",  tutorial.get(5));
-		tutorialTextures.put("1024x768",  tutorial.get(6));
-		tutorialTextures.put("1280x720",  tutorial.get(7));
-		tutorialTextures.put("800x600",   tutorial.get(8));
-		tutorialTextures.put("1360x768",  tutorial.get(9));
-		tutorialTextures.put("1366x768",  tutorial.get(10));
-		tutorialTextures.put("1280x800",  tutorial.get(11));
+		// Light tutorial textures
+		Array<TextureAtlas.AtlasRegion> tutorialLight =
+				assetLoader.loadTutorialTexturesLight().getRegions();
+		tutorialTexturesLight = new HashMap<>();
+		tutorialTexturesLight.put("1600x900",  tutorialLight.get(0));
+		tutorialTexturesLight.put("1920x1080", tutorialLight.get(1));
+		tutorialTexturesLight.put("1536x864",  tutorialLight.get(2));
+		tutorialTexturesLight.put("1680x1050", tutorialLight.get(3));
+		tutorialTexturesLight.put("1280x1024", tutorialLight.get(4));
+		tutorialTexturesLight.put("1440x900",  tutorialLight.get(5));
+		tutorialTexturesLight.put("1024x768",  tutorialLight.get(6));
+		tutorialTexturesLight.put("1280x720",  tutorialLight.get(7));
+		tutorialTexturesLight.put("800x600",   tutorialLight.get(8));
+		tutorialTexturesLight.put("1360x768",  tutorialLight.get(9));
+		tutorialTexturesLight.put("1366x768",  tutorialLight.get(10));
+		tutorialTexturesLight.put("1280x800",  tutorialLight.get(11));
+
+		// Dark tutorial textures
+		Array<TextureAtlas.AtlasRegion> tutorialDark =
+				assetLoader.loadTutorialTexturesDark().getRegions();
+		tutorialTexturesDark = new HashMap<>();
+		tutorialTexturesDark.put("1600x900",  tutorialDark.get(0));
+		tutorialTexturesDark.put("1920x1080", tutorialDark.get(1));
+		tutorialTexturesDark.put("1536x864",  tutorialDark.get(2));
+		tutorialTexturesDark.put("1680x1050", tutorialDark.get(3));
+		tutorialTexturesDark.put("1280x1024", tutorialDark.get(4));
+		tutorialTexturesDark.put("1440x900",  tutorialDark.get(5));
+		tutorialTexturesDark.put("1024x768",  tutorialDark.get(6));
+		tutorialTexturesDark.put("1280x720",  tutorialDark.get(7));
+		tutorialTexturesDark.put("800x600",   tutorialDark.get(8));
+		tutorialTexturesDark.put("1360x768",  tutorialDark.get(9));
+		tutorialTexturesDark.put("1366x768",  tutorialDark.get(10));
+		tutorialTexturesDark.put("1280x800",  tutorialDark.get(11));
 
 		// Sounds
 		sounds = new HashMap<>();
@@ -286,8 +303,12 @@ public class MyGame extends Game {
 		return keyTileTextures.get(color);
 	}
 
-	public TextureRegion getTutorialTexture(String name) {
-		return tutorialTextures.get(name);
+	public TextureRegion getTutorialTextureLight(String name) {
+		return tutorialTexturesLight.get(name);
+	}
+
+	public TextureRegion getTutorialTextureDark(String name) {
+		return tutorialTexturesDark.get(name);
 	}
 
 	public Sound getSound(String name) {
