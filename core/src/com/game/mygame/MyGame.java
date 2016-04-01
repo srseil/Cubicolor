@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 public class MyGame extends Game {
 
-	public static final String GAME_VERSION = "v1.0";
+	public static final String GAME_VERSION = "v1.1";
 
 	private Settings settings;
 	private ModelBatch modelBatch;
