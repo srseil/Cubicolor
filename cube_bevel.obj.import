@@ -1,0 +1,20 @@
+[remap]
+
+importer="wavefront_obj"
+type="Mesh"
+path="res://.import/cube_bevel.obj-ae618640bd23151a36b80f9440df6702.mesh"
+
+[deps]
+
+files=[ "res://.import/cube_bevel.obj-ae618640bd23151a36b80f9440df6702.mesh" ]
+
+source_file="res://cube_bevel.obj"
+source_md5="ef77b48dd49806cc59e04c473d9aaa96"
+
+dest_files=[ "res://.import/cube_bevel.obj-ae618640bd23151a36b80f9440df6702.mesh", "res://.import/cube_bevel.obj-ae618640bd23151a36b80f9440df6702.mesh" ]
+dest_md5="fc44ec2d5cc9ba7312316eb37cbfafce"
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3( 1, 1, 1 )

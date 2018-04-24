@@ -1,0 +1,6 @@
+Animation player: signal animation_finished is emitted BEFORE the call function key frame at the very end of the animation
+
+0.0 - 1.0
+at 1.0: call function bla()
+finish signal function end()
+end() is called before bla()

@@ -1,0 +1,59 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://level.gd" type="Script" id=1]
+[ext_resource path="res://player.tscn" type="PackedScene" id=2]
+
+[node name="level" type="Node"]
+
+script = ExtResource( 1 )
+
+[node name="camera" type="Camera" parent="." index="0"]
+
+transform = Transform( 0.837653, -0.383997, 0.388436, -0.00554013, 0.705149, 0.709038, -0.546174, -0.59608, 0.588543, 4.16881, 3.80344, 4.71671 )
+keep_aspect = 1
+cull_mask = 1048575
+environment = null
+h_offset = 0.0
+v_offset = 0.0
+doppler_tracking = 0
+projection = 0
+current = false
+fov = 70.0
+size = 1.0
+near = 0.05
+far = 100.0
+_sections_unfolded = [ "Transform" ]
+
+[node name="player" parent="." index="1" instance=ExtResource( 2 )]
+
+[node name="tiles" type="Node" parent="." index="2"]
+
+[node name="DirectionalLight" type="DirectionalLight" parent="." index="3"]
+
+transform = Transform( 0.931716, 0, 0.363187, -0.10436, 0.957827, 0.267724, -0.34787, -0.287345, 0.892423, 1.49832, 2.19579, 4.62347 )
+layers = 1
+light_color = Color( 1, 1, 1, 1 )
+light_energy = 1.0
+light_indirect_energy = 1.0
+light_negative = false
+light_specular = 0.5
+light_bake_mode = 1
+light_cull_mask = -1
+shadow_enabled = false
+shadow_color = Color( 0, 0, 0, 1 )
+shadow_bias = 0.1
+shadow_contact = 0.0
+shadow_reverse_cull_face = false
+editor_only = false
+directional_shadow_mode = 2
+directional_shadow_split_1 = 0.1
+directional_shadow_split_2 = 0.2
+directional_shadow_split_3 = 0.5
+directional_shadow_blend_splits = false
+directional_shadow_normal_bias = 0.8
+directional_shadow_bias_split_scale = 0.25
+directional_shadow_depth_range = 0
+directional_shadow_max_distance = 200.0
+_sections_unfolded = [ "Light" ]
+
+
