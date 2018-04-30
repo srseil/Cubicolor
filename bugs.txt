@@ -4,3 +4,46 @@ Animation player: signal animation_finished is emitted BEFORE the call function 
 at 1.0: call function bla()
 finish signal function end()
 end() is called before bla()
+
+---
+
+AnimationPlayer.queue(), apparently only the last animation in the queue fires the animation_finished signal. So imagine queue of A -> B -> C, only C will emit signal
+
+---
+
+Array.invert() only returns Nil????
+
+---
+
+GUI: Margins do not seem to work when parent container is a PanelContainer?
+
+---
+
+When a script has been changed in the editor and I edit it in VIM, save it and focus back on the editor, a prompt appears that asks me if I want to reload or whatever because the file has been changed. If you start the game before clicking on any of the options, then click on one of the options while the game is running, the editor will lock up even after you close the game again. you have to kill the editor afterwards
+
+
+RENDERING ARTIFACTS:
+player cube has visible seams from triangles, even without texture (i tested it without texture too)
+msaa not as good as it should be
+
+
+IMPROVEMENTS:
+- When opening a file dialog, let me start typing right away and highlight the first matched file so that I can hit enter to load it or whatever
+- When instancing a scene in the editor into another scene and forgetting to highlight a node as a parent, just use the root node as parent and dont give me a fucking "no parent node selected"
+- Sometimes the properties of objects changed by an animation are persistently modified in the editor when editing the animation. this leads to the fact that sometimes there is suddenly a rotation for an object just because i edited a rotating animation and MAYBE didnt set the time marker to the beginning. There should be a way to revert every animation change once the animation editor is closed or so
+- Also it would be nice if the properties changed by an animation were resetted once the animation finishes, so that the object is in the same state as it was when it started. Maybe make this configurable if not everyone likes it that way.
+- In the animation editor, when moving keyframes on the timeline, clamp their position to the beginning and end of the animation as specified below. Right now the frame disappears from the mouse pointer when you move it beyond the 0 point and you can also drag it past the end of the animation. Would be good if it stopped at these points so that you can quickly move frames to the start or end of the animation.
+- Right now you can only keyframe the whole color proerty in a material for an animation. it would be better if you could pick the different color channels (or at least the ALPHA channel!!!) individually, so that one can make e.g. an animation that blends the mesh in and out REGARDLESS of which material it actually uses (as long as it supports transparency). now this is not possible because you are always keyframing the whole color, you would have to be able to only change the color or alpha channel based on a REFERENCE to a material.
+- AT LEAST in Color picker, when highlighting a channel field for keyboard input, highlight the number or text inside so that I can immediately override the value
+- Also in the Color picker, when it is opened the field at the bottom is highlighted, but when you type you dont actually type anything in the field. The focus does not work.
+- GUI: Checkbox theme, the content margin for the different styleboxes should INCLUDE the icon. Right now, only the text is moved around. But for the gap between text and icon there is already the H separation property.
+- GUI: Add possibility for querying video modes supported by monitor, just like in GLFW
+- GUI: Gamepad control does not work in OptionButton dropdown menu. You can expand the menu, but then you cannot select any of the items.
+- GUI: There should be a proper padding solution. The margins sometimes do not work (like apparently when using a PanelContainer) and only deal in absolute values from the parent container's origin. A padding could define a distance relative to the previous node in the parent container or the other ones around it. It could simply be a hidden extra container that a node is put into, and the padding values could define this containers Min Size property and margin of itself inside that. Would not even be hard to implement probably.
+- GUI: Anchor is weird and I don't fully understand it. I think it means where the anchor for the object is with regards to the container it is located in, but why the four int values? why not just a combobox or something like that. The current UX for this is very confusing.
+- ProjectSettings: There is now way to find out what the actual path name for a setting is. For the default ones available, you can chase the tree on the left down to the setting and then use the lowercase version of the name with spaces replaced with underscores. This works. But when adding new settings yourself and not sticking to this convention, you have no indication of what the variable name of the setting is. The name or path should be displayed somewhere.
+- InputMap: You can change the mappings during runtime, but you cannot save them in an easy way after you have done that. You have to implement this yourself by e.g. creating config settings for the respective mappings or saving them in a separate file and loading them on startup. The engine needs to store the mappings anyway though, at least once you export the game. So why not make it possible to persistently save the mappings from code?
+- ProjecSettings: When adding a new property in the top bar, you can hit enter to add it after typing in the name. This is cool because you can quickly add multiple settings after another. But once you hit enter, the text field is filled with the name of the currently highlighted property, so you have to remove the text everytime again. The text should simply be highlighted.
+- Inspector and others: Sometimes (see theme editor) there is very little space to display files as properties in the inspector, but too much space to display the name of the property itself. The available space should be used more efficiently, so that I can simply increase the size of the inspector window and the file names of the resources are displayed completely.
+- FileSystem Panel: Make shortcuts like Ctrl-D for duplicating possible like they are in the Scene panel.
+- GUI: PopupMenu has attributes for hiding the menu when clicking on some specific things. I don't really understand what those mean exactly, but you don't seem to be able to turn off that the menu disappears when you click on some empty area in the panel.

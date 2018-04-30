@@ -1,0 +1,18 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/coloring.ogg-bb6231d21488ca442c24085710dc5b4e.oggstr"
+
+[deps]
+
+source_file="res://sounds/coloring.ogg"
+source_md5="205bd9024163897aefc6e0e911aacada"
+
+dest_files=[ "res://.import/coloring.ogg-bb6231d21488ca442c24085710dc5b4e.oggstr" ]
+dest_md5="aa93c0046fb23a29c3d6b9ed6c97a5d5"
+
+[params]
+
+loop=true
+loop_offset=0

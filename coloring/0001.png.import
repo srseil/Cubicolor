@@ -8,10 +8,10 @@ path.etc2="res://.import/0001.png-7f6395504171b48df42fa7805d154474.etc2.stex"
 [deps]
 
 source_file="res://coloring/0001.png"
-source_md5="9e669dc313896f98052d0bb4ae744df9"
+source_md5="a680de5a293d9c1443509016a278f2e4"
 
 dest_files=[ "res://.import/0001.png-7f6395504171b48df42fa7805d154474.s3tc.stex", "res://.import/0001.png-7f6395504171b48df42fa7805d154474.etc2.stex" ]
-dest_md5="91382118fd6004bd4a668ac970a62b83"
+dest_md5="9757bbe951feaf402bb8dcc409d86f3d"
 
 [params]
 

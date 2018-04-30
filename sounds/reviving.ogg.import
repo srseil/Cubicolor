@@ -1,0 +1,18 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/reviving.ogg-7cdde016e972e105304ad596fe01a963.oggstr"
+
+[deps]
+
+source_file="res://sounds/reviving.ogg"
+source_md5="6baef23c4d33bc78e7d59bd7fb55ef7a"
+
+dest_files=[ "res://.import/reviving.ogg-7cdde016e972e105304ad596fe01a963.oggstr" ]
+dest_md5="3de5b641d94a648f31e3dbb7bb928085"
+
+[params]
+
+loop=true
+loop_offset=0

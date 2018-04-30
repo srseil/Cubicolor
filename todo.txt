@@ -1,0 +1,20 @@
+Licht und Materialien anpassen
+ExitTile Textur
+
+Tutorial
+
+Soundeffekte im Spiel
+Soundeffekte im Menü
+Musik
+Lautstärke an Dezibel anpassen
+
+Level-Bugs fuxen
+Levelfortschritt
+
+(Texturen für Checkbox)
+
+Steam-Integration
+
+OPTIONAL:
+Pausemenü direkt ins Playmenü, möglichst der gleichen bzw. nächsten Schwierigkeit
+

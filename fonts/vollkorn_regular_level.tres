@@ -1,0 +1,16 @@
+[gd_resource type="DynamicFont" load_steps=2 format=2]
+
+[sub_resource type="DynamicFontData" id=1]
+
+font_path = "res://fonts/Vollkorn-Regular.ttf"
+
+[resource]
+
+size = 32
+use_mipmaps = false
+use_filter = false
+extra_spacing_top = -3
+extra_spacing_bottom = -3
+font_data = SubResource( 1 )
+_sections_unfolded = [ "Extra Spacing", "Font", "Settings" ]
+
