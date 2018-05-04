@@ -161,7 +161,9 @@ func build_level(diff, number):
 	reset_grid()
 
 	var hide_ui = ProjectSettings.get_setting("application/config/hide_ui")
-	if not hide_ui and diff == global.NORMAL and number == 2:
+	if not hide_ui and diff == global.NORMAL and number == 1:
+		$canvas/tutorial_first.visible = true
+	elif not hide_ui and diff == global.NORMAL and number == 2:
 		$canvas/tutorial1.visible = true
 	elif not hide_ui and diff == global.NORMAL and number == 3:
 		$canvas/tutorial2.visible = true
@@ -287,6 +289,10 @@ func load_level(difficulty, number):
 		requirements[i].requirements = requirements
 		requirements[i].exit = $exit_tile
 
+
+	$exit_tile.get_node("mesh").set_surface_material(0,
+		load("res://materials/exit_tile.tres").duplicate())
+	$exit_tile.get_node("mesh").get_surface_material(0).albedo_color.a = 0
 	$exit_tile.requirements = requirements
 	$exit_tile.level = self
 			
@@ -328,24 +334,40 @@ func load_level(difficulty, number):
 			FLOOR:
 				material_name = "tile_white"
 				tile.color = CUBICOLOR_WHITE
-			KEY_RED, LOCK_RED:
+			KEY_RED:
+				material_name = "keytile_red"
+				tile.color = CUBICOLOR_RED
+			LOCK_RED:
 				material_name = "tile_red"
 				tile.color = CUBICOLOR_RED
-			KEY_GREEN, LOCK_GREEN:
-				print("green")
+			KEY_GREEN:
+				material_name = "keytile_green"
+				tile.color = CUBICOLOR_GREEN
+			LOCK_GREEN:
 				material_name = "tile_green"
 				tile.color = CUBICOLOR_GREEN
-			KEY_BLUE, LOCK_BLUE:
+			KEY_BLUE:
+				material_name = "keytile_blue"
+				tile.color = CUBICOLOR_BLUE
+			LOCK_BLUE:
 				material_name = "tile_blue"
 				tile.color = CUBICOLOR_BLUE
-			KEY_YELLOW, LOCK_YELLOW:
+			KEY_YELLOW:
+				material_name = "keytile_yellow"
+				tile.color = CUBICOLOR_YELLOW
+			LOCK_YELLOW:
 				material_name = "tile_yellow"
 				tile.color = CUBICOLOR_YELLOW
 		if material_name != null:
 			tile.get_node("mesh").set_surface_material(0,
 				load("res://materials/" + material_name + ".tres").duplicate())
 
-		tile.get_node("mesh").get_surface_material(0).albedo_color.a = 0
+		if [KEY_RED, KEY_GREEN, KEY_BLUE, KEY_YELLOW].has(id):
+			tile.get_node("mesh").get_surface_material(0).set_shader_param(
+				"albedo", Color(0, 0, 0, 0))
+			pass
+		else:
+			tile.get_node("mesh").get_surface_material(0).albedo_color.a = 0
 			
 
 

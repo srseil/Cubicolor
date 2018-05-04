@@ -1,13 +1,11 @@
-Licht und Materialien anpassen
-ExitTile Textur
 
-Tutorial
+Licht und Materialien anpassen
+
 Kamera anpassen (Stapel)
+
 Übergänge der Animationen kubischer machen
 
-Level-Bugs fuxen
-
-Helle Versionen von Schriften im Level wegen Dark Background
+Level-Bugs fixen
 
 Steam-Integration
 

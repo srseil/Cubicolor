@@ -52,3 +52,4 @@ IMPROVEMENTS:
 - WorldEnvironment clear color doesn't override default settings from ProjectSettings, seems only possible when doing it through the environment property in the camera itself
 - GUI: PopupMenu anchors are being reset to 0 when hiding the element in the scene tree
 - GUI: Whats the point of a CenterContainer when it doesn't center the children when it changes its size? And why use it anyways when you can set the anchors in the children?
+- The animation system is so fucked up. why does the fuckin state of the currently edited animation carry over to the game? you constantly have to reset it to the first frame or so because otherwise the model will be fucked up. so fuckin stupid.

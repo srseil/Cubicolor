@@ -154,7 +154,7 @@ proximity_fade_enable = false
 distance_fade_enable = false
 _sections_unfolded = [ "Albedo", "Emission", "Metallic", "Roughness" ]
 
-[node name="level" type="Node" index="0"]
+[node name="level" type="Node"]
 
 script = ExtResource( 1 )
 
@@ -288,14 +288,14 @@ _sections_unfolded = [ "Anchor", "Rect", "Size Flags", "Theme" ]
 
 editor/display_folded = true
 visible = false
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -70.0
-margin_top = -88.0
-margin_right = 70.0
-margin_bottom = 87.0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 330.0
+margin_top = 212.0
+margin_right = 470.0
+margin_bottom = 387.0
 rect_min_size = Vector2( 140, 175 )
 rect_pivot_offset = Vector2( 0, 0 )
 rect_clip_content = false
@@ -427,14 +427,14 @@ _sections_unfolded = [ "Rect" ]
 
 editor/display_folded = true
 visible = false
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -70.0
-margin_top = -88.0
-margin_right = 70.0
-margin_bottom = 87.0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 330.0
+margin_top = 212.0
+margin_right = 470.0
+margin_bottom = 387.0
 rect_min_size = Vector2( 140, 175 )
 rect_pivot_offset = Vector2( 0, 0 )
 rect_clip_content = false
@@ -565,14 +565,14 @@ _sections_unfolded = [ "Rect" ]
 
 editor/display_folded = true
 visible = false
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -70.0
-margin_top = -65.0
-margin_right = 70.0
-margin_bottom = 65.0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 330.0
+margin_top = 235.0
+margin_right = 470.0
+margin_bottom = 365.0
 rect_min_size = Vector2( 140, 130 )
 rect_pivot_offset = Vector2( 0, 0 )
 rect_clip_content = false
@@ -676,6 +676,8 @@ _sections_unfolded = [ "Rect" ]
 
 [node name="tutorial_first" type="Container" parent="canvas" index="5"]
 
+editor/display_folded = true
+visible = false
 anchor_left = 0.0
 anchor_top = 0.0
 anchor_right = 1.0
