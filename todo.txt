@@ -2,19 +2,15 @@ Licht und Materialien anpassen
 ExitTile Textur
 
 Tutorial
-
-Soundeffekte im Spiel
-Soundeffekte im Menü
-Musik
-Lautstärke an Dezibel anpassen
+Kamera anpassen (Stapel)
+Übergänge der Animationen kubischer machen
 
 Level-Bugs fuxen
-Levelfortschritt
 
-(Texturen für Checkbox)
+Helle Versionen von Schriften im Level wegen Dark Background
 
 Steam-Integration
 
 OPTIONAL:
-Pausemenü direkt ins Playmenü, möglichst der gleichen bzw. nächsten Schwierigkeit
+Complete-Menü bessern
 

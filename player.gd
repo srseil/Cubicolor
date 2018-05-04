@@ -11,17 +11,22 @@ const CUBICOLOR_WHITE      = Color("#fcfaf6")
 const CUBICOLOR_BLACK      = Color("#2d2d2d")
 const CUBICOLOR_BACKGROUND = Color("#f3f1ed")
 
+var level_loaded = false
+
 var level
+var exit
 var pos = Vector2()
 var color
 var movable
 var fall_ready = false
+var paused = false
+var completed = false
 
 
 func _ready():
 	color = CUBICOLOR_BLACK
 	movable = false
-	$anim_player.play(get_anim("fall_down"))
+	$mesh_position/mesh.get_surface_material(0).set_shader_param("albedo", Color(0, 0, 0, 0))
 
 func tile_on_grid(x, y):
 	# change this to what we had with the C version
@@ -30,7 +35,6 @@ func tile_on_grid(x, y):
 	else:
 		return level.grid[y * level.cols + x]
 
-var paused = false
 
 func _process(delta):
 	if Input.is_action_just_pressed("quit"):
@@ -38,7 +42,6 @@ func _process(delta):
 
 	if Input.is_action_just_pressed("key_pause") \
 			or Input.is_action_just_pressed("pad_pause"):
-		print("pause bitch")
 		if not paused:
 			level.pause()
 			paused = true
@@ -50,42 +53,43 @@ func _process(delta):
 	if $anim_player.is_playing() or not movable or paused:
 		return
 
-	if Input.is_action_just_pressed("key_up") \
-			or Input.is_action_just_pressed("pad_up"):
+	if Input.is_action_just_pressed("key_forwards") \
+			or Input.is_action_just_pressed("pad_forwards"):
 		var tile = tile_on_grid(pos.x, pos.y - 1)
-		if tile == null or not tile.alive:
-			$anim_player.play("hint_up")
-		else:
+		if tile != null and tile.alive:
 			$anim_player.play("move_up")
-	elif Input.is_action_just_pressed("key_down") \
-			or Input.is_action_just_pressed("pad_down"):
+		elif tile != exit:
+			$anim_player.play("hint_up")
+	elif Input.is_action_just_pressed("key_backwards") \
+			or Input.is_action_just_pressed("pad_backwards"):
 		var tile = tile_on_grid(pos.x, pos.y + 1)
-		if tile == null or not tile.alive:
-			$anim_player.play("hint_down")
-		else:
+		if tile != null and tile.alive:
 			$anim_player.play("move_down")
+		elif tile != exit:
+			$anim_player.play("hint_down")
 	elif Input.is_action_just_pressed("key_right") \
 			or Input.is_action_just_pressed("pad_right"):
 		var tile = tile_on_grid(pos.x + 1, pos.y)
-		if tile == null or not tile.alive:
-			$anim_player.play("hint_right")
-		else:
+		if tile != null and tile.alive:
 			$anim_player.play("move_right")
+		elif tile != exit:
+			$anim_player.play("hint_right")
 	elif Input.is_action_just_pressed("key_left") \
 			or Input.is_action_just_pressed("pad_left"):
 		var tile = tile_on_grid(pos.x - 1, pos.y)
-		if tile == null or not tile.alive:
-			$anim_player.play("hint_left")
-		else:
+		if tile != null and tile.alive:
 			$anim_player.play("move_left")
-	elif Input.is_action_just_pressed("key_reset") \
-			or Input.is_action_just_pressed("pad_reset"):
+		elif tile != exit:
+			$anim_player.play("hint_left")
+	elif Input.is_action_just_pressed("key_restart") \
+			or Input.is_action_just_pressed("pad_restart"):
 		reset()
 
 func reset():
 	$anim_player.play(get_anim("fall_up"))
 	movable = false
 	level.reset()
+	level.reset_grid()
 
 func anim_finished(name):
 	# with new godot version, use $anim_player.get_playing_speed to check for backwards
@@ -96,8 +100,10 @@ func anim_finished(name):
 			.set_shader_param("albedo", tile.color)
 		color = tile.color
 		$anim_player.play("color")
+		level.get_node("coloring_sound").play()
 
 	if name.begins_with("move"):
+		level.get_node("move_sound").play()
 		tile.get_node("anim_player").play(tile.get_anim("die"))
 		tile.alive = false
 		move(name)
@@ -147,16 +153,42 @@ func react():
 	if tile.type == KEY_TILE:
 		if color != CUBICOLOR_BLACK and color != tile.color:
 			$anim_player.play_backwards("color")
+			level.get_node("decoloring_sound").play()
 		elif color == CUBICOLOR_BLACK:
 			color = tile.color
 			$mesh_position/mesh.get_surface_material(0) \
 				.set_shader_param("albedo", tile.color)
 			$anim_player.play("color")
+			level.get_node("coloring_sound").play()
 	elif tile.type == LOCK_TILE:
 		if tile.color == color:
 			$anim_player.play_backwards("color")
+			level.get_node("decoloring_sound").play()
 			color = CUBICOLOR_BLACK
 			level.remove_requirement(tile.color)
+	elif tile == exit:
+		print("WINWINWINWINWINWINWINWIN")
+		# change the progress
+		var dir
+		match level.diff:
+			global.NORMAL: dir = "application/config/normal_progress"
+			global.SMART: dir = "application/config/smart_progress"
+			global.GENIUS: dir = "application/config/genius_progress"
+		var progress = ProjectSettings.get_setting(dir)
+		print("number: " + str(level.number))
+		print("progress: " + str(progress))
+		if level.number <= progress:
+			level.completed()
+			return
+		ProjectSettings.set_setting(dir, progress + 1)
+		if progress + 1 == 16 and level.diff != global.GENIUS:
+			match level.diff + 1:
+				global.SMART: dir = "application/config/smart_progress"
+				global.GENIUS: dir = "application/config/genius_progress"
+			if ProjectSettings.get_setting(dir) < 0:
+				ProjectSettings.set_setting(dir, 0)
+		ProjectSettings.save()
+		level.completed()
 
 func move_anim_offset(reverse, axis):
 	if reverse:

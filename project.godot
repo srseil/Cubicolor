@@ -11,7 +11,7 @@ config_version=3
 [application]
 
 config/name="Cubicolor"
-run/main_scene="res://level.tscn"
+run/main_scene="res://game.tscn"
 config/icon="res://icon.png"
 config/dark_background=false
 config/hide_ui=false
@@ -21,7 +21,7 @@ config/key_left=16777231
 config/key_right=16777233
 config/key_restart=16777220
 config/key_pause=16777217
-config/normal_progress=15
+config/normal_progress=16
 config/smart_progress=0
 config/genius_progress=-1
 
@@ -29,8 +29,8 @@ config/genius_progress=-1
 
 music_muted=true
 sound_muted=false
-music_volume=0.31
-sound_volume=0.83
+music_volume=1.0
+sound_volume=1.0
 
 [autoload]
 

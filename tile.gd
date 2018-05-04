@@ -4,11 +4,15 @@ export(int, "NOTHING", "NORMAL", "KEY_TILE", "LOCK_TILE") var type
 export(Color) var color
 export(bool) var alive
 
+var revive_sound
 
+func _ready():
+	revive_sound = get_node("/root/game/level/revive_sound")
 
 func anim_finished(name):
 	if name.begins_with("revive"):
 		alive = true
+		revive_sound.play()
 	#elif name.begins_with("die"):
 	#	alive = false
 

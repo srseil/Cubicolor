@@ -713,7 +713,7 @@ _sections_unfolded = [ "Transform", "Visibility" ]
 [node name="anim_player" type="AnimationPlayer" parent="." index="0"]
 
 root_node = NodePath("..")
-autoplay = "fall_down_red"
+autoplay = ""
 playback_process_mode = 1
 playback_default_blend_time = 0.0
 playback_speed = 1.0

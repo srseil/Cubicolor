@@ -7,10 +7,10 @@ path="res://.import/checkbox_checked.png-7a3c11ad7d07de2d2e66a6eb7eca103b.stex"
 [deps]
 
 source_file="res://checkbox_checked.png"
-source_md5="80cfc004b410a3ce6c714b482cc962ac"
+source_md5="408e4c59a9230f29a3f243495c5c3a23"
 
 dest_files=[ "res://.import/checkbox_checked.png-7a3c11ad7d07de2d2e66a6eb7eca103b.stex" ]
-dest_md5="ac2a8774a903e529dab7e02507b8bdcf"
+dest_md5="430e2d6c2ffc5d64e8d90c24bbab79eb"
 
 [params]
 

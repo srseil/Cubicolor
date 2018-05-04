@@ -20,12 +20,15 @@ const CUBICOLOR_BLACK      = Color("#2d2d2d")
 #const CUBICOLOR_BACKGROUND = Color(243, 241, 237, 255)
 const CUBICOLOR_BACKGROUND = Color("#f3f1ed")
 
+var game
+
 var grid = []
 var rows
 var cols
 var start = Vector2()
 #var exit
 var requirements = []
+var exit_node
 
 var diff = SMART
 var number = 10
@@ -55,13 +58,49 @@ func reload():
 		child.queue_free()
 	grid.clear()
 	requirements.clear()
-	_ready()
+	build_level(diff, number)
 	print(requirements.size())
 
-
 func _ready():
-	#$player.set_process(false)
-	build_level(NORMAL, 1)
+	$player.set_process(false)
+	set_process(false)
+
+	$canvas/CenterContainer.rect_min_size = get_viewport().size
+	$canvas/CenterContainer.rect_size = get_viewport().size
+	print($canvas/CenterContainer.rect_size)
+	$canvas/CenterContainer.minimum_size_changed()
+
+	var sound_volume = ProjectSettings.get_setting("audio/sound_volume")
+	$button_sound.set_volume_db((1 - sound_volume) * -30)
+	$coloring_sound.set_volume_db((1 - sound_volume) * -30)
+	$decoloring_sound.set_volume_db((1 - sound_volume) * -30)
+	$solve_sound.set_volume_db((1 - sound_volume) * -30)
+	$move_sound.set_volume_db((1 - sound_volume) * -30)
+	$revive_sound.set_volume_db((1 - sound_volume) * -30)
+
+	add_button_sound(self)
+	var dark = ProjectSettings.get_setting("application/config/dark_background")
+	if dark:
+		print("DARK")
+		$environment.environment.background_color = \
+			Color(0.224, 0.224, 0.224, 1.0)
+	else:
+		print("BRIGHT")
+		$environment.environment.background_color = Color("#f2f0ed")
+	
+	var hide_ui = ProjectSettings.get_setting("application/config/hide_ui")
+	if hide_ui:
+		$canvas/difficulty.hide()
+		$canvas/level.hide()
+	
+	#$canvas/CenterContainer.rect_size = get_viewport().size
+	print(get_viewport().size)
+
+func add_button_sound(base):
+	for node in base.get_children():
+		add_button_sound(node)
+	if base is Button or base is CheckBox:
+		base.connect("pressed", $button_sound, "play", [])
 
 func build_level(diff, number):
 	self.diff = diff
@@ -77,6 +116,7 @@ func build_level(diff, number):
 	$player.translate(Vector3(start.x, 0, start.y))
 	$player.pos = start
 	$player.level = self
+	$player.exit = exit_node
 
 	$camera.translation = Vector3(0, 0, 0)
 	$camera.rotation = Vector3(0, 0, 0)
@@ -90,6 +130,8 @@ func build_level(diff, number):
 	# when requirement staple is very high, maybe go further back??
 
 	$camera.size = rows + 2 + 0.25
+	if $camera.size < 6:
+		$camera.size = 6
 
 
 	# position might actually be important???
@@ -97,6 +139,16 @@ func build_level(diff, number):
 	#print($directional_light.transform)
 
 	$exit_tile.get_node("anim_player").play("revive")
+	reset_grid()
+
+	var hide_ui = ProjectSettings.get_setting("application/config/hide_ui")
+	if not hide_ui and diff == global.NORMAL and number == 2:
+		$canvas/tutorial1.visible = true
+	elif not hide_ui and diff == global.NORMAL and number == 3:
+		$canvas/tutorial2.visible = true
+
+	set_process(true)
+	$player.set_process(true)
 
 
 func remove_requirement(color):
@@ -111,16 +163,27 @@ func remove_requirement(color):
 	if req == null:
 		return
 	req.get_node("anim_player").play(req.get_anim("blend_out"))
+	
+	for r in requirements:
+		if r.alive and r != req:
+			print("still alive")
+			return
+	exit_node.type = global.FLOOR
+	exit_node.alive = true
 
 func reset():
 	for req in requirements:
 		req.reset()
 	$exit_tile.reset()
-	reset_grid()
+	exit_node.type = global.NOTHING
+	exit_node.alive = false
+	#reset_grid()
+
 
 func reset_grid():
 	var wait_time = 0
 	for tile in grid:
+		print(str(tile.alive) + " " + str(tile.type))
 		if tile.type != global.NOTHING and not tile.alive:
 			var timer = Timer.new()
 			tile.add_child(timer)
@@ -230,10 +293,12 @@ func load_level(difficulty, number):
 				$exit_tile.translate(v)
 				for req in requirements:
 					req.translate(v)
+				exit_node = tile
 			continue
 
 		match id:
-			FLOOR: tile.type = global.NORMAL
+			FLOOR:
+				tile.type = global.FLOOR
 			KEY_RED, KEY_GREEN, KEY_BLUE, KEY_YELLOW:
 				tile.type = global.KEY_TILE
 			LOCK_RED, LOCK_GREEN, LOCK_BLUE, LOCK_YELLOW:
@@ -261,8 +326,14 @@ func load_level(difficulty, number):
 			tile.get_node("mesh").set_surface_material(0,
 				load("res://materials/" + material_name + ".tres").duplicate())
 
+		tile.get_node("mesh").get_surface_material(0).albedo_color.a = 0
+			
+
 
 	file.close()
+
+func complete_next_pressed():
+	game.switch_level(diff, number + 1)
 
 func pause_resume_pressed():
 	$canvas/CenterContainer/pause_menu.hide()
@@ -270,13 +341,26 @@ func pause_resume_pressed():
 
 func pause_restart_pressed():
 	$canvas/CenterContainer/pause_menu.hide()
+	$canvas/CenterContainer/complete_menu.hide()
+	$canvas/CenterContainer/complete_menu_alt.hide()
 	$player.paused = false
 	$player.reset()
 
 func pause_menu_pressed():
 	$canvas/CenterContainer/pause_menu.hide()
-	get_tree().change_scene("res://menu.tscn")
+	#get_tree().change_scene("res://menu.tscn")
+	game.close_level()
 
 func pause():
 	$canvas/CenterContainer/pause_menu.popup()
+
+func completed():
+	$solve_sound.play()
+	#$player.completed = true # not working, popup auto closes on esc
+	$player.paused = true
+	if number == 16:
+		$canvas/CenterContainer/complete_menu_alt.popup()
+	else:
+		$canvas/CenterContainer/complete_menu.popup()
+
 

@@ -588,7 +588,7 @@ tracks/1/keys = {
 script = ExtResource( 1 )
 type = 0
 color = null
-alive = true
+alive = false
 
 [node name="mesh" type="MeshInstance" parent="." index="0"]
 

@@ -10,9 +10,9 @@ source_file="res://sounds/button_click.ogg"
 source_md5="0bdadb9dac23a35050b41b75e65c1ff6"
 
 dest_files=[ "res://.import/button_click.ogg-a528f97517e0ffbf469a9833e414f225.oggstr" ]
-dest_md5="414fe890c55c79abecbc54ad33c7c0fd"
+dest_md5="a8a96940b2c9dda2817bd65893abc2ea"
 
 [params]
 
-loop=true
+loop=false
 loop_offset=0

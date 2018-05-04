@@ -10,9 +10,9 @@ source_file="res://sounds/coloring.ogg"
 source_md5="205bd9024163897aefc6e0e911aacada"
 
 dest_files=[ "res://.import/coloring.ogg-bb6231d21488ca442c24085710dc5b4e.oggstr" ]
-dest_md5="aa93c0046fb23a29c3d6b9ed6c97a5d5"
+dest_md5="df22e200066c6fcc1cd40035ce106247"
 
 [params]
 
-loop=true
+loop=false
 loop_offset=0

@@ -1,7 +1,7 @@
 extends Node
 
 # Tile type
-enum {NOTHING, NORMAL, KEY_TILE, LOCK_TILE}
+enum {NOTHING, FLOOR, KEY_TILE, LOCK_TILE}
 # Tile and player color
 enum {NONE, RED, GREEN, BLUE, YELLOW}
 

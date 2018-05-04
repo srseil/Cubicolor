@@ -11,10 +11,12 @@ var font
 var menu_button_group
 var current_menu_button
 
-var current_diff
+var current_diff = global.NORMAL
 
 var level_pack = preload("res://level.tscn")
 var level
+
+var game
 
 func _ready():
 	font = preload("res://fonts/vollkorn_regular_normal.tres")
@@ -27,16 +29,29 @@ func _ready():
 	load_state()
 	$HBoxContainer/buttons/credits.grab_focus()
 
-	level = level_pack.instance()
+	print("RECURSIVE")
+	add_button_sound(self)
+		
+
+func add_button_sound(base):
+	for node in base.get_children():
+		add_button_sound(node)
+	if base is Button or base is CheckBox:
+		base.connect("pressed", $button_sound, "play", [])
+
+func setup_levels():
+	#level = level_pack.instance()
 	for container in $HBoxContainer/panels/play/VBoxContainer/CenterContainer/GridContainer.get_children():
+		container.get_child(0).disconnect(
+			"pressed", game, "start_level")
 		container.get_child(0).connect(
-			"pressed", self, "start_level", [current_diff, container.get_index() + 1])
+			"pressed", game, "start_level", [current_diff, container.get_index() + 1])
 
 func start_level(diff, number):
 	get_tree().change_scene("res://level.tscn")
+	print("menu")
 	#get_tree().change_scene_to(level_pack)
 	#level_pack.build_level(diff, number)
-	
 
 func _process(delta):
 	if Input.is_action_just_pressed("bigger"):
@@ -122,18 +137,21 @@ func normal_pressed():
 		ProjectSettings.get_setting("application/config/normal_progress")
 	set_level_grid_progress(progress)
 	current_diff = global.NORMAL
+	setup_levels()
 
 func smart_pressed():
 	var progress = \
 		ProjectSettings.get_setting("application/config/smart_progress")
 	set_level_grid_progress(progress)
 	current_diff = global.SMART
+	setup_levels()
 
 func genius_pressed():
 	var progress = \
 		ProjectSettings.get_setting("application/config/genius_progress")
 	set_level_grid_progress(progress)
 	current_diff = global.GENIUS
+	setup_levels()
 
 func set_level_grid_progress(progress):
 	for container in level_grid.get_children():
@@ -150,19 +168,29 @@ func set_level_grid_progress(progress):
 
 func music_volume_changed(volume):
 	music_volume.text = str(volume)
+	game.music_player.set_volume_db((1 - volume / 100) * -30)
 	ProjectSettings.set_setting("audio/music_volume", volume / 100)
 	ProjectSettings.save()
 
 func sound_volume_changed(volume):
 	sound_volume.text = str(volume)
+	#game.sound_player.set_volume_db((1 - volume / 100) * -40)
+	# alle einzeln
+	$button_sound.set_volume_db((1 - volume / 100) * -30)
 	ProjectSettings.set_setting("audio/sound_volume", volume / 100)
 	ProjectSettings.save()
 
 func mute_music_toggled(active):
+	game.music_muted = true
 	ProjectSettings.set_setting("audio/music_muted", active)
 	ProjectSettings.save()
+	if active:
+		game.music_player.stop()
+	else:
+		game.music_player.play()
 
 func mute_sound_toggled(active):
+	game.sound_muted = true
 	ProjectSettings.set_setting("audio/sound_muted", active)
 	ProjectSettings.save()
 
@@ -198,6 +226,14 @@ func load_state():
 	sound_slider.value = sound * 100
 	mute_music.pressed = ProjectSettings.get_setting("audio/music_muted")
 	mute_sound.pressed = ProjectSettings.get_setting("audio/sound_muted")
+
+	game.music_player.set_volume_db((1 - music) * -30)
+	#game.sound_player.set_volume_db((1 - sound) * -40)
+	$button_sound.set_volume_db((1 - sound) * -30)
+	game.music_muted = mute_music.pressed
+	game.sound_muted = mute_sound.pressed
+	if mute_music.pressed:
+		game.music_player.stop()
 
 	var res_string = \
 		str(ProjectSettings.get_setting("display/window/size/width")) \
