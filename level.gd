@@ -84,6 +84,22 @@ func _ready():
 		print("DARK")
 		$environment.environment.background_color = \
 			Color(0.224, 0.224, 0.224, 1.0)
+		$canvas/difficulty.add_color_override("font_color", Color("#f2f0ed"))
+		$canvas/level.add_color_override("font_color", Color("#f2f0ed"))
+		$canvas/tutorial1.add_color_override("font_color", Color("#f2f0ed"))
+		$canvas/tutorial2.add_color_override("font_color", Color("#f2f0ed"))
+		$canvas/tutorial_first/Label.add_color_override(
+			"font_color", Color("#f2f0ed"))
+		$canvas/tutorial_first/Label2.add_color_override(
+			"font_color", Color("#f2f0ed"))
+		$canvas/tutorial_first/Label3.add_color_override(
+			"font_color", Color("#f2f0ed"))
+		$canvas/tutorial_first/TextureRect.texture = \
+			preload("res://gui/arrow_up_dark.png")
+		$canvas/tutorial_first/TextureRect2.texture = \
+			preload("res://gui/arrow_down_dark.png")
+		$canvas/tutorial_first/TextureRect3.texture = \
+			preload("res://gui/arrow_up_dark.png")
 	else:
 		print("BRIGHT")
 		$environment.environment.background_color = Color("#f2f0ed")
@@ -93,8 +109,11 @@ func _ready():
 		$canvas/difficulty.hide()
 		$canvas/level.hide()
 	
-	#$canvas/CenterContainer.rect_size = get_viewport().size
-	print(get_viewport().size)
+	$canvas/tutorial_first.rect_size.y = get_viewport().size.y
+	$canvas/tutorial_first.rect_size.x = get_viewport().size.y * (4.0 / 3.0)
+	$canvas/tutorial_first.rect_position.x = \
+		(get_viewport().size.x - $canvas/tutorial_first.rect_size.x) / 2.0
+
 
 func add_button_sound(base):
 	for node in base.get_children():
