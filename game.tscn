@@ -3,7 +3,7 @@
 [ext_resource path="res://game.gd" type="Script" id=1]
 [ext_resource path="res://music/soundtrack.ogg" type="AudioStream" id=2]
 
-[node name="game" type="Node"]
+[node name="game" type="Node" index="0"]
 
 script = ExtResource( 1 )
 

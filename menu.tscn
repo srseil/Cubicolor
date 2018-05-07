@@ -7,12 +7,12 @@
 [ext_resource path="res://buttontest.png" type="Texture" id=5]
 [ext_resource path="res://fonts/vollkorn_regular_header.tres" type="DynamicFont" id=6]
 [ext_resource path="res://fonts/vollkorn_regular_logo.tres" type="DynamicFont" id=7]
-[ext_resource path="res://gui/logo.png" type="Texture" id=8]
+[ext_resource path="res://gui/logo2.png" type="Texture" id=8]
 [ext_resource path="res://fonts/vollkorn_regular_license.tres" type="DynamicFont" id=9]
 [ext_resource path="res://fonts/vollkorn_regular_version.tres" type="DynamicFont" id=10]
 [ext_resource path="res://sounds/button_click.ogg" type="AudioStream" id=11]
 
-[node name="menu" type="CanvasLayer"]
+[node name="menu" type="CanvasLayer" index="0"]
 
 layer = 1
 offset = Vector2( 0, 0 )
@@ -201,13 +201,12 @@ _sections_unfolded = [ "Margin", "Rect" ]
 
 [node name="panels" type="VBoxContainer" parent="HBoxContainer" index="2"]
 
-editor/display_folded = true
 anchor_left = 0.0
 anchor_top = 0.0
 anchor_right = 0.0
 anchor_bottom = 0.0
 margin_left = 188.0
-margin_right = 537.0
+margin_right = 558.0
 margin_bottom = 500.0
 rect_pivot_offset = Vector2( 0, 0 )
 rect_clip_content = false
@@ -219,7 +218,6 @@ alignment = 1
 
 [node name="play" type="PanelContainer" parent="HBoxContainer/panels" index="0"]
 
-editor/display_folded = true
 visible = false
 anchor_left = 0.0
 anchor_top = 0.0
@@ -2129,6 +2127,8 @@ _sections_unfolded = [ "Rect", "Size Flags" ]
 
 [node name="settings" type="PanelContainer" parent="HBoxContainer/panels" index="2"]
 
+editor/display_folded = true
+visible = false
 anchor_left = 0.0
 anchor_top = 0.0
 anchor_right = 0.0
@@ -2887,7 +2887,6 @@ _sections_unfolded = [ "Margin", "Rect" ]
 [node name="credits" type="PanelContainer" parent="HBoxContainer/panels" index="3"]
 
 editor/display_folded = true
-visible = false
 anchor_left = 0.0
 anchor_top = 0.0
 anchor_right = 0.0
@@ -2951,11 +2950,10 @@ anchor_left = 0.0
 anchor_top = 0.0
 anchor_right = 0.0
 anchor_bottom = 0.0
-margin_top = 102.0
-margin_right = 900.0
-margin_bottom = 492.0
+margin_top = 80.0
+margin_right = 400.0
+margin_bottom = 230.0
 grow_horizontal = 0
-rect_scale = Vector2( 0.1, 0.1 )
 rect_pivot_offset = Vector2( 0, 0 )
 rect_clip_content = true
 mouse_filter = 1
@@ -2964,7 +2962,7 @@ size_flags_horizontal = 1
 size_flags_vertical = 1
 texture = ExtResource( 8 )
 stretch_mode = 0
-_sections_unfolded = [ "Grow Direction", "Rect" ]
+_sections_unfolded = [ "Grow Direction", "Margin", "Rect" ]
 
 [node name="Label3" type="Label" parent="HBoxContainer/panels/credits/VBoxContainer" index="2"]
 

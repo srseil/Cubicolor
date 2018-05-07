@@ -12,6 +12,8 @@ config_version=3
 
 config/name="Cubicolor"
 run/main_scene="res://game.tscn"
+boot_splash/image="res://boot_splash.png"
+boot_splash/fullsize=false
 config/icon="res://icon.png"
 config/dark_background=false
 config/hide_ui=false
@@ -27,10 +29,10 @@ config/genius_progress=-1
 
 [audio]
 
-music_muted=true
+music_muted=false
 sound_muted=false
-music_volume=1.0
-sound_volume=1.0
+music_volume=0.82
+sound_volume=0.71
 
 [autoload]
 

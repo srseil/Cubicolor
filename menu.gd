@@ -138,6 +138,8 @@ func normal_pressed():
 	set_level_grid_progress(progress)
 	current_diff = global.NORMAL
 	setup_levels()
+	$HBoxContainer/panels/play/VBoxContainer/HBoxContainer/Button.grab_focus()
+	print("jajajajaja")
 
 func smart_pressed():
 	var progress = \

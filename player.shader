@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode blend_mix,depth_draw_opaque,cull_back,diffuse_burley,specular_schlick_ggx;
+render_mode blend_mix,depth_draw_always,cull_back,diffuse_burley,specular_schlick_ggx;
 uniform vec4 albedo : hint_color;
 uniform sampler2D texture_albedo : hint_albedo;
 uniform float specular;
@@ -36,7 +36,10 @@ void fragment() {
 	
 	
 	
-	vec4 background = vec4(0.087, 0.087, 0.087, 1.0);
+	//vec4 background = vec4(0.087, 0.087, 0.087, 1.0);
+	//vec4 background = vec4(0.176, 0.176, 0.176, 1.0);
+	vec4 background = vec4(0.05, 0.05, 0.05, 1.0);
+	//vec4 background = vec4(1.0, 0.0, 0.0, 1.0);
 	vec4 texel_tint = albedo_tex * albedo;
 	ALBEDO.rgb = background.rgb * (1.0 - texel_tint.a)
 		+ texel_tint.rgb * texel_tint.a;

@@ -40,8 +40,10 @@ func anim_finished(name):
 			req.get_node("anim_player").play(req.get_anim("blend_in"))
 	
 func reset():
+	print("y_origin for reset: " + str(y_origin) + "   >" + str(y))
 	if not alive:
 		translate(Vector3(0, (y_origin - y) * 0.5, 0))
+		y = y_origin
 	elif y < y_origin:
 		$anim_player.play("fall_up")
 

@@ -9,6 +9,7 @@ const CUBICOLOR_BLUE       = Color("#6699cc")
 const CUBICOLOR_YELLOW     = Color("#ffcc66")
 const CUBICOLOR_WHITE      = Color("#fcfaf6")
 const CUBICOLOR_BLACK      = Color("#2d2d2d")
+#const CUBICOLOR_BLACK      = Color("#ffffff")
 const CUBICOLOR_BACKGROUND = Color("#f3f1ed")
 
 var level_loaded = false
@@ -50,7 +51,9 @@ func _process(delta):
 			level.get_node("canvas/CenterContainer/pause_menu").hide()
 
 	paused = level.get_node("canvas/CenterContainer/pause_menu").visible
-	if $anim_player.is_playing() or not movable or paused:
+	var completed = level.get_node("canvas/CenterContainer/complete_menu").visible \
+		or level.get_node("canvas/CenterContainer/complete_menu_alt").visible
+	if $anim_player.is_playing() or not movable or paused or completed:
 		return
 
 	if Input.is_action_just_pressed("key_forwards") \
@@ -86,6 +89,10 @@ func _process(delta):
 		reset()
 
 func reset():
+	var exit_anim = level.get_node("exit_tile/anim_player")
+	if exit_anim.is_playing() and exit_anim.current_animation.begins_with(
+		"fall_down"):
+		return
 	$anim_player.play(get_anim("fall_up"))
 	movable = false
 	level.reset()
@@ -122,6 +129,9 @@ func anim_finished(name):
 
 
 func reset_fall_down():
+	get_node("mesh_position/mesh").get_surface_material(0).set_shader_param(
+		"texture_albedo", preload("res://coloring/0001.png"))
+
 	if not $anim_player.is_playing():
 		$anim_player.play("fall_down_black")
 	else:

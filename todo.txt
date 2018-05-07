@@ -1,14 +1,14 @@
 
 Licht und Materialien anpassen
-
-Kamera anpassen (Stapel)
-
-Übergänge der Animationen kubischer machen
-
-Level-Bugs fixen
+-> Problem mit den Dreiecken: Die Textur entfernen und anderen Shader verwenden nach der Coloring-Animation?
 
 Steam-Integration
 
 OPTIONAL:
 Complete-Menü bessern
+Move schon kurz vor Beenden erlauben?
+Auflösung ändern Popup
+
+TESTING:
+Problem beim resetten, wenn exit_tile schon ganz unten. Manchmal wird ein requirement nicht wieder eingeblendet. Mal sehen ob es beim Spielen passiert oder nur künstlich hervorgerufen werden kann.
 

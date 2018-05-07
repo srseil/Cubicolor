@@ -140,17 +140,23 @@ func build_level(diff, number):
 	$camera.translation = Vector3(0, 0, 0)
 	$camera.rotation = Vector3(0, 0, 0)
 	$camera.translate(Vector3(
-		(cols - 1) / 2.0, 3.0, (rows - 1) / 2.0))
+		(cols - 1) / 2.0, 4.0, (rows - 1) / 2.0))
 	var distance = $camera.translation.y / tan(deg2rad(60))
+	if not (diff == global.NORMAL and number == 1):
+		var a = $exit_tile.transform.origin.x \
+			+ $exit_tile.transform.origin.z + 1
+		distance -= requirements.size() / (a * 5.0)
+		#distance -= requirements.size() / 3.0
 	$camera.translate(Vector3(
 		sin(deg2rad(20)) * distance, 0, sin(deg2rad(70)) * distance))
 	$camera.rotate_x(deg2rad(-60))
 	$camera.rotate_y(deg2rad(20))
 	# when requirement staple is very high, maybe go further back??
 
-	$camera.size = rows + 2 + 0.25
+	$camera.size = rows + 2.5 + 0.25
 	if $camera.size < 6:
 		$camera.size = 6
+
 
 
 	# position might actually be important???
@@ -178,7 +184,7 @@ func remove_requirement(color):
 
 	var req
 	for i in range(requirements.size() - 1, -1, -1):
-		if requirements[i].color == color:
+		if requirements[i].color == color and requirements[i].alive:
 			req = requirements[i]
 			break
 	if req == null:
@@ -206,12 +212,16 @@ func reset_grid():
 	for tile in grid:
 		print(str(tile.alive) + " " + str(tile.type))
 		if tile.type != global.NOTHING and not tile.alive:
+			var this_time = 0.1 * tile.translation.x \
+				+ 0.2 * tile.translation.z
+			if this_time == 0:
+				tile.get_node("anim_player").play(tile.get_anim("revive"))
+				continue
+
 			var timer = Timer.new()
 			tile.add_child(timer)
 			timer.one_shot = true
-			timer.wait_time = 0.1 * tile.translation.x \
-				+ 0.2 * tile.translation.z
-			#print("wait_time: " + str(timer.wait_time))
+			timer.wait_time = this_time
 			if wait_time < timer.wait_time:
 				print(str(wait_time) + " < " + str(timer.wait_time))
 				wait_time = timer.wait_time
@@ -226,11 +236,6 @@ func reset_grid():
 		+ grid[0].get_node("anim_player").get_animation("revive").length
 	timer.connect("timeout", $player, "reset_fall_down", [], CONNECT_ONESHOT)
 	timer.start()
-
-func last_finished():
-	$player.get_node("anim_player").queue("fall_down_black")
-	$player.movable = true
-
 
 func load_level(difficulty, number):
 	var filename = "res://levels/"
@@ -292,7 +297,8 @@ func load_level(difficulty, number):
 
 	$exit_tile.get_node("mesh").set_surface_material(0,
 		load("res://materials/exit_tile.tres").duplicate())
-	$exit_tile.get_node("mesh").get_surface_material(0).albedo_color.a = 0
+	#$exit_tile.get_node("mesh").get_surface_material(0).albedo_color.a = 0
+	$exit_tile.get_node("mesh").get_surface_material(0).set_shader_param("albedo", Color(0, 0, 0, 0))
 	$exit_tile.requirements = requirements
 	$exit_tile.level = self
 			
@@ -401,6 +407,12 @@ func completed():
 	$player.paused = true
 	if number == 16:
 		$canvas/CenterContainer/complete_menu_alt.popup()
+		if game.steam_loaded:
+			match diff:
+				NORMAL: Steam.setAchievement("COMPLETE_NORMAL")
+				SMART: Steam.setAchievement("COMPLETE_SMART")
+				GENIUS: Steam.setAchievement("COMPLETE_GENIUS")
+			Steam.storeStats()
 	else:
 		$canvas/CenterContainer/complete_menu.popup()
 

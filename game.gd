@@ -10,7 +10,16 @@ var music_player
 var music_muted
 var sound_muted
 
+var steam_loaded = false
+
+
 func _ready():
+	# Steam Stuff
+	steam_loaded = Steam.steamInit()
+	if steam_loaded:
+		Steam.requestCurrentStats()
+		#Steam.resetAllStats(true)
+		#Steam.storeStats()
 
 	menu_scene = load("res://menu.tscn")
 	level_scene = load("res://level.tscn")
@@ -23,6 +32,13 @@ func _ready():
 	menu.setup_levels()
 	add_child(menu, true)
 
+func _process():
+	Steam.run_callbacks()
+
+func _notification(what):
+	if what == MainLoop.NOTIFICATION_WM_QUIT_REQUEST:
+		Steam.shutdown()
+		get_tree().quit()
 
 func start_level(diff, number):
 	remove_child(get_node("menu"))
@@ -45,8 +61,8 @@ func close_level():
 		global.SMART: menu.smart_pressed()
 		global.GENIUS: menu.genius_pressed()
 
-	for n in get_children():
-		print(n.name)
+	print("öalskjfaölsdkjföalskjfaölskjfaölskjf")
+	print(menu.current_diff)
 
 func switch_level(diff, number):
 	remove_child(get_node("level"))

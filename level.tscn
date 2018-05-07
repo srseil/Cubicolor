@@ -7,9 +7,9 @@
 [ext_resource path="res://fonts/vollkorn_regular_tutorial_bottom.tres" type="DynamicFont" id=5]
 [ext_resource path="res://gui/arrow_up.png" type="Texture" id=6]
 [ext_resource path="res://gui/arrow_down.png" type="Texture" id=7]
-[ext_resource path="res://player.tscn" type="PackedScene" id=8]
-[ext_resource path="res://tile.tscn" type="PackedScene" id=9]
-[ext_resource path="res://exit_tile.gd" type="Script" id=10]
+[ext_resource path="res://tile.tscn" type="PackedScene" id=8]
+[ext_resource path="res://exit_tile.gd" type="Script" id=9]
+[ext_resource path="res://player.tscn" type="PackedScene" id=10]
 [ext_resource path="res://pause.gd" type="Script" id=11]
 [ext_resource path="res://sounds/button_click.ogg" type="AudioStream" id=12]
 [ext_resource path="res://sounds/coloring.ogg" type="AudioStream" id=13]
@@ -154,7 +154,7 @@ proximity_fade_enable = false
 distance_fade_enable = false
 _sections_unfolded = [ "Albedo", "Emission", "Metallic", "Roughness" ]
 
-[node name="level" type="Node"]
+[node name="level" type="Node" index="0"]
 
 script = ExtResource( 1 )
 
@@ -288,14 +288,14 @@ _sections_unfolded = [ "Anchor", "Rect", "Size Flags", "Theme" ]
 
 editor/display_folded = true
 visible = false
-anchor_left = 0.0
-anchor_top = 0.0
-anchor_right = 0.0
-anchor_bottom = 0.0
-margin_left = 330.0
-margin_top = 212.0
-margin_right = 470.0
-margin_bottom = 387.0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -70.0
+margin_top = -88.0
+margin_right = 70.0
+margin_bottom = 87.0
 rect_min_size = Vector2( 140, 175 )
 rect_pivot_offset = Vector2( 0, 0 )
 rect_clip_content = false
@@ -427,14 +427,14 @@ _sections_unfolded = [ "Rect" ]
 
 editor/display_folded = true
 visible = false
-anchor_left = 0.0
-anchor_top = 0.0
-anchor_right = 0.0
-anchor_bottom = 0.0
-margin_left = 330.0
-margin_top = 212.0
-margin_right = 470.0
-margin_bottom = 387.0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -70.0
+margin_top = -88.0
+margin_right = 70.0
+margin_bottom = 87.0
 rect_min_size = Vector2( 140, 175 )
 rect_pivot_offset = Vector2( 0, 0 )
 rect_clip_content = false
@@ -565,14 +565,14 @@ _sections_unfolded = [ "Rect" ]
 
 editor/display_folded = true
 visible = false
-anchor_left = 0.0
-anchor_top = 0.0
-anchor_right = 0.0
-anchor_bottom = 0.0
-margin_left = 330.0
-margin_top = 235.0
-margin_right = 470.0
-margin_bottom = 365.0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -70.0
+margin_top = -65.0
+margin_right = 70.0
+margin_bottom = 65.0
 rect_min_size = Vector2( 140, 130 )
 rect_pivot_offset = Vector2( 0, 0 )
 rect_clip_content = false
@@ -817,13 +817,11 @@ near = 0.05
 far = 100.0
 _sections_unfolded = [ "Transform" ]
 
-[node name="player" parent="." index="3" instance=ExtResource( 8 )]
+[node name="tiles" type="Node" parent="." index="3"]
 
-[node name="tiles" type="Node" parent="." index="4"]
+[node name="requirements" type="Node" parent="." index="4"]
 
-[node name="requirements" type="Node" parent="." index="5"]
-
-[node name="directional_light" type="DirectionalLight" parent="." index="6"]
+[node name="directional_light" type="DirectionalLight" parent="." index="5"]
 
 transform = Transform( 0.999915, -0.000151158, 0.012984, 0, 0.999932, 0.0116411, -0.0129849, -0.0116401, 0.999848, 0, 0, 0 )
 layers = 1
@@ -851,16 +849,18 @@ directional_shadow_depth_range = 0
 directional_shadow_max_distance = 200.0
 _sections_unfolded = [ "Light", "Transform" ]
 
-[node name="exit_tile" parent="." index="7" instance=ExtResource( 9 )]
+[node name="exit_tile" parent="." index="6" instance=ExtResource( 8 )]
 
 editor/display_folded = true
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0 )
-script = ExtResource( 10 )
+script = ExtResource( 9 )
 _sections_unfolded = [ "Transform" ]
 
 [node name="mesh" parent="exit_tile" index="0"]
 
 material/0 = SubResource( 2 )
+
+[node name="player" parent="." index="7" instance=ExtResource( 10 )]
 
 [node name="pause" type="Node" parent="." index="8"]
 
