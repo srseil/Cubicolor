@@ -202,8 +202,8 @@ func reset():
 	for req in requirements:
 		req.reset()
 	$exit_tile.reset()
-	exit_node.type = global.NOTHING
-	exit_node.alive = false
+	#exit_node.type = global.NOTHING
+	#exit_node.alive = false
 	#reset_grid()
 
 
@@ -232,8 +232,8 @@ func reset_grid():
 	var timer = Timer.new()
 	add_child(timer)
 	timer.one_shot = true
-	timer.wait_time = wait_time \
-		+ grid[0].get_node("anim_player").get_animation("revive").length
+	timer.wait_time = wait_time + 0.77
+	#+ grid[0].get_node("anim_player").get_animation("revive").length
 	timer.connect("timeout", $player, "reset_fall_down", [], CONNECT_ONESHOT)
 	timer.start()
 
@@ -281,7 +281,8 @@ func load_level(difficulty, number):
 				tile.color = CUBICOLOR_YELLOW
 		tile.get_node("mesh").set_surface_material(0,
 			load("res://materials/" + material_name + ".tres").duplicate())
-		tile.get_node("mesh").get_surface_material(0).albedo_color.a = 0;
+		#tile.get_node("mesh").get_surface_material(0).albedo_color.a = 0;
+		tile.get_node("mesh").get_surface_material(0).set_shader_param("albedo", Color(1, 1, 1, 0))
 
 		requirements.push_front(tile)
 		$requirements.add_child(tile, true)
@@ -373,7 +374,8 @@ func load_level(difficulty, number):
 				"albedo", Color(0, 0, 0, 0))
 			pass
 		else:
-			tile.get_node("mesh").get_surface_material(0).albedo_color.a = 0
+			#tile.get_node("mesh").get_surface_material(0).albedo_color.a = 0
+			tile.get_node("mesh").get_surface_material(0).set_shader_param("albedo", Color(1, 1, 1, 0))
 			
 
 
@@ -403,6 +405,7 @@ func pause():
 
 func completed():
 	$solve_sound.play()
+	game.save_progress()
 	#$player.completed = true # not working, popup auto closes on esc
 	$player.paused = true
 	if number == 16:

@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=2]
+[gd_scene load_steps=26 format=2]
 
 [ext_resource path="res://tile.gd" type="Script" id=1]
 [ext_resource path="res://ground_bevel.obj" type="ArrayMesh" id=2]
@@ -15,8 +15,20 @@ tracks/0/path = NodePath("mesh:material/0:albedo_color")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
-tracks/0/enabled = true
+tracks/0/enabled = false
 tracks/0/keys = {
+"times": PoolRealArray( 0, 0.3 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 0.4, 0.6, 0.8, 0 ), Color( 0.4, 0.6, 0.8, 1 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("mesh:material/0:shader_param/albedo")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
 "times": PoolRealArray( 0, 0.3 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 0,
@@ -34,8 +46,20 @@ tracks/0/path = NodePath("mesh:material/0:albedo_color")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
-tracks/0/enabled = true
+tracks/0/enabled = false
 tracks/0/keys = {
+"times": PoolRealArray( 0, 0.3 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 0.6, 0.8, 0.6, 0 ), Color( 0.6, 0.8, 0.6, 1 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("mesh:material/0:shader_param/albedo")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
 "times": PoolRealArray( 0, 0.3 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 0,
@@ -53,12 +77,24 @@ tracks/0/path = NodePath("mesh:material/0:albedo_color")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
-tracks/0/enabled = true
+tracks/0/enabled = false
 tracks/0/keys = {
 "times": PoolRealArray( 0, 0.3 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 0,
 "values": [ Color( 0.94902, 0.466667, 0.47451, 0 ), Color( 0.94902, 0.466667, 0.47451, 1 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("mesh:material/0:shader_param/albedo")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.3 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 0.94902, 0.466667, 0.478431, 0 ), Color( 0.94902, 0.466667, 0.478431, 1 ) ]
 }
 
 [sub_resource type="Animation" id=4]
@@ -72,8 +108,20 @@ tracks/0/path = NodePath("mesh:material/0:albedo_color")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
-tracks/0/enabled = true
+tracks/0/enabled = false
 tracks/0/keys = {
+"times": PoolRealArray( 0, 0.3 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 0.8, 0.4, 0 ), Color( 1, 0.8, 0.4, 1 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("mesh:material/0:shader_param/albedo")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
 "times": PoolRealArray( 0, 0.3 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 0,
@@ -91,8 +139,20 @@ tracks/0/path = NodePath("mesh:material/0:albedo_color")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
-tracks/0/enabled = true
+tracks/0/enabled = false
 tracks/0/keys = {
+"times": PoolRealArray( 0, 0.3 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 0.4, 0.6, 0.8, 1 ), Color( 0.4, 0.6, 0.8, 0 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("mesh:material/0:shader_param/albedo")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
 "times": PoolRealArray( 0, 0.3 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 0,
@@ -110,8 +170,20 @@ tracks/0/path = NodePath("mesh:material/0:albedo_color")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
-tracks/0/enabled = true
+tracks/0/enabled = false
 tracks/0/keys = {
+"times": PoolRealArray( 0, 0.3 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 0.6, 0.8, 0.6, 1 ), Color( 0.6, 0.8, 0.6, 0 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("mesh:material/0:shader_param/albedo")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
 "times": PoolRealArray( 0, 0.3 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 0,
@@ -128,12 +200,24 @@ tracks/0/path = NodePath("mesh:material/0:albedo_color")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
-tracks/0/enabled = true
+tracks/0/enabled = false
 tracks/0/keys = {
 "times": PoolRealArray( 0, 0.3 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 0,
 "values": [ Color( 0.94902, 0.466667, 0.47451, 1 ), Color( 0.94902, 0.466667, 0.47451, 0 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("mesh:material/0:shader_param/albedo")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.3 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 0.94902, 0.466667, 0.478431, 1 ), Color( 0.94902, 0.466667, 0.478431, 0 ) ]
 }
 
 [sub_resource type="Animation" id=8]
@@ -147,8 +231,20 @@ tracks/0/path = NodePath("mesh:material/0:albedo_color")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
-tracks/0/enabled = true
+tracks/0/enabled = false
 tracks/0/keys = {
+"times": PoolRealArray( 0, 0.3 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 0.8, 0.4, 1 ), Color( 1, 0.8, 0.4, 0 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("mesh:material/0:shader_param/albedo")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
 "times": PoolRealArray( 0, 0.3 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 0,
@@ -189,12 +285,24 @@ tracks/2/path = NodePath("mesh:material/0:albedo_color")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/imported = false
-tracks/2/enabled = true
+tracks/2/enabled = false
 tracks/2/keys = {
 "times": PoolRealArray( 0, 0.77 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 0,
 "values": [ Color( 0.988235, 0.980392, 0.964706, 1 ), Color( 0.988235, 0.980392, 0.964706, 0 ) ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("mesh:material/0:shader_param/albedo")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 0.77 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 0.984314, 0.976471, 0.964706, 1 ), Color( 0.984314, 0.976471, 0.964706, 0 ) ]
 }
 
 [sub_resource type="Animation" id=10]
@@ -220,7 +328,7 @@ tracks/1/path = NodePath("mesh:material/0:albedo_color")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/imported = false
-tracks/1/enabled = true
+tracks/1/enabled = false
 tracks/1/keys = {
 "times": PoolRealArray( 0, 0.77 ),
 "transitions": PoolRealArray( 1, 1 ),
@@ -263,7 +371,7 @@ tracks/1/path = NodePath("mesh:material/0:albedo_color")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/imported = false
-tracks/1/enabled = true
+tracks/1/enabled = false
 tracks/1/keys = {
 "times": PoolRealArray( 0, 0.77 ),
 "transitions": PoolRealArray( 1, 1 ),
@@ -306,7 +414,7 @@ tracks/1/path = NodePath("mesh:material/0:albedo_color")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/imported = false
-tracks/1/enabled = true
+tracks/1/enabled = false
 tracks/1/keys = {
 "times": PoolRealArray( 0, 0.77 ),
 "transitions": PoolRealArray( 1, 1 ),
@@ -349,7 +457,7 @@ tracks/1/path = NodePath("mesh:material/0:albedo_color")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/imported = false
-tracks/1/enabled = true
+tracks/1/enabled = false
 tracks/1/keys = {
 "times": PoolRealArray( 0, 0.77 ),
 "transitions": PoolRealArray( 1, 1 ),
@@ -405,7 +513,7 @@ tracks/0/keys = {
 "values": [ Vector3( 0, -0.25, 0 ), Vector3( 0, 0.25, 0 ) ]
 }
 
-[sub_resource type="Animation" id=23]
+[sub_resource type="Animation" id=16]
 
 resource_name = "revive"
 length = 0.77
@@ -428,7 +536,7 @@ tracks/1/path = NodePath("mesh:material/0:albedo_color")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/imported = false
-tracks/1/enabled = true
+tracks/1/enabled = false
 tracks/1/keys = {
 "times": PoolRealArray( 0, 0.77 ),
 "transitions": PoolRealArray( 1, 1 ),
@@ -471,7 +579,7 @@ tracks/1/path = NodePath("mesh:material/0:albedo_color")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/imported = false
-tracks/1/enabled = true
+tracks/1/enabled = false
 tracks/1/keys = {
 "times": PoolRealArray( 0, 0.77 ),
 "transitions": PoolRealArray( 1, 1 ),
@@ -514,7 +622,7 @@ tracks/1/path = NodePath("mesh:material/0:albedo_color")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/imported = false
-tracks/1/enabled = true
+tracks/1/enabled = false
 tracks/1/keys = {
 "times": PoolRealArray( 0, 0.77 ),
 "transitions": PoolRealArray( 1, 1 ),
@@ -534,52 +642,8 @@ tracks/2/keys = {
 "values": [ Color( 0.6, 0.8, 0.6, 0 ), Color( 0.6, 0.8, 0.6, 1 ) ]
 }
 
-[sub_resource type="Animation" id=16]
-
-resource_name = "revive_old"
-length = 0.77
-loop = false
-step = 0.1
-tracks/0/type = "value"
-tracks/0/path = NodePath("mesh:translation")
-tracks/0/interp = 2
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0, 0.77 ),
-"transitions": PoolRealArray( -1.4, 1 ),
-"update": 0,
-"values": [ Vector3( 0, -1, 0 ), Vector3( 0, -0.25, 0 ) ]
-}
-tracks/1/type = "value"
-tracks/1/path = NodePath("mesh:material_override:albedo_color")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = false
-tracks/1/keys = {
-"times": PoolRealArray( 0, 0.77 ),
-"transitions": PoolRealArray( 1, 1 ),
-"update": 0,
-"values": [ Color( 0.988235, 0.980392, 0.964706, 0 ), Color( 0.988235, 0.980392, 0.964706, 1 ) ]
-}
-tracks/2/type = "value"
-tracks/2/path = NodePath("mesh:material/0:albedo_color")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/keys = {
-"times": PoolRealArray( 0, 0.8 ),
-"transitions": PoolRealArray( 1, 1 ),
-"update": 0,
-"values": [ Color( 0.988235, 0.980392, 0.964706, 0 ), Color( 0.988235, 0.980392, 0.964706, 1 ) ]
-}
-
 [sub_resource type="Animation" id=19]
 
-resource_name = "revive_red"
 length = 0.77
 loop = false
 step = 0.1
@@ -600,7 +664,7 @@ tracks/1/path = NodePath("mesh:material/0:albedo_color")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/imported = false
-tracks/1/enabled = true
+tracks/1/enabled = false
 tracks/1/keys = {
 "times": PoolRealArray( 0, 0.77 ),
 "transitions": PoolRealArray( 1, 1 ),
@@ -622,7 +686,6 @@ tracks/2/keys = {
 
 [sub_resource type="Animation" id=20]
 
-resource_name = "revive_yellow"
 length = 0.77
 loop = false
 step = 0.1
@@ -643,7 +706,7 @@ tracks/1/path = NodePath("mesh:material/0:albedo_color")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/imported = false
-tracks/1/enabled = true
+tracks/1/enabled = false
 tracks/1/keys = {
 "times": PoolRealArray( 0, 0.77 ),
 "transitions": PoolRealArray( 1, 1 ),
@@ -769,10 +832,9 @@ anims/die_red = SubResource( 12 )
 anims/die_yellow = SubResource( 13 )
 anims/fall_down = SubResource( 14 )
 anims/fall_up = SubResource( 15 )
-anims/revive = SubResource( 23 )
+anims/revive = SubResource( 16 )
 anims/revive_blue = SubResource( 17 )
 anims/revive_green = SubResource( 18 )
-anims/revive_old = SubResource( 16 )
 anims/revive_red = SubResource( 19 )
 anims/revive_yellow = SubResource( 20 )
 anims/swirl_down = SubResource( 21 )

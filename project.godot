@@ -23,16 +23,16 @@ config/key_left=16777231
 config/key_right=16777233
 config/key_restart=16777220
 config/key_pause=16777217
-config/normal_progress=16
-config/smart_progress=0
+config/normal_progress=2
+config/smart_progress=-1
 config/genius_progress=-1
 
 [audio]
 
 music_muted=false
 sound_muted=false
-music_volume=0.82
-sound_volume=0.71
+music_volume=1.0
+sound_volume=1.0
 
 [autoload]
 

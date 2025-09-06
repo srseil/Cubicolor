@@ -42,8 +42,10 @@ func add_button_sound(base):
 func setup_levels():
 	#level = level_pack.instance()
 	for container in $HBoxContainer/panels/play/VBoxContainer/CenterContainer/GridContainer.get_children():
+		#if "pressed" in container.get_child(0).get_signal_list():
 		container.get_child(0).disconnect(
 			"pressed", game, "start_level")
+		#if not container.get_child(0).is_connected("pressed", game, "start_level"):
 		container.get_child(0).connect(
 			"pressed", game, "start_level", [current_diff, container.get_index() + 1])
 
@@ -81,12 +83,12 @@ onready var key_right = $HBoxContainer/panels/controls/VBoxContainer/HBoxContain
 onready var key_restart = $HBoxContainer/panels/controls/VBoxContainer/HBoxContainer5/Button
 onready var key_pause = $HBoxContainer/panels/controls/VBoxContainer/HBoxContainer6/Button
 
-onready var pad_forwards = $HBoxContainer/panels/controls/VBoxContainer/HBoxContainer/Button2
-onready var pad_backwards = $HBoxContainer/panels/controls/VBoxContainer/HBoxContainer2/Button2
-onready var pad_left = $HBoxContainer/panels/controls/VBoxContainer/HBoxContainer3/Button2
-onready var pad_right = $HBoxContainer/panels/controls/VBoxContainer/HBoxContainer4/Button2
-onready var pad_restart = $HBoxContainer/panels/controls/VBoxContainer/HBoxContainer5/Button2
-onready var pad_pause = $HBoxContainer/panels/controls/VBoxContainer/HBoxContainer6/Button2
+#onready var pad_forwards = $HBoxContainer/panels/controls/VBoxContainer/HBoxContainer/Button2
+#onready var pad_backwards = $HBoxContainer/panels/controls/VBoxContainer/HBoxContainer2/Button2
+#onready var pad_left = $HBoxContainer/panels/controls/VBoxContainer/HBoxContainer3/Button2
+#onready var pad_right = $HBoxContainer/panels/controls/VBoxContainer/HBoxContainer4/Button2
+#onready var pad_restart = $HBoxContainer/panels/controls/VBoxContainer/HBoxContainer5/Button2
+#onready var pad_pause = $HBoxContainer/panels/controls/VBoxContainer/HBoxContainer6/Button2
 
 # SETTINGS
 onready var vsync = $HBoxContainer/panels/settings/VBoxContainer/HBoxContainer5/CheckBox2
