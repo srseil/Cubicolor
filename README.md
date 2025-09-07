@@ -5,3 +5,5 @@ Cubicolor is a minimalist puzzle game. The rules are simple: Match the color pat
 [Cubicolor on Steam](https://store.steampowered.com/app/454190/Cubicolor/)
 
 **Note:** The `master` branch of this repository represents an older version (v1.1) of the game, implemented in Java using the libGDX game development framework. The game was later re-implemented in the Godot engine, the code for the up-to-date version lives on the `godot` branch.
+
+![screenshot](./screenshot.png "Cubicolor")
