@@ -111,11 +111,12 @@ internal static class Program
         if (Path.GetFileName(exe) == "MacOS") yield return Path.Combine(Path.GetDirectoryName(exe)!, "Resources");
     }
 
-    private static GameContext Context(IRenderer renderer, SaveStore saves, string assets, IFontLoader fonts, IAudio audio)
+    private static GameContext Context(IRenderer renderer, SaveStore saves, string assets, IFontLoader fonts, IAudio audio,
+                                       IAchievements achievements)
     {
         var text = new Text(fonts, Path.Combine(assets, "fonts"), new OverlayAtlas(renderer.Atlas));
         audio.Apply(saves.Settings);
-        return new GameContext(renderer, BoardMeshes.Upload(renderer), new Ui(text), saves, audio, new NoAchievements(),
+        return new GameContext(renderer, BoardMeshes.Upload(renderer), new Ui(text), saves, audio, achievements,
             Path.Combine(assets, "levels"));
     }
 
@@ -131,7 +132,7 @@ internal static class Program
         using var renderer = new MetalRenderer(IntPtr.Zero, () => (width, height), vsync: false);
         // Headless, the mix goes nowhere unless it is captured to a file.
         using var audio = new AudioService(MusicPath(assets), _ => null);
-        GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio);
+        GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio, new NoAchievements());
         List<float>? captured = captureAudio != null ? [] : null;
         var block = new float[Mixer.Rate / 60 * 2];
         var input = new ScriptedInput();
@@ -182,7 +183,8 @@ internal static class Program
         using var renderer = new MetalRenderer(window.MetalLayer, () =>
             ((int) MathF.Round(window.Width * window.PixelDensity), (int) MathF.Round(window.Height * window.PixelDensity)), settings.VSync);
         using var audio = new AudioService(MusicPath(assets), CoreAudioOutput.Start);
-        GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio);
+        using Steam? steam = Steam.Start();
+        GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio, steam ?? (IAchievements) new NoAchievements());
         context.ApplyDisplay = s => window.SetFullscreen(s.Fullscreen);
         if (settings.Fullscreen) window.SetFullscreen(true);
         var frame = new Frame(context, FirstScreen(context, level));
@@ -191,6 +193,7 @@ internal static class Program
         double last = 0;
         while (!window.CloseRequested && !context.QuitRequested)
         {
+            steam?.Tick();
             double now = clock.Elapsed.TotalSeconds;
             double seconds = Math.Min(now - last, 0.1);
             last = now;
