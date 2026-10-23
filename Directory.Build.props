@@ -1,0 +1,14 @@
+<Project>
+
+    <!-- Shared by every project in the repository. -->
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <!-- Culture-independent formatting everywhere: saved data and logs read the same on every machine. -->
+        <InvariantGlobalization>true</InvariantGlobalization>
+    </PropertyGroup>
+
+</Project>

@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!-- The engine-free part of the game: levels, rules, progress, settings and the import of old saves.
+         It never sees the platform, the renderer or the audio. -->
+    <PropertyGroup>
+        <RootNamespace>Cubicolor.Simulation</RootNamespace>
+        <IsAotCompatible>true</IsAotCompatible>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Cubicolor.Tests" />
+    </ItemGroup>
+
+</Project>

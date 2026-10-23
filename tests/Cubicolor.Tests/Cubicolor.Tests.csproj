@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <RootNamespace>Cubicolor.Tests</RootNamespace>
+        <IsPackable>false</IsPackable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <!-- xUnit v3 test projects are self-hosting executables on Microsoft.Testing.Platform; global.json puts
+             `dotnet test` in that platform's mode, which prints each failure with its message. -->
+        <OutputType>Exe</OutputType>
+        <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="xunit.v3" Version="3.2.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Cubicolor.Simulation\Cubicolor.Simulation.csproj" />
+        <ProjectReference Include="..\..\src\Cubicolor\Cubicolor.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="Fixtures\**\*" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+</Project>

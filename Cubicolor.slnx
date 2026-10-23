@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Cubicolor.Simulation/Cubicolor.Simulation.csproj" />
+    <Project Path="src/Cubicolor/Cubicolor.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Cubicolor.Tests/Cubicolor.Tests.csproj" />
+  </Folder>
+</Solution>
