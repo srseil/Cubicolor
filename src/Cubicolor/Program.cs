@@ -149,6 +149,11 @@ internal static class Program
             }
             script.BeforeFrame(time, frame.Screen, context);
             if (script.Error != null) break;
+            if (script.Next is { } next)
+            {
+                frame.Show(next);
+                script.Next = null;
+            }
             frame.Run(input, step, width, height);
             script.AfterFrame(renderer);
             if (captured != null)

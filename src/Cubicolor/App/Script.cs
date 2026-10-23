@@ -19,6 +19,7 @@ namespace Cubicolor.App;
 //   pad <button>                a controller button for one frame (South, East, Menu, Up, ...)
 //   click "<label>"             the widget with that label, as the mouse would
 //   moves <FBLR...>             rolls, each once the cube is ready
+//   play <level>                straight into a level, e.g. play genius07
 //   screenshot <path>           the next frame as a PNG
 //   expect <what> <value>       fail unless it holds: screen (menu|level), level (normal03), state
 //                               (ready|busy|paused|completed), solved.<difficulty> (a number), focus
@@ -34,6 +35,9 @@ internal sealed class Script
     private Queue<char>? _moves;
 
     public string? Error { get; private set; }
+
+    // A screen the script switches to before the next frame.
+    public IScreen? Next { get; set; }
     public bool Done => _lines.Count == 0 && _pendingScreenshot == null && _moves == null && Error == null && _time >= _waitUntil;
 
     private double _time;
@@ -121,6 +125,11 @@ internal sealed class Script
             case "moves":
                 _moves = new Queue<char>(argument);
                 _deadline = time + 10 + argument.Length;
+                return true;
+            case "play":
+                if (argument.Length < 3 || !Enum.TryParse(argument[..^2], true, out Difficulty difficulty)
+                    || !int.TryParse(argument[^2..], out int number)) { Fail(line); return true; }
+                Next = new LevelScreen(context, difficulty, number);
                 return true;
             case "screenshot":
                 _pendingScreenshot = argument;
