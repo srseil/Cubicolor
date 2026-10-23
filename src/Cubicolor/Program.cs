@@ -72,7 +72,7 @@ internal static class Program
             return 2;
         }
 
-        string assets = Path.Combine(AppContext.BaseDirectory, "assets");
+        string assets = AssetsDirectory();
         bool temporary = headless && dataDir == null;
         if (temporary) dataDir = Path.Combine(Path.GetTempPath(), "cubicolor-" + Guid.NewGuid().ToString("N"));
         SaveLocations locations = dataDir != null
@@ -91,6 +91,14 @@ internal static class Program
         {
             if (temporary && Directory.Exists(dataDir)) Directory.Delete(dataDir!, recursive: true);
         }
+    }
+
+    // The game's data: beside the executable, or in a macOS bundle's Contents/Resources.
+    private static string AssetsDirectory()
+    {
+        string beside = Path.Combine(AppContext.BaseDirectory, "assets");
+        string bundled = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "Resources", "assets"));
+        return Directory.Exists(beside) || !Directory.Exists(bundled) ? beside : bundled;
     }
 
     // Where the earlier versions' files may sit beside the game: the executable's directory, the working

@@ -6,9 +6,8 @@ using System.Text;
 namespace Cubicolor.Platform.Mac;
 
 // The Objective-C runtime, called directly: classes and selectors by name, and objc_msgSend cast to the
-// exact signature of each call. On arm64 there is one objc_msgSend for every signature (no _stret or
-// _fpret variants), and a C# function pointer of the right type gets the calling convention right,
-// structs passed by value included. No bindings package, no native shim (docs/metal-renderer.md §3). Used
+// exact signature of each call. A C# function pointer of the right type gets the calling convention right,
+// structs passed by value included; large struct returns on x86-64 go through objc_msgSend_stret. No bindings package, no native shim (docs/metal-renderer.md §3). Used
 // by the renderer (Core/Metal) and the platform layer (AppKit, Window, MacInput), which also defines a few
 // classes of its own through it (DefineClass).
 //
@@ -21,11 +20,17 @@ internal static unsafe partial class ObjC
 {
     private const string Lib = "/usr/lib/libobjc.A.dylib";
 
-    private static readonly IntPtr MsgSend;
+    private static readonly IntPtr MsgSend, MsgSendStret;
+
+    // On x86-64 a struct returned in memory (anything over 16 bytes, such as a CGRect) comes back through
+    // objc_msgSend_stret, which takes the result's address first; arm64 has one objc_msgSend for everything.
+    private static readonly bool UsesStret = RuntimeInformation.ProcessArchitecture == Architecture.X64;
 
     static ObjC()
     {
-        MsgSend = NativeLibrary.GetExport(NativeLibrary.Load(Lib), "objc_msgSend");
+        IntPtr library = NativeLibrary.Load(Lib);
+        MsgSend = NativeLibrary.GetExport(library, "objc_msgSend");
+        MsgSendStret = UsesStret ? NativeLibrary.GetExport(library, "objc_msgSend_stret") : IntPtr.Zero;
         // NSString and friends have to be loaded before objc_getClass can find them.
         NativeLibrary.Load("/System/Library/Frameworks/Foundation.framework/Foundation");
     }
@@ -72,9 +77,25 @@ internal static unsafe partial class ObjC
 
     // Typed message sends: R the return type, A.. the arguments, all blittable.
     public static R Send<R>(IntPtr obj, IntPtr sel) where R : unmanaged
-        => ((delegate* unmanaged<IntPtr, IntPtr, R>) MsgSend)(obj, sel);
+    {
+        if (UsesStret && sizeof(R) > 16)
+        {
+            R result;
+            ((delegate* unmanaged<R*, IntPtr, IntPtr, void>) MsgSendStret)(&result, obj, sel);
+            return result;
+        }
+        return ((delegate* unmanaged<IntPtr, IntPtr, R>) MsgSend)(obj, sel);
+    }
     public static R Send<R, A>(IntPtr obj, IntPtr sel, A a) where R : unmanaged where A : unmanaged
-        => ((delegate* unmanaged<IntPtr, IntPtr, A, R>) MsgSend)(obj, sel, a);
+    {
+        if (UsesStret && sizeof(R) > 16)
+        {
+            R result;
+            ((delegate* unmanaged<R*, IntPtr, IntPtr, A, void>) MsgSendStret)(&result, obj, sel, a);
+            return result;
+        }
+        return ((delegate* unmanaged<IntPtr, IntPtr, A, R>) MsgSend)(obj, sel, a);
+    }
     public static R Send<R, A, B>(IntPtr obj, IntPtr sel, A a, B b) where R : unmanaged where A : unmanaged where B : unmanaged
         => ((delegate* unmanaged<IntPtr, IntPtr, A, B, R>) MsgSend)(obj, sel, a, b);
     public static R Send<R, A, B, C>(IntPtr obj, IntPtr sel, A a, B b, C c) where R : unmanaged where A : unmanaged where B : unmanaged where C : unmanaged
