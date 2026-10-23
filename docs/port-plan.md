@@ -95,8 +95,19 @@ Two quirks in the old saves:
   bytes, a truncated file, both formats present).
 - **Tested for real** on each OS before release: install the current public build, play a few levels,
   switch to the new build on a beta branch, check that progress is there, then switch back.
-- **macOS risk:** a file the old Java game wrote inside `Cubicolor.app` must survive the update. Steam
-  normally leaves files it didn't install alone (unverified). The beta-branch test answers it.
+- **Risk: Steam deleting the Java saves on update.** The Java game could only save if `savestates/` and
+  `config/` already existed in its working directory. Its default `savestate.xml` (all levels unsolved)
+  and `config.xml` were in the repository's assets, so they almost certainly shipped in the Mac and Linux
+  depots. When a file from the old manifest is missing in the new one, Steam removes it on update (from
+  memory, to verify). That would delete the player's progress before the new game could read it.
+  - **Mitigation:** the new Mac and Linux depots keep both files at their old paths, marked `userconfig`
+    in the depot build script, so Steam installs them only where missing and never overwrites or
+    removes them (from memory, to verify against the Steamworks depot docs).
+  - **Inside `Cubicolor.app` on macOS,** extra files after signing break the bundle's seal. So the
+    files must either survive beside a re-signed bundle, or the new `.app` keeps them outside the sealed
+    part.
+  - **To check in Steamworks:** the old depots' file lists.
+  - **To prove:** the beta-branch test.
 - **Steam Cloud is turned on properly** for the new save file:
   - Steam Auto-Cloud with one root per OS, matching the paths above.
   - The old `savestates` rule is removed.
