@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Threading;
 using Cubicolor.App;
+using Cubicolor.Audio;
 using Cubicolor.Game;
 using Cubicolor.Platform;
 using Cubicolor.Platform.Mac;
@@ -28,12 +29,13 @@ internal static class Program
           --level <name>          start in a level, e.g. normal03
           --data-dir <dir>        where progress and settings live (headless default: a fresh temporary one)
           --timeout <seconds>     fail a run that takes longer
+          --capture-audio <wav>   headless: write what the game played to a WAV file
         """;
 
     private static int Main(string[] args)
     {
         bool headless = false;
-        string? script = null, level = null, dataDir = null;
+        string? script = null, level = null, dataDir = null, captureAudio = null;
         int width = 1280, height = 720;
         double timeout = double.PositiveInfinity;
         try
@@ -47,6 +49,7 @@ internal static class Program
                     case "--exec": script = args[++i]; break;
                     case "--level": level = args[++i]; break;
                     case "--data-dir": dataDir = args[++i]; break;
+                    case "--capture-audio": captureAudio = args[++i]; break;
                     case "--timeout": timeout = double.Parse(args[++i], CultureInfo.InvariantCulture); break;
                     case "--size":
                         string[] parts = args[++i].Split('x');
@@ -81,7 +84,7 @@ internal static class Program
         try
         {
             return headless
-                ? RunHeadless(saves, assets, width, height, script, level, timeout)
+                ? RunHeadless(saves, assets, width, height, script, level, timeout, captureAudio)
                 : RunWindowed(saves, assets, level);
         }
         finally
@@ -100,21 +103,29 @@ internal static class Program
         if (Path.GetFileName(exe) == "MacOS") yield return Path.Combine(Path.GetDirectoryName(exe)!, "Resources");
     }
 
-    private static GameContext Context(IRenderer renderer, SaveStore saves, string assets, IFontLoader fonts)
+    private static GameContext Context(IRenderer renderer, SaveStore saves, string assets, IFontLoader fonts, IAudio audio)
     {
         var text = new Text(fonts, Path.Combine(assets, "fonts"), new OverlayAtlas(renderer.Atlas));
-        return new GameContext(renderer, BoardMeshes.Upload(renderer), new Ui(text), saves, new SilentAudio(), new NoAchievements(),
+        audio.Apply(saves.Settings);
+        return new GameContext(renderer, BoardMeshes.Upload(renderer), new Ui(text), saves, audio, new NoAchievements(),
             Path.Combine(assets, "levels"));
     }
+
+    private static string MusicPath(string assets) => Path.Combine(assets, "music", "soundtrack.qoa");
 
     private static IScreen FirstScreen(GameContext context, string? level) => level == null
         ? new MenuScreen(context)
         : new LevelScreen(context, Enum.Parse<Difficulty>(level[..^2], ignoreCase: true), int.Parse(level[^2..], CultureInfo.InvariantCulture));
 
-    private static int RunHeadless(SaveStore saves, string assets, int width, int height, string? scriptText, string? level, double timeout)
+    private static int RunHeadless(SaveStore saves, string assets, int width, int height, string? scriptText, string? level, double timeout,
+                                   string? captureAudio)
     {
         using var renderer = new MetalRenderer(IntPtr.Zero, () => (width, height), vsync: false);
-        GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader());
+        // Headless, the mix goes nowhere unless it is captured to a file.
+        using var audio = new AudioService(MusicPath(assets), _ => null);
+        GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio);
+        List<float>? captured = captureAudio != null ? [] : null;
+        var block = new float[Mixer.Rate / 60 * 2];
         var input = new ScriptedInput();
         var frame = new Frame(context, FirstScreen(context, level));
         var script = new Script(scriptText ?? "", input);
@@ -131,8 +142,18 @@ internal static class Program
             if (script.Error != null) break;
             frame.Run(input, step, width, height);
             script.AfterFrame(renderer);
+            if (captured != null)
+            {
+                audio.Mixer.Render(block);
+                captured.AddRange(block);
+            }
             time += step;
             if (context.QuitRequested) break;
+        }
+        if (captured != null)
+        {
+            Wav.Write(captureAudio!, new Wav.Clip(Mixer.Rate, 2, Wav.FromFloat(captured.ToArray())));
+            Log.Info($"Sound captured: {captureAudio}");
         }
         if (script.Error is { } error)
         {
@@ -152,7 +173,8 @@ internal static class Program
         MenuScreen.KeyName = KeyCodes.Name;
         using var renderer = new MetalRenderer(window.MetalLayer, () =>
             ((int) MathF.Round(window.Width * window.PixelDensity), (int) MathF.Round(window.Height * window.PixelDensity)), settings.VSync);
-        GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader());
+        using var audio = new AudioService(MusicPath(assets), CoreAudioOutput.Start);
+        GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio);
         context.ApplyDisplay = s => window.SetFullscreen(s.Fullscreen);
         if (settings.Fullscreen) window.SetFullscreen(true);
         var frame = new Frame(context, FirstScreen(context, level));

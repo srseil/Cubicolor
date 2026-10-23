@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!-- Development tool: measures the original sound effects, renders the synthesized ones beside them, and
+         encodes the music to QOA. Never shipped. -->
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <RootNamespace>Cubicolor.Tools.SoundLab</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Cubicolor\Cubicolor.csproj" />
+    </ItemGroup>
+
+</Project>

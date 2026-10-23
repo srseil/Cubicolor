@@ -22,13 +22,6 @@ public interface IAudio : IDisposable
     void Apply(Settings settings);
 }
 
-public sealed class SilentAudio : IAudio
-{
-    public void Play(Sound sound) { }
-    public void Apply(Settings settings) { }
-    public void Dispose() { }
-}
-
 // Steam's achievements, one per difficulty finished; nothing without Steam.
 public interface IAchievements
 {
