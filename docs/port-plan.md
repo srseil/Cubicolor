@@ -1,6 +1,7 @@
 # Cubicolor in C#: the port plan
 
-**Status: accepted in outline, 2026-10-23.** §9 records the decisions and what is still open.
+**Status: accepted in outline, 2026-10-23.** §9 records the decisions and what is still open; §10 says
+where the work stands.
 
 ## Scope
 
@@ -320,3 +321,20 @@ macOS-only and moves on its own.
 7. **Open: pushing the branch change.** It rewrites what `master` shows on GitHub, so it waits for
    Stefan's go-ahead.
 8. **Open: which shipped sound came from which recording** (§4.1). Only matters if synthesis falls short.
+
+## 10. Where it stands
+
+- 2026-10-23: **macOS playable end to end, headless-verified.**
+  - Done:
+    - the rules, all 48 levels (solved by search, solutions recorded and replayed)
+    - progress and settings with the import of both earlier versions' saves
+    - the Metal renderer with procedural meshes and patterns
+    - every animation, the menus, the level screen, Core Text
+    - synthesized sound effects, the QOA music, Core Audio
+    - Steam achievements
+    - a universal NativeAOT `.app`
+  - All 48 levels play through the real game loop headless.
+  - Not yet checked by a person: the game in a window (input feel, fullscreen, controller, sound). Visual
+    checks so far are headless screenshots compared against the 2016 screenshots.
+  - Open: how the 53 MB music file is versioned; the Steamworks SDK libraries for packaging; Stefan's ear on
+    the synthesized sounds.
