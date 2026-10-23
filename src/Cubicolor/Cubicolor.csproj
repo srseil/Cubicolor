@@ -11,6 +11,17 @@
         <InternalsVisibleTo Include="Cubicolor.Tests" />
     </ItemGroup>
 
+    <!-- The shaders are compiled at load time by each platform's own compiler (Metal's newLibraryWithSource), so
+         they ship as source, embedded in the assembly. -->
+    <ItemGroup>
+        <EmbeddedResource Include="Shaders\**\*" LogicalName="Shaders/%(Filename)%(Extension)" />
+    </ItemGroup>
+
+    <!-- The game's data: levels and fonts, beside the executable. -->
+    <ItemGroup>
+        <None Include="..\..\assets\**\*" Link="assets\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
     <ItemGroup>
         <ProjectReference Include="..\Cubicolor.Simulation\Cubicolor.Simulation.csproj" />
     </ItemGroup>
