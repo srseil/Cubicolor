@@ -336,5 +336,7 @@ macOS-only and moves on its own.
   - All 48 levels play through the real game loop headless.
   - Not yet checked by a person: the game in a window (input feel, fullscreen, controller, sound). Visual
     checks so far are headless screenshots compared against the 2016 screenshots.
+  - First drafts of every Steam store and library image, the icon and screenshots: `--art <dir>` renders them
+    at their exact sizes from the game itself.
   - Open: how the 53 MB music file is versioned; the Steamworks SDK libraries for packaging; Stefan's ear on
     the synthesized sounds.

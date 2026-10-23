@@ -137,8 +137,9 @@ internal sealed unsafe class MetalRenderer : IRenderer
         var commands = MetalCommandBuffer.From(_queue, "frame");
         var pass = RenderPassDescriptor.Create();
         Vector4 background = scene.Background;
+        // A transparent background (for images to lay over others) clears to premultiplied colour.
         pass.ColorResolved(0, _multisample, new MetalTexture(target, (uint) width, (uint) height), LoadAction.Clear,
-            new MTLClearColor(background.X, background.Y, background.Z, 1));
+            new MTLClearColor(background.X * background.W, background.Y * background.W, background.Z * background.W, background.W));
         pass.Depth(_depth, LoadAction.Clear, StoreAction.DontCare, 1.0);
         MetalRenderEncoder encoder = commands.RenderPass(pass);
 

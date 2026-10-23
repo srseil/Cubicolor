@@ -30,12 +30,13 @@ internal static class Program
           --data-dir <dir>        where progress and settings live (headless default: a fresh temporary one)
           --timeout <seconds>     fail a run that takes longer
           --capture-audio <wav>   headless: write what the game played to a WAV file
+          --art <dir>             render the Steam store and library images, the icon and screenshots into <dir>
         """;
 
     private static int Main(string[] args)
     {
         bool headless = false;
-        string? script = null, level = null, dataDir = null, captureAudio = null;
+        string? script = null, level = null, dataDir = null, captureAudio = null, art = null;
         int width = 1280, height = 720;
         double timeout = double.PositiveInfinity;
         try
@@ -50,6 +51,7 @@ internal static class Program
                     case "--level": level = args[++i]; break;
                     case "--data-dir": dataDir = args[++i]; break;
                     case "--capture-audio": captureAudio = args[++i]; break;
+                    case "--art": art = args[++i]; headless = true; break;
                     case "--timeout": timeout = double.Parse(args[++i], CultureInfo.InvariantCulture); break;
                     case "--size":
                         string[] parts = args[++i].Split('x');
@@ -83,6 +85,7 @@ internal static class Program
 
         try
         {
+            if (art != null) return RenderArt(saves, assets, art);
             return headless
                 ? RunHeadless(saves, assets, width, height, script, level, timeout, captureAudio)
                 : RunWindowed(saves, assets, level);
@@ -174,6 +177,26 @@ internal static class Program
             Log.Error($"Run failed: {error}");
             return 1;
         }
+        return 0;
+    }
+
+    private static int RenderArt(SaveStore saves, string assets, string directory)
+    {
+        int width = 1280, height = 720;
+        using var renderer = new MetalRenderer(IntPtr.Zero, () => (width, height), vsync: false);
+        using var audio = new AudioService(MusicPath(assets), _ => null);
+        var text = new Text(new CoreTextFontLoader(), Path.Combine(assets, "fonts"), new OverlayAtlas(renderer.Atlas));
+        GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio, new NoAchievements());
+        // A development tool: it reads the recorded solutions from the repository it is run in.
+        string? root = Environment.CurrentDirectory;
+        while (root != null && !File.Exists(Path.Combine(root, "Cubicolor.slnx"))) root = Path.GetDirectoryName(root);
+        if (root == null)
+        {
+            Console.Error.WriteLine("--art runs from within the repository");
+            return 2;
+        }
+        string solutions = Path.Combine(root, "tests", "Cubicolor.Tests", "Fixtures", "solutions.txt");
+        new Art(context, text, solutions, (w, h) => (width, height) = (w, h)).RenderAll(directory);
         return 0;
     }
 
