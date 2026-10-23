@@ -1,22 +1,22 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
+using Cubicolor.Render;
 
-namespace Cubicolor.Platform;
+namespace Cubicolor.Platform.Mac;
 
 // A font file opened through macOS's Core Text, at one pixel size: the metrics, glyph bounds, advances and
 // kerning SdfFont lays text out by, and each glyph's coverage drawn by Core Graphics (docs/native-macos.md
 // §4.2). Core Text reads OpenType (CFF and TrueType outlines) itself, so there is no font parser here.
 //
 // Sizes are in pixels with one pixel per point; y runs UP from the baseline, as Core Text has it.
-internal sealed unsafe partial class CoreTextFont : IDisposable
+internal sealed unsafe partial class CoreTextFont : IFontFace
 {
     private IntPtr _font;
 
-    public double Ascent { get; }
-    public double Descent { get; }   // positive, below the baseline
-    public double Leading { get; }
-    public double CapHeight { get; }
+    public float Ascent { get; }
+    public float Descent { get; }   // positive, below the baseline
+    public float LineGap { get; }
 
     public CoreTextFont(string path, double size)
     {
@@ -32,10 +32,9 @@ internal sealed unsafe partial class CoreTextFont : IDisposable
         CFRelease(descriptors);
         if (_font == IntPtr.Zero) throw new InvalidOperationException($"Couldn't open the font in '{path}'");
 
-        Ascent = CTFontGetAscent(_font);
-        Descent = CTFontGetDescent(_font);
-        Leading = CTFontGetLeading(_font);
-        CapHeight = CTFontGetCapHeight(_font);
+        Ascent = (float) CTFontGetAscent(_font);
+        Descent = (float) CTFontGetDescent(_font);
+        LineGap = (float) CTFontGetLeading(_font);
     }
 
     // The glyph for a character, or 0 (the font's .notdef) when the font has none.
@@ -46,16 +45,16 @@ internal sealed unsafe partial class CoreTextFont : IDisposable
         return glyph;
     }
 
-    public double Advance(ushort glyph)
+    public float Advance(ushort glyph)
     {
         CGSize advance;
         CTFontGetAdvancesForGlyphs(_font, 0 /* horizontal */, &glyph, &advance, 1);
-        return advance.Width;
+        return (float) advance.Width;
     }
 
     // How much the font's layout moves `right` when it follows `left`, beyond their own advances: Core
     // Text's layout of the pair, which applies the font's kerning, against the two advances alone.
-    public double Kerning(char left, char right)
+    public float Kerning(char left, char right)
     {
         char* pair = stackalloc char[2] { left, right };
         IntPtr text = CFStringCreateWithCharacters(IntPtr.Zero, pair, 2);
@@ -71,15 +70,11 @@ internal sealed unsafe partial class CoreTextFont : IDisposable
         CFRelease(attributed);
         CFRelease(attributes);
         CFRelease(text);
-        return width - Advance(GlyphFor(left)) - Advance(GlyphFor(right));
+        return (float) width - Advance(GlyphFor(left)) - Advance(GlyphFor(right));
     }
 
-    // A glyph's coverage, 8 bits a pixel, cropped to its ink; null for a glyph with none (space). `Left` and
-    // `Top` place the crop: the x of its left edge from the pen, and the y of its top edge above the
-    // baseline.
-    public sealed record Ink(int Width, int Height, float[] Coverage, int Left, int Top);
-
-    public Ink? Rasterize(ushort glyph)
+    // A glyph's coverage, cropped to its ink; null for a glyph with none (space).
+    public GlyphInk? Rasterize(ushort glyph)
     {
         CGRect bounds;
         CTFontGetBoundingRectsForGlyphs(_font, 0, &glyph, &bounds, 1);
@@ -107,8 +102,8 @@ internal sealed unsafe partial class CoreTextFont : IDisposable
     }
 
     // Coverage drawn into a `width` by `height` canvas whose bottom-left sits at (`left`, `bottom`) from the
-    // pen, cropped to its ink; null when nothing was drawn. Also how SymbolImages crops an SF Symbol.
-    internal static Ink? Crop(byte[] pixels, int width, int height, int left, int bottom)
+    // pen, cropped to its ink; null when nothing was drawn.
+    private static GlyphInk? Crop(byte[] pixels, int width, int height, int left, int bottom)
     {
         // The first row of the bitmap is its TOP (y = bottom + height in the font's space).
         int x0 = width, y0 = height, x1 = -1, y1 = -1;
@@ -122,11 +117,10 @@ internal sealed unsafe partial class CoreTextFont : IDisposable
         if (x1 < 0) return null;
 
         int iw = x1 - x0 + 1, ih = y1 - y0 + 1;
-        var coverage = new float[iw * ih];
+        var coverage = new byte[iw * ih];
         for (int y = 0; y < ih; y++)
-            for (int x = 0; x < iw; x++)
-                coverage[y * iw + x] = pixels[(y0 + y) * width + x0 + x] / 255f;
-        return new Ink(iw, ih, coverage, left + x0, bottom + height - y0);
+            pixels.AsSpan((y0 + y) * width + x0, iw).CopyTo(coverage.AsSpan(y * iw));
+        return new GlyphInk(iw, ih, coverage, left + x0, bottom + height - y0);
     }
 
     public void Dispose()
@@ -159,7 +153,6 @@ internal sealed unsafe partial class CoreTextFont : IDisposable
     [LibraryImport(CoreTextPath)] private static partial double CTFontGetAscent(IntPtr font);
     [LibraryImport(CoreTextPath)] private static partial double CTFontGetDescent(IntPtr font);
     [LibraryImport(CoreTextPath)] private static partial double CTFontGetLeading(IntPtr font);
-    [LibraryImport(CoreTextPath)] private static partial double CTFontGetCapHeight(IntPtr font);
     [LibraryImport(CoreTextPath)] private static partial byte CTFontGetGlyphsForCharacters(IntPtr font, char* characters, ushort* glyphs, nint count);
     [LibraryImport(CoreTextPath)] private static partial double CTFontGetAdvancesForGlyphs(IntPtr font, int orientation, ushort* glyphs, CGSize* advances, nint count);
     [LibraryImport(CoreTextPath)] private static partial CGRect CTFontGetBoundingRectsForGlyphs(IntPtr font, int orientation, ushort* glyphs, CGRect* rects, nint count);
@@ -172,4 +165,9 @@ internal sealed unsafe partial class CoreTextFont : IDisposable
     [LibraryImport(CoreGraphicsPath)] private static partial void CGContextSetShouldSmoothFonts(IntPtr context, byte value);
     [LibraryImport(CoreGraphicsPath)] private static partial void CGContextSetRGBFillColor(IntPtr context, double r, double g, double b, double a);
     [LibraryImport(CoreGraphicsPath)] private static partial void CGContextRelease(IntPtr context);
+}
+
+internal sealed class CoreTextFontLoader : IFontLoader
+{
+    public IFontFace Open(string path, float pixelSize) => new CoreTextFont(path, pixelSize);
 }

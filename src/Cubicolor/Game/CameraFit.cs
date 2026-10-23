@@ -18,10 +18,11 @@ public static class CameraFit
     // View and projection showing the box from `min` to `max` in a viewport of `aspect` (width / height), with
     // `margin` of the view's height free above and below it, never zoomed in further than `minHeight` world
     // units of view height.
-    public static (Matrix4x4 View, Matrix4x4 Projection) Fit(Vector3 min, Vector3 max, float aspect, float margin, float minHeight)
+    public static (Matrix4x4 View, Matrix4x4 Projection) Fit(Vector3 min, Vector3 max, float aspect, float margin, float minHeight,
+                                                            Vector3? forward = null)
     {
         Vector3 centre = (min + max) / 2;
-        Matrix4x4 view = Matrix4x4.CreateLookAt(centre - Forward * 50, centre, Vector3.UnitY);
+        Matrix4x4 view = Matrix4x4.CreateLookAt(centre - (forward ?? Forward) * 50, centre, Vector3.UnitY);
 
         var low = new Vector2(float.MaxValue);
         var high = new Vector2(float.MinValue);
@@ -39,5 +40,17 @@ public static class CameraFit
         Matrix4x4 projection = Matrix4x4.CreateOrthographicOffCenter(
             middle.X - width / 2, middle.X + width / 2, middle.Y - height / 2, middle.Y + height / 2, 1f, 100f);
         return (view, projection);
+    }
+
+    // The same, but framing the box in `target` (pixels) of a `screen`-sized frame rather than the whole of it.
+    public static (Matrix4x4 View, Matrix4x4 Projection) FitInto(Vector3 min, Vector3 max, Render.Rect target, Vector2 screen, Vector3 forward)
+    {
+        var (view, projection) = Fit(min, max, target.Width / target.Height, 0f, 0f, forward);
+        // The fitted box in view space, from the projection's scale and offset.
+        float width = 2 / projection.M11, height = 2 / projection.M22;
+        float left = (-1 - projection.M41) * width / 2, top = (1 - projection.M42) * height / 2;
+        float perPixel = width / target.Width;
+        float frameLeft = left - target.X * perPixel, frameTop = top + target.Y * perPixel;
+        return (view, Matrix4x4.CreateOrthographicOffCenter(frameLeft, frameLeft + screen.X * perPixel, frameTop - screen.Y * perPixel, frameTop, 1f, 100f));
     }
 }

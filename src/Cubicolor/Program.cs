@@ -1,67 +1,181 @@
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
+using System.Threading;
+using Cubicolor.App;
 using Cubicolor.Game;
+using Cubicolor.Platform;
+using Cubicolor.Platform.Mac;
 using Cubicolor.Platform.Metal;
 using Cubicolor.Render;
 using Cubicolor.Simulation.Levels;
+using Cubicolor.Simulation.Saves;
 using Cubicolor.Utilities;
 
 namespace Cubicolor;
 
+// The composition root: options, the platform, the services, the loop.
 internal static class Program
 {
+    private const string Usage = """
+        Cubicolor [options]
+          --headless              no window: render offscreen at a fixed 60 frames a second
+          --script <file>         run a script of commands (see App/Script.cs), headless; the run ends with it
+          --exec "<commands>"     the same, inline, ';'-separated
+          --size <W>x<H>          headless frame size in pixels (default 1280x720)
+          --level <name>          start in a level, e.g. normal03
+          --data-dir <dir>        where progress and settings live (headless default: a fresh temporary one)
+          --timeout <seconds>     fail a run that takes longer
+        """;
+
     private static int Main(string[] args)
     {
-        string level = "normal03";
-        string output = "scratch/frame.png";
-        string moves = "";
-        double extra = 0;
+        bool headless = false;
+        string? script = null, level = null, dataDir = null;
         int width = 1280, height = 720;
-        for (int i = 0; i < args.Length; i++)
+        double timeout = double.PositiveInfinity;
+        try
         {
-            switch (args[i])
+            for (int i = 0; i < args.Length; i++)
             {
-                case "--level": level = args[++i]; break;
-                case "--screenshot": output = args[++i]; break;
-                case "--moves": moves = args[++i]; break;
-                case "--time": extra = double.Parse(args[++i], System.Globalization.CultureInfo.InvariantCulture); break;
-                case "--size":
-                    string[] parts = args[++i].Split('x');
-                    width = int.Parse(parts[0]);
-                    height = int.Parse(parts[1]);
-                    break;
+                switch (args[i])
+                {
+                    case "--headless": headless = true; break;
+                    case "--script": script = File.ReadAllText(args[++i]); break;
+                    case "--exec": script = args[++i]; break;
+                    case "--level": level = args[++i]; break;
+                    case "--data-dir": dataDir = args[++i]; break;
+                    case "--timeout": timeout = double.Parse(args[++i], CultureInfo.InvariantCulture); break;
+                    case "--size":
+                        string[] parts = args[++i].Split('x');
+                        (width, height) = (int.Parse(parts[0], CultureInfo.InvariantCulture), int.Parse(parts[1], CultureInfo.InvariantCulture));
+                        break;
+                    case "--help": Console.WriteLine(Usage); return 0;
+                    default: throw new ArgumentException($"Unknown option {args[i]}");
+                }
             }
         }
-
-        var difficulty = Enum.Parse<Difficulty>(level[..^2], ignoreCase: true);
-        Level loaded = LevelFile.Load(Path.Combine(AppContext.BaseDirectory, "assets", "levels"), difficulty, int.Parse(level[^2..]));
-        using var renderer = new MetalRenderer(IntPtr.Zero, () => (width, height), vsync: false);
-        var meshes = BoardMeshes.Upload(renderer);
-        var puzzle = new Puzzle(loaded);
-        var board = new BoardView(loaded, meshes);
-        board.Start(puzzle);
-        const double step = 1.0 / 60;
-        while (!board.Ready()) board.Advance(step);
-        foreach (char c in moves)
+        catch (Exception e) when (e is ArgumentException or FormatException or IndexOutOfRangeException or IOException)
         {
-            Direction direction = c switch { 'F' => Direction.Forwards, 'B' => Direction.Backwards, 'L' => Direction.Left, _ => Direction.Right };
-            board.Show(puzzle.Roll(direction));
-            do board.Advance(step); while (!board.Ready());
+            Console.Error.WriteLine($"{e.Message}\n{Usage}");
+            return 2;
         }
-        for (double t = 0; t < extra; t += step) board.Advance(step);
 
-        var scene = new Scene
+        if (script != null && !headless)
         {
-            Background = Palette.Background,
-            Lighting = new Lighting(new(0.27f, 1f, 0.6f), new(0.233f), new(0.574f), 0.09f, 8f),
-        };
-        var (min, max) = board.Bounds();
-        (scene.View, scene.Projection) = CameraFit.Fit(min, max, (float) width / height, 0.12f, 6f);
-        board.Draw(scene);
-        renderer.Draw(scene, ReadOnlySpan<OverlayVertex>.Empty);
-        Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output))!);
-        Png.Write(output, renderer.ReadPixels(), renderer.Width, renderer.Height, bgra: false, opaque: true);
-        Log.Info($"Wrote {output}");
+            Console.Error.WriteLine("Scripts run headless only: add --headless");
+            return 2;
+        }
+
+        string assets = Path.Combine(AppContext.BaseDirectory, "assets");
+        bool temporary = headless && dataDir == null;
+        if (temporary) dataDir = Path.Combine(Path.GetTempPath(), "cubicolor-" + Guid.NewGuid().ToString("N"));
+        SaveLocations locations = dataDir != null
+            ? new SaveLocations(dataDir, [], [])
+            : SaveLocations.For(SaveLocations.Platform.MacOS, Environment.GetEnvironmentVariable, InstallDirectories());
+        SaveStore saves = SaveStore.Load(locations);
+        foreach (string source in saves.Sources) Log.Info($"Loaded {source}");
+
+        try
+        {
+            return headless
+                ? RunHeadless(saves, assets, width, height, script, level, timeout)
+                : RunWindowed(saves, assets, level);
+        }
+        finally
+        {
+            if (temporary && Directory.Exists(dataDir)) Directory.Delete(dataDir!, recursive: true);
+        }
+    }
+
+    // Where the earlier versions' files may sit beside the game: the executable's directory, the working
+    // directory, and inside a macOS bundle both Contents/MacOS and Contents/Resources.
+    private static IEnumerable<string> InstallDirectories()
+    {
+        string exe = AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
+        yield return exe;
+        yield return Environment.CurrentDirectory;
+        if (Path.GetFileName(exe) == "MacOS") yield return Path.Combine(Path.GetDirectoryName(exe)!, "Resources");
+    }
+
+    private static GameContext Context(IRenderer renderer, SaveStore saves, string assets, IFontLoader fonts)
+    {
+        var text = new Text(fonts, Path.Combine(assets, "fonts"), new OverlayAtlas(renderer.Atlas));
+        return new GameContext(renderer, BoardMeshes.Upload(renderer), new Ui(text), saves, new SilentAudio(), new NoAchievements(),
+            Path.Combine(assets, "levels"));
+    }
+
+    private static IScreen FirstScreen(GameContext context, string? level) => level == null
+        ? new MenuScreen(context)
+        : new LevelScreen(context, Enum.Parse<Difficulty>(level[..^2], ignoreCase: true), int.Parse(level[^2..], CultureInfo.InvariantCulture));
+
+    private static int RunHeadless(SaveStore saves, string assets, int width, int height, string? scriptText, string? level, double timeout)
+    {
+        using var renderer = new MetalRenderer(IntPtr.Zero, () => (width, height), vsync: false);
+        GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader());
+        var input = new ScriptedInput();
+        var frame = new Frame(context, FirstScreen(context, level));
+        var script = new Script(scriptText ?? "", input);
+        const double step = 1.0 / 60;
+        double time = 0;
+        while (!script.Done)
+        {
+            if (time > timeout)
+            {
+                Log.Error($"Timed out after {timeout} s");
+                return 4;
+            }
+            script.BeforeFrame(time, frame.Screen, context);
+            if (script.Error != null) break;
+            frame.Run(input, step, width, height);
+            script.AfterFrame(renderer);
+            time += step;
+            if (context.QuitRequested) break;
+        }
+        if (script.Error is { } error)
+        {
+            Log.Error($"Run failed: {error}");
+            return 1;
+        }
+        return 0;
+    }
+
+    private static int RunWindowed(SaveStore saves, string assets, string? level)
+    {
+        AppKit.Start("Cubicolor");
+        Settings settings = saves.Settings;
+        var (w, h) = settings.WindowSize ?? (1280, 720);
+        using var window = new MacWindow(w, h, "Cubicolor");
+        var input = new MacInput(window);
+        MenuScreen.KeyName = KeyCodes.Name;
+        using var renderer = new MetalRenderer(window.MetalLayer, () =>
+            ((int) MathF.Round(window.Width * window.PixelDensity), (int) MathF.Round(window.Height * window.PixelDensity)), settings.VSync);
+        GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader());
+        context.ApplyDisplay = s => window.SetFullscreen(s.Fullscreen);
+        if (settings.Fullscreen) window.SetFullscreen(true);
+        var frame = new Frame(context, FirstScreen(context, level));
+
+        var clock = Stopwatch.StartNew();
+        double last = 0;
+        while (!window.CloseRequested && !context.QuitRequested)
+        {
+            double now = clock.Elapsed.TotalSeconds;
+            double seconds = Math.Min(now - last, 0.1);
+            last = now;
+            try
+            {
+                if (!frame.Run(input, seconds, renderer.Width, renderer.Height)) Thread.Sleep(5);
+            }
+            catch (Exception e) when (e is not OutOfMemoryException)
+            {
+                // One bad frame is logged, not fatal.
+                Log.Error($"Frame failed: {e}");
+            }
+            if (!settings.VSync) Thread.Sleep(1);
+        }
+        saves.SaveSettings();
         return 0;
     }
 }

@@ -7,7 +7,7 @@ namespace Cubicolor.Render;
 // space left, or opens a new one. The first texels are kept fully covered for solid shapes.
 public sealed class OverlayAtlas
 {
-    public const int Size = 1024;
+    public const int Size = 2048;
     private const int Padding = 1;
 
     private readonly IOverlayAtlas _target;
@@ -17,12 +17,22 @@ public sealed class OverlayAtlas
     {
         if (target.Size != Size) throw new ArgumentException($"The atlas is {target.Size} texels, expected {Size}");
         _target = target;
+        Clear();
+    }
+
+    // Forget everything placed so far (what was handed out is overwritten from now on).
+    public void Clear()
+    {
         Span<byte> solid = stackalloc byte[4 * 4];
         solid.Fill(255);
         _target.Upload(0, 0, 4, 4, solid);
+        _shelfY = 0;
         _x = 4 + Padding;
         _shelfHeight = 4;
     }
+
+    public bool Fits(int width, int height) =>
+        _x + width + Padding <= Size ? _shelfY + height + Padding <= Size : _shelfY + _shelfHeight + Padding + height + Padding <= Size;
 
     // A texel in the middle of the covered block.
     public static Vector2 Solid => new(2f / Size, 2f / Size);

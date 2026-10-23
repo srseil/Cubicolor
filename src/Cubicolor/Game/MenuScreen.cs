@@ -1,0 +1,205 @@
+using System;
+using System.Linq;
+using System.Numerics;
+using Cubicolor.Render;
+using Cubicolor.Simulation.Input;
+using Cubicolor.Simulation.Levels;
+using Cubicolor.Simulation.Saves;
+
+namespace Cubicolor.Game;
+
+// The main menu: the logo, the sections down the left (Play, Controls, Settings, Credits, Quit) and the
+// chosen section's panel on the right, as in both earlier versions.
+public sealed class MenuScreen : IScreen
+{
+    public const string Version = "Cubicolor v2.0";
+
+    private enum Section { Play, Controls, Settings, Credits }
+
+    private readonly GameContext _context;
+    private readonly LogoView _logo;
+    private Section _section = Section.Play;
+    private Difficulty _difficulty;
+    private GameAction? _rebinding;
+
+    public MenuScreen(GameContext context, Difficulty difficulty = Difficulty.Normal)
+    {
+        _context = context;
+        _difficulty = difficulty;
+        _logo = new LogoView(context.Meshes);
+        context.Ui.Focus("Play", force: true);
+    }
+
+    // Shows a key's name as the keyboard layout prints it; set by the platform.
+    public static Func<Key, string> KeyName { get; set; } = key => key.ToString();
+
+    public IScreen Frame(double seconds, Scene scene)
+    {
+        Ui ui = _context.Ui;
+        scene.Background = _context.Background;
+        scene.Lighting = GameContext.Light;
+        float width = ui.Size.X / ui.Scale;
+        float left = (width - 1060) / 2;
+
+        ui.Label("Cubicolor", new Rect(0, ui.Px(28), ui.Size.X, ui.Px(100)), 84, style: FontStyle.Black);
+        _logo.Advance(seconds);
+        _logo.Draw(scene, ui.R(width / 2 - 150, 130, 300, 90), ui.Size);
+
+        if (_rebinding is { } action)
+        {
+            Capture(ui, action);
+        }
+        else if (ui.Navigation.Back && _section != Section.Play)
+        {
+            ui.Focus(_section.ToString(), force: true);
+            _section = Section.Play;
+        }
+
+        IScreen next = this;
+        (string Label, Section? Section)[] items =
+            [("Play", Section.Play), ("Controls", Section.Controls), ("Settings", Section.Settings), ("Credits", Section.Credits), ("Quit", null)];
+        for (int i = 0; i < items.Length; i++)
+        {
+            var (label, section) = items[i];
+            if (ui.Button(label, ui.R(left, 270 + i * 62, 210, 48), selected: section == _section && section != null))
+            {
+                if (section is { } s) _section = s;
+                else _context.QuitRequested = true;
+            }
+        }
+
+        Rect panel = ui.R(left + 260, 262, 800, 420);
+        ui.Panel(panel);
+        switch (_section)
+        {
+            case Section.Play: next = Play(ui, panel) ?? next; break;
+            case Section.Controls: Controls(ui, panel); break;
+            case Section.Settings: SettingsPanel(ui, panel); break;
+            case Section.Credits: Credits(ui, panel); break;
+        }
+
+        ui.Label(Version, ui.P(width - ui.TextWidth(Version, 18) / ui.Scale - 20, 690), 18);
+        if (ui.Clicked) _context.Audio.Play(Sound.Click);
+        return next;
+    }
+
+    private IScreen? Play(Ui ui, Rect panel)
+    {
+        Progress progress = _context.Saves.Progress;
+        float x = panel.X / ui.Scale, y = panel.Y / ui.Scale;
+        Difficulty[] all = Enum.GetValues<Difficulty>();
+        for (int i = 0; i < all.Length; i++)
+        {
+            Difficulty d = all[i];
+            bool open = progress.Solved(d) != Progress.Locked;
+            if (ui.Button(d.ToString(), ui.R(x + 160 + i * 165, y + 24, 150, 44), enabled: open, selected: d == _difficulty)) _difficulty = d;
+        }
+        for (int n = 1; n <= Level.PerDifficulty; n++)
+        {
+            int row = (n - 1) / 4, column = (n - 1) % 4;
+            Rect cell = ui.R(x + 250 + column * 80, y + 92 + row * 78, 64, 64);
+            bool open = progress.IsOpen(_difficulty, n);
+            if (ui.Button(n.ToString(), cell, 26, enabled: open, selected: progress.IsSolved(_difficulty, n), id: $"{_difficulty} {n}"))
+                return new LevelScreen(_context, _difficulty, n);
+        }
+        return null;
+    }
+
+    private void Controls(Ui ui, Rect panel)
+    {
+        Settings settings = _context.Saves.Settings;
+        float x = panel.X / ui.Scale + 60, y = panel.Y / ui.Scale + 24;
+        ui.Label("Player Movement", ui.P(x, y), 28);
+        (GameAction Action, string Label, string Pad)[] rows =
+        [
+            (GameAction.Forwards, "Forwards:", ""),
+            (GameAction.Backwards, "Backwards:", "Analog stick"),
+            (GameAction.Left, "Left:", "or D-Pad"),
+            (GameAction.Right, "Right:", ""),
+            (GameAction.Restart, "Restart:", "B / Circle"),
+            (GameAction.Pause, "Pause Menu:", "Start / Options"),
+        ];
+        float rowY = y + 44;
+        for (int i = 0; i < rows.Length; i++)
+        {
+            var (action, label, pad) = rows[i];
+            if (i == 4)
+            {
+                ui.Label("Level Control", ui.P(x, rowY + 6), 28);
+                rowY += 44;
+            }
+            ui.Label(label, ui.P(x + 20, rowY + 8), 24);
+            string name = _rebinding == action ? "Press a key" : KeyName(settings.Keys[action]);
+            if (ui.Button(name, ui.R(x + 200, rowY, 220, 40), 22, id: label)) _rebinding = action;
+            if (pad.Length > 0) ui.Label(pad, ui.P(x + 460, rowY + 8), 22);
+            rowY += 50;
+        }
+    }
+
+    // The next key pressed becomes the binding. A key already bound elsewhere swaps with this one, so no
+    // action is ever left without a key.
+    private void Capture(Ui ui, GameAction action)
+    {
+        Key? key = ui.Input.PressedThisFrame().FirstOrDefault(k => k != Key.Unknown);
+        if (key is not { } pressed || pressed == Key.Unknown) return;
+        Settings settings = _context.Saves.Settings;
+        foreach (var (other, bound) in settings.Keys.ToArray())
+            if (bound == pressed && other != action)
+                settings.Keys[other] = settings.Keys[action];
+        settings.Keys[action] = pressed;
+        _context.Saves.SaveSettings();
+        _rebinding = null;
+    }
+
+    private void SettingsPanel(Ui ui, Rect panel)
+    {
+        Settings s = _context.Saves.Settings;
+        float x = panel.X / ui.Scale + 60, y = panel.Y / ui.Scale + 24;
+        bool changed = false;
+
+        ui.Label("Game", ui.P(x, y), 28);
+        bool dark = s.DarkBackground, hide = s.HideUi;
+        changed |= ui.Toggle("Dark Background", ui.R(x + 20, y + 44, 280, 36), ref dark);
+        changed |= ui.Toggle("Hide UI", ui.R(x + 360, y + 44, 200, 36), ref hide);
+        s.DarkBackground = dark;
+        s.HideUi = hide;
+
+        ui.Label("Audio", ui.P(x, y + 104), 28);
+        double music = s.MusicVolume, sound = s.SoundVolume;
+        bool musicMuted = s.MusicMuted, soundMuted = s.SoundMuted;
+        ui.Label("Music Volume", ui.P(x + 20, y + 146), 22);
+        changed |= ui.Slider("Music Volume", ui.R(x + 20, y + 180, 260, 20), ref music);
+        changed |= ui.Toggle("Mute Music", ui.R(x + 20, y + 212, 220, 32), ref musicMuted, 22);
+        ui.Label("Sound Volume", ui.P(x + 360, y + 146), 22);
+        changed |= ui.Slider("Sound Volume", ui.R(x + 360, y + 180, 260, 20), ref sound);
+        changed |= ui.Toggle("Mute Sounds", ui.R(x + 360, y + 212, 220, 32), ref soundMuted, 22);
+        (s.MusicVolume, s.SoundVolume, s.MusicMuted, s.SoundMuted) = (music, sound, musicMuted, soundMuted);
+
+        ui.Label("Video", ui.P(x, y + 270), 28);
+        bool fullscreen = s.Fullscreen, vsync = s.VSync;
+        bool display = ui.Toggle("Fullscreen", ui.R(x + 20, y + 314, 220, 36), ref fullscreen);
+        display |= ui.Toggle("VSync", ui.R(x + 360, y + 314, 200, 36), ref vsync);
+        (s.Fullscreen, s.VSync) = (fullscreen, vsync);
+
+        if (changed || display)
+        {
+            _context.Saves.SaveSettings();
+            _context.Audio.Apply(s);
+            ui.Dark = s.DarkBackground;
+        }
+        if (display) _context.ApplyDisplay?.Invoke(s);
+    }
+
+    private static void Credits(Ui ui, Rect panel)
+    {
+        float x = panel.X / ui.Scale, y = panel.Y / ui.Scale;
+        float w = panel.Width / ui.Scale;
+        ui.Label("Cubicolor", ui.R(x, y + 40, w, 60), 48, style: FontStyle.Black);
+        ui.Label("A game by Stefan Seil", ui.R(x, y + 110, w, 40), 26);
+        ui.Label("Relaxing Piano Music by Kevin MacLeod (incompetech.com)", ui.R(x, y + 200, w, 26), 18);
+        ui.Label("Licensed under Creative Commons: By Attribution 3.0 License", ui.R(x, y + 226, w, 26), 18);
+        ui.Label("https://creativecommons.org/licenses/by/3.0/", ui.R(x, y + 252, w, 26), 18);
+        ui.Label("Vollkorn by Friedrich Althausen, SIL Open Font License 1.1", ui.R(x, y + 292, w, 26), 18);
+        ui.Label("@Moltenplay        Moltenplay.com", ui.R(x, y + 350, w, 30), 22);
+    }
+}
