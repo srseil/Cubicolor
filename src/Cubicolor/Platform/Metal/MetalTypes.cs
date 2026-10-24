@@ -257,6 +257,12 @@ internal readonly struct RenderPipelineDescriptor
         Call(attachment, SelDestinationAlpha, (nuint) 5);
     }
 
+    private static readonly IntPtr SelWriteMask = Sel("setWriteMask:");
+
+    // Which colour channels the pipeline writes (MTLColorWriteMask: 0 none, 0xf all).
+    public void WriteMask(int index, ulong mask) =>
+        Call(Send<IntPtr, nuint>(Send<IntPtr>(Handle, SelColorAttachments), SelAt, (nuint) index), SelWriteMask, (nuint) mask);
+
     public void DepthFormat(PixelFormat format) => Call(Handle, SelDepthFormat, format);
     public void SampleCount(int samples) => Call(Handle, SelSampleCount, (nuint) samples);
 

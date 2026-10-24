@@ -24,7 +24,8 @@ internal sealed unsafe class MetalRenderer : IRenderer
     private readonly MetalLayer? _layer;
     private readonly Func<(int Width, int Height)> _size;
 
-    private readonly MetalPipeline _opaque, _translucent, _overlay;
+    private readonly MetalPipeline _opaque, _translucent, _depthOnly, _overlay;
+    private IntPtr _lastCommands;   // the last frame's command buffer, retained, for waiting on the GPU
     private readonly IntPtr _sampler;
     private readonly MetalAtlas _atlas;
     private readonly List<(MetalBuffer Vertices, MetalBuffer Indices, int IndexCount)> _meshes = [];
@@ -53,8 +54,9 @@ internal sealed unsafe class MetalRenderer : IRenderer
 
         MetalLibrary scene = _device.NewLibrary(Shader("Scene.metal"), "Scene.metal");
         MetalLibrary overlay = _device.NewLibrary(Shader("Overlay.metal"), "Overlay.metal");
-        _opaque = ScenePipeline(scene, "scene, opaque", translucent: false);
-        _translucent = ScenePipeline(scene, "scene, translucent", translucent: true);
+        _opaque = ScenePipeline(scene, "scene, opaque", ScenePass.Opaque);
+        _translucent = ScenePipeline(scene, "scene, translucent", ScenePass.Translucent);
+        _depthOnly = ScenePipeline(scene, "scene, depth only", ScenePass.DepthOnly);
 
         var descriptor = RenderPipelineDescriptor.Create("overlay", overlay.Function("overlay_vertex"), overlay.Function("overlay_fragment"));
         descriptor.ColorFormat(0, ColorFormat);
@@ -66,21 +68,26 @@ internal sealed unsafe class MetalRenderer : IRenderer
 
         _sampler = _device.NewSampler(SamplerFilter.Linear, MipFilter.NotMipmapped, AddressMode.ClampToEdge, 0);
         _atlas = new MetalAtlas(_device.NewTexture("overlay atlas", PixelFormat.R8Unorm, OverlayAtlas.Size, OverlayAtlas.Size,
-            TextureUsage.ShaderRead, StorageMode.Shared));
+            TextureUsage.ShaderRead, StorageMode.Shared), this);
         Log.Info($"Renderer: {Name}");
     }
 
-    private MetalPipeline ScenePipeline(MetalLibrary library, string label, bool translucent)
+    private enum ScenePass { Opaque, Translucent, DepthOnly }
+
+    // A translucent mesh fades as one object: its depth first (DepthOnly, no colour), then its colour only
+    // where it is the nearest surface (Translucent, depth equal), so each pixel blends it exactly once and
+    // its own sides never show through one another.
+    private MetalPipeline ScenePipeline(MetalLibrary library, string label, ScenePass pass)
     {
         var descriptor = RenderPipelineDescriptor.Create(label, library.Function("scene_vertex"), library.Function("scene_fragment"));
         descriptor.ColorFormat(0, ColorFormat);
-        if (translucent) descriptor.AlphaBlend(0);
+        if (pass == ScenePass.Translucent) descriptor.AlphaBlend(0);
+        if (pass == ScenePass.DepthOnly) descriptor.WriteMask(0, 0);
         descriptor.DepthFormat(PixelFormat.Depth32Float);
         descriptor.SampleCount(Samples);
         descriptor.VertexLayout([(VertexFormat.Float3, 0), (VertexFormat.Float3, 12)], MeshVertex.Stride, VertexBufferIndex);
-        // Translucent meshes write depth too: drawn farthest first, each hides the parts of those behind it that
-        // it covers, so fading tiles that overlap don't show through one another.
-        return new MetalPipeline(_device.NewRenderPipeline(descriptor.Handle, label), _device.NewDepthState(CompareFunction.LessEqual, true));
+        IntPtr depth = _device.NewDepthState(CompareFunction.LessEqual, pass != ScenePass.Translucent);
+        return new MetalPipeline(_device.NewRenderPipeline(descriptor.Handle, label), depth);
     }
 
     private static string Shader(string name)
@@ -111,7 +118,7 @@ internal sealed unsafe class MetalRenderer : IRenderer
     private struct DrawUniforms
     {
         public Matrix4x4 Model;
-        public Vector4 Color, Accent, Pattern;
+        public Vector4 Color, Accent, Pattern, PaintUp;
     }
 
     public bool Draw(Scene scene, ReadOnlySpan<OverlayVertex> overlay)
@@ -169,8 +176,13 @@ internal sealed unsafe class MetalRenderer : IRenderer
         {
             // View space looks down -z: the farthest has the smallest z.
             translucent.Sort((a, b) => a.Depth.CompareTo(b.Depth));
-            encoder.SetPipeline(_translucent);
-            foreach (var (_, item) in translucent) DrawMesh(encoder, item);
+            foreach (var (_, item) in translucent)
+            {
+                encoder.SetPipeline(_depthOnly);
+                DrawMesh(encoder, item);
+                encoder.SetPipeline(_translucent);
+                DrawMesh(encoder, item);
+            }
         }
 
         MetalBuffer overlayBuffer = default;
@@ -187,6 +199,8 @@ internal sealed unsafe class MetalRenderer : IRenderer
 
         if (drawable != IntPtr.Zero) commands.Present(drawable);
         commands.Commit();
+        Release(ref _lastCommands);
+        _lastCommands = objc_retain(commands.Handle);
         // The command buffer keeps what it uses alive until it completes.
         if (overlayBuffer.Handle != IntPtr.Zero)
         {
@@ -213,6 +227,7 @@ internal sealed unsafe class MetalRenderer : IRenderer
             Color = item.Color,
             Accent = item.Accent,
             Pattern = new Vector4((float) item.Surface, item.Progress, 0, 0),
+            PaintUp = new Vector4(item.PaintUp == Vector3.Zero ? Vector3.UnitY : item.PaintUp, 0),
         };
         encoder.SetVertexBytes(uniforms, 1);
         encoder.SetFragmentBytes(uniforms, 1);
@@ -272,15 +287,28 @@ internal sealed unsafe class MetalRenderer : IRenderer
         _meshes.Clear();
         _opaque.Release();
         _translucent.Release();
+        _depthOnly.Release();
+        Release(ref _lastCommands);
         _overlay.Release();
     }
 
-    private sealed class MetalAtlas(MetalTexture texture) : IOverlayAtlas
+    // Waits for the last frame the GPU was given to finish.
+    private void WaitForGpu()
+    {
+        if (_lastCommands != IntPtr.Zero) new MetalCommandBuffer(_lastCommands).WaitUntilCompleted();
+    }
+
+    // The atlas lives in memory the CPU and GPU share, and a frame still drawing may be reading it: a new
+    // glyph waits for that frame first, or it would flicker in half written. Glyphs are added rarely.
+    private sealed class MetalAtlas(MetalTexture texture, MetalRenderer renderer) : IOverlayAtlas
     {
         public MetalTexture Texture { get; } = texture;
         public int Size => (int) Texture.Width;
 
-        public void Upload(int x, int y, int width, int height, ReadOnlySpan<byte> coverage) =>
+        public void Upload(int x, int y, int width, int height, ReadOnlySpan<byte> coverage)
+        {
+            renderer.WaitForGpu();
             Texture.ReplaceRegion(x, y, width, height, coverage, 1);
+        }
     }
 }

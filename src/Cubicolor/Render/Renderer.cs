@@ -26,8 +26,9 @@ public enum Surface
 
 // One mesh to draw: where (Model, object to world), in which colours, with which pattern. Colours are linear
 // RGB; Color.W is the opacity the whole mesh is drawn with.
+// For the paint, PaintUp points away from the face it starts at, in the mesh's own space (zero means +y).
 public readonly record struct DrawItem(MeshHandle Mesh, Matrix4x4 Model, Vector4 Color, Surface Surface = Surface.Plain,
-                                       Vector4 Accent = default, float Progress = 0);
+                                       Vector4 Accent = default, float Progress = 0, Vector3 PaintUp = default);
 
 // The light the scene is lit by: an ambient term and one directional light (Direction points towards the
 // light), both linear RGB, plus a soft highlight.

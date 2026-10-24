@@ -19,6 +19,7 @@ struct Draw
     float4 color;            // rgb, and the opacity of the whole mesh
     float4 accent;
     float4 pattern;          // x: Surface, y: progress
+    float4 paintUp;          // xyz: away from the face the paint starts at, in the mesh's own space
 };
 
 struct VertexIn
@@ -29,7 +30,8 @@ struct VertexIn
 
 struct Fragment
 {
-    float4 position [[position]];
+    // Invariant: the depth pass and the colour pass of a translucent mesh must reach exactly the same depth.
+    float4 position [[position, invariant]];
     float3 normal;
     float3 local;
     float3 localNormal;
@@ -60,11 +62,19 @@ static float coverage(float distance)
     return clamp(0.5 - distance / width, 0.0, 1.0);
 }
 
-// The paint's front: how far along the surface a point is from the cube's bottom edge, going up the side
-// it is on and then in over the top towards the middle (0 at the bottom, 1 at the top edge, 1.5 at the
-// top's centre). The fingers are a smooth wave along the cube's girth, so the paint rises in tongues.
-static float paint_reach(float3 p, float3 n)
+// The paint's front: how far along the surface a point is from the face the paint starts at (the cube's
+// bottom when it began: `up` points away from it, in the cube's own space), going up the side the point is on
+// and then in over the opposite face towards its middle: 0 at the bottom, 1 at the top edge, 1.5 at the
+// top's centre. The tongues are a smooth wave along the cube's girth, so the paint rises in fingers; they
+// grow in from nothing at the bottom, so the paint starts evenly all round.
+static float paint_reach(float3 position, float3 normal, float3 up)
 {
+    float3 a = abs(up.y) > 0.5 ? float3(1, 0, 0) : float3(0, 1, 0);
+    float3 b = cross(up, a);
+    float3 p = float3(dot(position, a), dot(position, up), dot(position, b));
+    float3 n = float3(dot(normal, a), dot(normal, up), dot(normal, b));
+    if (n.y < -0.7) return -0.05;
+
     float girth;
     float height;
     if (n.y > 0.7)
@@ -80,7 +90,7 @@ static float paint_reach(float3 p, float3 n)
         else girth = (n.z > 0 ? 1.0 : 3.0) + (n.z > 0 ? -p.x : p.x) + 0.5;
     }
     float tongues = 0.06 * sin(girth * 2.0 * M_PI_F * 2.0 + 0.7) + 0.04 * sin(girth * 2.0 * M_PI_F * 5.0 + 2.1);
-    return height + tongues;
+    return height + tongues * smoothstep(0.0, 0.3, height);
 }
 
 fragment float4 scene_fragment(Fragment in [[stage_in]], constant Frame& frame [[buffer(0)]], constant Draw& draw [[buffer(1)]])
@@ -92,7 +102,7 @@ fragment float4 scene_fragment(Fragment in [[stage_in]], constant Frame& frame [
     float2 p = in.local.xz;
     float plus = coverage(min(rounded_box(p, float2(0.27, 0.095), 0.095), rounded_box(p, float2(0.095, 0.27), 0.095)));
     float square = coverage(rounded_box(p, float2(0.36, 0.36), 0.07));
-    float reach = paint_reach(in.local, in.localNormal);
+    float reach = paint_reach(in.local, in.localNormal, draw.paintUp.xyz);
     float spread = coverage(reach - draw.pattern.y * 1.65);
     float drain = coverage((1.0 - draw.pattern.y) * 1.65 - reach);
     float top = in.localNormal.y > 0.7 ? 1.0 : 0.0;
