@@ -178,7 +178,9 @@ public sealed class Ui
             Label(label, rect, textSize, Style.DisabledText);
             return false;
         }
-        bool pressed = focused && rect.Contains(Input.MousePosition) && Input.MouseDown(MouseButton.Left);
+        // Pressed while the mouse holds it, and on the frame it lets go too: that is when the click lands and the
+        // button may become the selected one, which it otherwise only shows a frame later.
+        bool pressed = focused && rect.Contains(Input.MousePosition) && (Input.MouseDown(MouseButton.Left) || activated && Input.MouseReleased(MouseButton.Left));
         if (focused) FocusRing(rect, radius);
         Overlay.RoundedRectangle(rect, radius, pressed || selected ? Style.Accent : Style.Button);
         if (done)
@@ -226,8 +228,15 @@ public sealed class Ui
     // focus (which then does not move focus away).
     // `row`, when given, is the whole line it sits on (its label included): what focus moves between, so a
     // column of settings lines up.
-    public bool Slider(string id, Rect rect, ref double value, Rect? row = null)
+    // A disabled slider shows its value greyed and cannot be focused or moved.
+    public bool Slider(string id, Rect rect, ref double value, Rect? row = null, bool enabled = true)
     {
+        if (!enabled)
+        {
+            Overlay.RoundedRectangle(rect, Px(6), Style.Track);
+            Overlay.RoundedRectangle(new Rect(rect.X, rect.Y, MathF.Max(rect.Height, rect.Width * (float) value), rect.Height), Px(6), Style.Disabled);
+            return false;
+        }
         var (focused, _) = Interact(id, row ?? rect, true);
         _sliders.Add(id);
         double before = value;

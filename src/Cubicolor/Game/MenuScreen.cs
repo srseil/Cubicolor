@@ -172,20 +172,20 @@ public sealed class MenuScreen : IScreen
         const float row = 36, gap = 12, width = 560;
         bool changed = false, display = false;
 
-        bool dark = s.DarkBackground, hide = s.HideUi;
+        bool dark = s.DarkBackground, show = !s.HideUi;
         changed |= ui.Toggle("Dark Background", ui.R(x, y, width, 32), ref dark);
-        changed |= ui.Toggle("Hide UI", ui.R(x, y += row, width, 32), ref hide);
-        (s.DarkBackground, s.HideUi) = (dark, hide);
+        changed |= ui.Toggle("Show Level Name and Hints", ui.R(x, y += row, width, 32), ref show);
+        (s.DarkBackground, s.HideUi) = (dark, !show);
 
         double music = s.MusicVolume, sound = s.SoundVolume;
         bool musicMuted = s.MusicMuted, soundMuted = s.SoundMuted;
         changed |= Volume(ui, "Music", x, y += row + gap, ref music, ref musicMuted);
-        bool soundChanged = Volume(ui, "Sound", x, y += 3 * row - 4 + gap, ref sound, ref soundMuted);
+        bool soundChanged = Volume(ui, "Sound", x, y += 2 * row + 8 + gap, ref sound, ref soundMuted);
         changed |= soundChanged;
         (s.MusicVolume, s.SoundVolume, s.MusicMuted, s.SoundMuted) = (music, sound, musicMuted, soundMuted);
 
         bool fullscreen = s.Fullscreen, vsync = s.VSync;
-        y += 3 * row - 4 + gap;
+        y += 2 * row + 8 + gap * 2;
         display |= ui.Toggle("Fullscreen", ui.R(x, y, width, 32), ref fullscreen);
         display |= ui.Toggle("VSync", ui.R(x, y + row, width, 32), ref vsync);
         (s.Fullscreen, s.VSync) = (fullscreen, vsync);
@@ -207,13 +207,15 @@ public sealed class MenuScreen : IScreen
 
     private double _previewCooldown;
 
-    // A volume's name, its slider with the percentage beside it, and its mute switch beneath.
+    // A switch for the music or the sounds, and their volume beneath it, which can only be changed while
+    // they are on.
     private static bool Volume(Ui ui, string name, float x, float y, ref double volume, ref bool muted)
     {
-        ui.Label(name, ui.P(x, y), 24);
-        bool changed = ui.Slider($"{name} Volume", ui.R(x, y + 40, 400, 20), ref volume, ui.R(x, y + 32, 560, 36));
-        ui.Label($"{Math.Round(volume * 100):0} %", ui.P(x + 420, y + 34), 22);
-        changed |= ui.Toggle("Mute", ui.R(x, y + 72, 560, 32), ref muted, id: $"Mute {name}");
+        bool on = !muted;
+        bool changed = ui.Toggle(name, ui.R(x, y, 560, 32), ref on);
+        muted = !on;
+        changed |= ui.Slider($"{name} Volume", ui.R(x + 44, y + 46, 380, 20), ref volume, ui.R(x, y + 38, 560, 36), enabled: on);
+        ui.Label($"{Math.Round(volume * 100):0} %", ui.P(x + 444, y + 40), 22, on ? null : Style.DisabledText);
         return changed;
     }
 
