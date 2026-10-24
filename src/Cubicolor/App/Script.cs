@@ -73,7 +73,7 @@ internal sealed class Script
         {
             string line = _lines.Peek();
             if (!Step(line, time, screen, context)) return;   // still waiting on this line
-            _lines.Dequeue();
+            if (_lines.Count > 0) _lines.Dequeue();   // a failure has emptied the queue already
         }
     }
 
