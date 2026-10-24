@@ -72,6 +72,37 @@ public sealed class Overlay
         for (int i = 0; i < n; i++) Triangle(centre, outline[i], outline[(i + 1) % n], color);
     }
 
+    // A rounded rectangle's outline, `thickness` wide, drawn outward from `r`'s edge.
+    public void RoundedOutline(Rect r, float radius, float thickness, Vector4 color)
+    {
+        const int perCorner = 6;
+        radius = MathF.Max(0, MathF.Min(radius, MathF.Min(r.Width, r.Height) / 2));
+        (Vector2 Corner, float Start)[] corners =
+        [
+            (new Vector2(r.Right - radius, r.Y + radius), -MathF.PI / 2),
+            (new Vector2(r.Right - radius, r.Bottom - radius), 0),
+            (new Vector2(r.X + radius, r.Bottom - radius), MathF.PI / 2),
+            (new Vector2(r.X + radius, r.Y + radius), MathF.PI),
+        ];
+        Span<Vector2> inner = stackalloc Vector2[4 * (perCorner + 1)];
+        Span<Vector2> outer = stackalloc Vector2[4 * (perCorner + 1)];
+        int n = 0;
+        foreach (var (corner, start) in corners)
+            for (int i = 0; i <= perCorner; i++)
+            {
+                float angle = start + MathF.PI / 2 * i / perCorner;
+                var direction = new Vector2(MathF.Cos(angle), MathF.Sin(angle));
+                inner[n] = corner + direction * radius;
+                outer[n++] = corner + direction * (radius + thickness);
+            }
+        for (int i = 0; i < n; i++)
+        {
+            int j = (i + 1) % n;
+            Triangle(inner[i], outer[i], outer[j], color);
+            Triangle(inner[i], outer[j], inner[j], color);
+        }
+    }
+
     // A textured quad from the atlas, its coverage tinting `color`.
     public void Image(Rect r, Vector2 uvTopLeft, Vector2 uvBottomRight, Vector4 color)
     {

@@ -71,6 +71,7 @@ public sealed class Ui
         _mouseMoved = Vector2.DistanceSquared(input.MousePosition, _lastMouse) > 0.5f;
         _lastMouse = input.MousePosition;
 
+        FocusBefore = _focus;
         // Left and right on a slider move the slider, not the focus.
         bool onSlider = _focus != null && _previousSliders.Contains(_focus);
         if (navigation.Move is { } direction && _previous.Count > 0 && !(onSlider && direction is Direction.Left or Direction.Right))
@@ -87,6 +88,9 @@ public sealed class Ui
     }
 
     public string? Focused => _focus;
+
+    // What had focus before this frame's navigation moved it.
+    public string? FocusBefore { get; private set; }
 
     private string? Nearest(Direction direction)
     {
@@ -154,7 +158,16 @@ public sealed class Ui
         return (focused, activated);
     }
 
-    public bool Button(string label, Rect rect, float textSize = 24, bool enabled = true, bool selected = false, string? id = null)
+    // The ring around whatever has focus: its own colour, so it never reads as selected or finished, which
+    // are shown by the khaki fill and the khaki tick.
+    private void FocusRing(Rect rect, float radius) =>
+        Overlay.RoundedOutline(new Rect(rect.X - Px(3), rect.Y - Px(3), rect.Width + Px(6), rect.Height + Px(6)), radius + Px(3), Px(2.5f),
+            Dark ? Palette.DarkText : Style.Dark);
+
+    // `selected` fills it khaki (the current section or difficulty); `done` puts a khaki tick in its corner (a
+    // solved level).
+    public bool Button(string label, Rect rect, float textSize = 24, bool enabled = true, bool selected = false, string? id = null,
+                       bool done = false)
     {
         var (focused, activated) = Interact(id ?? label, rect, enabled);
         float radius = Px(5);
@@ -165,9 +178,13 @@ public sealed class Ui
             return false;
         }
         bool pressed = focused && rect.Contains(Input.MousePosition) && Input.MouseDown(MouseButton.Left);
+        if (focused) FocusRing(rect, radius);
         Overlay.RoundedRectangle(rect, radius, pressed || selected ? Style.Accent : Style.Button);
-        if (focused && !pressed)
-            Overlay.RoundedRectangle(new Rect(rect.X + radius, rect.Bottom - Px(4), rect.Width - 2 * radius, Px(4)), Px(2), Style.Accent);
+        if (done)
+        {
+            float tick = MathF.Min(rect.Width, rect.Height) * 0.36f;
+            Tick(new Rect(rect.Right - tick - Px(2), rect.Y + Px(2), tick, tick), Style.Accent);
+        }
         Label(label, rect, textSize, pressed || selected ? Style.Dark : Style.ButtonText);
         return activated;
     }
@@ -178,8 +195,9 @@ public sealed class Ui
         if (activated) value = !value;
         float box = rect.Height * 0.7f;
         var boxRect = new Rect(rect.X, rect.Y + (rect.Height - box) / 2, box, box);
-        Overlay.RoundedRectangle(boxRect, Px(5), focused ? Style.Accent : Style.Button);
-        if (value) Tick(boxRect, focused ? Style.Dark : Style.ButtonText);
+        if (focused) FocusRing(boxRect, Px(5));
+        Overlay.RoundedRectangle(boxRect, Px(5), Style.Button);
+        if (value) Tick(boxRect, Style.ButtonText);
         Label(label, new Vector2(boxRect.Right + Px(12), rect.Y + (rect.Height - _text.LineHeight(FontStyle.Regular, Px(textSize))) / 2), textSize);
         return activated;
     }
@@ -205,18 +223,20 @@ public sealed class Ui
 
     // A volume slider from 0 to 1: dragged with the mouse, or moved in tenths with left and right while in
     // focus (which then does not move focus away).
-    public bool Slider(string id, Rect rect, ref double value)
+    // `row`, when given, is the whole line it sits on (its label included): what focus moves between, so a
+    // column of settings lines up.
+    public bool Slider(string id, Rect rect, ref double value, Rect? row = null)
     {
-        var (focused, _) = Interact(id, rect, true);
+        var (focused, _) = Interact(id, row ?? rect, true);
         _sliders.Add(id);
         double before = value;
         if (focused && rect.Contains(Input.MousePosition) && Input.MouseDown(MouseButton.Left))
             value = Math.Clamp((Input.MousePosition.X - rect.X) / rect.Width, 0, 1);
         if (focused && Navigation.Move == Direction.Left) value = Math.Max(0, Math.Round(value * 10 - 1) / 10);
         if (focused && Navigation.Move == Direction.Right) value = Math.Min(1, Math.Round(value * 10 + 1) / 10);
+        if (focused) FocusRing(rect, Px(6));
         Overlay.RoundedRectangle(rect, Px(6), Style.Track);
         Overlay.RoundedRectangle(new Rect(rect.X, rect.Y, MathF.Max(rect.Height, rect.Width * (float) value), rect.Height), Px(6), Style.Accent);
-        if (focused) Overlay.RoundedRectangle(new Rect(rect.X, rect.Bottom - Px(3), rect.Width, Px(3)), Px(1.5f), Style.Dark);
         return Math.Abs(before - value) > 1e-9;
     }
 

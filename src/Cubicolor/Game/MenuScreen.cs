@@ -55,6 +55,13 @@ public sealed class MenuScreen : IScreen
             _section = Section.Play;
         }
 
+        // Right from the sections enters the panel at its top; left from the panel goes back to its section.
+        string[] sections = ["Play", "Controls", "Settings", "Credits", "Quit"];
+        bool fromSections = ui.FocusBefore != null && sections.Contains(ui.FocusBefore);
+        if (ui.Navigation.Move == Direction.Right && fromSections && FirstInPanel() is { } first) ui.Focus(first, force: true);
+        else if (ui.Navigation.Move == Direction.Left && !fromSections && ui.Focused != null && sections.Contains(ui.Focused))
+            ui.Focus(_section.ToString(), force: true);
+
         IScreen next = this;
         (string Label, Section? Section)[] items =
             [("Play", Section.Play), ("Controls", Section.Controls), ("Settings", Section.Settings), ("Credits", Section.Credits), ("Quit", null)];
@@ -83,6 +90,14 @@ public sealed class MenuScreen : IScreen
         return next;
     }
 
+    private string? FirstInPanel() => _section switch
+    {
+        Section.Play => _difficulty.ToString(),
+        Section.Controls => "Forwards:",
+        Section.Settings => "Dark Background",
+        _ => null,
+    };
+
     private IScreen? Play(Ui ui, Rect panel)
     {
         Progress progress = _context.Saves.Progress;
@@ -99,7 +114,7 @@ public sealed class MenuScreen : IScreen
             int row = (n - 1) / 4, column = (n - 1) % 4;
             Rect cell = ui.R(x + 250 + column * 80, y + 92 + row * 78, 64, 64);
             bool open = progress.IsOpen(_difficulty, n);
-            if (ui.Button(n.ToString(), cell, 26, enabled: open, selected: progress.IsSolved(_difficulty, n), id: $"{_difficulty} {n}"))
+            if (ui.Button(n.ToString(), cell, 26, enabled: open, done: progress.IsSolved(_difficulty, n), id: $"{_difficulty} {n}"))
                 return new LevelScreen(_context, _difficulty, n);
         }
         return null;
@@ -151,34 +166,35 @@ public sealed class MenuScreen : IScreen
         _rebinding = null;
     }
 
+    // One column, top to bottom, so up and down move between settings and left and right are free for the
+    // sliders.
     private void SettingsPanel(Ui ui, Rect panel)
     {
         Settings s = _context.Saves.Settings;
-        float x = panel.X / ui.Scale + 60, y = panel.Y / ui.Scale + 24;
-        bool changed = false;
+        float x = panel.X / ui.Scale + 70, y = panel.Y / ui.Scale + 30;
+        const float row = 42, gap = 16, width = 560;
+        bool changed = false, display = false;
 
-        ui.Label("Game", ui.P(x, y), 28);
         bool dark = s.DarkBackground, hide = s.HideUi;
-        changed |= ui.Toggle("Dark Background", ui.R(x + 20, y + 44, 280, 36), ref dark);
-        changed |= ui.Toggle("Hide UI", ui.R(x + 360, y + 44, 200, 36), ref hide);
-        s.DarkBackground = dark;
-        s.HideUi = hide;
+        changed |= ui.Toggle("Dark Background", ui.R(x, y, width, 34), ref dark);
+        changed |= ui.Toggle("Hide UI", ui.R(x, y += row, width, 34), ref hide);
+        (s.DarkBackground, s.HideUi) = (dark, hide);
 
-        ui.Label("Audio", ui.P(x, y + 104), 28);
         double music = s.MusicVolume, sound = s.SoundVolume;
         bool musicMuted = s.MusicMuted, soundMuted = s.SoundMuted;
-        ui.Label("Music Volume", ui.P(x + 20, y + 146), 22);
-        changed |= ui.Slider("Music Volume", ui.R(x + 20, y + 180, 260, 20), ref music);
-        changed |= ui.Toggle("Mute Music", ui.R(x + 20, y + 212, 220, 32), ref musicMuted, 22);
-        ui.Label("Sound Volume", ui.P(x + 360, y + 146), 22);
-        changed |= ui.Slider("Sound Volume", ui.R(x + 360, y + 180, 260, 20), ref sound);
-        changed |= ui.Toggle("Mute Sounds", ui.R(x + 360, y + 212, 220, 32), ref soundMuted, 22);
+        y += row + gap;
+        ui.Label("Music Volume", ui.P(x, y + 2), 24);
+        changed |= ui.Slider("Music Volume", ui.R(x + 220, y + 8, 340, 20), ref music, ui.R(x, y, width, 34));
+        changed |= ui.Toggle("Mute Music", ui.R(x, y += row, width, 34), ref musicMuted);
+        ui.Label("Sound Volume", ui.P(x, (y += row) + 2), 24);
+        changed |= ui.Slider("Sound Volume", ui.R(x + 220, y + 8, 340, 20), ref sound, ui.R(x, y, width, 34));
+        changed |= ui.Toggle("Mute Sounds", ui.R(x, y += row, width, 34), ref soundMuted);
         (s.MusicVolume, s.SoundVolume, s.MusicMuted, s.SoundMuted) = (music, sound, musicMuted, soundMuted);
 
-        ui.Label("Video", ui.P(x, y + 270), 28);
         bool fullscreen = s.Fullscreen, vsync = s.VSync;
-        bool display = ui.Toggle("Fullscreen", ui.R(x + 20, y + 314, 220, 36), ref fullscreen);
-        display |= ui.Toggle("VSync", ui.R(x + 360, y + 314, 200, 36), ref vsync);
+        y += row + gap;
+        display |= ui.Toggle("Fullscreen", ui.R(x, y, width, 34), ref fullscreen);
+        display |= ui.Toggle("VSync", ui.R(x, y + row, width, 34), ref vsync);
         (s.Fullscreen, s.VSync) = (fullscreen, vsync);
 
         if (changed || display)
