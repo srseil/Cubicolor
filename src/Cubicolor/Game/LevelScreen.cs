@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using Cubicolor.Platform;
 using Cubicolor.Render;
@@ -37,6 +38,7 @@ public sealed class LevelScreen : IScreen
     public IScreen Frame(double seconds, Scene scene)
     {
         _board.Advance(seconds);
+        PlayDue();
         Ui ui = _context.Ui;
         IInput input = ui.Input;
         Settings settings = _context.Saves.Settings;
@@ -113,16 +115,39 @@ public sealed class LevelScreen : IScreen
 
     private (Direction Direction, double At)? _queued;
 
+    // Sounds waiting for their moment on the board's clock: what a roll causes is heard as the cube lands.
+    private readonly List<(double At, Sound Sound)> _sounds = [];
+
+    private void PlayAt(double at, Sound sound) => _sounds.Add((at, sound));
+
+    private void PlayDue()
+    {
+        for (int i = _sounds.Count - 1; i >= 0; i--)
+            if (_board.Now >= _sounds[i].At)
+            {
+                _context.Audio.Play(_sounds[i].Sound);
+                _sounds.RemoveAt(i);
+            }
+    }
+
     private void Roll(Direction direction)
     {
         Move move = _puzzle.Roll(direction);
         _board.Show(move);
         if (!move.Rolled) return;
 
-        _context.Audio.Play(Sound.Step);
-        if (move.PaintAfter != Paint.None && move.PaintAfter != move.PaintBefore) _context.Audio.Play(Sound.Paint);
-        else if (move.PaintBefore != Paint.None && move.PaintAfter == Paint.None) _context.Audio.Play(Sound.Unpaint);
-        if (move.Solved) Solve();
+        double landed = _board.Now + BoardView.Roll;
+        PlayAt(landed, Sound.Step);
+        if (move.PaintBefore != Paint.None && move.PaintAfter != move.PaintBefore)
+        {
+            PlayAt(landed, Sound.Unpaint);
+            if (move.PaintAfter != Paint.None) PlayAt(landed + BoardView.PaintTime, Sound.Paint);
+        }
+        else if (move.PaintAfter != move.PaintBefore)
+        {
+            PlayAt(landed, Sound.Paint);
+        }
+        if (move.Solved) Solve(landed);
     }
 
     public void Restart()
@@ -132,18 +157,19 @@ public sealed class LevelScreen : IScreen
         _board.Restart();
         _completeAt = null;
         _queued = null;
+        _sounds.Clear();
         _panel = Panel.None;
         _context.Audio.Play(Sound.Revive);
     }
 
-    private void Solve()
+    private void Solve(double landed)
     {
         Progress progress = _context.Saves.Progress;
         progress.Complete(Level.Difficulty, Level.Number);
         _context.Saves.SaveProgress();
         if (Level.Number == Simulation.Levels.Level.PerDifficulty) _context.Achievements.Unlock(Level.Difficulty);
-        _context.Audio.Play(Sound.Solve);
-        _completeAt = _board.Now + BoardView.Roll + 0.4;
+        PlayAt(landed, Sound.Solve);
+        _completeAt = landed + 0.4;
     }
 
     private void DrawHud(Ui ui, Settings settings)

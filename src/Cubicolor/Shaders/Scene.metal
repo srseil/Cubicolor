@@ -87,26 +87,20 @@ fragment float4 scene_fragment(Fragment in [[stage_in]], constant Frame& frame [
 {
     float3 base = draw.color.rgb;
     int surface = int(draw.pattern.x);
-    bool top = in.localNormal.y > 0.7;
-    if (surface == 1 && top)
-    {
-        // The key's plus: two rounded bars across the top face.
-        float2 p = in.local.xz;
-        float bar = min(rounded_box(p, float2(0.21, 0.075), 0.075), rounded_box(p, float2(0.075, 0.21), 0.075));
-        base = mix(base, draw.accent.rgb, coverage(bar) * draw.accent.a);
-    }
-    else if (surface == 2 && top)
-    {
-        float square = rounded_box(in.local.xz, float2(0.36, 0.36), 0.07);
-        base = mix(base, draw.accent.rgb, coverage(square) * draw.accent.a);
-    }
-    else if (surface == 3)
-    {
-        // Paint reaches 1.6 (past the top's centre, fingers and all) as progress reaches 1.
-        float front = draw.pattern.y * 1.65;
-        float reach = paint_reach(in.local, in.localNormal);
-        base = mix(base, draw.accent.rgb, coverage(reach - front) * draw.accent.a);
-    }
+    // Every coverage is worked out before anything branches per pixel: fwidth needs its neighbours to have run
+    // the same code, and on the top face's edge they would not have (which drew a dashed line there).
+    float2 p = in.local.xz;
+    float plus = coverage(min(rounded_box(p, float2(0.27, 0.095), 0.095), rounded_box(p, float2(0.095, 0.27), 0.095)));
+    float square = coverage(rounded_box(p, float2(0.36, 0.36), 0.07));
+    float reach = paint_reach(in.local, in.localNormal);
+    float spread = coverage(reach - draw.pattern.y * 1.65);
+    float drain = coverage((1.0 - draw.pattern.y) * 1.65 - reach);
+    float top = in.localNormal.y > 0.7 ? 1.0 : 0.0;
+
+    // The key's plus and the exit's square on the top face; the paint spreading over the cube as progress goes
+    // to 1, or draining out of its bottom first as progress goes back to 0.
+    float amount = surface == 1 ? plus * top : surface == 2 ? square * top : surface == 3 ? spread : surface == 4 ? drain : 0.0;
+    base = mix(base, draw.accent.rgb, amount * draw.accent.a);
 
     float3 n = normalize(in.normal);
     float3 l = normalize(frame.lightDirection.xyz);

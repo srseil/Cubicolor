@@ -10,8 +10,8 @@ namespace Cubicolor.Game;
 public sealed record BoardMeshes(MeshHandle Cube, MeshHandle Slab)
 {
     public static BoardMeshes Upload(IRenderer renderer) => new(
-        renderer.Upload(RoundedBox.Build(Vector3.One, 0.1f, 6)),
-        renderer.Upload(RoundedBox.Build(new Vector3(1f, 0.5f, 1f), 0.04f, 4)));
+        renderer.Upload(RoundedBox.Build(Vector3.One, 0.1f, 10, softness: 2f)),
+        renderer.Upload(RoundedBox.Build(new Vector3(1f, 0.5f, 1f), 0.045f, 8, softness: 1.8f)));
 }
 
 // What the player sees of a level: every tile, the cube, the exit and its stack of requirements, each with
@@ -38,7 +38,9 @@ public sealed class BoardView
 
     private readonly Level _level;
     private readonly BoardMeshes _meshes;
-    private readonly (Tile? Tile, Animated Drop, Animated Alpha)[] _tiles;
+    // Each tile, how far it has dropped, how much of it shows, and how much of its key's plus is left (a key's
+    // colour goes into the cube that rolls onto it).
+    private readonly (Tile? Tile, Animated Drop, Animated Alpha, Animated Plus)[] _tiles;
     private readonly Animated[] _requirementLevel;
     private readonly Animated[] _requirementAlpha;
     private readonly Animated _exitLevel = new(-1), _exitTurn = new(0), _exitAlpha = new(0);
@@ -47,7 +49,10 @@ public sealed class BoardView
     private readonly Animated _cubeHeight = new(CubeDrop), _cubeAlpha = new(0), _paintProgress = new(0);
     private (Direction Direction, double Start, double Duration, float Angle) _roll;
     private Paint _paint;
+    private bool _draining;
     private (Paint Paint, double At)? _nextPaint;
+    // Where the cube goes back to once it has lifted off, and when (a restart).
+    private (Cell Cell, double At)? _home;
 
     public double Now { get; private set; }
 
@@ -58,11 +63,11 @@ public sealed class BoardView
     {
         _level = level;
         _meshes = meshes;
-        _tiles = new (Tile?, Animated, Animated)[level.CellCount];
+        _tiles = new (Tile?, Animated, Animated, Animated)[level.CellCount];
         for (int i = 0; i < _tiles.Length; i++)
         {
             Tile tile = level[level.CellAt(i)];
-            _tiles[i] = (tile.Kind is TileKind.Nothing or TileKind.Exit ? null : tile, new Animated(TileDrop), new Animated(0));
+            _tiles[i] = (tile.Kind is TileKind.Nothing or TileKind.Exit ? null : tile, new Animated(TileDrop), new Animated(0), new Animated(1));
         }
         _requirementLevel = level.Requirements.Select((_, i) => new Animated(i)).ToArray();
         _requirementAlpha = level.Requirements.Select(_ => new Animated(0)).ToArray();
@@ -72,10 +77,19 @@ public sealed class BoardView
     public void Advance(double seconds)
     {
         Now += seconds;
-        foreach (var (_, drop, alpha) in _tiles)
+        foreach (var (_, drop, alpha, plus) in _tiles)
         {
             drop.Settle(Now);
             alpha.Settle(Now);
+            plus.Settle(Now);
+        }
+        if (_home is { } home && Now >= home.At)
+        {
+            _cube = home.Cell;
+            _roll = default;
+            _paint = Paint.None;
+            _draining = false;
+            _home = null;
         }
         foreach (Animated animated in _requirementLevel.Concat(_requirementAlpha)) animated.Settle(Now);
         foreach (Animated animated in new[] { _exitLevel, _exitTurn, _exitAlpha, _cubeHeight, _cubeAlpha, _paintProgress }) animated.Settle(Now);
@@ -111,8 +125,9 @@ public sealed class BoardView
     {
         _cubeHeight.MoveTo(CubeDrop, Now, CubeFall, Ease.InOut);
         _cubeAlpha.MoveTo(0, Now, CubeFall);
-        _paintProgress.MoveTo(0, Now, CubeFall);
         _nextPaint = null;
+        foreach (var (tile, _, _, plus) in _tiles)
+            if (tile?.Kind == TileKind.Key && plus.Target < 1) plus.MoveTo(1, Now, Fade);
         double wave = Wave(everything: false);
         double stacked = RaiseStack(Now);
         double land = Math.Max(Math.Max(Now + CubeFall, Now + wave + TileFall), stacked);
@@ -137,18 +152,22 @@ public sealed class BoardView
         _cube = move.To;
 
         double after = Now + Roll;
+        var landed = _tiles[_level.Index(move.To)];
+        if (landed.Tile?.Kind == TileKind.Key) landed.Plus.MoveTo(0, after, PaintTime);
         if (move.PaintAfter != move.PaintBefore)
         {
             _nextPaint = null;
             if (move.PaintBefore == Paint.None)
             {
                 _paint = move.PaintAfter;
+                _draining = false;
                 _paintProgress.Set(0);
                 _paintProgress.MoveTo(1, after, PaintTime);
             }
             else
             {
-                // The colour drains away, then, on a key of another colour, the new one rises.
+                // The colour drains away out of the bottom, then, on a key of another colour, the new one rises.
+                _draining = true;
                 _paintProgress.MoveTo(0, after, PaintTime);
                 if (move.PaintAfter != Paint.None) _nextPaint = (move.PaintAfter, after + PaintTime);
             }
@@ -176,8 +195,9 @@ public sealed class BoardView
         double longest = 0;
         for (int i = 0; i < _tiles.Length; i++)
         {
-            var (tile, drop, alpha) = _tiles[i];
+            var (tile, drop, alpha, plus) = _tiles[i];
             if (tile == null || (!everything && drop.Target == 0)) continue;
+            plus.Set(1);
             Cell cell = _level.CellAt(i);
             double delay = 0.1 * cell.Column + 0.2 * cell.Row;
             drop.MoveTo(0, Now + delay, TileFall, Ease.InOut);
@@ -216,12 +236,10 @@ public sealed class BoardView
         return t;
     }
 
+    // The cube, already lifted off and invisible by `at`, goes back to the start then and drops onto it.
     private void DropCube(double at)
     {
-        // The cube is already invisible when this switches it back to the start.
-        _cube = _level.Start;
-        _roll = default;
-        _paint = Paint.None;
+        _home = (_level.Start, at);
         _cubeHeight.MoveTo(0, at, CubeFall, Ease.InOut);
         _cubeAlpha.MoveTo(1, at, CubeFall);
     }
@@ -236,13 +254,14 @@ public sealed class BoardView
         if (_nextPaint is { } next && Now >= next.At)
         {
             _paint = next.Paint;
+            _draining = false;
             _paintProgress.MoveTo(1, next.At, PaintTime);
             _nextPaint = null;
         }
 
         for (int i = 0; i < _tiles.Length; i++)
         {
-            var (tile, drop, fade) = _tiles[i];
+            var (tile, drop, fade, plus) = _tiles[i];
             if (tile is not { } t) continue;
             float alpha = fade.At(Now);
             if (alpha <= 0.001f) continue;
@@ -250,7 +269,7 @@ public sealed class BoardView
             Matrix4x4 model = Matrix4x4.CreateTranslation(cell.Column, -0.25f - drop.At(Now), cell.Row);
             scene.Items.Add(t.Kind switch
             {
-                TileKind.Key => new DrawItem(_meshes.Slab, model, Palette.White.WithAlpha(alpha), Surface.KeyPlus, Palette.Of(t.Paint)),
+                TileKind.Key => new DrawItem(_meshes.Slab, model, Palette.White.WithAlpha(alpha), Surface.KeyPlus, Palette.Of(t.Paint).WithAlpha(plus.At(Now))),
                 TileKind.Lock => new DrawItem(_meshes.Slab, model, Palette.Of(t.Paint).WithAlpha(alpha)),
                 _ => new DrawItem(_meshes.Slab, model, Palette.White.WithAlpha(alpha)),
             });
@@ -276,7 +295,7 @@ public sealed class BoardView
 
         float cubeAlpha = _cubeAlpha.At(Now);
         if (cubeAlpha > 0.001f)
-            scene.Items.Add(new DrawItem(_meshes.Cube, CubeModel(), Palette.Black.WithAlpha(cubeAlpha), Surface.Paint,
+            scene.Items.Add(new DrawItem(_meshes.Cube, CubeModel(), Palette.Black.WithAlpha(cubeAlpha), _draining ? Surface.Drain : Surface.Paint,
                 Palette.Of(_paint), _paintProgress.At(Now)));
     }
 

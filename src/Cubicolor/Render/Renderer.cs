@@ -19,6 +19,9 @@ public enum Surface
     // The player cube: the accent colour rising up the sides and closing over the top as Progress goes from
     // 0 to 1.
     Paint = 3,
+    // The same paint leaving: it drains out of the bottom first, so as Progress goes from 1 to 0 nothing is
+    // left underneath for a roll to show.
+    Drain = 4,
 }
 
 // One mesh to draw: where (Model, object to world), in which colours, with which pattern. Colours are linear

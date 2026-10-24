@@ -24,13 +24,19 @@ public static class RoundedBox
     // A box of `size` centred on the origin, every edge rounded with `radius`, each rounding made of
     // `segments` steps. Every face is a grid whose lines bunch up in the rounded band at its border; each grid
     // point is pushed out from the box's inner core (the box shrunk by the radius) to the radius, which gives
-    // flat faces, quarter-cylinder edges and eighth-sphere corners with exact normals.
-    public static MeshData Build(Vector3 size, float radius, int segments)
+    // flat faces, quarter-cylinder edges and eighth-sphere corners.
+    //
+    // The normals round off over a wider band than the shape, `softness` times the radius: the light turns
+    // gradually towards the edge, as it would on a larger rounding, while the outline stays crisp. With the
+    // exact normals the flat face's sudden end read as a sharp crease in the highlight.
+    public static MeshData Build(Vector3 size, float radius, int segments, float softness = 1)
     {
         Vector3 half = size / 2;
-        if (radius <= 0 || radius > MathF.Min(half.X, MathF.Min(half.Y, half.Z)))
+        float soft = radius * softness;
+        if (radius <= 0 || soft > MathF.Min(half.X, MathF.Min(half.Y, half.Z)))
             throw new ArgumentOutOfRangeException(nameof(radius), radius, "Must be positive and fit the box");
         Vector3 core = half - new Vector3(radius);
+        Vector3 softCore = half - new Vector3(soft);
 
         var vertices = new List<MeshVertex>();
         var indices = new List<ushort>();
@@ -45,8 +51,8 @@ public static class RoundedBox
         ];
         foreach (var (axis, sign, u, v) in faces)
         {
-            float[] us = Steps(Get(half, u), radius, segments);
-            float[] vs = Steps(Get(half, v), radius, segments);
+            float[] us = Steps(Get(half, u), radius, soft, segments);
+            float[] vs = Steps(Get(half, v), radius, soft, segments);
             int first = vertices.Count;
             foreach (float b in vs)
             foreach (float a in us)
@@ -56,8 +62,9 @@ public static class RoundedBox
                 Set(ref onBox, u, a);
                 Set(ref onBox, v, b);
                 Vector3 inner = Vector3.Clamp(onBox, -core, core);
-                Vector3 normal = Vector3.Normalize(onBox - inner);
-                vertices.Add(new MeshVertex(inner + normal * radius, normal));
+                Vector3 position = inner + Vector3.Normalize(onBox - inner) * radius;
+                Vector3 normal = Vector3.Normalize(onBox - Vector3.Clamp(onBox, -softCore, softCore));
+                vertices.Add(new MeshVertex(position, normal));
             }
             int columns = us.Length;
             for (int j = 0; j < vs.Length - 1; j++)
@@ -71,20 +78,21 @@ public static class RoundedBox
         return new MeshData([.. vertices], [.. indices]);
     }
 
-    // Grid lines along one axis of a face, from -half to +half: `segments` steps through each rounded band,
-    // one across the flat middle. A face holds half of each edge's rounding (the 45 degrees nearest to it),
-    // and a point `d` into the band turns the normal by atan(d / radius), so the steps are spaced by that
-    // angle to make the rounding even.
-    private static float[] Steps(float half, float radius, int segments)
+    // Grid lines along one axis of a face, from -half to +half. Through each rounded band, `segments` steps
+    // spaced by the angle they turn the outline (a point `d` into the band turns it by atan(d / radius), and a
+    // face holds the 45 degrees nearest to it); then, out to the soft band's end, steps for the normals to
+    // turn in; one across the flat middle.
+    private static float[] Steps(float half, float radius, float soft, int segments)
     {
+        var edge = new List<float>();   // distances from the edge, outermost first
+        for (int k = segments; k >= 0; k--) edge.Add(radius - radius * MathF.Tan(MathF.PI / 4 * k / segments));
+        for (int k = 1; k <= segments && soft > radius; k++) edge.Add(radius + (soft - radius) * k / segments);
         var steps = new List<float>();
-        for (int k = segments; k >= 0; k--) steps.Add(-half + radius - radius * Tan(k, segments));
-        for (int k = 0; k <= segments; k++) steps.Add(half - radius + radius * Tan(k, segments));
-        // The two bands meet when the face is no wider than the rounding: drop the doubled point.
-        if (MathF.Abs(steps[segments] - steps[segments + 1]) < 1e-6f) steps.RemoveAt(segments + 1);
+        foreach (float d in edge) steps.Add(-half + d);
+        for (int i = edge.Count - 1; i >= 0; i--) steps.Add(half - edge[i]);
+        // The two bands meet when the face is no wider than them: drop the doubled point.
+        if (MathF.Abs(steps[edge.Count - 1] - steps[edge.Count]) < 1e-6f) steps.RemoveAt(edge.Count);
         return [.. steps];
-
-        static float Tan(int k, int segments) => MathF.Tan(MathF.PI / 4 * k / segments);
     }
 
     private static float Get(Vector3 v, int axis) => axis switch { 0 => v.X, 1 => v.Y, _ => v.Z };

@@ -78,7 +78,9 @@ internal sealed unsafe class MetalRenderer : IRenderer
         descriptor.DepthFormat(PixelFormat.Depth32Float);
         descriptor.SampleCount(Samples);
         descriptor.VertexLayout([(VertexFormat.Float3, 0), (VertexFormat.Float3, 12)], MeshVertex.Stride, VertexBufferIndex);
-        return new MetalPipeline(_device.NewRenderPipeline(descriptor.Handle, label), _device.NewDepthState(CompareFunction.LessEqual, !translucent));
+        // Translucent meshes write depth too: drawn farthest first, each hides the parts of those behind it that
+        // it covers, so fading tiles that overlap don't show through one another.
+        return new MetalPipeline(_device.NewRenderPipeline(descriptor.Handle, label), _device.NewDepthState(CompareFunction.LessEqual, true));
     }
 
     private static string Shader(string name)
