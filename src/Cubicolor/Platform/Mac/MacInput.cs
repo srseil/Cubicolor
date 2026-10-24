@@ -61,7 +61,7 @@ internal sealed class MacInput : IInput
         _buttonsPrevious = _buttons;
         _buttons = _buttonsHeld;
         (float x, float y) = _window.MouseLocation();
-        _mousePosition = new Vector2(x, y);
+        _mousePosition = new Vector2(x, y) * _window.PixelDensity;
         _gamepad = GameControllers.Read();
     }
 

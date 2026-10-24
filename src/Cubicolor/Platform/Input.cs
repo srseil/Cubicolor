@@ -62,7 +62,8 @@ public interface IInput
     // Every key that went down this frame, for capturing a new binding.
     IEnumerable<Key> PressedThisFrame();
 
-    // In window points from the top left.
+    // In pixels of the drawn frame from its top left, the space the UI lays out in (window points times the
+    // display's pixel density).
     Vector2 MousePosition { get; }
     bool MouseDown(MouseButton button);
     bool MousePressed(MouseButton button);
