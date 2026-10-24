@@ -17,18 +17,18 @@ public enum Surface
     // The exit block: a rounded square in the accent colour on the top face.
     ExitSquare = 2,
     // The player cube: the accent colour rising up the sides and closing over the top as Progress goes from
-    // 0 to 1.
+    // 0 to 1, and sinking back into the face below as Drained goes from 0 to 1.
     Paint = 3,
-    // The same paint leaving: it drains out of the bottom first, so as Progress goes from 1 to 0 nothing is
-    // left underneath for a roll to show.
-    Drain = 4,
 }
 
 // One mesh to draw: where (Model, object to world), in which colours, with which pattern. Colours are linear
 // RGB; Color.W is the opacity the whole mesh is drawn with.
-// For the paint, PaintUp points away from the face it starts at, in the mesh's own space (zero means +y).
+// The paint is two fronts: spreading (Progress 0 to 1, away from the face PaintUp points away from) and draining
+// (Drained 0 to 1, the face DrainUp points away from clearing last). Both directions are in the mesh's own
+// space; zero means +y.
 public readonly record struct DrawItem(MeshHandle Mesh, Matrix4x4 Model, Vector4 Color, Surface Surface = Surface.Plain,
-                                       Vector4 Accent = default, float Progress = 0, Vector3 PaintUp = default);
+                                       Vector4 Accent = default, float Progress = 0, Vector3 PaintUp = default,
+                                       float Drained = 0, Vector3 DrainUp = default);
 
 // The light the scene is lit by: an ambient term and one directional light (Direction points towards the
 // light), both linear RGB, plus a soft highlight.

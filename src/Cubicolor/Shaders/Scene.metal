@@ -18,8 +18,9 @@ struct Draw
     float4x4 model;
     float4 color;            // rgb, and the opacity of the whole mesh
     float4 accent;
-    float4 pattern;          // x: Surface, y: progress
+    float4 pattern;          // x: Surface, y: spread, z: drained
     float4 paintUp;          // xyz: away from the face the paint starts at, in the mesh's own space
+    float4 drainUp;          // xyz: away from the face the paint drains into
 };
 
 struct VertexIn
@@ -104,12 +105,15 @@ fragment float4 scene_fragment(Fragment in [[stage_in]], constant Frame& frame [
     float square = coverage(rounded_box(p, float2(0.36, 0.36), 0.07));
     float reach = paint_reach(in.local, in.localNormal, draw.paintUp.xyz);
     float spread = coverage(reach - draw.pattern.y * 1.65);
-    float drain = coverage((1.0 - draw.pattern.y) * 1.65 - reach);
+    // What is left as it drains: everything below a front sinking towards the face the cube stands on.
+    float remaining = 1.0 - draw.pattern.z;
+    float kept = coverage(paint_reach(in.local, in.localNormal, draw.drainUp.xyz) - remaining * 1.65);
     float top = in.localNormal.y > 0.7 ? 1.0 : 0.0;
 
-    // The key's plus and the exit's square on the top face; the paint spreading over the cube as progress goes
-    // to 1, or draining out of its bottom first as progress goes back to 0.
-    float amount = surface == 1 ? plus * top : surface == 2 ? square * top : surface == 3 ? spread : surface == 4 ? drain : 0.0;
+    // The key's plus and the exit's square on the top face; the paint spreading over the cube, and what is left
+    // of it while it drains (none at all at either end, not even on the face it starts from or drains into).
+    float painted = (draw.pattern.y > 0.0 ? spread : 0.0) * (remaining > 0.0 ? kept : 0.0);
+    float amount = surface == 1 ? plus * top : surface == 2 ? square * top : surface == 3 ? painted : 0.0;
     base = mix(base, draw.accent.rgb, amount * draw.accent.a);
 
     float3 n = normalize(in.normal);

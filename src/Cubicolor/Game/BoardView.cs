@@ -47,15 +47,14 @@ public sealed class BoardView
     private readonly Animated _exitLevel = new(-1), _exitTurn = new(0), _exitAlpha = new(0);
 
     private Cell _cube;
-    private readonly Animated _cubeHeight = new(CubeDrop), _cubeAlpha = new(0), _paintProgress = new(0);
+    private readonly Animated _cubeHeight = new(CubeDrop), _cubeAlpha = new(0), _paintProgress = new(0), _drained = new(0);
     private (Direction Direction, double Start, double Duration, float Angle) _roll;
     // Which way the cube is turned: rolls add up, so its faces (and the paint on them) stay where they went.
     // _rollFrom is how it was turned before the roll under way.
     private Matrix4x4 _orientation = Matrix4x4.Identity, _rollFrom = Matrix4x4.Identity;
-    // Away from the face the paint started at, in the cube's own space.
-    private Vector3 _paintUp = Vector3.UnitY;
+    // Away from the face the paint started at, and from the face it drains into, in the cube's own space.
+    private Vector3 _paintUp = Vector3.UnitY, _drainUp = Vector3.UnitY;
     private Paint _paint;
-    private bool _draining;
     private (Paint Paint, double At)? _nextPaint;
     // Where the cube goes back to once it has lifted off, and when (a restart).
     private (Cell Cell, double At)? _home;
@@ -95,11 +94,10 @@ public sealed class BoardView
             _roll = default;
             _orientation = _rollFrom = Matrix4x4.Identity;
             _paint = Paint.None;
-            _draining = false;
             _home = null;
         }
         foreach (Animated animated in _requirementLevel.Concat(_requirementAlpha)) animated.Settle(Now);
-        foreach (Animated animated in new[] { _exitLevel, _exitTurn, _exitAlpha, _cubeHeight, _cubeAlpha, _paintProgress }) animated.Settle(Now);
+        foreach (Animated animated in new[] { _exitLevel, _exitTurn, _exitAlpha, _cubeHeight, _cubeAlpha, _paintProgress, _drained }) animated.Settle(Now);
     }
 
     // Whether the cube can take the next roll: the last one has (nearly) ended, so a key pressed a moment
@@ -113,7 +111,7 @@ public sealed class BoardView
     }
 
     // Whether everything has come to rest.
-    public bool Settled => Now >= ReadyAt && Now >= _roll.Start + _roll.Duration && !_exitLevel.IsMoving(Now) && !_paintProgress.IsMoving(Now);
+    public bool Settled => Now >= ReadyAt && Now >= _roll.Start + _roll.Duration && !_exitLevel.IsMoving(Now) && !_paintProgress.IsMoving(Now) && !_drained.IsMoving(Now);
 
     // The board rises tile by tile in a wave from the back left, the exit climbs to the top of its stack as the
     // requirements appear under it, then the cube drops onto the start.
@@ -172,19 +170,16 @@ public sealed class BoardView
             _nextPaint = null;
             if (move.PaintBefore == Paint.None)
             {
-                _paint = move.PaintAfter;
-                _draining = false;
-                _paintUp = Up();
-                _paintProgress.Set(0);
-                _paintProgress.MoveTo(1, after, PaintTime);
+                // The colour rises from the key once the cube is down on it, not while it is still rolling there.
+                _nextPaint = (move.PaintAfter, after);
             }
             else
             {
-                // The colour drains away out of the bottom, then, on a key of another colour, the new one rises.
-                // (Paint still spreading keeps its direction, so it turns around without a jump.)
-                if (!_paintProgress.IsMoving(Now)) _paintUp = Up();
-                _draining = true;
-                _paintProgress.MoveTo(0, after, PaintTime);
+                // The colour sinks into the tile, the top clearing first, while whatever was still spreading goes
+                // on spreading; then, on a key of another colour, the new one rises.
+                _drainUp = Up();
+                _drained.Set(0);
+                _drained.MoveTo(1, after, PaintTime);
                 if (move.PaintAfter != Paint.None) _nextPaint = (move.PaintAfter, after + PaintTime);
             }
         }
@@ -233,25 +228,50 @@ public sealed class BoardView
         int count = _requirementLevel.Length;
         _exitAlpha.MoveTo(1, start, Fade);
         double t = Math.Max(start, _exitLevel.EndsAt);
-        int level = (int) MathF.Round(_exitLevel.At(t));
+        int exit = (int) MathF.Round(_exitLevel.At(t));
+        int steps = Math.Max(0, count - exit);
+
+        // Everything above a gap climbs with the exit, a level per step, so nothing ever passes through anything
+        // else: a requirement that has to rise d levels does so in the last d steps, when everything above it
+        // rises too. Where each one is after k steps:
+        var rises = new List<(int Index, int From)>();
         for (int i = 0; i < count; i++)
         {
-            bool showing = _requirementAlpha[i].Target > 0;
-            if (showing) _requirementLevel[i].MoveTo(i, t, StackStep);
-            else _requirementLevel[i].Set(i);
+            if (_requirementAlpha[i].Target > 0)
+            {
+                int from = (int) MathF.Round(_requirementLevel[i].At(t));
+                rises.Add((i, from));
+                for (int k = steps - (i - from); k < steps; k++)
+                    _requirementLevel[i].MoveTo(from + k - (steps - (i - from)) + 1, t + k * StackStep, StackStep);
+            }
+            else
+            {
+                _requirementLevel[i].Set(i);
+            }
         }
-        double[] passed = new double[count];
-        for (int step = level + 1; step <= count; step++)
+        int LevelAfter(int index, int from, int k) => from + Math.Max(0, k - (steps - (index - from)));
+
+        for (int k = 0; k < steps; k++)
         {
-            _exitLevel.MoveTo(step, t, StackStep, step == 0 ? Ease.InOut : Ease.Linear);
-            _exitTurn.MoveTo(_exitTurn.Target + 90, t, StackStep);
-            t += StackStep;
-            if (step >= 1) passed[step - 1] = t;
+            int to = exit + k + 1;
+            _exitLevel.MoveTo(to, t + k * StackStep, StackStep, to == 0 ? Ease.InOut : Ease.Linear);
+            _exitTurn.MoveTo(_exitTurn.Target + 90, t + k * StackStep, StackStep);
         }
+
+        // A requirement coming back fades in at its place once nothing (requirement or exit) will be there or
+        // pass through it any more.
         for (int i = 0; i < count; i++)
-            if (_requirementAlpha[i].Target <= 0)
-                _requirementAlpha[i].MoveTo(1, Math.Max(passed[i], start), Fade);
-        return t;
+        {
+            if (_requirementAlpha[i].Target > 0) continue;
+            int lastBusy = -1;
+            for (int k = 0; k <= steps; k++)
+            {
+                bool busy = exit + k == i || rises.Exists(r => LevelAfter(r.Index, r.From, k) == i);
+                if (busy) lastBusy = k;
+            }
+            _requirementAlpha[i].MoveTo(1, Math.Max(start, t + (lastBusy + 1) * StackStep), Fade);
+        }
+        return t + steps * StackStep;
     }
 
     // The cube, already lifted off and invisible by `at`, goes back to the start then and drops onto it.
@@ -272,8 +292,9 @@ public sealed class BoardView
         if (_nextPaint is { } next && Now >= next.At)
         {
             _paint = next.Paint;
-            _draining = false;
             _paintUp = Up();
+            _paintProgress.Set(0);
+            _drained.Set(0);
             _paintProgress.MoveTo(1, next.At, PaintTime);
             _nextPaint = null;
         }
@@ -314,8 +335,8 @@ public sealed class BoardView
 
         float cubeAlpha = _cubeAlpha.At(Now);
         if (cubeAlpha > 0.001f)
-            scene.Items.Add(new DrawItem(_meshes.Cube, CubeModel(), Palette.Black.WithAlpha(cubeAlpha), _draining ? Surface.Drain : Surface.Paint,
-                Palette.Of(_paint), _paintProgress.At(Now), _paintUp));
+            scene.Items.Add(new DrawItem(_meshes.Cube, CubeModel(), Palette.Black.WithAlpha(cubeAlpha), Surface.Paint,
+                Palette.Of(_paint), _paintProgress.At(Now), _paintUp, _drained.At(Now), _drainUp));
     }
 
     // The cube at rest on its cell, or tipped about the bottom edge it is rolling over.

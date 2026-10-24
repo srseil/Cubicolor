@@ -118,7 +118,7 @@ internal sealed unsafe class MetalRenderer : IRenderer
     private struct DrawUniforms
     {
         public Matrix4x4 Model;
-        public Vector4 Color, Accent, Pattern, PaintUp;
+        public Vector4 Color, Accent, Pattern, PaintUp, DrainUp;
     }
 
     public bool Draw(Scene scene, ReadOnlySpan<OverlayVertex> overlay)
@@ -226,8 +226,9 @@ internal sealed unsafe class MetalRenderer : IRenderer
             Model = item.Model,
             Color = item.Color,
             Accent = item.Accent,
-            Pattern = new Vector4((float) item.Surface, item.Progress, 0, 0),
+            Pattern = new Vector4((float) item.Surface, item.Progress, item.Drained, 0),
             PaintUp = new Vector4(item.PaintUp == Vector3.Zero ? Vector3.UnitY : item.PaintUp, 0),
+            DrainUp = new Vector4(item.DrainUp == Vector3.Zero ? Vector3.UnitY : item.DrainUp, 0),
         };
         encoder.SetVertexBytes(uniforms, 1);
         encoder.SetFragmentBytes(uniforms, 1);
