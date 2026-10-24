@@ -22,6 +22,9 @@ internal sealed class MacInput : IInput
 
     private Vector2 _mousePosition;
     private int _buttonsHeld, _buttons, _buttonsPrevious;
+    // Buttons that went down or up during this frame's events: a quick click can do both between two frames,
+    // which comparing the held state alone would miss.
+    private int _buttonsWentDown, _buttonsWentUp;
     private float _scrollDelta;
     private bool _focused;
     private GamepadState _gamepad;
@@ -40,6 +43,7 @@ internal sealed class MacInput : IInput
     {
         _scrollDelta = 0f;
         _eventPressed.Clear();
+        _buttonsWentDown = _buttonsWentUp = 0;
 
         AppKit.PumpEvents(Observe);
         if (AppKit.QuitRequested) _window.RequestClose();
@@ -94,15 +98,15 @@ internal sealed class MacInput : IInput
                 _held[(int) key] = down;
                 break;
             }
-            case 1: _buttonsHeld |= 1; break;    // left down
-            case 2: _buttonsHeld &= ~1; break;   // left up
-            case 3: _buttonsHeld |= 4; break;    // right down
-            case 4: _buttonsHeld &= ~4; break;   // right up
+            case 1: ButtonDown(1); break;   // left
+            case 2: ButtonUp(1); break;
+            case 3: ButtonDown(4); break;   // right
+            case 4: ButtonUp(4); break;
             case 25:
-                if (Send<nint>(e, SelButton) == 2) _buttonsHeld |= 2;
+                if (Send<nint>(e, SelButton) == 2) ButtonDown(2);
                 break;
             case 26:
-                if (Send<nint>(e, SelButton) == 2) _buttonsHeld &= ~2;
+                if (Send<nint>(e, SelButton) == 2) ButtonUp(2);
                 break;
             case 22:   // scroll: precise deltas (trackpads) in points, a wheel's in lines
             {
@@ -133,9 +137,21 @@ internal sealed class MacInput : IInput
         foreach (int key in _eventPressed) yield return (Key) key;
     }
 
+    private void ButtonDown(int flag)
+    {
+        _buttonsHeld |= flag;
+        _buttonsWentDown |= flag;
+    }
+
+    private void ButtonUp(int flag)
+    {
+        _buttonsHeld &= ~flag;
+        _buttonsWentUp |= flag;
+    }
+
     public bool MouseDown(MouseButton button) => (_buttons & Flag(button)) != 0;
-    public bool MousePressed(MouseButton button) => (_buttons & Flag(button)) != 0 && (_buttonsPrevious & Flag(button)) == 0;
-    public bool MouseReleased(MouseButton button) => (_buttons & Flag(button)) == 0 && (_buttonsPrevious & Flag(button)) != 0;
+    public bool MousePressed(MouseButton button) => (_buttonsWentDown & Flag(button)) != 0;
+    public bool MouseReleased(MouseButton button) => (_buttonsWentUp & Flag(button)) != 0;
 
     private static int Flag(MouseButton button) => button switch
     {

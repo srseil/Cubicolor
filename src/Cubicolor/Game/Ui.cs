@@ -36,6 +36,7 @@ public sealed class Ui
     private List<(string Label, Rect Rect)> _previous = [];
     private string? _focus;
     private HashSet<string> _sliders = [], _previousSliders = [];
+    private string? _dragging;
     private bool _mouseMoved;
     private Vector2 _lastMouse;
 
@@ -189,9 +190,9 @@ public sealed class Ui
         return activated;
     }
 
-    public bool Toggle(string label, Rect rect, ref bool value, float textSize = 24)
+    public bool Toggle(string label, Rect rect, ref bool value, float textSize = 24, string? id = null)
     {
-        var (focused, activated) = Interact(label, rect, true);
+        var (focused, activated) = Interact(id ?? label, rect, true);
         if (activated) value = !value;
         float box = rect.Height * 0.7f;
         var boxRect = new Rect(rect.X, rect.Y + (rect.Height - box) / 2, box, box);
@@ -230,8 +231,14 @@ public sealed class Ui
         var (focused, _) = Interact(id, row ?? rect, true);
         _sliders.Add(id);
         double before = value;
-        if (focused && rect.Contains(Input.MousePosition) && Input.MouseDown(MouseButton.Left))
+        // Pressed on the track, it follows the mouse until the button is let go, wherever the mouse goes, so
+        // both ends are easy to reach.
+        if (Input.MousePressed(MouseButton.Left) && rect.Inset(-Px(6)).Contains(Input.MousePosition)) _dragging = id;
+        if (_dragging == id)
+        {
             value = Math.Clamp((Input.MousePosition.X - rect.X) / rect.Width, 0, 1);
+            if (!Input.MouseDown(MouseButton.Left)) _dragging = null;
+        }
         if (focused && Navigation.Move == Direction.Left) value = Math.Max(0, Math.Round(value * 10 - 1) / 10);
         if (focused && Navigation.Move == Direction.Right) value = Math.Min(1, Math.Round(value * 10 + 1) / 10);
         if (focused) FocusRing(rect, Px(6));
@@ -241,10 +248,11 @@ public sealed class Ui
     }
 
     // A panel behind a group of widgets.
+    // A panel behind a group of widgets, outlined all round.
     public void Panel(Rect rect)
     {
         float radius = Px(5);
-        Overlay.RoundedRectangle(new Rect(rect.X, rect.Y + Px(3), rect.Width, rect.Height), radius, Style.Dark);
         Overlay.RoundedRectangle(rect, radius, Dark ? Palette.Hex(0x4a4a4a) : Style.Panel);
+        Overlay.RoundedOutline(rect, radius, Px(2.5f), Style.Dark);
     }
 }

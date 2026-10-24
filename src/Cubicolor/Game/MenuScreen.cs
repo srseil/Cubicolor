@@ -12,12 +12,11 @@ namespace Cubicolor.Game;
 // chosen section's panel on the right, as in both earlier versions.
 public sealed class MenuScreen : IScreen
 {
-    public const string Version = "Cubicolor v2.0";
+    public const string Version = "v2.0";
 
     private enum Section { Play, Controls, Settings, Credits }
 
     private readonly GameContext _context;
-    private readonly LogoView _logo;
     private Section _section = Section.Play;
     private Difficulty _difficulty;
     private GameAction? _rebinding;
@@ -26,7 +25,6 @@ public sealed class MenuScreen : IScreen
     {
         _context = context;
         _difficulty = difficulty;
-        _logo = new LogoView(context.Meshes);
         context.Ui.Focus("Play", force: true);
     }
 
@@ -42,8 +40,7 @@ public sealed class MenuScreen : IScreen
         float left = (width - 1060) / 2;
 
         ui.Label("Cubicolor", new Rect(0, ui.Px(28), ui.Size.X, ui.Px(100)), 84, style: FontStyle.Black);
-        _logo.Advance(seconds);
-        _logo.Draw(scene, ui.R(width / 2 - 150, 130, 300, 90), ui.Size);
+        _previewCooldown -= seconds;
 
         if (_rebinding is { } action)
         {
@@ -171,30 +168,26 @@ public sealed class MenuScreen : IScreen
     private void SettingsPanel(Ui ui, Rect panel)
     {
         Settings s = _context.Saves.Settings;
-        float x = panel.X / ui.Scale + 70, y = panel.Y / ui.Scale + 30;
-        const float row = 42, gap = 16, width = 560;
+        float x = panel.X / ui.Scale + 70, y = panel.Y / ui.Scale + 22;
+        const float row = 36, gap = 12, width = 560;
         bool changed = false, display = false;
 
         bool dark = s.DarkBackground, hide = s.HideUi;
-        changed |= ui.Toggle("Dark Background", ui.R(x, y, width, 34), ref dark);
-        changed |= ui.Toggle("Hide UI", ui.R(x, y += row, width, 34), ref hide);
+        changed |= ui.Toggle("Dark Background", ui.R(x, y, width, 32), ref dark);
+        changed |= ui.Toggle("Hide UI", ui.R(x, y += row, width, 32), ref hide);
         (s.DarkBackground, s.HideUi) = (dark, hide);
 
         double music = s.MusicVolume, sound = s.SoundVolume;
         bool musicMuted = s.MusicMuted, soundMuted = s.SoundMuted;
-        y += row + gap;
-        ui.Label("Music Volume", ui.P(x, y + 2), 24);
-        changed |= ui.Slider("Music Volume", ui.R(x + 220, y + 8, 340, 20), ref music, ui.R(x, y, width, 34));
-        changed |= ui.Toggle("Mute Music", ui.R(x, y += row, width, 34), ref musicMuted);
-        ui.Label("Sound Volume", ui.P(x, (y += row) + 2), 24);
-        changed |= ui.Slider("Sound Volume", ui.R(x + 220, y + 8, 340, 20), ref sound, ui.R(x, y, width, 34));
-        changed |= ui.Toggle("Mute Sounds", ui.R(x, y += row, width, 34), ref soundMuted);
+        changed |= Volume(ui, "Music", x, y += row + gap, ref music, ref musicMuted);
+        bool soundChanged = Volume(ui, "Sound", x, y += 3 * row - 4 + gap, ref sound, ref soundMuted);
+        changed |= soundChanged;
         (s.MusicVolume, s.SoundVolume, s.MusicMuted, s.SoundMuted) = (music, sound, musicMuted, soundMuted);
 
         bool fullscreen = s.Fullscreen, vsync = s.VSync;
-        y += row + gap;
-        display |= ui.Toggle("Fullscreen", ui.R(x, y, width, 34), ref fullscreen);
-        display |= ui.Toggle("VSync", ui.R(x, y + row, width, 34), ref vsync);
+        y += 3 * row - 4 + gap;
+        display |= ui.Toggle("Fullscreen", ui.R(x, y, width, 32), ref fullscreen);
+        display |= ui.Toggle("VSync", ui.R(x, y + row, width, 32), ref vsync);
         (s.Fullscreen, s.VSync) = (fullscreen, vsync);
 
         if (changed || display)
@@ -203,7 +196,25 @@ public sealed class MenuScreen : IScreen
             _context.Audio.Apply(s);
             ui.Dark = s.DarkBackground;
         }
+        // A taste of the new sound volume as it changes, a few times a second at most.
+        if (soundChanged && _previewCooldown <= 0)
+        {
+            _context.Audio.Play(Sound.Step);
+            _previewCooldown = 0.15;
+        }
         if (display) _context.ApplyDisplay?.Invoke(s);
+    }
+
+    private double _previewCooldown;
+
+    // A volume's name, its slider with the percentage beside it, and its mute switch beneath.
+    private static bool Volume(Ui ui, string name, float x, float y, ref double volume, ref bool muted)
+    {
+        ui.Label(name, ui.P(x, y), 24);
+        bool changed = ui.Slider($"{name} Volume", ui.R(x, y + 40, 400, 20), ref volume, ui.R(x, y + 32, 560, 36));
+        ui.Label($"{Math.Round(volume * 100):0} %", ui.P(x + 420, y + 34), 22);
+        changed |= ui.Toggle("Mute", ui.R(x, y + 72, 560, 32), ref muted, id: $"Mute {name}");
+        return changed;
     }
 
     private static void Credits(Ui ui, Rect panel)
