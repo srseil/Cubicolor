@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using Cubicolor.Platform;
 using Cubicolor.Render;
@@ -33,6 +34,7 @@ public sealed class LevelScreen : IScreen
         _puzzle = new Puzzle(level);
         _board = new BoardView(level, context.Meshes);
         _board.Start(_puzzle);
+        PlayArrivals();
     }
 
     public IScreen Frame(double seconds, Scene scene)
@@ -62,7 +64,7 @@ public sealed class LevelScreen : IScreen
             if (_queued is { } queued && !_puzzle.Solved)
             {
                 // A press during the last roll waits a moment for the cube, so quick play is not lost.
-                if (_board.Now - queued.At > 0.3) _queued = null;
+                if (_board.Now - queued.At > BoardView.Roll + 0.15) _queued = null;
                 else if (_board.Ready(_puzzle.Position.Step(queued.Direction)))
                 {
                     _queued = null;
@@ -120,6 +122,19 @@ public sealed class LevelScreen : IScreen
 
     private void PlayAt(double at, Sound sound) => _sounds.Add((at, sound));
 
+    // Each tile clicks into place with its own sound as the wave brings it up, as in the earlier versions;
+    // tiles arriving together share one.
+    private void PlayArrivals()
+    {
+        double last = double.NegativeInfinity;
+        foreach (double at in _board.Arrivals.Order())
+        {
+            if (at - last < 0.04) continue;
+            PlayAt(at, Sound.Revive);
+            last = at;
+        }
+    }
+
     private void PlayDue()
     {
         for (int i = _sounds.Count - 1; i >= 0; i--)
@@ -159,7 +174,7 @@ public sealed class LevelScreen : IScreen
         _queued = null;
         _sounds.Clear();
         _panel = Panel.None;
-        _context.Audio.Play(Sound.Revive);
+        PlayArrivals();
     }
 
     private void Solve(double landed)

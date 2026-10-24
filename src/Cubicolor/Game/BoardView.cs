@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Cubicolor.Render;
@@ -10,8 +11,8 @@ namespace Cubicolor.Game;
 public sealed record BoardMeshes(MeshHandle Cube, MeshHandle Slab)
 {
     public static BoardMeshes Upload(IRenderer renderer) => new(
-        renderer.Upload(RoundedBox.Build(Vector3.One, 0.1f, 10, softness: 2f)),
-        renderer.Upload(RoundedBox.Build(new Vector3(1f, 0.5f, 1f), 0.045f, 8, softness: 1.8f)));
+        renderer.Upload(RoundedBox.Build(Vector3.One, 0.08f, 10, softness: 1.4f)),
+        renderer.Upload(RoundedBox.Build(new Vector3(1f, 0.5f, 1f), 0.04f, 8, softness: 1.4f)));
 }
 
 // What the player sees of a level: every tile, the cube, the exit and its stack of requirements, each with
@@ -48,6 +49,11 @@ public sealed class BoardView
     private Cell _cube;
     private readonly Animated _cubeHeight = new(CubeDrop), _cubeAlpha = new(0), _paintProgress = new(0);
     private (Direction Direction, double Start, double Duration, float Angle) _roll;
+    // Which way the cube is turned: rolls add up, so its faces (and the paint on them) stay where they went.
+    // _rollFrom is how it was turned before the roll under way.
+    private Matrix4x4 _orientation = Matrix4x4.Identity, _rollFrom = Matrix4x4.Identity;
+    // Away from the face the paint started at, in the cube's own space.
+    private Vector3 _paintUp = Vector3.UnitY;
     private Paint _paint;
     private bool _draining;
     private (Paint Paint, double At)? _nextPaint;
@@ -87,6 +93,7 @@ public sealed class BoardView
         {
             _cube = home.Cell;
             _roll = default;
+            _orientation = _rollFrom = Matrix4x4.Identity;
             _paint = Paint.None;
             _draining = false;
             _home = null;
@@ -100,7 +107,7 @@ public sealed class BoardView
     public bool Ready(Cell? target = null)
     {
         if (Now < ReadyAt) return false;
-        if (Now < _roll.Start + _roll.Duration * 0.85) return false;
+        if (Now < _roll.Start + _roll.Duration) return false;
         if (target == _level.Exit && _exitLevel.IsMoving(Now)) return false;
         return true;
     }
@@ -110,6 +117,10 @@ public sealed class BoardView
 
     // The board rises tile by tile in a wave from the back left, the exit climbs to the top of its stack as the
     // requirements appear under it, then the cube drops onto the start.
+    // When each tile of the last wave arrives, for its sound.
+    public IReadOnlyList<double> Arrivals => _arrivals;
+    private readonly List<double> _arrivals = [];
+
     public void Start(Puzzle puzzle)
     {
         double wave = Wave(everything: true);
@@ -146,6 +157,8 @@ public sealed class BoardView
         }
 
         _roll = (move.Direction, Now, Roll, 90f);
+        _rollFrom = _orientation;
+        _orientation = Snap(_orientation * Matrix4x4.CreateFromAxisAngle(Axis(move.Direction), MathF.PI / 2));
         var left = _tiles[_level.Index(move.From)];
         left.Drop.MoveTo(TileDrop, Now + Roll * 0.5, TileFall, Ease.InOut);
         left.Alpha.MoveTo(0, Now + Roll * 0.5, TileFall);
@@ -161,12 +174,15 @@ public sealed class BoardView
             {
                 _paint = move.PaintAfter;
                 _draining = false;
+                _paintUp = Up();
                 _paintProgress.Set(0);
                 _paintProgress.MoveTo(1, after, PaintTime);
             }
             else
             {
                 // The colour drains away out of the bottom, then, on a key of another colour, the new one rises.
+                // (Paint still spreading keeps its direction, so it turns around without a jump.)
+                if (!_paintProgress.IsMoving(Now)) _paintUp = Up();
                 _draining = true;
                 _paintProgress.MoveTo(0, after, PaintTime);
                 if (move.PaintAfter != Paint.None) _nextPaint = (move.PaintAfter, after + PaintTime);
@@ -193,6 +209,7 @@ public sealed class BoardView
     private double Wave(bool everything)
     {
         double longest = 0;
+        _arrivals.Clear();
         for (int i = 0; i < _tiles.Length; i++)
         {
             var (tile, drop, alpha, plus) = _tiles[i];
@@ -202,6 +219,7 @@ public sealed class BoardView
             double delay = 0.1 * cell.Column + 0.2 * cell.Row;
             drop.MoveTo(0, Now + delay, TileFall, Ease.InOut);
             alpha.MoveTo(1, Now + delay, TileFall);
+            _arrivals.Add(Now + delay + TileFall);
             longest = Math.Max(longest, delay);
         }
         return longest;
@@ -255,6 +273,7 @@ public sealed class BoardView
         {
             _paint = next.Paint;
             _draining = false;
+            _paintUp = Up();
             _paintProgress.MoveTo(1, next.At, PaintTime);
             _nextPaint = null;
         }
@@ -296,7 +315,7 @@ public sealed class BoardView
         float cubeAlpha = _cubeAlpha.At(Now);
         if (cubeAlpha > 0.001f)
             scene.Items.Add(new DrawItem(_meshes.Cube, CubeModel(), Palette.Black.WithAlpha(cubeAlpha), _draining ? Surface.Drain : Surface.Paint,
-                Palette.Of(_paint), _paintProgress.At(Now)));
+                Palette.Of(_paint), _paintProgress.At(Now), _paintUp));
     }
 
     // The cube at rest on its cell, or tipped about the bottom edge it is rolling over.
@@ -305,22 +324,38 @@ public sealed class BoardView
         var centre = new Vector3(_cube.Column, 0.5f + _cubeHeight.At(Now), _cube.Row);
         var (direction, start, duration, angle) = _roll;
         float t = duration > 0 ? (float) Math.Clamp((Now - start) / duration, 0, 1) : 1;
-        if (t >= 1) return Matrix4x4.CreateTranslation(centre);
+        if (t >= 1) return _orientation * Matrix4x4.CreateTranslation(centre);
 
-        Vector3 d = direction switch
-        {
-            Direction.Forwards => -Vector3.UnitZ,
-            Direction.Backwards => Vector3.UnitZ,
-            Direction.Left => -Vector3.UnitX,
-            _ => Vector3.UnitX,
-        };
+        Vector3 d = Step(direction);
         // A roll has already moved the cube to its new cell: it turns from the old one, about the edge between.
         bool rolling = angle >= 90f;
         Vector3 from = rolling ? centre - d : centre;
         Vector3 pivot = from + d * 0.5f - Vector3.UnitY * 0.5f;
         float turn = rolling ? angle * t : angle * (t < 0.5f ? 2 * t : 2 * (1 - t));
-        return Matrix4x4.CreateTranslation(from - pivot)
-               * Matrix4x4.CreateFromAxisAngle(Vector3.Cross(Vector3.UnitY, d), turn * MathF.PI / 180)
+        return (rolling ? _rollFrom : _orientation)
+               * Matrix4x4.CreateTranslation(from - pivot)
+               * Matrix4x4.CreateFromAxisAngle(Axis(direction), turn * MathF.PI / 180)
                * Matrix4x4.CreateTranslation(pivot);
+    }
+
+    private static Vector3 Step(Direction direction) => direction switch
+    {
+        Direction.Forwards => -Vector3.UnitZ,
+        Direction.Backwards => Vector3.UnitZ,
+        Direction.Left => -Vector3.UnitX,
+        _ => Vector3.UnitX,
+    };
+
+    // What a roll in `direction` turns the cube about: the bottom edge it tips over.
+    private static Vector3 Axis(Direction direction) => Vector3.Cross(Vector3.UnitY, Step(direction));
+
+    // World up in the cube's own space: away from the face it stands on.
+    private Vector3 Up() => Vector3.TransformNormal(Vector3.UnitY, Matrix4x4.Transpose(_orientation));
+
+    // Quarter turns only ever give 0 and ±1: rounding keeps rolls from adding up rounding errors.
+    private static Matrix4x4 Snap(Matrix4x4 m)
+    {
+        static float R(float v) => MathF.Round(v);
+        return new Matrix4x4(R(m.M11), R(m.M12), R(m.M13), 0, R(m.M21), R(m.M22), R(m.M23), 0, R(m.M31), R(m.M32), R(m.M33), 0, 0, 0, 0, 1);
     }
 }
