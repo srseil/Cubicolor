@@ -61,8 +61,9 @@ public sealed class AudioTests
     [InlineData(1.0, false, 1.0)]
     [InlineData(0.0, false, 0.0)]
     [InlineData(1.0, true, 0.0)]
-    [InlineData(0.5, false, 0.1778)]   // -15 dB, the earlier versions' curve
-    public void Volume_settings_follow_the_old_curve(double volume, bool muted, double gain) =>
+    [InlineData(0.5, false, 0.3163)]   // -10 dB: half as loud
+    [InlineData(0.8, false, 0.6904)]   // -3.2 dB
+    public void Volume_settings_are_linear_in_loudness(double volume, bool muted, double gain) =>
         Assert.Equal(gain, Mixer.Gain(volume, muted), 3);
 
     [Fact]

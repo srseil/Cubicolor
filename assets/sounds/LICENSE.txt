@@ -1,0 +1,3 @@
+tile.wav is the tile sound of the earlier versions of Cubicolor, edited from "sticks hitting sticks" by
+worthahep88 (https://freesound.org/s/319217/), released under Creative Commons 0 (public domain dedication):
+https://creativecommons.org/publicdomain/zero/1.0/

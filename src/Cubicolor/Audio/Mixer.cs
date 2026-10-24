@@ -25,8 +25,10 @@ public sealed class Mixer
     private int _musicBuffered, _musicBufferStart;
     private float _musicGain, _soundGain = 1;
 
-    // The volume curve both earlier versions had: a setting v in 0..1 attenuates by 30 (1 - v) dB.
-    public static float Gain(double volume, bool muted) => muted || volume <= 0 ? 0 : MathF.Pow(10, (float) ((1 - volume) * -30 / 20));
+    // The slider is linear in how loud it sounds: loudness halves for every 10 dB less, so a volume v (0..1)
+    // is a gain of v^1.66 (20 log10(v^1.66) = 10 log2 v dB). Half way is half as loud, -10 dB. (The earlier
+    // versions' 30 dB taper took 6 dB off by 80 % already, which felt like a fall from the top.)
+    public static float Gain(double volume, bool muted) => muted || volume <= 0 ? 0 : MathF.Pow((float) Math.Min(volume, 1), 1.661f);
 
     public void SetVolumes(float music, float sound)
     {
