@@ -114,18 +114,18 @@ public sealed class MenuScreen : IScreen
 
     // Settings and Controls stand on one grid of rows, from the same top with the same pitch, so their rows line
     // up as the panel switches between them; a gap sets groups apart.
-    private const float Top = 24, Pitch = 42, Gap = 14, RowHeight = 36;
+    private const float Top = 24, Gap = 14, RowHeight = 36;
 
-    private static float RowY(float panelY, int row, int gaps, float pitch = Pitch) => panelY + Top + row * pitch + gaps * Gap;
+    // Both have seven rows, spread out to fill the panel, with the gap before the last two.
+    private const float Pitch = (PanelHeight - 2 * Top - RowHeight - Gap) / 6;
 
-    // Controls has fewer rows than Settings; they spread out to fill the panel the same way.
-    private const float ControlsPitch = (PanelHeight - 2 * Top - RowHeight - Gap) / 6;
+    private static float Row(float panelY, int row) => panelY + Top + row * Pitch + (row >= 5 ? Gap : 0);
 
     private string? FirstInPanel() => _section switch
     {
         Section.Play => _difficulty.ToString(),
         Section.Controls => "Forwards key",
-        Section.Settings => "Dark Background",
+        Section.Settings => "Language",
         _ => null,
     };
 
@@ -160,8 +160,8 @@ public sealed class MenuScreen : IScreen
         Settings settings = _context.Saves.Settings;
         bool connected = ui.Input.Gamepad.Connected;
         float x = ui.DesignX(panel.X) + 45, y = ui.DesignY(panel.Y);
-        ui.Label("Keyboard", ui.R(x + 170, RowY(y, 0, 0, ControlsPitch), 180, RowHeight), 24);
-        ui.Label("Controller", ui.R(x + 370, RowY(y, 0, 0, ControlsPitch), 180, RowHeight), 24);
+        ui.Label("Keyboard", ui.R(x + 170, Row(y, 0), 180, RowHeight), 24);
+        ui.Label("Controller", ui.R(x + 370, Row(y, 0), 180, RowHeight), 24);
         (GameAction Action, string Label)[] rows =
         [
             (GameAction.Forwards, "Forwards"), (GameAction.Backwards, "Backwards"), (GameAction.Left, "Left"), (GameAction.Right, "Right"),
@@ -170,7 +170,7 @@ public sealed class MenuScreen : IScreen
         for (int i = 0; i < rows.Length; i++)
         {
             var (action, label) = rows[i];
-            float rowY = RowY(y, i + 1, i >= 4 ? 1 : 0, ControlsPitch);
+            float rowY = Row(y, i + 1);
             ui.Label(label, ui.R(x, rowY, 160, RowHeight), 24, align: Align.Left);
             bool typing = _rebinding == (action, false);
             Key key = settings.Keys[action];
@@ -180,7 +180,8 @@ public sealed class MenuScreen : IScreen
             GamepadButtons button = Flag(settings.Pad[action]);
             bool capturing = _rebinding == (action, true);
             if (ui.SymbolButton($"{label} button", ui.R(x + 370, rowY, 180, RowHeight), capturing ? [] : ui.Input.SymbolsFor(button),
-                                capturing ? "Press a button" : PadName(settings.Pad[action]), enabled: connected))
+                                capturing ? "Press a button" : PadName(settings.Pad[action]), enabled: connected,
+                                caption: capturing ? null : ui.Input.NameFor(button)))
                 _rebinding = (action, true);
         }
     }
@@ -246,32 +247,32 @@ public sealed class MenuScreen : IScreen
         const float width = PanelWidth - 160;
         bool changed = false, display = false;
 
-        bool dark = s.DarkBackground, show = !s.HideUi;
-        changed |= ui.Toggle("Dark Background", ui.R(x, RowY(y, 0, 0), width, RowHeight), ref dark);
-        changed |= ui.Toggle("Show Level Name and Tutorial", ui.R(x, RowY(y, 1, 0), width, RowHeight), ref show);
-        (s.DarkBackground, s.HideUi) = (dark, !show);
-
-        double music = s.MusicVolume, sound = s.SoundVolume;
-        bool musicMuted = s.MusicMuted, soundMuted = s.SoundMuted;
-        changed |= Volume(ui, "Music", x, RowY(y, 2, 1), width, ref music, ref musicMuted);
-        bool soundChanged = Volume(ui, "Sound", x, RowY(y, 4, 2), width, ref sound, ref soundMuted);
-        changed |= soundChanged;
-        (s.MusicVolume, s.SoundVolume, s.MusicMuted, s.SoundMuted) = (music, sound, musicMuted, soundMuted);
-
-        bool fullscreen = s.Fullscreen, vsync = s.VSync;
-        display |= ui.Toggle("Fullscreen", ui.R(x, RowY(y, 6, 3), width / 2, RowHeight), ref fullscreen);
-        display |= ui.Toggle("VSync", ui.R(x + width / 2, RowY(y, 6, 3), width / 2, RowHeight), ref vsync);
-        (s.Fullscreen, s.VSync) = (fullscreen, vsync);
-
         // Each language by its own name; choosing one keeps it, whatever Steam or the system say.
         int language = (int) _context.Language;
-        if (ui.Choice("Language", ui.R(x, RowY(y, 7, 3), width, RowHeight), ui.Px(240), ref language, Languages.Count,
+        if (ui.Choice("Language", ui.R(x, Row(y, 0), width, RowHeight), ui.Px(width - 210), ref language, Languages.Count,
                       i => ((Language) i).NativeName()))
         {
             s.Language = (Language) language;
             changed = true;
             _context.ApplyLanguage();
         }
+
+        bool dark = s.DarkBackground, show = !s.HideUi;
+        changed |= ui.Toggle("Dark Background", ui.R(x, Row(y, 1), width, RowHeight), ref dark);
+        changed |= ui.Toggle("Show Level Name and Tutorial", ui.R(x, Row(y, 2), width, RowHeight), ref show);
+        (s.DarkBackground, s.HideUi) = (dark, !show);
+
+        double music = s.MusicVolume, sound = s.SoundVolume;
+        bool musicMuted = s.MusicMuted, soundMuted = s.SoundMuted;
+        changed |= Volume(ui, "Music", x, Row(y, 3), width, ref music, ref musicMuted);
+        bool soundChanged = Volume(ui, "Sound", x, Row(y, 4), width, ref sound, ref soundMuted);
+        changed |= soundChanged;
+        (s.MusicVolume, s.SoundVolume, s.MusicMuted, s.SoundMuted) = (music, sound, musicMuted, soundMuted);
+
+        bool fullscreen = s.Fullscreen, vsync = s.VSync;
+        display |= ui.Toggle("Fullscreen", ui.R(x, Row(y, 5), width, RowHeight), ref fullscreen);
+        display |= ui.Toggle("VSync", ui.R(x, Row(y, 6), width, RowHeight), ref vsync);
+        (s.Fullscreen, s.VSync) = (fullscreen, vsync);
 
         if (changed || display)
         {
@@ -290,17 +291,15 @@ public sealed class MenuScreen : IScreen
 
     private double _previewCooldown;
 
-    // A switch for the music or the sounds, and their volume on the row beneath it, which can only be changed
-    // while they are on.
+    // A switch for the music or the sounds with their volume beside it, which can only be changed while they
+    // are on.
     private static bool Volume(Ui ui, string name, float x, float y, float width, ref double volume, ref bool muted)
     {
         bool on = !muted;
-        bool changed = ui.Toggle(name, ui.R(x, y, width, RowHeight), ref on);
+        var (switched, moved) = ui.ToggleSlider(name, ui.R(x, y, width, RowHeight), ui.R(x + 210, y + 13, width - 290, 10), ref on, ref volume);
         muted = !on;
-        float slider = y + Pitch;
-        changed |= ui.Slider($"{name} Volume", ui.R(x + 36, slider + 8, width - 116, 20), ref volume, ui.R(x, slider, width, RowHeight), enabled: on);
-        ui.Label($"{Math.Round(volume * 100):0} %", ui.R(x + width - 64, slider, 64, RowHeight), 22, on ? null : Style.DisabledText, align: Align.Right);
-        return changed;
+        ui.Label($"{Math.Round(volume * 100):0} %", ui.R(x + width - 64, y, 64, RowHeight), 22, on ? null : Style.DisabledText, align: Align.Right);
+        return switched || moved;
     }
 
     // The credits as a column of blocks, centred in the panel: the title and the logo scene under it, then

@@ -76,4 +76,8 @@ public interface IInput
     // The controller's own symbols for a button (SF Symbols names), one per kind of controller connected; empty
     // when none names one (no controller, or a platform without symbols).
     IReadOnlyList<string> SymbolsFor(GamepadButtons button) => [];
+
+    // The button's name, for when its symbol doesn't tell it apart: a controller drawing two buttons the same
+    // way (a DualSense's Create and Options are both a plain capsule). Null when the symbol says enough.
+    string? NameFor(GamepadButtons button) => null;
 }

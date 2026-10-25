@@ -289,8 +289,8 @@ public sealed class Ui
     }
 
     // A button showing symbols (a controller's own, for one of its buttons) instead of a label, or `text` when
-    // there are none.
-    public bool SymbolButton(string id, Rect rect, IReadOnlyList<string> symbols, string text, bool enabled = true)
+    // there are none; `caption`, when given, is written beside the symbols.
+    public bool SymbolButton(string id, Rect rect, IReadOnlyList<string> symbols, string text, bool enabled = true, string? caption = null)
     {
         var (focused, activated) = Interact(id, rect, enabled);
         float radius = Px(5);
@@ -298,7 +298,9 @@ public sealed class Ui
         Overlay.RoundedRectangle(rect, radius, enabled ? Style.Button : Style.Disabled);
         Vector4 color = enabled ? Style.ButtonText : Style.DisabledText;
         float size = rect.Height * 0.6f, gap = Px(10);
-        float x = rect.Centre.X - (symbols.Count * size + (symbols.Count - 1) * gap) / 2 + size / 2;
+        float captionWidth = caption != null ? TextWidth(caption, 20) : 0;
+        float width = symbols.Count * size + (symbols.Count - 1) * gap + (caption != null ? gap + captionWidth : 0);
+        float x = rect.Centre.X - width / 2 + size / 2;
         bool drawn = symbols.Count > 0;
         foreach (string symbol in symbols)
         {
@@ -306,6 +308,7 @@ public sealed class Ui
             x += size + gap;
         }
         if (!drawn) Label(text, rect, 22, color);
+        else if (caption != null) Label(caption, new Rect(x - size / 2, rect.Y, captionWidth, rect.Height), 20, color, align: Align.Left);
         return activated;
     }
 
@@ -341,36 +344,43 @@ public sealed class Ui
         Overlay.Triangle(from - side, to + side, from + side, color);
     }
 
-    // A volume slider from 0 to 1: dragged with the mouse, or moved in tenths with left and right while in
-    // focus (which then does not move focus away).
-    // `row`, when given, is the whole line it sits on (its label included): what focus moves between, so a
-    // column of settings lines up.
-    // A disabled slider shows its value greyed and cannot be focused or moved.
-    public bool Slider(string id, Rect rect, ref double value, Rect? row = null, bool enabled = true)
+    // A switch with a slider beside it on one row (music on or off and its volume): one stop for focus, where
+    // confirm flips the switch and left and right move the slider in tenths. The mouse flips the switch on the
+    // box and its label, and drags the slider on its track. The slider can't move while the switch is off.
+    public (bool Switched, bool Moved) ToggleSlider(string label, Rect row, Rect track, ref bool on, ref double value, float textSize = 24)
     {
-        if (!enabled)
-        {
-            Overlay.RoundedRectangle(rect, Px(6), Style.Track);
-            Overlay.RoundedRectangle(new Rect(rect.X, rect.Y, MathF.Max(rect.Height, rect.Width * (float) value), rect.Height), Px(6), Style.Disabled);
-            return false;
-        }
-        var (focused, _) = Interact(id, row ?? rect, true);
-        _sliders.Add(id);
+        var (focused, _) = Interact(label, row, true);
+        _sliders.Add(label);
+        var toggleArea = new Rect(row.X, row.Y, track.X - row.X - Px(8), row.Height);
+        bool switched = (focused && Navigation.Confirm)
+                        || (_dragging == null && Input.MouseReleased(MouseButton.Left) && toggleArea.Contains(Input.MousePosition));
+        if (switched) on = !on;
+
+        float box = row.Height * 0.7f;
+        var boxRect = new Rect(row.X, row.Y + (row.Height - box) / 2, box, box);
+        FocusRing(boxRect, Px(5));
+        Overlay.RoundedRectangle(boxRect, Px(5), Style.Button);
+        if (on) Tick(boxRect, Style.ButtonText);
+        Label(label, new Rect(boxRect.Right + Px(12), row.Y, track.X - boxRect.Right - Px(20), row.Height), textSize, align: Align.Left);
+
         double before = value;
-        // Pressed on the track, it follows the mouse until the button is let go, wherever the mouse goes, so
-        // both ends are easy to reach.
-        if (Input.MousePressed(MouseButton.Left) && rect.Inset(-Px(6)).Contains(Input.MousePosition)) _dragging = id;
-        if (_dragging == id)
+        if (on)
         {
-            value = Math.Clamp((Input.MousePosition.X - rect.X) / rect.Width, 0, 1);
-            if (!Input.MouseDown(MouseButton.Left)) _dragging = null;
+            // Pressed on the track, it follows the mouse until the button is let go, wherever the mouse goes, so
+            // both ends are easy to reach.
+            if (Input.MousePressed(MouseButton.Left) && track.Inset(-Px(8)).Contains(Input.MousePosition)) _dragging = label;
+            if (_dragging == label)
+            {
+                value = Math.Clamp((Input.MousePosition.X - track.X) / track.Width, 0, 1);
+                if (!Input.MouseDown(MouseButton.Left)) _dragging = null;
+            }
+            if (focused && Navigation.Move == Direction.Left) value = Math.Max(0, Math.Round(value * 10 - 1) / 10);
+            if (focused && Navigation.Move == Direction.Right) value = Math.Min(1, Math.Round(value * 10 + 1) / 10);
         }
-        if (focused && Navigation.Move == Direction.Left) value = Math.Max(0, Math.Round(value * 10 - 1) / 10);
-        if (focused && Navigation.Move == Direction.Right) value = Math.Min(1, Math.Round(value * 10 + 1) / 10);
-        FocusRing(rect, Px(6));
-        Overlay.RoundedRectangle(rect, Px(6), Style.Track);
-        Overlay.RoundedRectangle(new Rect(rect.X, rect.Y, MathF.Max(rect.Height, rect.Width * (float) value), rect.Height), Px(6), Style.Accent);
-        return Math.Abs(before - value) > 1e-9;
+        Overlay.RoundedRectangle(track, track.Height / 2, Style.Track);
+        Overlay.RoundedRectangle(new Rect(track.X, track.Y, MathF.Max(track.Height, track.Width * (float) value), track.Height), track.Height / 2,
+            on ? Style.Accent : Style.Disabled);
+        return (switched, Math.Abs(before - value) > 1e-9);
     }
 
     // One of `count` choices, shown as `shown(index)` in a box at the row's right end with the label at its left:
