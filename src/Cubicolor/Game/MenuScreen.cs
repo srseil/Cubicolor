@@ -79,7 +79,7 @@ public sealed class MenuScreen : IScreen
         }
 
         Rect panel = ui.R(left + 260, 262, 800, 420);
-        ui.Panel(panel);
+        ui.Panel(panel, under: true);
         // A section's contents fade in when it is chosen.
         if (_section != _sectionShown) (_sectionShown, _sectionFade) = (_section, 0);
         _sectionFade = Math.Min(1, _sectionFade + (float) seconds / 0.15f);
@@ -122,7 +122,9 @@ public sealed class MenuScreen : IScreen
             int row = (n - 1) / 4, column = (n - 1) % 4;
             Rect cell = ui.R(x + 250 + column * 80, y + 92 + row * 78, 64, 64);
             bool open = progress.IsOpen(_difficulty, n);
-            if (ui.Button(n.ToString(), cell, 26, enabled: open, done: progress.IsSolved(_difficulty, n), id: $"{_difficulty} {n}"))
+            // The cells answer to the mouse right up to their neighbours, so the grid has no dead space.
+            Rect hit = ui.R(x + 242 + column * 80, y + 85 + row * 78, 80, 78);
+            if (ui.Button(n.ToString(), cell, 26, enabled: open, done: progress.IsSolved(_difficulty, n), id: $"{_difficulty} {n}", hit: hit))
                 return new LevelScreen(_context, _difficulty, n);
         }
         return null;
@@ -157,8 +159,6 @@ public sealed class MenuScreen : IScreen
                 _rebinding = (action, true);
             rowY += 50;
         }
-        ui.Label(connected ? "The left stick moves the cube too." : "Connect a controller to change its buttons.",
-                 ui.R(x + 20, rowY + 8, 640, 30), 20);
     }
 
     private static GamepadButtons Flag(PadButton button) => (GamepadButtons) (1 << (int) button);

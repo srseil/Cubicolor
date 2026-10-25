@@ -41,6 +41,8 @@ public sealed class Ui
     private Vector2 _lastMouse;
 
     public Overlay Overlay { get; } = new();
+    // Drawn before the 3D scene, under it: the menus' panels, so a scene can be shown on one.
+    public Overlay Underlay { get; } = new();
     // The UI is laid out on a 1280 x 720 design canvas, scaled to fit the window whole and centred in it, so
     // nothing is ever cut off: Scale is pixels per design unit, Origin the canvas's top left in pixels.
     public const float CanvasWidth = 1280, CanvasHeight = 720;
@@ -71,6 +73,7 @@ public sealed class Ui
         Scale = MathF.Min(height / CanvasHeight, width / CanvasWidth);
         Origin = new Vector2((width - CanvasWidth * Scale) / 2, (height - CanvasHeight * Scale) / 2);
         Overlay.Clear();
+        Underlay.Clear();
         Clicked = false;
         _previous = [.. _widgets];
         _widgets.Clear();
@@ -166,13 +169,17 @@ public sealed class Ui
     // How much of each widget's focus ring shows: it fades in and out over a tenth of a second.
     private readonly Dictionary<string, float> _ring = [];
     private float _ringNow;
+    private Rect _hit;   // the last widget's hit area
 
-    private (bool Focused, bool Activated) Interact(string label, Rect rect, bool enabled)
+    // A widget answers to the mouse a little beyond what it draws (`hit`, by default its rectangle grown by 5
+    // units on every side), so the gaps between neighbours are not dead space.
+    private (bool Focused, bool Activated) Interact(string label, Rect rect, bool enabled, Rect? hit = null)
     {
         _ringNow = 0;
         if (!enabled || !Interactive) return (false, false);
         _widgets.Add((label, rect));
-        bool over = rect.Contains(Input.MousePosition);
+        _hit = hit ?? rect.Inset(-Px(5));
+        bool over = _hit.Contains(Input.MousePosition);
         if (over && _mouseMoved) _focus = label;
         bool focused = _focus == label;
         float ring = _ring.GetValueOrDefault(label);
@@ -197,9 +204,9 @@ public sealed class Ui
     // `selected` fills it khaki (the current section or difficulty); `done` puts a khaki tick in its corner (a
     // solved level).
     public bool Button(string label, Rect rect, float textSize = 24, bool enabled = true, bool selected = false, string? id = null,
-                       bool done = false)
+                       bool done = false, Rect? hit = null)
     {
-        var (focused, activated) = Interact(id ?? label, rect, enabled);
+        var (focused, activated) = Interact(id ?? label, rect, enabled, hit);
         float radius = Px(5);
         if (!enabled)
         {
@@ -209,7 +216,7 @@ public sealed class Ui
         }
         // Pressed while the mouse holds it, and on the frame it lets go too: that is when the click lands and the
         // button may become the selected one, which it otherwise only shows a frame later.
-        bool pressed = focused && rect.Contains(Input.MousePosition) && (Input.MouseDown(MouseButton.Left) || activated && Input.MouseReleased(MouseButton.Left));
+        bool pressed = focused && _hit.Contains(Input.MousePosition) && (Input.MouseDown(MouseButton.Left) || activated && Input.MouseReleased(MouseButton.Left));
         FocusRing(rect, radius);
         Overlay.RoundedRectangle(rect, radius, pressed || selected ? Style.Accent : Style.Button);
         if (done)
@@ -329,11 +336,12 @@ public sealed class Ui
     }
 
     // A panel behind a group of widgets.
-    // A panel behind a group of widgets, outlined all round.
-    public void Panel(Rect rect)
+    // A panel behind a group of widgets, outlined all round; `under` puts it beneath the 3D scene.
+    public void Panel(Rect rect, bool under = false)
     {
         float radius = Px(5);
-        Overlay.RoundedRectangle(rect, radius, Dark ? Palette.Hex(0x4a4a4a) : Style.Panel);
-        Overlay.RoundedOutline(rect, radius, Px(2.5f), Style.Dark);
+        Overlay target = under ? Underlay : Overlay;
+        target.RoundedRectangle(rect, radius, Dark ? Palette.Hex(0x4a4a4a) : Style.Panel);
+        target.RoundedOutline(rect, radius, Px(2.5f), Style.Dark);
     }
 }

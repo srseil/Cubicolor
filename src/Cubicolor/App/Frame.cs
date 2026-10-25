@@ -21,7 +21,7 @@ internal sealed class Frame(GameContext context, IScreen first)
         context.Ui.Begin(input, Navigate(input), width, height, seconds);
         _scene.Items.Clear();
         Screen = Screen.Frame(seconds, _scene);
-        return context.Renderer.Draw(_scene, context.Ui.Overlay.Vertices);
+        return context.Renderer.Draw(_scene, context.Ui.Underlay.Vertices, context.Ui.Overlay.Vertices);
     }
 
     public void Show(IScreen screen) => Screen = screen;

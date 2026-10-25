@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using Cubicolor.Utilities;
@@ -95,14 +96,26 @@ internal static class GameControllers
     private static IntPtr[] _known = [];
     private static readonly List<Dictionary<GamepadButtons, string>> _symbols = [];
 
-    // The distinct symbols for `button` across the connected controllers; empty when none has one.
+    // The distinct symbols for `button` across the connected controllers; with none connected (or none naming
+    // it), the Xbox layout's symbol, so the controls screen shows an icon either way.
     public static IReadOnlyList<string> SymbolsFor(GamepadButtons button)
     {
         var names = new List<string>(2);
         foreach (Dictionary<GamepadButtons, string> controller in _symbols)
             if (controller.TryGetValue(button, out string? name) && !names.Contains(name)) names.Add(name);
+        if (names.Count == 0 && Defaults.TryGetValue(button, out string? fallback)) names.Add(fallback);
         return names;
     }
+
+    private static readonly Dictionary<GamepadButtons, string> Defaults = new()
+    {
+        [GamepadButtons.South] = "a.circle", [GamepadButtons.East] = "b.circle",
+        [GamepadButtons.West] = "x.circle", [GamepadButtons.North] = "y.circle",
+        [GamepadButtons.LeftShoulder] = "lb.rectangle.roundedbottom", [GamepadButtons.RightShoulder] = "rb.rectangle.roundedbottom",
+        [GamepadButtons.Menu] = "line.3.horizontal.circle", [GamepadButtons.Options] = "rectangle.on.rectangle.circle",
+        [GamepadButtons.Up] = "dpad.up.filled", [GamepadButtons.Down] = "dpad.down.filled",
+        [GamepadButtons.Left] = "dpad.left.filled", [GamepadButtons.Right] = "dpad.right.filled",
+    };
 
     private static readonly (GamepadButtons Button, string[] Path)[] Elements =
     [
@@ -140,6 +153,8 @@ internal static class GameControllers
                 if (Str(Send<IntPtr>(element, Sel("unmappedSfSymbolsName"))) is { Length: > 0 } symbol) map.TryAdd(button, symbol);
             }
             _symbols.Add(map);
+            Log.Info($"Game controller symbols, {Str(Send<IntPtr>(controller, SelVendor)) ?? "unnamed"}: "
+                     + (map.Count == 0 ? "none" : string.Join(", ", map.Select(kv => $"{kv.Key} {kv.Value}"))));
         }
     }
 }

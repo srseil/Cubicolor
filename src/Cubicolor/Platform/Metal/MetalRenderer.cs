@@ -10,8 +10,8 @@ using static Cubicolor.Platform.Mac.ObjC;
 
 namespace Cubicolor.Platform.Metal;
 
-// The renderer on macOS. One render pass a frame into a multisampled target: the scene's opaque meshes,
-// then its translucent ones farthest first, then the overlay; resolved into the window's drawable, or, with no
+// The renderer on macOS. One render pass a frame into a multisampled target: the underlay, the scene's opaque
+// meshes, then its translucent ones farthest first, then the overlay; resolved into the window's drawable, or, with no
 // window (headless), into a texture of its own that ReadPixels copies out.
 internal sealed unsafe class MetalRenderer : IRenderer
 {
@@ -121,7 +121,7 @@ internal sealed unsafe class MetalRenderer : IRenderer
         public Vector4 Color, Accent, Pattern, PaintUp, DrainUp;
     }
 
-    public bool Draw(Scene scene, ReadOnlySpan<OverlayVertex> overlay)
+    public bool Draw(Scene scene, ReadOnlySpan<OverlayVertex> underlay, ReadOnlySpan<OverlayVertex> overlay)
     {
         using var pool = AutoreleasePool.Push();
         (int width, int height) = _size();
@@ -151,6 +151,17 @@ internal sealed unsafe class MetalRenderer : IRenderer
             new MTLClearColor(background.X * background.W, background.Y * background.W, background.Z * background.W, background.W));
         pass.Depth(_depth, LoadAction.Clear, StoreAction.DontCare, 1.0);
         MetalRenderEncoder encoder = commands.RenderPass(pass);
+
+        // The underlay and the overlay share one buffer: the underlay's triangles first.
+        MetalBuffer overlayBuffer = default;
+        if (underlay.Length + overlay.Length > 0)
+        {
+            var both = new OverlayVertex[underlay.Length + overlay.Length];
+            underlay.CopyTo(both);
+            overlay.CopyTo(both.AsSpan(underlay.Length));
+            overlayBuffer = _device.NewBuffer(MemoryMarshal.AsBytes(both.AsSpan()), "overlay vertices");
+        }
+        if (underlay.Length > 0) DrawOverlay(encoder, overlayBuffer, 0, underlay.Length, width, height);
 
         Lighting light = scene.Lighting;
         var frame = new FrameUniforms
@@ -185,16 +196,7 @@ internal sealed unsafe class MetalRenderer : IRenderer
             }
         }
 
-        MetalBuffer overlayBuffer = default;
-        if (overlay.Length > 0)
-        {
-            overlayBuffer = _device.NewBuffer(MemoryMarshal.AsBytes(overlay), "overlay vertices");
-            encoder.SetPipeline(_overlay);
-            encoder.SetVertexBytes(new Vector2(width, height), 0);
-            encoder.SetVertexBuffer(overlayBuffer, VertexBufferIndex);
-            encoder.SetFragmentTexture(_atlas.Texture.Handle, _sampler, 0);
-            encoder.Draw(PrimitiveType.Triangle, 0, overlay.Length);
-        }
+        if (overlay.Length > 0) DrawOverlay(encoder, overlayBuffer, underlay.Length, overlay.Length, width, height);
         encoder.End();
 
         if (drawable != IntPtr.Zero) commands.Present(drawable);
@@ -216,6 +218,15 @@ internal sealed unsafe class MetalRenderer : IRenderer
         Width = width;
         Height = height;
         return true;
+    }
+
+    private void DrawOverlay(MetalRenderEncoder encoder, MetalBuffer vertices, int first, int count, int width, int height)
+    {
+        encoder.SetPipeline(_overlay);
+        encoder.SetVertexBytes(new Vector2(width, height), 0);
+        encoder.SetVertexBuffer(vertices, VertexBufferIndex);
+        encoder.SetFragmentTexture(_atlas.Texture.Handle, _sampler, 0);
+        encoder.Draw(PrimitiveType.Triangle, first, count);
     }
 
     private void DrawMesh(MetalRenderEncoder encoder, DrawItem item)

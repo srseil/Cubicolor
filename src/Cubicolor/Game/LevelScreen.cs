@@ -46,7 +46,11 @@ public sealed class LevelScreen : IScreen
         Settings settings = _context.Saves.Settings;
         IScreen next = this;
 
-        if (_panel == Panel.None)
+        if (_leaving != null)
+        {
+            // Fading out: no more input.
+        }
+        else if (_panel == Panel.None)
         {
             if (Pressed(input, settings.Keys[GameAction.Pause]) || input.Gamepad.WasPressed(Pad(settings, GameAction.Pause)))
             {
@@ -77,7 +81,7 @@ public sealed class LevelScreen : IScreen
             _panel = Panel.None;
         }
 
-        if (_puzzle.Solved && _completeAt is { } at && _board.Now >= at && _panel == Panel.None)
+        if (_puzzle.Solved && _completeAt is { } at && _board.Now >= at && _panel == Panel.None && _leaving == null)
         {
             _panel = Panel.Completed;
             ui.Focus(Level.Number < Simulation.Levels.Level.PerDifficulty ? "Next Level" : "Main Menu", force: true);
@@ -95,6 +99,17 @@ public sealed class LevelScreen : IScreen
         (scene.View, scene.Projection) = _camera.Value;
         _board.Draw(scene);
 
+        // Leaving: everything fades out, then the next screen takes over.
+        float shown = 1;
+        if (_leaving != null)
+        {
+            _leaveFade = Math.Max(0, _leaveFade - (float) seconds / 0.3f);
+            shown = _leaveFade * _leaveFade * (3 - 2 * _leaveFade);
+            for (int i = 0; i < scene.Items.Count; i++)
+                scene.Items[i] = scene.Items[i] with { Color = scene.Items[i].Color with { W = scene.Items[i].Color.W * shown } };
+            if (_leaveFade <= 0) return _leaving();
+        }
+        ui.Overlay.Opacity = shown;
         DrawHud(ui, settings);
 
         // The pause and completion panels fade in and out over a sixth of a second; one fading out is drawn but
@@ -104,7 +119,7 @@ public sealed class LevelScreen : IScreen
         if (_panelFade <= 0) _shown = Panel.None;
         if (_shown != Panel.None)
         {
-            ui.Overlay.Opacity = _panelFade * _panelFade * (3 - 2 * _panelFade);
+            ui.Overlay.Opacity = shown * _panelFade * _panelFade * (3 - 2 * _panelFade);
             ui.Interactive = _panel != Panel.None;
             IScreen? chosen = _shown == Panel.Pause ? PausePanel(ui) : CompletedPanel(ui);
             if (ui.Interactive) next = chosen ?? next;
@@ -139,6 +154,15 @@ public sealed class LevelScreen : IScreen
 
     private (Direction Direction, double At)? _queued;
     private Panel _shown;
+    private Func<IScreen>? _leaving;
+    private float _leaveFade = 1;
+
+    // Leaves for another screen once this one has faded out.
+    private void Leave(Func<IScreen> next)
+    {
+        _leaving ??= next;
+        _panel = Panel.None;
+    }
     private (System.Numerics.Matrix4x4, System.Numerics.Matrix4x4)? _camera;
     private float _cameraAspect;
     private float _panelFade;
@@ -243,7 +267,7 @@ public sealed class LevelScreen : IScreen
         ui.Label("Pause", new Rect(panel.X, panel.Y + ui.Px(16), panel.Width, ui.Px(44)), 36);
         if (ui.Button("Resume", Row(ui, panel, 0))) _panel = Panel.None;
         if (ui.Button("Restart", Row(ui, panel, 1))) Restart();
-        if (ui.Button("Main Menu", Row(ui, panel, 2))) return new MenuScreen(_context, Level.Difficulty);
+        if (ui.Button("Main Menu", Row(ui, panel, 2))) Leave(() => new MenuScreen(_context, Level.Difficulty));
         return null;
     }
 
@@ -253,9 +277,9 @@ public sealed class LevelScreen : IScreen
         Rect panel = CentredPanel(ui, last ? 2 : 3);
         ui.Label("Completed", new Rect(panel.X, panel.Y + ui.Px(16), panel.Width, ui.Px(44)), 36);
         int row = 0;
-        if (!last && ui.Button("Next Level", Row(ui, panel, row++))) return new LevelScreen(_context, Level.Difficulty, Level.Number + 1);
+        if (!last && ui.Button("Next Level", Row(ui, panel, row++))) Leave(() => new LevelScreen(_context, Level.Difficulty, Level.Number + 1));
         if (ui.Button("Play Again", Row(ui, panel, row++))) Restart();
-        if (ui.Button("Main Menu", Row(ui, panel, row))) return new MenuScreen(_context, Level.Difficulty);
+        if (ui.Button("Main Menu", Row(ui, panel, row))) Leave(() => new MenuScreen(_context, Level.Difficulty));
         return null;
     }
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using Cubicolor.Platform;
@@ -16,6 +17,10 @@ internal sealed class ScriptedInput : IInput
     public Vector2 MousePosition { get; set; } = new(-1, -1);
     public float ScrollDelta => 0;
     public GamepadState Gamepad => new(_pad, _pad) { Connected = Connected || _pad != GamepadButtons.None };
+
+    // The symbols a real run would show without a controller (the Xbox layout's), so screenshots match it.
+    public IReadOnlyList<string> SymbolsFor(GamepadButtons button) =>
+        OperatingSystem.IsMacOS() ? Platform.Mac.GameControllers.SymbolsFor(button) : [];
 
     // A controller plugged in for the script, pressed or not.
     public bool Connected { get; set; }

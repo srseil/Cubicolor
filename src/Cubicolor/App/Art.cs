@@ -144,7 +144,7 @@ internal sealed class Art(GameContext context, Text text, string solutions, Acti
     private void Save(string directory, string name, int width, int height, bool opaque)
     {
         resize(width, height);
-        context.Renderer.Draw(_scene, _overlay.Vertices);
+        context.Renderer.Draw(_scene, [], _overlay.Vertices);
         string path = Path.Combine(directory, name + ".png");
         byte[] pixels = context.Renderer.ReadPixels();
         if (!opaque)

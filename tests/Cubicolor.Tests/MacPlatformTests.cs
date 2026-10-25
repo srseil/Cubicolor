@@ -22,6 +22,18 @@ public sealed class MacPlatformTests
         Assert.Contains(ink.Coverage, c => c == 0);
     }
 
+    // The symbols the controls screen falls back to with no controller connected: each must exist.
+    [Theory]
+    [InlineData("a.circle"), InlineData("b.circle"), InlineData("x.circle"), InlineData("y.circle")]
+    [InlineData("lb.rectangle.roundedbottom"), InlineData("rb.rectangle.roundedbottom")]
+    [InlineData("line.3.horizontal.circle"), InlineData("rectangle.on.rectangle.circle")]
+    [InlineData("dpad.up.filled"), InlineData("dpad.down.filled"), InlineData("dpad.left.filled"), InlineData("dpad.right.filled")]
+    public void The_default_controller_symbols_exist(string name)
+    {
+        Assert.SkipUnless(OperatingSystem.IsMacOS(), "macOS only");
+        Assert.NotNull(SymbolImages.Rasterize(name, 32));
+    }
+
     [Fact]
     public void An_unknown_symbol_is_none() =>
         Assert.Null(OperatingSystem.IsMacOS() ? SymbolImages.Rasterize("no.such.symbol.anywhere", 32) : null);

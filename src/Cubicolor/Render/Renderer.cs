@@ -81,9 +81,9 @@ public interface IRenderer : IDisposable
     MeshHandle Upload(MeshData mesh);
     IOverlayAtlas Atlas { get; }
 
-    // Draw a frame: the scene, then the overlay's triangles (three vertices each) on top. Returns false when
-    // nothing could be drawn (a window with no drawable yet).
-    bool Draw(Scene scene, ReadOnlySpan<OverlayVertex> overlay);
+    // Draw a frame: the underlay's triangles (three vertices each) on the background, the scene over them, then
+    // the overlay's on top. Returns false when nothing could be drawn (a window with no drawable yet).
+    bool Draw(Scene scene, ReadOnlySpan<OverlayVertex> underlay, ReadOnlySpan<OverlayVertex> overlay);
 
     // The last drawn frame as RGBA bytes, row 0 at the top. For screenshots, which headless runs take.
     byte[] ReadPixels();
