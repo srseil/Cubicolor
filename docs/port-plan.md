@@ -336,7 +336,12 @@ macOS-only and moves on its own.
 9. **The music in plain git** (decided 2026-10-25): the Godot branch's `soundtrack.ogg` byte for byte, so the
    history, which already holds it, doesn't grow. Git LFS would add setup to every clone and CI checkout
    for no saving.
-10. **Ten languages** (decided 2026-10-25): English, French, German, Spanish, Simplified Chinese, Russian,
+10. **A folder per platform, assets as separate files** (decided 2026-10-25): `Cubicolor.app` on macOS;
+    `Cubicolor.exe`, `steam_api64.dll` and `assets/` on Windows; `Cubicolor`, `libsteam_api.so` and
+    `assets/` on Linux, each one Steam depot. SteamPipe sends only the chunks that changed, so a code fix is
+    just the executable; with the assets embedded in it, a fix could resend the 26 MB of music. The Steam
+    library comes from the Steamworks SDK and ships with the game: the Steam client doesn't provide it.
+11. **Ten languages** (decided 2026-10-25): English, French, German, Spanish, Simplified Chinese, Russian,
    Brazilian Portuguese, Japanese, Korean and Polish, the languages most of Steam's players read.
    - The English text is the key. `assets/lang/<code>.txt` maps it to each translation, and widgets keep
      the English as their id, so focus and scripts work the same in every language.
@@ -369,5 +374,5 @@ macOS-only and moves on its own.
     at their exact sizes from the game itself.
   - Open: the Steamworks SDK libraries for packaging; Stefan's ear on
     the synthesized sounds.
-- 2026-10-25: **ten languages**, chosen in Settings or followed from Steam or the system (§9.10). Every screen
+- 2026-10-25: **ten languages**, chosen in Settings or followed from Steam or the system (§9.11). Every screen
   checked headless in each. Open: native-speaker review, the store page.
