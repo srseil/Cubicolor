@@ -159,7 +159,7 @@ internal static class GameControllers
                 if (element == IntPtr.Zero || Send<byte, IntPtr>(element, SelResponds, Sel("unmappedSfSymbolsName")) == 0) continue;
                 if (Str(Send<IntPtr>(element, Sel("unmappedSfSymbolsName"))) is { Length: > 0 } symbol) map.TryAdd(button, symbol);
                 if (Send<byte, IntPtr>(element, SelResponds, Sel("localizedName")) != 0
-                    && Str(Send<IntPtr>(element, Sel("localizedName"))) is { Length: > 0 } localized) names.TryAdd(button, localized);
+                    && Str(Send<IntPtr>(element, Sel("localizedName"))) is { Length: > 0 } localized) names.TryAdd(button, localized.EndsWith(" Button", StringComparison.Ordinal) ? localized[..^7] : localized);
             }
             _symbols.Add(map);
             foreach (var (button, symbol) in map)
