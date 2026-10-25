@@ -126,6 +126,7 @@ public sealed class LevelScreen : IScreen
             ui.Overlay.Opacity = 1;
             ui.Interactive = true;
         }
+        if (ui.Clicked) _context.Audio.Play(Sound.Click);
         return next;
     }
 
