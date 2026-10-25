@@ -264,6 +264,11 @@ everything at any size:
 - A new trailer recorded in-game.
 - The system requirements text updated (it still reads Vista and OpenGL ES 3.0).
 
+Decided 2026-10-25 (Stefan): the wide capsules (header, small, main, library header) and the library logo stay
+the 2016 design, the title over the logo's row of tiles. The tall capsules have the title above a level, the
+event cover the title on the left and a level on the right; the library hero is a level with its left kept free
+for the logo.
+
 ## 7. Order of work
 
 1. **Branches:** `libgdx` holds the Java code, with a README note like `godot`'s. `master` is emptied

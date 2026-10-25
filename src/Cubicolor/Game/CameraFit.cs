@@ -55,6 +55,23 @@ public static class CameraFit
         return (view, Matrix4x4.CreateOrthographicOffCenter(frameLeft, frameLeft + screen.X * perPixel, frameTop - screen.Y * perPixel, frameTop, 1f, 100f));
     }
 
+    // The same for `points` rather than a box: tighter, as a box's far corners lie outside an L-shaped board.
+    public static (Matrix4x4 View, Matrix4x4 Projection) FitInto(IReadOnlyList<Vector3> points, Render.Rect target, Vector2 screen, Vector3 forward)
+    {
+        Vector3 centre = Vector3.Zero;
+        foreach (Vector3 p in points) centre += p;
+        centre /= points.Count;
+        Matrix4x4 view = Matrix4x4.CreateLookAt(centre - forward * 50, centre, Vector3.UnitY);
+        var (low, high) = Extent(points, view);
+        Vector2 size = high - low;
+        float perPixel = MathF.Max(size.X / target.Width, size.Y / target.Height);
+        // The points' middle at the target's middle.
+        Vector2 middle = (low + high) / 2;
+        float frameLeft = middle.X - (target.X + target.Width / 2) * perPixel;
+        float frameTop = middle.Y + (target.Y + target.Height / 2) * perPixel;
+        return (view, Matrix4x4.CreateOrthographicOffCenter(frameLeft, frameLeft + screen.X * perPixel, frameTop - screen.Y * perPixel, frameTop, 1f, 100f));
+    }
+
     // View and projection that put the middle of `centreOn`'s projection in the middle of the view, and make it
     // large enough for all of `contain` around that middle, with `margin` of the view's height free at the
     // edges. Used for the board: its tiles sit in the middle of the screen, whatever the stack beside them.

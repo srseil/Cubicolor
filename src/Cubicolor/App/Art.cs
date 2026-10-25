@@ -21,16 +21,18 @@ internal sealed class Art(GameContext context, Text text, string solutions, Acti
     public void RenderAll(string directory)
     {
         Directory.CreateDirectory(directory);
-        // Capsules: title and board side by side, or stacked when the image is tall.
-        Capsule(directory, "header_capsule", 920, 430, "genius05");
-        Capsule(directory, "small_capsule", 462, 174, "smart04");
-        Capsule(directory, "main_capsule", 1232, 706, "genius05");
-        Capsule(directory, "vertical_capsule", 748, 896, "genius12");
-        Capsule(directory, "library_capsule", 600, 900, "genius12");
-        Capsule(directory, "library_header", 920, 430, "genius05");
+        // The wide capsules are the 2016 ones redrawn: the title over the logo's row of tiles. The tall ones and
+        // the event cover have the title with a level below or beside it; the library hero leaves its left for
+        // the logo.
+        Lockup(directory, "header_capsule", 920, 430);
+        Lockup(directory, "small_capsule", 462, 174);
+        Lockup(directory, "main_capsule", 1232, 706);
+        Lockup(directory, "library_header", 920, 430);
+        WithBoard(directory, "vertical_capsule", 748, 896, "smart09");
+        WithBoard(directory, "library_capsule", 600, 900, "smart09");
+        WithBoard(directory, "event_cover", 800, 450, "genius05");
         Capsule(directory, "page_background", 1438, 810, "genius15", title: false, faded: true);
-        Capsule(directory, "library_hero", 3840, 1240, "genius15", title: false);
-        Capsule(directory, "event_cover", 800, 450, "smart09");
+        Hero(directory, "library_hero", 3840, 1240, "genius15");
         Logo(directory, "library_logo", 1280, 720);
         Icon(directory, "icon_macos", 1024, IconKind.MacOS);
         Icon(directory, "icon", 1024, IconKind.Plain);
@@ -110,21 +112,103 @@ internal sealed class Art(GameContext context, Text text, string solutions, Acti
         Save(directory, name, width, height, opaque: true);
     }
 
+    // The 2016 logo: the title over the row of tiles with the tipped cube, as large as fits `area` and centred in
+    // it. Proportions measured off the old main capsule: the row 70 % of the title's width, and title and row
+    // together about half as tall as the title is wide.
+    private void DrawLockup(Rect area, int width, int height)
+    {
+        const float tall = 0.5f;
+        float titleWidth = MathF.Min(area.Width, area.Height / tall);
+        float size = titleWidth / text.Measure("Cubicolor", FontStyle.Black, 100) * 100;
+        titleWidth = text.Measure("Cubicolor", FontStyle.Black, size);
+        float line = text.LineHeight(FontStyle.Black, size);
+        float top = area.Y + (area.Height - titleWidth * tall) / 2;
+        // The line's top is above the ascenders: lift it so the ink, not the line, starts at `top`.
+        text.Draw(_overlay, "Cubicolor", new Vector2(area.X + (area.Width - titleWidth) / 2, top - line * 0.14f), FontStyle.Black, size, Palette.Text);
+        float rowWidth = titleWidth * 0.7f;
+        float rowTop = top + line * 0.64f;
+        var row = new Rect(area.X + (area.Width - rowWidth) / 2, rowTop, rowWidth, top + titleWidth * tall - rowTop);
+        new LogoView(context.Meshes).Draw(_scene, row, new Vector2(width, height));
+    }
+
+    private void Lockup(string directory, string name, int width, int height)
+    {
+        Begin(Palette.Background);
+        float margin = MathF.Min(width, height) * 0.1f;
+        DrawLockup(new Rect(margin, margin, width - 2 * margin, height - 2 * margin), width, height);
+        Write(directory, name, Render(width, height), width, height, opaque: true);
+    }
+
+    // The title and a level part-way through: stacked when the image is tall, the title centred on the left
+    // when it is wide.
+    private void WithBoard(string directory, string name, int width, int height, string level)
+    {
+        bool tall = height > width;
+        Rect title = tall ? new Rect(width * 0.08f, height * 0.05f, width * 0.84f, height * 0.14f)
+                          : new Rect(width * 0.05f, height * 0.1f, width * 0.4f, height * 0.8f);
+        // Shifted right a little: the framing keeps room on the right for more than is still drawn there.
+        Rect boardArea = tall ? new Rect(width * 0.12f, height * 0.25f, width * 0.86f, height * 0.69f)
+                              : new Rect(width * 0.5f, height * 0.08f, width * 0.46f, height * 0.84f);
+        Begin(Palette.Background);
+        BoardView board = Board(level, 0.45);
+        (_scene.View, _scene.Projection) = CameraFit.FitInto(board.Extent(), boardArea, new Vector2(width, height), CameraFit.Forward);
+        board.Draw(_scene);
+        DrawTitle(title);
+        Write(directory, name, Render(width, height), width, height, opaque: true);
+    }
+
+    // The title as large as fits `area`, its ink centred in it.
+    private void DrawTitle(Rect area)
+    {
+        // Measured at this size: the ink of "Cubicolor" (no descenders) runs from 0.14 to 0.82 of the line.
+        const float inkTop = 0.14f, inkHeight = 0.68f;
+        float line100 = text.LineHeight(FontStyle.Black, 100);
+        float size = MathF.Min(area.Width / text.Measure("Cubicolor", FontStyle.Black, 100), area.Height / (line100 * inkHeight)) * 100;
+        float width = text.Measure("Cubicolor", FontStyle.Black, size);
+        float line = text.LineHeight(FontStyle.Black, size);
+        float y = area.Y + (area.Height - line * inkHeight) / 2 - line * inkTop;
+        text.Draw(_overlay, "Cubicolor", new Vector2(area.X + (area.Width - width) / 2, y), FontStyle.Black, size, Palette.Text);
+    }
+
+    // The library hero: a level large on the right, no text; Steam lays the library logo over its left.
+    private void Hero(string directory, string name, int width, int height, string level)
+    {
+        Begin(Palette.Background);
+        BoardView board = Board(level, 0.45);
+        var (min, max) = board.Bounds();
+        var area = new Rect(width * 0.5f, height * 0.06f, width * 0.44f, height * 0.88f);
+        (_scene.View, _scene.Projection) = CameraFit.FitInto(min, max, area, new Vector2(width, height), CameraFit.Forward);
+        board.Draw(_scene);
+        Write(directory, name, Render(width, height), width, height, opaque: true);
+    }
+
+    private void Begin(Vector4 background)
+    {
+        _scene.Items.Clear();
+        _overlay.Clear();
+        _underlay.Clear();
+        _scene.Background = background;
+        _scene.Lighting = GameContext.Light;
+    }
+
+    private static readonly float[] Linear = Enumerable.Range(0, 256).Select(v =>
+        v / 255f is var s && s <= 0.04045f ? s / 12.92f : MathF.Pow((s + 0.055f) / 1.055f, 2.4f)).ToArray();
+
+    private static byte Encode(float linear)
+    {
+        float l = Math.Clamp(linear, 0, 1);
+        float s = l <= 0.0031308f ? l * 12.92f : 1.055f * MathF.Pow(l, 1 / 2.4f) - 0.055f;
+        return (byte) MathF.Round(s * 255);
+    }
+
     private static (string Difficulty, int Number) LevelName(string level) =>
         (char.ToUpperInvariant(level[0]) + level[1..^2], int.Parse(level[^2..]));
 
     // The title over the logo's row of tiles, on nothing: the library lays it over the hero image.
     private void Logo(string directory, string name, int width, int height)
     {
-        _scene.Items.Clear();
-        _overlay.Clear();
-        _scene.Background = Palette.Background with { W = 0 };
-        _scene.Lighting = GameContext.Light;
-        float size = height * 0.36f;
-        float textWidth = text.Measure("Cubicolor", FontStyle.Black, size);
-        text.Draw(_overlay, "Cubicolor", new Vector2((width - textWidth) / 2, height * 0.08f), FontStyle.Black, size, Palette.Text);
-        var logo = new LogoView(context.Meshes);
-        logo.Draw(_scene, new Rect(width * 0.25f, height * 0.6f, width * 0.5f, height * 0.36f), new Vector2(width, height));
+        Begin(Palette.Background with { W = 0 });
+        DrawLockup(new Rect(width * 0.02f, height * 0.02f, width * 0.96f, height * 0.96f), width, height);
         Save(directory, name, width, height, opaque: false);
     }
 
@@ -259,18 +343,26 @@ internal sealed class Art(GameContext context, Text text, string solutions, Acti
         }
     }
 
-    private void Save(string directory, string name, int width, int height, bool opaque)
+    private void Save(string directory, string name, int width, int height, bool opaque) =>
+        Write(directory, name, Render(width, height), width, height, opaque);
+
+    private byte[] Render(int width, int height)
     {
         resize(width, height);
         context.Renderer.Draw(_scene, _underlay.Vertices, _overlay.Vertices);
         _underlay.Clear();
+        return context.Renderer.ReadPixels();
+    }
+
+    private static void Write(string directory, string name, byte[] pixels, int width, int height, bool opaque)
+    {
         string path = Path.Combine(directory, name + ".png");
-        byte[] pixels = context.Renderer.ReadPixels();
         if (!opaque)
-            // The frame holds premultiplied colour; PNG wants it straight.
+            // The frame holds colour premultiplied in linear light (it blends before sRGB encoding); PNG wants it
+            // straight.
             for (int i = 0; i < pixels.Length; i += 4)
                 if (pixels[i + 3] is > 0 and < 255 and var a)
-                    for (int c = 0; c < 3; c++) pixels[i + c] = (byte) Math.Min(255, pixels[i + c] * 255 / a);
+                    for (int c = 0; c < 3; c++) pixels[i + c] = Encode(Linear[pixels[i + c]] * 255 / a);
         Png.Write(path, pixels, width, height, bgra: false, opaque: opaque);
         Log.Info($"Art: {path} ({width}x{height})");
     }
