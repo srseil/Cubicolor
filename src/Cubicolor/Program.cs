@@ -134,7 +134,7 @@ internal static class Program
     {
         using var renderer = new MetalRenderer(IntPtr.Zero, () => (width, height), vsync: false);
         // Headless, the mix goes nowhere unless it is captured to a file.
-        using var audio = new AudioService(MusicPath(assets), Path.Combine(assets, "sounds"), _ => null);
+        using var audio = new AudioService(MusicPath(assets), _ => null);
         GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio, new NoAchievements());
         List<float>? captured = captureAudio != null ? [] : null;
         var block = new float[Mixer.Rate / 60 * 2];
@@ -184,7 +184,7 @@ internal static class Program
     {
         int width = 1280, height = 720;
         using var renderer = new MetalRenderer(IntPtr.Zero, () => (width, height), vsync: false);
-        using var audio = new AudioService(MusicPath(assets), Path.Combine(assets, "sounds"), _ => null);
+        using var audio = new AudioService(MusicPath(assets), _ => null);
         var text = new Text(new CoreTextFontLoader(), Path.Combine(assets, "fonts"), new OverlayAtlas(renderer.Atlas));
         GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio, new NoAchievements());
         // A development tool: it reads the recorded solutions from the repository it is run in.
@@ -210,10 +210,11 @@ internal static class Program
         MenuScreen.KeyName = KeyCodes.Name;
         using var renderer = new MetalRenderer(window.MetalLayer, () =>
             ((int) MathF.Round(window.Width * window.PixelDensity), (int) MathF.Round(window.Height * window.PixelDensity)), settings.VSync);
-        using var audio = new AudioService(MusicPath(assets), Path.Combine(assets, "sounds"), CoreAudioOutput.Start);
+        using var audio = new AudioService(MusicPath(assets), CoreAudioOutput.Start);
         using Steam? steam = Steam.Start();
         GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio, steam ?? (IAchievements) new NoAchievements());
         context.ApplyDisplay = s => window.SetFullscreen(s.Fullscreen);
+        context.OpenUrl = AppKit.OpenUrl;
         if (settings.Fullscreen) window.SetFullscreen(true);
         var frame = new Frame(context, FirstScreen(context, level));
 

@@ -103,4 +103,42 @@ internal static class Analysis
             }
         }
     }
+
+    // The resonances a struck sound is made of: its strongest spectral peaks just after the strike, each with
+    // its starting level and how fast it dies away (the time constant of an exponential fitted to its
+    // magnitude, frame by frame, while it stays well above the noise).
+    public static List<(double Hz, double Level, double Decay)> Modes(float[] mono, int rate, int count)
+    {
+        const int window = 2048, hop = 128;
+        int onset = 0;
+        float peak = 0;
+        for (int i = 0; i < mono.Length; i++)
+            if (MathF.Abs(mono[i]) > peak) (peak, onset) = (MathF.Abs(mono[i]), i);
+        int start = Math.Max(0, onset - window / 4);
+        var (first, binHz) = Spectrum(mono.AsSpan(start, Math.Min(window, mono.Length - start)), rate);
+        var modes = new List<(double, double, double)>();
+        foreach (var (hz, level) in Peaks(first, binHz, count, apart: 40))
+        {
+            int bin = (int) Math.Round(hz / binHz);
+            var times = new List<double>();
+            var logs = new List<double>();
+            for (int at = start; at + window <= mono.Length; at += hop)
+            {
+                var (m, _) = Spectrum(mono.AsSpan(at, window), rate);
+                float magnitude = Math.Max(m[bin], Math.Max(m[Math.Max(0, bin - 1)], m[Math.Min(m.Length - 1, bin + 1)]));
+                if (magnitude < level * 0.01) break;
+                times.Add((double) (at - start) / rate);
+                logs.Add(Math.Log(magnitude));
+            }
+            double decay = 0.005;
+            if (times.Count >= 3)
+            {
+                double mt = times.Average(), ml = logs.Average();
+                double slope = times.Zip(logs).Sum(p => (p.First - mt) * (p.Second - ml)) / times.Sum(t => (t - mt) * (t - mt));
+                if (slope < 0) decay = -1 / slope;
+            }
+            modes.Add((hz, level, decay));
+        }
+        return modes;
+    }
 }

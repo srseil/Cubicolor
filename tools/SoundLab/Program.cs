@@ -11,6 +11,7 @@ internal static class Program
         SoundLab measure <wav>...                  loudness over time, spectral centroid and peaks
         SoundLab encode-music <in.wav> <out.qoa>   the music, to QOA (with the round trip's signal-to-noise ratio)
         SoundLab render <dir>                      every synthesized effect as <dir>/<sound>.wav
+        SoundLab modes <wav> [count]               the resonances of a struck sound: frequency, level, decay
         """;
 
     private static int Main(string[] args)
@@ -25,6 +26,15 @@ internal static class Program
             case "measure":
                 foreach (string path in args.Skip(1)) Measure(path);
                 return 0;
+            case "modes" when args.Length >= 2:
+            {
+                Wav.Clip clip = Wav.Read(args[1]);
+                float[] mono = Analysis.Mono(clip.Samples, clip.Channels);
+                int count = args.Length > 2 ? int.Parse(args[2]) : 8;
+                foreach (var (hz, level, decay) in Analysis.Modes(mono, clip.SampleRate, count))
+                    Console.WriteLine($"{hz,8:0} Hz  level {level,8:0.0}  decay {decay * 1000,7:0.0} ms");
+                return 0;
+            }
             case "render" when args.Length == 2:
                 Directory.CreateDirectory(args[1]);
                 foreach (Game.Sound sound in Enum.GetValues<Game.Sound>())
