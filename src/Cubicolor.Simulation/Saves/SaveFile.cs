@@ -78,6 +78,8 @@ public static class SaveFile
         yield return ("sound_muted", Bool(s.SoundMuted));
         yield return ("fullscreen", Bool(s.Fullscreen));
         yield return ("vsync", Bool(s.VSync));
+        if (s.Language is { } language)
+            yield return ("language", language.Code());
         if (s.WindowSize is var (width, height))
             yield return ("window_size", FormattableString.Invariant($"{width}x{height}"));
         foreach (var (action, key) in s.Keys)
@@ -99,6 +101,7 @@ public static class SaveFile
         if (values.TryGetValue("music_volume", out string? v) && TryDouble(v, out double d)) s.MusicVolume = Settings.ClampVolume(d);
         if (values.TryGetValue("sound_volume", out v) && TryDouble(v, out d)) s.SoundVolume = Settings.ClampVolume(d);
         if (values.TryGetValue("window_size", out v) && TrySize(v, out var size)) s.WindowSize = size;
+        if (values.TryGetValue("language", out v)) s.Language = Languages.FromCode(v);
         foreach (GameAction action in Enum.GetValues<GameAction>())
             if (values.TryGetValue("key." + Name(action), out v) && Enum.TryParse(v, out Input.Key key) && Enum.IsDefined(key) && key != Input.Key.Unknown)
                 s.Keys[action] = key;

@@ -26,6 +26,8 @@ public sealed class Settings
     public bool SoundMuted { get; set; }
     public bool Fullscreen { get; set; }
     public bool VSync { get; set; } = true;
+    // The language the player chose, or null to follow Steam's (or the system's) language.
+    public Language? Language { get; set; }
     // The window's size in points when not fullscreen, or null for a size picked from the screen.
     public (int Width, int Height)? WindowSize { get; set; }
 
