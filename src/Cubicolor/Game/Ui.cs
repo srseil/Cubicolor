@@ -279,6 +279,9 @@ public sealed class Ui
         return activated;
     }
 
+    // Uses up this frame's move: focus has gone where it should, and no widget is to step with it too.
+    public void Spend() => Navigation = Navigation with { Move = null };
+
     // Undoes this frame's navigation and leaves nothing to be activated: while a binding is being captured, the
     // key or button pressed for it must do nothing else.
     public void Hold()

@@ -64,16 +64,24 @@ public sealed class MenuScreen : IScreen
         }
         else if (ui.Navigation.Back && _section != Section.Play)
         {
-            ui.Focus(_section.ToString(), force: true);
+            ui.Focus("Play", force: true);
             _section = Section.Play;
         }
 
         // Right from the sections enters the panel at its top; left from the panel goes back to its section.
         string[] sections = ["Play", "Controls", "Settings", "Credits", "Quit"];
         bool fromSections = ui.FocusBefore != null && sections.Contains(ui.FocusBefore);
-        if (ui.Navigation.Move == Direction.Right && fromSections && FirstInPanel() is { } first) ui.Focus(first, force: true);
+        // The press that moves focus across is spent on that: it doesn't also step the widget it lands on.
+        if (ui.Navigation.Move == Direction.Right && fromSections && FirstInPanel() is { } first)
+        {
+            ui.Focus(first, force: true);
+            ui.Spend();
+        }
         else if (ui.Navigation.Move == Direction.Left && !fromSections && ui.Focused != null && sections.Contains(ui.Focused))
+        {
             ui.Focus(_section.ToString(), force: true);
+            ui.Spend();
+        }
 
         IScreen next = this;
         (string Label, Section? Section)[] items =
