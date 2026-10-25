@@ -16,8 +16,9 @@ internal sealed class Frame(GameContext context, IScreen first)
     public bool Run(IInput input, double seconds, int width, int height)
     {
         input.Poll();
+        context.Audio.Watch();
         context.Ui.Dark = context.Saves.Settings.DarkBackground;
-        context.Ui.Begin(input, Navigate(input), width, height);
+        context.Ui.Begin(input, Navigate(input), width, height, seconds);
         _scene.Items.Clear();
         Screen = Screen.Frame(seconds, _scene);
         return context.Renderer.Draw(_scene, context.Ui.Overlay.Vertices);

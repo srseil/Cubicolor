@@ -20,6 +20,14 @@ public interface IAudio : IDisposable
     void Play(Sound sound);
     // Applies the volume settings, music included.
     void Apply(Settings settings);
+    // Once a frame: lets the output notice it has stopped and start again.
+    void Watch();
+}
+
+// Where the mixed sound goes: the platform's audio output.
+public interface IAudioOutput : IDisposable
+{
+    void Watch();
 }
 
 // Steam's achievements, one per difficulty finished; nothing without Steam.
@@ -44,8 +52,9 @@ public sealed class GameContext(IRenderer renderer, BoardMeshes meshes, Ui ui, S
     public IAchievements Achievements { get; } = achievements;
     public string LevelsDirectory { get; } = levels;
 
-    // Set by the window layer: what the display settings do.
+    // Set by the window layer: what the display settings do, and opening a web page in the browser.
     public Action<Settings>? ApplyDisplay { get; set; }
+    public Action<string>? OpenUrl { get; set; }
 
     public bool QuitRequested { get; set; }
 
