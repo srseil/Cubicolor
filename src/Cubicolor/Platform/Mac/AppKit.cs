@@ -92,6 +92,15 @@ internal static unsafe class AppKit
         Call(App, SelUpdateWindows);
     }
 
+    // Sleep until an event arrives or `seconds` pass, leaving the event queued for PumpEvents.
+    public static void WaitForEvent(double seconds)
+    {
+        if (App == IntPtr.Zero) return;
+        using var pool = AutoreleasePool.Push();
+        IntPtr until = Send<IntPtr, double>(Class("NSDate"), Sel("dateWithTimeIntervalSinceNow:"), seconds);
+        Send<IntPtr, ulong, IntPtr, IntPtr, byte>(App, SelNextEvent, ulong.MaxValue, until, NSString("kCFRunLoopDefaultMode"), 0);
+    }
+
     // A web page in the default browser.
     public static void OpenUrl(string url)
     {

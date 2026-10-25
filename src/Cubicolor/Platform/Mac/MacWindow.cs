@@ -59,6 +59,8 @@ internal sealed unsafe class MacWindow : IWindow
     // Pixels per point: 2 on Retina displays.
     public float PixelDensity => (float) Send<double>(Handle, Sel("backingScaleFactor"));
 
+    // Whether any of the window can be seen: not minimised, not on another space, not covered entirely.
+    public bool IsVisible => (Send<nuint>(Handle, Sel("occlusionState")) & (1u << 1)) != 0;
     public bool IsFocused => Send<byte>(Handle, Sel("isKeyWindow")) != 0;
     public bool IsFullscreen => (Send<nuint>(Handle, Sel("styleMask")) & (1u << 14)) != 0;
 

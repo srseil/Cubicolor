@@ -252,7 +252,7 @@ internal static class Program
         context.ApplyDisplay = s => window.SetFullscreen(s.Fullscreen);
         context.OpenUrl = AppKit.OpenUrl;
         if (settings.Fullscreen) window.SetFullscreen(true);
-        var frame = new Frame(context, FirstScreen(context, level));
+        var frame = new Frame(context, FirstScreen(context, level)) { SkipUnchanged = true };
 
         var clock = Stopwatch.StartNew();
         double last = 0;
@@ -264,14 +264,21 @@ internal static class Program
             last = now;
             try
             {
-                if (!frame.Run(input, seconds, renderer.Width, renderer.Height)) Thread.Sleep(5);
+                bool visible = window.IsVisible;
+                bool drawn = frame.Run(input, seconds, renderer.Width, renderer.Height, draw: visible);
+                // Presenting paces a frame that was drawn (with vsync); one that was not waits here instead: a
+                // still picture until the next event or a sixtieth of a second, for controllers and timers, and a
+                // hidden window a tenth, which keeps the game going (a fade, a level's sounds) at next to no cost.
+                if (!visible) AppKit.WaitForEvent(0.1);
+                else if (!drawn) Thread.Sleep(5);
+                else if (frame.Unchanged) AppKit.WaitForEvent(1.0 / 60);
+                else if (!settings.VSync) Thread.Sleep(1);
             }
             catch (Exception e) when (e is not OutOfMemoryException)
             {
                 // One bad frame is logged, not fatal.
                 Log.Error($"Frame failed: {e}");
             }
-            if (!settings.VSync) Thread.Sleep(1);
         }
         saves.SaveSettings();
         return 0;
