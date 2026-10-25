@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using Cubicolor.Game;
+using Cubicolor.Platform.Mac;
 using Cubicolor.Simulation.Saves;
 using Xunit;
 
@@ -75,5 +76,23 @@ public sealed class LanguageTests
         string[] difficulties = Enum.GetNames<Cubicolor.Simulation.Levels.Difficulty>();
         Assert.All(keys.Except(difficulties), key => Assert.Contains($"\"{key}\"", source));
         Assert.Subset(keys.ToHashSet(), difficulties.ToHashSet());
+    }
+
+    // The trimmed CJK fonts (tools/subset-fonts.sh) must keep up with the tables: every character a language
+    // shows, its name in the language list included, has a glyph in Vollkorn or in one of its fallbacks.
+    [Fact]
+    public void The_shipped_fonts_draw_every_character_of_every_language()
+    {
+        string fonts = Repo.Assets("fonts");
+        using var vollkorn = new CoreTextFont(Path.Combine(fonts, "Vollkorn-Regular.ttf"), 24);
+        foreach (Language language in Enum.GetValues<Language>())
+        {
+            var fallbacks = GameContext.FallbackFonts(language).Select(f => new CoreTextFont(Path.Combine(fonts, f), 24)).ToList();
+            Strings table = Strings.Load(Repo.Assets("lang"), language);
+            string text = string.Concat(table.Keys.Select(k => table[k])) + language.NativeName();
+            char[] missing = [.. text.Where(c => !char.IsWhiteSpace(c) && vollkorn.GlyphFor(c) == 0 && fallbacks.All(f => f.GlyphFor(c) == 0)).Distinct()];
+            foreach (CoreTextFont face in fallbacks) face.Dispose();
+            Assert.True(missing.Length == 0, $"{language} has no glyph for: {new string(missing)}");
+        }
     }
 }

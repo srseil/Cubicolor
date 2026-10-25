@@ -34,33 +34,6 @@ internal sealed unsafe partial class CoreTextFont : IFontFace
         (Ascent, Descent, LineGap) = Metrics(_font);
     }
 
-    private CoreTextFont(IntPtr font)
-    {
-        _font = font;
-        (Ascent, Descent, LineGap) = Metrics(font);
-    }
-
-    // An installed font by its PostScript name, or null: Core Text hands back a stand-in for a name it doesn't
-    // know, so the name is checked.
-    public static CoreTextFont? Installed(string name, double size)
-    {
-        fixed (char* chars = name)
-        {
-            IntPtr cfName = CFStringCreateWithCharacters(IntPtr.Zero, chars, name.Length);
-            IntPtr font = CTFontCreateWithName(cfName, size, IntPtr.Zero);
-            CFRelease(cfName);
-            if (font == IntPtr.Zero) return null;
-            IntPtr found = CTFontCopyPostScriptName(font);
-            int length = (int) CFStringGetLength(found);
-            var buffer = new char[length];
-            fixed (char* b = buffer) CFStringGetCharacters(found, new CFRange(0, length), b);
-            CFRelease(found);
-            if (new string(buffer) == name) return new CoreTextFont(font);
-            CFRelease(font);
-            return null;
-        }
-    }
-
     private static (float, float, float) Metrics(IntPtr font) =>
         ((float) CTFontGetAscent(font), (float) CTFontGetDescent(font), (float) CTFontGetLeading(font));
 
@@ -191,7 +164,6 @@ internal sealed unsafe partial class CoreTextFont : IFontFace
     [StructLayout(LayoutKind.Sequential)] private struct CGPoint { public double X, Y; }
     [StructLayout(LayoutKind.Sequential)] private struct CGSize { public double Width, Height; }
     [StructLayout(LayoutKind.Sequential)] private struct CGRect { public double X, Y, Width, Height; }
-    [StructLayout(LayoutKind.Sequential)] private readonly record struct CFRange(nint Location, nint Length);
 
     private const string CoreFoundationPath = "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation";
     private const string CoreTextPath = "/System/Library/Frameworks/CoreText.framework/CoreText";
@@ -206,13 +178,9 @@ internal sealed unsafe partial class CoreTextFont : IFontFace
     [LibraryImport(CoreFoundationPath)] private static partial IntPtr CFStringCreateWithCharacters(IntPtr allocator, char* chars, nint length);
     [LibraryImport(CoreFoundationPath)] private static partial IntPtr CFDictionaryCreate(IntPtr allocator, IntPtr* keys, IntPtr* values, nint count, IntPtr keyCallBacks, IntPtr valueCallBacks);
     [LibraryImport(CoreFoundationPath)] private static partial IntPtr CFAttributedStringCreate(IntPtr allocator, IntPtr text, IntPtr attributes);
-    [LibraryImport(CoreFoundationPath)] private static partial nint CFStringGetLength(IntPtr text);
-    [LibraryImport(CoreFoundationPath)] private static partial void CFStringGetCharacters(IntPtr text, CFRange range, char* buffer);
 
     [LibraryImport(CoreTextPath)] private static partial IntPtr CTFontManagerCreateFontDescriptorsFromURL(IntPtr url);
     [LibraryImport(CoreTextPath)] private static partial IntPtr CTFontCreateWithFontDescriptor(IntPtr descriptor, double size, IntPtr matrix);
-    [LibraryImport(CoreTextPath)] private static partial IntPtr CTFontCreateWithName(IntPtr name, double size, IntPtr matrix);
-    [LibraryImport(CoreTextPath)] private static partial IntPtr CTFontCopyPostScriptName(IntPtr font);
     [LibraryImport(CoreTextPath)] private static partial double CTFontGetAscent(IntPtr font);
     [LibraryImport(CoreTextPath)] private static partial double CTFontGetDescent(IntPtr font);
     [LibraryImport(CoreTextPath)] private static partial double CTFontGetLeading(IntPtr font);
@@ -233,5 +201,4 @@ internal sealed unsafe partial class CoreTextFont : IFontFace
 internal sealed class CoreTextFontLoader : IFontLoader
 {
     public IFontFace Open(string path, float pixelSize) => new CoreTextFont(path, pixelSize);
-    public IFontFace? OpenInstalled(string name, float pixelSize) => CoreTextFont.Installed(name, pixelSize);
 }

@@ -336,9 +336,10 @@ macOS-only and moves on its own.
      system's first supported language, then English. A choice is saved as `language = <code>`; older
      settings files simply have none.
    - Text longer than its box is set smaller until it fits.
-   - Chinese, Japanese and Korean come from installed serif fonts, the language's own first (macOS:
-     Songti SC, Hiragino Mincho, AppleMyungjo). Windows has its own; a Linux system may have none, so
-     bundling a Noto CJK subset is the open point there.
+   - Chinese, Japanese and Korean come from Noto Serif CJK Medium, shipped beside Vollkorn and trimmed to
+     the characters the tables use (`tools/subset-fonts.sh`, about 150 KB for all three), so every
+     platform draws them alike. The language's own font comes first, so shared Han characters take its
+     forms. `LanguageTests` fails when a table uses a character the trimmed fonts lack.
    - The translations are machine-drafted and need a native speaker's pass. The Steam store page and the
      languages listed in Steamworks are to be translated and set with them.
 
@@ -361,4 +362,4 @@ macOS-only and moves on its own.
   - Open: how the 26 MB music file is versioned; the Steamworks SDK libraries for packaging; Stefan's ear on
     the synthesized sounds.
 - 2026-10-25: **ten languages**, chosen in Settings or followed from Steam or the system (§9.9). Every screen
-  checked headless in each. Open: native-speaker review, the store page, CJK fonts on Linux.
+  checked headless in each. Open: native-speaker review, the store page.

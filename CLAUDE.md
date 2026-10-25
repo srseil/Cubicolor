@@ -25,7 +25,8 @@ when something is decided. Its §2 (old saves) is the one hard requirement: neve
 - `tests/Cubicolor.Tests`: xUnit v3 (a test-only package; the game itself has no package references).
 - `assets/`: data the game loads (levels, fonts, music, `lang/` string tables), each with its licence beside it.
   The English text is the key into each language's table; a new or changed English UI text needs a line in
-  every table (`LanguageTests` checks they match).
+  every table (`LanguageTests` checks they match), and a changed zh-Hans, ja or ko table needs
+  `tools/subset-fonts.sh` run again to trim the CJK fonts to its characters.
   `assets/music/soundtrack.ogg` is not in git yet (26 MB); `tools/SoundLab encode-music` makes it from the
   original WAV in Dropbox (`Projekte/Cubicolor/data6/MyGame/wav/soundtrack.wav`) through `oggenc`
   (`brew install vorbis-tools`).

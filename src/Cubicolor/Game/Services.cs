@@ -63,8 +63,6 @@ public sealed class GameContext(IRenderer renderer, BoardMeshes meshes, Ui ui, S
     public string LanguageDirectory { get; init; } = "";
     public Language? ForcedLanguage { get; init; }
     public Language DetectedLanguage { get; init; } = Language.English;
-    // The installed fonts that draw what Vollkorn can't, for a language: its own script's first.
-    public Func<Language, IReadOnlyList<string>> FallbackFonts { get; init; } = _ => [];
 
     public Language Language => ForcedLanguage ?? Saves.Settings.Language ?? DetectedLanguage;
 
@@ -74,6 +72,20 @@ public sealed class GameContext(IRenderer renderer, BoardMeshes meshes, Ui ui, S
         if (Ui.Strings.Language == Language && Ui.Strings != Strings.English) return;
         Ui.Strings = Strings.Load(LanguageDirectory, Language);
         Ui.FallbackFonts = FallbackFonts(Language);
+    }
+
+    // The fonts that draw what Vollkorn can't: Noto Serif CJK, trimmed to the characters the game shows
+    // (tools/subset-fonts.sh). The language's own comes first, so the characters the scripts share (Han) take
+    // its forms; the others still draw the names in the language list.
+    public static IReadOnlyList<string> FallbackFonts(Language language)
+    {
+        const string chinese = "NotoSerifSC-Medium-Subset.otf", japanese = "NotoSerifJP-Medium-Subset.otf", korean = "NotoSerifKR-Medium-Subset.otf";
+        return language switch
+        {
+            Language.Japanese => [japanese, chinese, korean],
+            Language.Korean => [korean, chinese, japanese],
+            _ => [chinese, japanese, korean],
+        };
     }
 
     public Level Load(Difficulty difficulty, int number) => LevelFile.Load(LevelsDirectory, difficulty, number);

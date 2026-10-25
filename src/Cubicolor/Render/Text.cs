@@ -21,10 +21,10 @@ public sealed class Text : IDisposable
     private readonly OverlayAtlas _atlas;
     private readonly Dictionary<(FontStyle, int), IFontFace> _faces = [];
     private readonly Dictionary<(FontStyle, int, char), Glyph?> _glyphs = [];
-    // Characters Vollkorn has no glyph for (Chinese, Japanese, Korean) come from installed fonts, tried in
-    // order; which character comes from which face is worked out once.
+    // Characters Vollkorn has no glyph for (Chinese, Japanese, Korean) come from the fallback fonts beside it,
+    // tried in order; which character comes from which face is worked out once.
     private IReadOnlyList<string> _fallbacks = [];
-    private readonly Dictionary<(string, int), IFontFace?> _installed = [];
+    private readonly Dictionary<(string, int), IFontFace> _fallbackFaces = [];
     private readonly Dictionary<(FontStyle, int, char), IFontFace> _faceOf = [];
     private readonly Dictionary<(string, int), Glyph?> _symbols = [];
 
@@ -49,7 +49,7 @@ public sealed class Text : IDisposable
         return face;
     }
 
-    // The installed fonts to draw what Vollkorn can't, by name, in the order to try them.
+    // The font files (in the fonts directory) to draw what Vollkorn can't, in the order to try them.
     public IReadOnlyList<string> Fallbacks
     {
         get => _fallbacks;
@@ -67,13 +67,13 @@ public sealed class Text : IDisposable
         if (_faceOf.TryGetValue((style, pixels, c), out IFontFace? face)) return face;
         face = primary;
         if (primary.GlyphFor(c) == 0 && !char.IsWhiteSpace(c))
-            foreach (string name in _fallbacks)
+            foreach (string file in _fallbacks)
             {
-                if (!_installed.TryGetValue((name, pixels), out IFontFace? installed))
-                    _installed[(name, pixels)] = installed = _loader.OpenInstalled(name, pixels);
-                if (installed != null && installed.GlyphFor(c) != 0)
+                if (!_fallbackFaces.TryGetValue((file, pixels), out IFontFace? fallback))
+                    _fallbackFaces[(file, pixels)] = fallback = _loader.Open(Path.Combine(_directory, file), pixels);
+                if (fallback.GlyphFor(c) != 0)
                 {
-                    face = installed;
+                    face = fallback;
                     break;
                 }
             }
@@ -202,7 +202,7 @@ public sealed class Text : IDisposable
     {
         foreach (IFontFace face in _faces.Values) face.Dispose();
         _faces.Clear();
-        foreach (IFontFace? face in _installed.Values) face?.Dispose();
-        _installed.Clear();
+        foreach (IFontFace face in _fallbackFaces.Values) face.Dispose();
+        _fallbackFaces.Clear();
     }
 }

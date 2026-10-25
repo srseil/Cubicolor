@@ -136,7 +136,6 @@ internal static class Program
             LanguageDirectory = Path.Combine(assets, "lang"),
             ForcedLanguage = forced,
             DetectedLanguage = detected,
-            FallbackFonts = MacFonts.Fallbacks,
         };
         context.ApplyLanguage();
         return context;
