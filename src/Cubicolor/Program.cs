@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using Cubicolor.App;
 using Cubicolor.Audio;
@@ -31,12 +32,14 @@ internal static class Program
           --timeout <seconds>     fail a run that takes longer
           --capture-audio <wav>   headless: write what the game played to a WAV file
           --art <dir>             render the Steam store and library images, the icon and screenshots into <dir>
+          --perf                  headless: report frame times (CPU, GPU), draw calls and allocations at the end
         """;
 
     private static int Main(string[] args)
     {
         bool headless = false;
         string? script = null, level = null, dataDir = null, captureAudio = null, art = null;
+        bool perf = false;
         int width = 1280, height = 720;
         double timeout = double.PositiveInfinity;
         try
@@ -52,6 +55,7 @@ internal static class Program
                     case "--data-dir": dataDir = args[++i]; break;
                     case "--capture-audio": captureAudio = args[++i]; break;
                     case "--art": art = args[++i]; headless = true; break;
+                    case "--perf": perf = true; break;
                     case "--timeout": timeout = double.Parse(args[++i], CultureInfo.InvariantCulture); break;
                     case "--size":
                         string[] parts = args[++i].Split('x');
@@ -87,7 +91,7 @@ internal static class Program
         {
             if (art != null) return RenderArt(saves, assets, art);
             return headless
-                ? RunHeadless(saves, assets, width, height, script, level, timeout, captureAudio)
+                ? RunHeadless(saves, assets, width, height, script, level, timeout, captureAudio, perf)
                 : RunWindowed(saves, assets, level);
         }
         finally
@@ -130,7 +134,7 @@ internal static class Program
         : new LevelScreen(context, Enum.Parse<Difficulty>(level[..^2], ignoreCase: true), int.Parse(level[^2..], CultureInfo.InvariantCulture));
 
     private static int RunHeadless(SaveStore saves, string assets, int width, int height, string? scriptText, string? level, double timeout,
-                                   string? captureAudio)
+                                   string? captureAudio, bool perf)
     {
         using var renderer = new MetalRenderer(IntPtr.Zero, () => (width, height), vsync: false);
         MenuScreen.KeySymbol = KeyCodes.Symbol;
@@ -139,6 +143,8 @@ internal static class Program
         using var audio = new AudioService(MusicPath(assets), _ => null);
         GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio, new NoAchievements());
         List<float>? captured = captureAudio != null ? [] : null;
+        var samples = new List<(double UpdateMs, RenderStats Render, long Allocated)>();
+        int[] gcBefore = [GC.CollectionCount(0), GC.CollectionCount(1), GC.CollectionCount(2)];
         var block = new float[Mixer.Rate / 60 * 2];
         var input = new ScriptedInput();
         var frame = new Frame(context, FirstScreen(context, level));
@@ -159,7 +165,9 @@ internal static class Program
                 frame.Show(next);
                 script.Next = null;
             }
+            long allocated = GC.GetAllocatedBytesForCurrentThread();
             frame.Run(input, step, width, height);
+            if (perf) samples.Add((frame.UpdateMs, renderer.Stats, GC.GetAllocatedBytesForCurrentThread() - allocated));
             script.AfterFrame(renderer);
             if (captured != null)
             {
@@ -169,6 +177,7 @@ internal static class Program
             time += step;
             if (context.QuitRequested) break;
         }
+        if (perf) PerfReport(samples, gcBefore);
         if (captured != null)
         {
             Wav.Write(captureAudio!, new Wav.Clip(Mixer.Rate, 2, Wav.FromFloat(captured.ToArray())));
@@ -180,6 +189,26 @@ internal static class Program
             return 1;
         }
         return 0;
+    }
+
+    // Averages, 95th percentiles and worsts over a run's frames, skipping the first 30 (start-up, compiling).
+    private static void PerfReport(List<(double UpdateMs, RenderStats Render, long Allocated)> samples, int[] gcBefore)
+    {
+        var frames = samples.Skip(30).ToList();
+        if (frames.Count == 0) return;
+        string Stat(Func<(double UpdateMs, RenderStats Render, long Allocated), double> f, string unit)
+        {
+            var values = frames.Select(f).OrderBy(v => v).ToList();
+            return $"avg {values.Average():0.00} {unit}, p95 {values[(int) (values.Count * 0.95)]:0.00}, max {values[^1]:0.00}";
+        }
+        Console.WriteLine($"Frames: {frames.Count}");
+        Console.WriteLine($"  update (logic, UI)   {Stat(s => s.UpdateMs, "ms")}");
+        Console.WriteLine($"  render, CPU          {Stat(s => s.Render.CpuMs, "ms")}");
+        Console.WriteLine($"  render, GPU          {Stat(s => s.Render.GpuMs, "ms")}");
+        Console.WriteLine($"  draw calls           {Stat(s => s.Render.DrawCalls, "")}");
+        Console.WriteLine($"  triangles            {Stat(s => s.Render.Triangles, "")}");
+        Console.WriteLine($"  allocated per frame  {Stat(s => s.Allocated / 1024.0, "KB")}");
+        Console.WriteLine($"  collections          gen0 {GC.CollectionCount(0) - gcBefore[0]}, gen1 {GC.CollectionCount(1) - gcBefore[1]}, gen2 {GC.CollectionCount(2) - gcBefore[2]}");
     }
 
     private static int RenderArt(SaveStore saves, string assets, string directory)

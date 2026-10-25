@@ -38,7 +38,21 @@ internal sealed unsafe partial class CoreTextFont : IFontFace
     }
 
     // The glyph for a character, or 0 (the font's .notdef) when the font has none.
+    // Glyphs, advances and kerning are asked for every frame the same text is laid out, and Core Text's answers
+    // never change for a font: each is worked out once. (Kerning builds a whole CTLine per pair.)
+    private readonly System.Collections.Generic.Dictionary<char, ushort> _glyphs = [];
+    private readonly System.Collections.Generic.Dictionary<ushort, float> _advances = [];
+    private readonly System.Collections.Generic.Dictionary<(char, char), float> _kerning = [];
+
     public ushort GlyphFor(char c)
+    {
+        if (_glyphs.TryGetValue(c, out ushort cached)) return cached;
+        ushort found = LookUpGlyph(c);
+        _glyphs[c] = found;
+        return found;
+    }
+
+    private ushort LookUpGlyph(char c)
     {
         ushort glyph = 0;
         CTFontGetGlyphsForCharacters(_font, &c, &glyph, 1);
@@ -46,6 +60,14 @@ internal sealed unsafe partial class CoreTextFont : IFontFace
     }
 
     public float Advance(ushort glyph)
+    {
+        if (_advances.TryGetValue(glyph, out float cached)) return cached;
+        float advance = MeasureAdvance(glyph);
+        _advances[glyph] = advance;
+        return advance;
+    }
+
+    private float MeasureAdvance(ushort glyph)
     {
         CGSize advance;
         CTFontGetAdvancesForGlyphs(_font, 0 /* horizontal */, &glyph, &advance, 1);
@@ -55,6 +77,14 @@ internal sealed unsafe partial class CoreTextFont : IFontFace
     // How much the font's layout moves `right` when it follows `left`, beyond their own advances: Core
     // Text's layout of the pair, which applies the font's kerning, against the two advances alone.
     public float Kerning(char left, char right)
+    {
+        if (_kerning.TryGetValue((left, right), out float cached)) return cached;
+        float kerning = MeasureKerning(left, right);
+        _kerning[(left, right)] = kerning;
+        return kerning;
+    }
+
+    private float MeasureKerning(char left, char right)
     {
         char* pair = stackalloc char[2] { left, right };
         IntPtr text = CFStringCreateWithCharacters(IntPtr.Zero, pair, 2);

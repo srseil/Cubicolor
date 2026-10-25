@@ -37,6 +37,9 @@ internal sealed unsafe class MetalRenderer : IRenderer
     public int Width { get; private set; }
     public int Height { get; private set; }
     public IOverlayAtlas Atlas => _atlas;
+    public RenderStats Stats { get; private set; }
+    private int _drawCalls, _triangles;
+    private OverlayVertex[] _overlayVertices = [];   // the underlay and overlay together, reused frame to frame
 
     // With a layer, frames go to the window; without one, to an offscreen texture of `size`.
     public MetalRenderer(IntPtr layer, Func<(int Width, int Height)> size, bool vsync)
@@ -124,6 +127,8 @@ internal sealed unsafe class MetalRenderer : IRenderer
     public bool Draw(Scene scene, ReadOnlySpan<OverlayVertex> underlay, ReadOnlySpan<OverlayVertex> overlay)
     {
         using var pool = AutoreleasePool.Push();
+        long started = System.Diagnostics.Stopwatch.GetTimestamp();
+        _drawCalls = _triangles = 0;
         (int width, int height) = _size();
         width = Math.Max(1, width);
         height = Math.Max(1, height);
@@ -156,10 +161,11 @@ internal sealed unsafe class MetalRenderer : IRenderer
         MetalBuffer overlayBuffer = default;
         if (underlay.Length + overlay.Length > 0)
         {
-            var both = new OverlayVertex[underlay.Length + overlay.Length];
-            underlay.CopyTo(both);
-            overlay.CopyTo(both.AsSpan(underlay.Length));
-            overlayBuffer = _device.NewBuffer(MemoryMarshal.AsBytes(both.AsSpan()), "overlay vertices");
+            int total = underlay.Length + overlay.Length;
+            if (_overlayVertices.Length < total) _overlayVertices = new OverlayVertex[Math.Max(total, _overlayVertices.Length * 2)];
+            underlay.CopyTo(_overlayVertices);
+            overlay.CopyTo(_overlayVertices.AsSpan(underlay.Length));
+            overlayBuffer = _device.NewBuffer(MemoryMarshal.AsBytes(_overlayVertices.AsSpan(0, total)), "overlay vertices");
         }
         if (underlay.Length > 0) DrawOverlay(encoder, overlayBuffer, 0, underlay.Length, width, height);
 
@@ -201,6 +207,9 @@ internal sealed unsafe class MetalRenderer : IRenderer
 
         if (drawable != IntPtr.Zero) commands.Present(drawable);
         commands.Commit();
+        double cpuMs = System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+        Stats = new RenderStats(cpuMs, Stats.GpuMs, _drawCalls + (underlay.Length > 0 ? 1 : 0) + (overlay.Length > 0 ? 1 : 0),
+            _triangles + (underlay.Length + overlay.Length) / 3, underlay.Length + overlay.Length);
         Release(ref _lastCommands);
         _lastCommands = objc_retain(commands.Handle);
         // The command buffer keeps what it uses alive until it completes.
@@ -213,6 +222,7 @@ internal sealed unsafe class MetalRenderer : IRenderer
         {
             commands.WaitUntilCompleted();
             if (commands.Status == CommandBufferStatus.Error) throw new InvalidOperationException($"The frame failed on the GPU: {commands.ErrorMessage}");
+            Stats = Stats with { GpuMs = (commands.GpuEndTime - commands.GpuStartTime) * 1000 };
         }
         _lastFrame = target;
         Width = width;
@@ -245,6 +255,8 @@ internal sealed unsafe class MetalRenderer : IRenderer
         encoder.SetFragmentBytes(uniforms, 1);
         encoder.SetVertexBuffer(vertices, VertexBufferIndex);
         encoder.DrawIndexed16(count, indices, 0);
+        _drawCalls++;
+        _triangles += count / 3;
     }
 
     private void EnsureTargets(int width, int height)

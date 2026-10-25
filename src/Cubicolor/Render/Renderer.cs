@@ -70,6 +70,10 @@ public interface IOverlayAtlas
     void Upload(int x, int y, int width, int height, ReadOnlySpan<byte> coverage);
 }
 
+// What drawing the last frame took: CPU time to record and submit it, GPU time to draw it (known once it has
+// finished; headless runs wait for that), and how much was drawn.
+public readonly record struct RenderStats(double CpuMs, double GpuMs, int DrawCalls, int Triangles, int OverlayVertices);
+
 // What every backend implements: meshes uploaded once, then a frame of scene and overlay at a time. Sizes are
 // in pixels.
 public interface IRenderer : IDisposable
@@ -84,6 +88,8 @@ public interface IRenderer : IDisposable
     // Draw a frame: the underlay's triangles (three vertices each) on the background, the scene over them, then
     // the overlay's on top. Returns false when nothing could be drawn (a window with no drawable yet).
     bool Draw(Scene scene, ReadOnlySpan<OverlayVertex> underlay, ReadOnlySpan<OverlayVertex> overlay);
+
+    RenderStats Stats { get; }
 
     // The last drawn frame as RGBA bytes, row 0 at the top. For screenshots, which headless runs take.
     byte[] ReadPixels();

@@ -13,6 +13,9 @@ internal sealed class Frame(GameContext context, IScreen first)
 
     public IScreen Screen { get; private set; } = first;
 
+    // How long the last frame's input, game logic and UI took on the CPU, before drawing.
+    public double UpdateMs { get; private set; }
+
     public bool Run(IInput input, double seconds, int width, int height)
     {
         input.Poll();
@@ -20,7 +23,9 @@ internal sealed class Frame(GameContext context, IScreen first)
         context.Ui.Dark = context.Saves.Settings.DarkBackground;
         context.Ui.Begin(input, Navigate(input), width, height, seconds);
         _scene.Items.Clear();
+        long started = System.Diagnostics.Stopwatch.GetTimestamp();
         Screen = Screen.Frame(seconds, _scene);
+        UpdateMs = System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
         return context.Renderer.Draw(_scene, context.Ui.Underlay.Vertices, context.Ui.Overlay.Vertices);
     }
 

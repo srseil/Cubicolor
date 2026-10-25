@@ -230,7 +230,8 @@ public sealed class LevelScreen : IScreen
     private void Solve(double landed)
     {
         Progress progress = _context.Saves.Progress;
-        progress.Complete(Level.Difficulty, Level.Number);
+        // Only the menu's open levels count; a script can also go straight into a locked one.
+        if (progress.IsOpen(Level.Difficulty, Level.Number)) progress.Complete(Level.Difficulty, Level.Number);
         _context.Saves.SaveProgress();
         if (Level.Number == Simulation.Levels.Level.PerDifficulty) _context.Achievements.Unlock(Level.Difficulty);
         PlayAt(landed, Sound.Solve);
