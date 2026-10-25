@@ -256,7 +256,7 @@ public sealed class MenuScreen : IScreen
 
         // Each language by its own name; choosing one keeps it, whatever Steam or the system say.
         int language = (int) _context.Language;
-        if (ui.Choice("Language", ui.R(x, Row(y, 0), width, RowHeight), ui.Px(width - 210), ref language, Languages.Count,
+        if (ui.Choice("Language", ui.R(x, Row(y, 0), width, RowHeight), ui.Px(198), ref language, Languages.Count,
                       i => ((Language) i).NativeName()))
         {
             s.Language = (Language) language;

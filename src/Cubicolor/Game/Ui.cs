@@ -383,7 +383,7 @@ public sealed class Ui
         return (switched, Math.Abs(before - value) > 1e-9);
     }
 
-    // One of `count` choices, shown as `shown(index)` in a box at the row's right end with the label at its left:
+    // One of `count` choices, shown as `shown(index)` in a box at the row's left end with the label after it:
     // left and right step through them while the row has focus (and do not move focus away), a click on the box
     // steps forward. Returns whether the choice changed.
     public bool Choice(string label, Rect row, float boxWidth, ref int index, int count, Func<int, string> shown, float textSize = 24)
@@ -391,11 +391,11 @@ public sealed class Ui
         var (focused, activated) = Interact(label, row, true);
         _sliders.Add(label);
         int before = index;
-        var box = new Rect(row.Right - boxWidth, row.Y, boxWidth, row.Height);
+        var box = new Rect(row.X, row.Y, boxWidth, row.Height);
         if (focused && Navigation.Move == Direction.Left) index = (index + count - 1) % count;
         if (focused && Navigation.Move == Direction.Right) index = (index + 1) % count;
         if (activated) index = (index + 1) % count;
-        Label(label, new Rect(row.X, row.Y, row.Width - boxWidth - Px(12), row.Height), textSize, align: Align.Left);
+        Label(label, new Rect(box.Right + Px(12), row.Y, row.Width - boxWidth - Px(12), row.Height), textSize, align: Align.Left);
         float radius = Px(5);
         FocusRing(box, radius);
         Overlay.RoundedRectangle(box, radius, Style.Button);
