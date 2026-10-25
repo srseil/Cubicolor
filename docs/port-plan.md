@@ -330,8 +330,8 @@ macOS-only and moves on its own.
 5. **Order: macOS first.** Windows and Linux follow on Stefan's dual-boot laptop. There is no Steam
    Deck. GitHub Actions comes later.
 6. **Steam Cloud on**, through Auto-Cloud (decided 2026-10-23).
-7. **Open: pushing the branch change.** It rewrites what `master` shows on GitHub, so it waits for
-   Stefan's go-ahead.
+7. **The branch change is on GitHub** (pushed 2026-10-25): `master` is the C# port, `libgdx` the Java
+   version, `godot` the Godot one.
 8. **Open: which shipped sound came from which recording** (§4.1). Only matters if synthesis falls short.
 9. **The music in plain git** (decided 2026-10-25): the Godot branch's `soundtrack.ogg` byte for byte, so the
    history, which already holds it, doesn't grow. Git LFS would add setup to every clone and CI checkout
