@@ -176,10 +176,13 @@ public static class Qoa
     // --- Decoding ---
 
     // Decodes a QOA file frame by frame, so the music is never held decoded in memory.
-    public sealed class Decoder
+    // Reads a QOA stream a frame at a time, so a long soundtrack never sits in memory whole. The decoder owns the
+    // stream; it must be able to seek, for Rewind.
+    public sealed class Decoder : IDisposable
     {
-        private readonly byte[] _data;
-        private int _position;
+        private readonly Stream _stream;
+        private readonly byte[] _bytes;       // the current frame as read, header included
+        private int _position, _end;          // within _bytes
         private readonly Lms[] _lms;
         private short[] _frame = [];
         private int _frameFrames, _frameRead;
@@ -188,25 +191,31 @@ public static class Qoa
         public int SampleRate { get; }
         public int TotalFrames { get; }
 
-        public Decoder(byte[] data)
+        public Decoder(byte[] data) : this(new MemoryStream(data, writable: false)) { }
+
+        public Decoder(Stream stream)
         {
-            _data = data;
-            if (data.Length < 16 || data[0] != 'q' || data[1] != 'o' || data[2] != 'a' || data[3] != 'f')
+            _stream = stream;
+            Span<byte> head = stackalloc byte[16];
+            if (stream.ReadAtLeast(head, 16, throwOnEndOfStream: false) < 16 || head[0] != 'q' || head[1] != 'o' || head[2] != 'a' || head[3] != 'f')
                 throw new InvalidDataException("Not a QOA file");
-            TotalFrames = (int) BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan(4));
-            ulong header = BinaryPrimitives.ReadUInt64BigEndian(data.AsSpan(8));
+            TotalFrames = (int) BinaryPrimitives.ReadUInt32BigEndian(head[4..]);
+            ulong header = BinaryPrimitives.ReadUInt64BigEndian(head[8..]);
             Channels = (int) (header >> 56);
             SampleRate = (int) ((header >> 32) & 0xffffff);
             if (Channels == 0 || SampleRate == 0) throw new InvalidDataException("A QOA file without channels or rate");
             _lms = new Lms[Channels];
+            _bytes = new byte[8 + Channels * 16 + FrameLength / SliceLength * Channels * 8];
             Rewind();
         }
 
         public void Rewind()
         {
-            _position = 8;
+            _stream.Position = 8;
             _frameFrames = _frameRead = 0;
         }
+
+        public void Dispose() => _stream.Dispose();
 
         // Fills `output` with interleaved samples; returns how many sample frames it wrote (fewer at the end).
         public int Read(Span<short> output)
@@ -225,19 +234,32 @@ public static class Qoa
 
         private ulong Next()
         {
-            ulong value = BinaryPrimitives.ReadUInt64BigEndian(_data.AsSpan(_position));
+            ulong value = BinaryPrimitives.ReadUInt64BigEndian(_bytes.AsSpan(_position));
             _position += 8;
             return value;
         }
 
+        // The next frame's bytes into _bytes: its header says how many there are. False at the end, or where
+        // the stream breaks off or stops making sense.
+        private bool Fill()
+        {
+            if (_stream.ReadAtLeast(_bytes.AsSpan(0, 8), 8, throwOnEndOfStream: false) < 8) return false;
+            int size = (int) (BinaryPrimitives.ReadUInt64BigEndian(_bytes) & 0xffff);
+            if (size < 8 || size > _bytes.Length) return false;
+            if (_stream.ReadAtLeast(_bytes.AsSpan(8, size - 8), size - 8, throwOnEndOfStream: false) < size - 8) return false;
+            _position = 0;
+            _end = size;
+            return true;
+        }
+
         private bool DecodeFrame()
         {
-            if (_position + 8 > _data.Length) return false;
+            if (!Fill()) return false;
             ulong header = Next();
             int channels = (int) (header >> 56);
             int length = (int) ((header >> 16) & 0xffff);
-            int size = (int) (header & 0xffff);
-            if (channels != Channels || length == 0 || _position - 8 + size > _data.Length) return false;
+            if (channels != Channels || length == 0 || length > FrameLength
+                || 8 + channels * 16 + (length + SliceLength - 1) / SliceLength * channels * 8 > _end) return false;
             for (int c = 0; c < channels; c++)
             {
                 ulong history = Next(), weights = Next();

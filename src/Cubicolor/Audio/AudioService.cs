@@ -24,7 +24,8 @@ public sealed class AudioService : IAudio
         {
             try
             {
-                _mixer.SetMusic(new Qoa.Decoder(File.ReadAllBytes(musicPath)));
+                // Streamed from the file, a frame (a tenth of a second) at a time.
+                _mixer.SetMusic(new Qoa.Decoder(new FileStream(musicPath, FileMode.Open, FileAccess.Read, FileShare.Read, 1 << 16)));
             }
             catch (InvalidDataException e)
             {
@@ -45,5 +46,9 @@ public sealed class AudioService : IAudio
 
     public void Watch() => _output?.Watch();
 
-    public void Dispose() => _output?.Dispose();
+    public void Dispose()
+    {
+        _output?.Dispose();
+        _mixer.SetMusic(null)?.Dispose();
+    }
 }

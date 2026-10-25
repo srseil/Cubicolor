@@ -44,14 +44,17 @@ public sealed class Mixer
         lock (_gate) _voices.Add(new Voice(stereo, gain));
     }
 
-    public void SetMusic(Qoa.Decoder? music)
+    // Returns the music played before, which the caller now owns again.
+    public Qoa.Decoder? SetMusic(Qoa.Decoder? music)
     {
         lock (_gate)
         {
+            Qoa.Decoder? before = _music;
             _music = music;
             _musicPosition = 0;
             _musicBuffered = _musicBufferStart = 0;
             music?.Rewind();
+            return before;
         }
     }
 
