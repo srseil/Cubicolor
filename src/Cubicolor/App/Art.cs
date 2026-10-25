@@ -39,6 +39,7 @@ internal sealed class Art(GameContext context, Text text, string solutions, Acti
         Icon(directory, "shortcut_icon", 256, IconKind.Plain);
         Icon(directory, "app_icon", 184, IconKind.Square);
         MacIconSet(Path.Combine(directory, "Cubicolor.iconset"));
+        TrailerText(Path.Combine(directory, "trailer"));
         foreach (string level in new[] { "normal03", "smart09", "genius05", "genius12", "genius15" })
             Capsule(directory, $"screenshot_{level}", 1920, 1080, level, title: false, hud: true);
     }
@@ -210,6 +211,29 @@ internal sealed class Art(GameContext context, Text text, string solutions, Acti
         Begin(Palette.Background with { W = 0 });
         DrawLockup(new Rect(width * 0.02f, height * 0.02f, width * 0.96f, height * 0.96f), width, height);
         Save(directory, name, width, height, opaque: false);
+    }
+
+    // The trailer's words, each on its own transparent strip for tools/trailer to place: the 2016 trailer's
+    // captions and end card at 1080p, their widths measured off its 720p frames and scaled by 1.5.
+    private void TrailerText(string directory)
+    {
+        Directory.CreateDirectory(directory);
+        TextStrip(directory, "title", "Cubicolor", FontStyle.Black, Width("Cubicolor", FontStyle.Black, 1375));
+        TextStrip(directory, "caption1", "Match the colors\u2026", FontStyle.Regular, Width("Match the colors\u2026", FontStyle.Regular, 729));
+        TextStrip(directory, "caption2", "\u2026on one single path.", FontStyle.Regular, Width("\u2026on one single path.", FontStyle.Regular, 813));
+        // The website at the size the old one was set in.
+        TextStrip(directory, "website", "srseil.com", FontStyle.Regular, Width("Moltenplay.com", FontStyle.Regular, 622));
+    }
+
+    private float Width(string words, FontStyle style, float pixels) => pixels / text.Measure(words, style, 100) * 100;
+
+    private void TextStrip(string directory, string name, string words, FontStyle style, float size)
+    {
+        Begin(Palette.Background with { W = 0 });
+        int width = (int) MathF.Ceiling(text.Measure(words, style, size)) + 40;
+        int height = (int) MathF.Ceiling(text.LineHeight(style, size)) + 40;
+        text.Draw(_overlay, words, new Vector2(20, 20), style, size, Palette.Text);
+        Write(directory, name, Render(width, height), width, height, opaque: false);
     }
 
     private enum IconKind { Plain, MacOS, Square }
