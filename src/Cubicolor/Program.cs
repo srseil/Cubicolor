@@ -33,6 +33,8 @@ internal static class Program
           --data-dir <dir>        where progress and settings live (headless default: a fresh temporary one)
           --timeout <seconds>     fail a run that takes longer
           --capture-audio <wav>   headless: write what the game played to a WAV file
+          --record <file>         headless: write every frame's pixels to a file, raw RGBA (a named pipe
+                                  into ffmpeg makes a video of it)
           --art <dir>             render the Steam store and library images, the icon and screenshots into <dir>
           --perf                  headless: report frame times (CPU, GPU), draw calls and allocations at the end;
                                   in a window: log frames drawn, still and hidden and the CPU used, every 5 s
@@ -41,7 +43,7 @@ internal static class Program
     private static int Main(string[] args)
     {
         bool headless = false;
-        string? script = null, level = null, dataDir = null, captureAudio = null, art = null;
+        string? script = null, level = null, dataDir = null, captureAudio = null, record = null, art = null;
         bool perf = false;
         Language? language = null;
         int width = 1280, height = 720;
@@ -61,6 +63,7 @@ internal static class Program
                         break;
                     case "--data-dir": dataDir = args[++i]; break;
                     case "--capture-audio": captureAudio = args[++i]; break;
+                    case "--record": record = args[++i]; break;
                     case "--art": art = args[++i]; headless = true; break;
                     case "--perf": perf = true; break;
                     case "--timeout": timeout = double.Parse(args[++i], CultureInfo.InvariantCulture); break;
@@ -98,7 +101,7 @@ internal static class Program
         {
             if (art != null) return RenderArt(saves, assets, art, language);
             return headless
-                ? RunHeadless(saves, assets, width, height, script, level, timeout, captureAudio, perf, language)
+                ? RunHeadless(saves, assets, width, height, script, level, timeout, captureAudio, record, perf, language)
                 : RunWindowed(saves, assets, level, perf, language);
         }
         finally
@@ -148,7 +151,7 @@ internal static class Program
         : new LevelScreen(context, Enum.Parse<Difficulty>(level[..^2], ignoreCase: true), int.Parse(level[^2..], CultureInfo.InvariantCulture));
 
     private static int RunHeadless(SaveStore saves, string assets, int width, int height, string? scriptText, string? level, double timeout,
-                                   string? captureAudio, bool perf, Language? language)
+                                   string? captureAudio, string? record, bool perf, Language? language)
     {
         using var renderer = new MetalRenderer(IntPtr.Zero, () => (width, height), vsync: false);
         MenuScreen.KeySymbol = KeyCodes.Symbol;
@@ -157,6 +160,7 @@ internal static class Program
         using var audio = new AudioService(MusicPath(assets), _ => null);
         GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio, new NoAchievements(), language, Language.English);
         List<float>? captured = captureAudio != null ? [] : null;
+        using FileStream? recording = record != null ? new FileStream(record, FileMode.Create, FileAccess.Write) : null;
         var samples = new List<(double UpdateMs, RenderStats Render, long Allocated)>();
         int[] gcBefore = [GC.CollectionCount(0), GC.CollectionCount(1), GC.CollectionCount(2)];
         var block = new float[Mixer.Rate / 60 * 2];
@@ -183,6 +187,7 @@ internal static class Program
             frame.Run(input, step, width, height);
             if (perf) samples.Add((frame.UpdateMs, renderer.Stats, GC.GetAllocatedBytesForCurrentThread() - allocated));
             script.AfterFrame(renderer);
+            recording?.Write(renderer.ReadPixels());
             if (captured != null)
             {
                 audio.Mixer.Render(block);

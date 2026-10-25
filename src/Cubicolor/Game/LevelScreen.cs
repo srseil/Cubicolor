@@ -23,6 +23,9 @@ public sealed class LevelScreen : IScreen
     private Panel _panel;
     private double? _completeAt;
 
+    // Filmed for the trailer: the level plays out with no Completed panel and no bell, as the 2016 recordings did.
+    public bool Filmed { get; init; }
+
     public Level Level => _puzzle.Level;
     public Puzzle Puzzle => _puzzle;
     public BoardView Board => _board;
@@ -82,7 +85,7 @@ public sealed class LevelScreen : IScreen
             _panel = Panel.None;
         }
 
-        if (_puzzle.Solved && _completeAt is { } at && _board.Now >= at && _panel == Panel.None && _leaving == null)
+        if (_puzzle.Solved && !Filmed && _completeAt is { } at && _board.Now >= at && _panel == Panel.None && _leaving == null)
         {
             _panel = Panel.Completed;
             ui.Focus(Level.Number < Simulation.Levels.Level.PerDifficulty ? "Next Level" : "Main Menu", force: true);
@@ -248,7 +251,7 @@ public sealed class LevelScreen : IScreen
         if (progress.IsOpen(Level.Difficulty, Level.Number)) progress.Complete(Level.Difficulty, Level.Number);
         _context.Saves.SaveProgress();
         if (Level.Number == Simulation.Levels.Level.PerDifficulty) _context.Achievements.Unlock(Level.Difficulty);
-        PlayAt(landed, Sound.Solve);
+        if (!Filmed) PlayAt(landed, Sound.Solve);
         _completeAt = landed + CompleteDelay;
     }
 
