@@ -131,7 +131,7 @@ internal sealed class Art(GameContext context, Text text, string solutions, Acti
     private enum IconKind { Plain, MacOS, Square }
 
     // How the macOS icon's rounded square is drawn: flat, or as a plaque with depth.
-    public enum Plaque { Flat, Edged, Raised }
+    public enum Plaque { Flat, Edged, Raised, Glint }
 
     public Plaque IconPlaque { get; set; } = Plaque.Flat;
 
@@ -164,7 +164,11 @@ internal sealed class Art(GameContext context, Text text, string solutions, Acti
             top = top.Inset(rim);
             radius -= rim;
         }
-        _underlay.RoundedRectangle(top, radius, Palette.Hex(0xf7f5f1), Palette.Hex(0xe9e6df));
+        // Under a glint, the face is a shade darker, so the light has something to show against.
+        if (IconPlaque == Plaque.Glint) _underlay.RoundedRectangle(top, radius, Palette.Hex(0xeeebe5), Palette.Hex(0xdedad2));
+        else _underlay.RoundedRectangle(top, radius, Palette.Hex(0xf7f5f1), Palette.Hex(0xe9e6df));
+        if (IconPlaque == Plaque.Glint)
+            text.DrawImage(_underlay, $"glint {size}", Glint(top, radius), new Vector2(top.X, top.Y), new Vector4(1, 1, 1, 1));
         if (IconPlaque == Plaque.Raised)
         {
             // Where the cube stands: a soft dark ellipse.
@@ -195,6 +199,41 @@ internal sealed class Art(GameContext context, Text text, string solutions, Acti
         (_scene.View, _scene.Projection) = CameraFit.FitInto(new Vector3(-0.5f), new Vector3(0.5f), target, new Vector2(size), CameraFit.Forward);
         _scene.Items.Add(new DrawItem(context.Meshes.Cube, Matrix4x4.Identity, Palette.Black));
         Save(directory, name, size, size, opaque: kind == IconKind.Square);
+    }
+
+    // Light catching the plaque from the top right: a soft pool in that corner and a fine highlight along the
+    // top and right rims, both fading away from it, clipped to the plaque's rounded shape.
+    private static GlyphInk Glint(Rect face, float radius)
+    {
+        int width = (int) MathF.Ceiling(face.Width), height = (int) MathF.Ceiling(face.Height);
+        var coverage = new byte[width * height];
+        float body = face.Width;
+        var corner = new Vector2(width - radius * 0.6f, radius * 0.6f);
+        for (int y = 0; y < height; y++)
+        for (int x = 0; x < width; x++)
+        {
+            var p = new Vector2(x + 0.5f, y + 0.5f);
+            // Signed distance to the rounded rectangle's edge, negative inside.
+            Vector2 q = Vector2.Abs(p - new Vector2(width, height) / 2) - new Vector2(width, height) / 2 + new Vector2(radius);
+            float edge = Vector2.Max(q, Vector2.Zero).Length() + MathF.Min(MathF.Max(q.X, q.Y), 0) - radius;
+            float inside = Math.Clamp(0.5f - edge, 0, 1);
+            if (inside <= 0) continue;
+            float fromCorner = Vector2.Distance(p, corner) / body;
+            float pool = 0.75f * MathF.Exp(-fromCorner / 0.28f);
+            // The rim: within a sliver of the top or right edge, strongest near the corner.
+            float rimWidth = body * 0.012f;
+            float rim = Math.Clamp(1 - (-edge) / rimWidth, 0, 1) * 0.9f * MathF.Exp(-fromCorner / 0.45f);
+            // The rim lights the top and right sides, fading in by how much a point lies towards the lit corner.
+            Vector2 centre = new Vector2(width, height) / 2;
+            float towards = Vector2.Dot(Vector2.Normalize(p - centre + new Vector2(1e-3f)), Vector2.Normalize(corner - centre));
+            float side = Math.Clamp((towards + 0.2f) / 0.8f, 0, 1);
+            side = side * side * (3 - 2 * side);
+            float light = pool + rim * side;
+            // A little noise before rounding to 8 bits, so the soft gradient doesn't band.
+            float dither = (((uint) (x * 73 + y * 151) * 2654435761u) >> 24) / 255f - 0.5f;
+            coverage[y * width + x] = (byte) Math.Clamp(light * inside * 255 + dither, 0, 255);
+        }
+        return new GlyphInk(width, height, coverage, 0, 0);
     }
 
     // The macOS icon in each plaque style, side by side for choosing.

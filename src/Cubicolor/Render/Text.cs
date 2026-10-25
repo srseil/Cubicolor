@@ -103,6 +103,28 @@ public sealed class Text : IDisposable
         return glyph;
     }
 
+    // An image of coverage (`ink`, made by the caller) drawn into `rect` at one texel a pixel, kept in the atlas
+    // under `key` so it is uploaded once.
+    public void DrawImage(Overlay overlay, string key, GlyphInk ink, Vector2 topLeft, Vector4 color)
+    {
+        if (!_images.TryGetValue(key, out Glyph? glyph))
+        {
+            if (!_atlas.Fits(ink.Width, ink.Height))
+            {
+                _atlas.Clear();
+                _glyphs.Clear();
+                _symbols.Clear();
+                _images.Clear();
+            }
+            var (uvTopLeft, uvBottomRight) = _atlas.Add(ink.Width, ink.Height, ink.Coverage);
+            glyph = new Glyph(uvTopLeft, uvBottomRight, ink.Width, ink.Height, 0, 0);
+            _images[key] = glyph;
+        }
+        overlay.Image(new Rect(topLeft.X, topLeft.Y, glyph.Width, glyph.Height), glyph.UvTopLeft, glyph.UvBottomRight, color);
+    }
+
+    private readonly Dictionary<string, Glyph> _images = [];
+
     // A named symbol, `size` pixels high, centred on `centre`; false when there is no such symbol to draw.
     public bool DrawSymbol(Overlay overlay, string name, Vector2 centre, float size, Vector4 color)
     {

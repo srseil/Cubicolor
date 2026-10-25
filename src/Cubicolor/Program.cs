@@ -134,6 +134,7 @@ internal static class Program
     {
         using var renderer = new MetalRenderer(IntPtr.Zero, () => (width, height), vsync: false);
         MenuScreen.KeySymbol = KeyCodes.Symbol;
+        MenuScreen.KeyName = KeyCodes.Name;
         // Headless, the mix goes nowhere unless it is captured to a file.
         using var audio = new AudioService(MusicPath(assets), _ => null);
         GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio, new NoAchievements());

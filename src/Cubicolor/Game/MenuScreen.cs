@@ -13,7 +13,7 @@ namespace Cubicolor.Game;
 // chosen section's panel on the right, as in both earlier versions.
 public sealed class MenuScreen : IScreen
 {
-    public const string Version = "v2.0";
+    public const string Version = "Cubicolor v2.0";
 
     private enum Section { Play, Controls, Settings, Credits }
 
@@ -45,7 +45,6 @@ public sealed class MenuScreen : IScreen
         const float width = Ui.CanvasWidth;
         const float left = (width - SectionsWidth - 50 - PanelWidth) / 2;
 
-        ui.Label("Cubicolor", ui.R(0, 28, width, 100), 84, style: FontStyle.Black);
         _previewCooldown -= seconds;
 
         if (_rebinding is { } rebinding)
@@ -73,14 +72,14 @@ public sealed class MenuScreen : IScreen
         for (int i = 0; i < items.Length; i++)
         {
             var (label, section) = items[i];
-            if (ui.Button(label, ui.R(left, 270 + i * 62, SectionsWidth, 48), selected: section == _section && section != null))
+            if (ui.Button(label, ui.R(left, PanelTop + 8 + i * 62, SectionsWidth, 48), selected: section == _section && section != null))
             {
                 if (section is { } s) _section = s;
                 else _context.QuitRequested = true;
             }
         }
 
-        Rect panel = ui.R(left + SectionsWidth + 50, 262, PanelWidth, PanelHeight);
+        Rect panel = ui.R(left + SectionsWidth + 50, PanelTop, PanelWidth, PanelHeight);
         ui.Panel(panel, under: true);
         // A section's contents fade in when it is chosen.
         if (_section != _sectionShown) (_sectionShown, _sectionFade) = (_section, 0);
@@ -100,13 +99,17 @@ public sealed class MenuScreen : IScreen
         return next;
     }
 
-    private const float SectionsWidth = 210, PanelWidth = 640, PanelHeight = 420;
+    // The sections and the panel, centred on the canvas.
+    private const float SectionsWidth = 210, PanelWidth = 640, PanelHeight = 420, PanelTop = (Ui.CanvasHeight - PanelHeight) / 2;
 
     // Settings and Controls stand on one grid of rows, from the same top with the same pitch, so their rows line
     // up as the panel switches between them; a gap sets groups apart.
     private const float Top = 24, Pitch = 42, Gap = 14, RowHeight = 36;
 
-    private static float RowY(float panelY, int row, int gaps) => panelY + Top + row * Pitch + gaps * Gap;
+    private static float RowY(float panelY, int row, int gaps, float pitch = Pitch) => panelY + Top + row * pitch + gaps * Gap;
+
+    // Controls has fewer rows than Settings; they spread out to fill the panel the same way.
+    private const float ControlsPitch = (PanelHeight - 2 * Top - RowHeight - Gap) / 6;
 
     private string? FirstInPanel() => _section switch
     {
@@ -147,8 +150,8 @@ public sealed class MenuScreen : IScreen
         Settings settings = _context.Saves.Settings;
         bool connected = ui.Input.Gamepad.Connected;
         float x = ui.DesignX(panel.X) + 45, y = ui.DesignY(panel.Y);
-        ui.Label("Keyboard", ui.R(x + 170, RowY(y, 0, 0), 180, RowHeight), 24);
-        ui.Label("Controller", ui.R(x + 370, RowY(y, 0, 0), 180, RowHeight), 24);
+        ui.Label("Keyboard", ui.R(x + 170, RowY(y, 0, 0, ControlsPitch), 180, RowHeight), 24);
+        ui.Label("Controller", ui.R(x + 370, RowY(y, 0, 0, ControlsPitch), 180, RowHeight), 24);
         (GameAction Action, string Label)[] rows =
         [
             (GameAction.Forwards, "Forwards"), (GameAction.Backwards, "Backwards"), (GameAction.Left, "Left"), (GameAction.Right, "Right"),
@@ -157,7 +160,7 @@ public sealed class MenuScreen : IScreen
         for (int i = 0; i < rows.Length; i++)
         {
             var (action, label) = rows[i];
-            float rowY = RowY(y, i + 1, i >= 4 ? 1 : 0);
+            float rowY = RowY(y, i + 1, i >= 4 ? 1 : 0, ControlsPitch);
             ui.Label(label, ui.R(x, rowY, 160, RowHeight), 24, align: Align.Left);
             bool typing = _rebinding == (action, false);
             Key key = settings.Keys[action];

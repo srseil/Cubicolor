@@ -57,8 +57,8 @@ internal static unsafe partial class KeyCodes
     {
         string? fixedName = key switch
         {
-            Key.Return => "Return", Key.Escape => "Escape", Key.Backspace => "Delete", Key.Tab => "Tab",
-            Key.Space => "Space", Key.Delete => "Forward Delete", Key.Capslock => "Caps Lock",
+            Key.Return => "Return", Key.Escape => "esc", Key.Backspace => "Delete", Key.Tab => "Tab",
+            Key.Space => "space", Key.Delete => "Forward Delete", Key.Capslock => "Caps Lock",
             Key.LCtrl => "Left Control", Key.RCtrl => "Right Control", Key.LShift => "Left Shift",
             Key.RShift => "Right Shift", Key.LAlt => "Left Option", Key.RAlt => "Right Option",
             Key.LGUI => "Left Command", Key.RGUI => "Right Command", Key.Up => "Up", Key.Down => "Down",
@@ -108,8 +108,8 @@ internal static unsafe partial class KeyCodes
     [LibraryImport(CarbonPath)] private static partial int UCKeyTranslate(byte* layout, ushort code, ushort action, uint modifiers,
         uint keyboardType, uint options, uint* deadKeyState, nint maxLength, out nint length, char* chars);
 
-    // The SF Symbol for a key that has one (arrows, return, delete, escape, tab, space and the modifiers), for
-    // the controls screen; null for letters, digits and the rest, which are shown as the layout prints them.
+    // The SF Symbol for a key whose Mac keycap shows a symbol (arrows, return, delete, tab and the modifiers),
+    // for the controls screen; null for the rest, shown in text as the keycap reads ("esc", "space", letters).
     public static string? Symbol(Key key) => key switch
     {
         Key.Up => "arrow.up",
@@ -119,9 +119,7 @@ internal static unsafe partial class KeyCodes
         Key.Return or Key.KpEnter => "return",
         Key.Backspace => "delete.left",
         Key.Delete => "delete.right",
-        Key.Escape => "escape",
         Key.Tab => "arrow.right.to.line",
-        Key.Space => "space",
         Key.LShift or Key.RShift => "shift",
         Key.LCtrl or Key.RCtrl => "control",
         Key.LAlt or Key.RAlt => "option",
