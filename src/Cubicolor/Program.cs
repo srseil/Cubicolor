@@ -32,7 +32,8 @@ internal static class Program
           --timeout <seconds>     fail a run that takes longer
           --capture-audio <wav>   headless: write what the game played to a WAV file
           --art <dir>             render the Steam store and library images, the icon and screenshots into <dir>
-          --perf                  headless: report frame times (CPU, GPU), draw calls and allocations at the end
+          --perf                  headless: report frame times (CPU, GPU), draw calls and allocations at the end;
+                                  in a window: log frames drawn, still and hidden and the CPU used, every 5 s
         """;
 
     private static int Main(string[] args)
@@ -92,7 +93,7 @@ internal static class Program
             if (art != null) return RenderArt(saves, assets, art);
             return headless
                 ? RunHeadless(saves, assets, width, height, script, level, timeout, captureAudio, perf)
-                : RunWindowed(saves, assets, level);
+                : RunWindowed(saves, assets, level, perf);
         }
         finally
         {
@@ -233,7 +234,7 @@ internal static class Program
         return 0;
     }
 
-    private static int RunWindowed(SaveStore saves, string assets, string? level)
+    private static int RunWindowed(SaveStore saves, string assets, string? level, bool perf)
     {
         AppKit.Start("Cubicolor");
         // A bundle has its icon from Info.plist; run straight from a build, the Dock gets it here.
@@ -256,6 +257,7 @@ internal static class Program
 
         var clock = Stopwatch.StartNew();
         double last = 0;
+        var meter = perf ? new WindowMeter() : null;
         while (!window.CloseRequested && !context.QuitRequested)
         {
             steam?.Tick();
@@ -273,6 +275,7 @@ internal static class Program
                 else if (!drawn) Thread.Sleep(5);
                 else if (frame.Unchanged) AppKit.WaitForEvent(1.0 / 60);
                 else if (!settings.VSync) Thread.Sleep(1);
+                meter?.Count(frame, visible, now);
             }
             catch (Exception e) when (e is not OutOfMemoryException)
             {
@@ -282,5 +285,29 @@ internal static class Program
         }
         saves.SaveSettings();
         return 0;
+    }
+
+    // What a window spends: how many frames were drawn, left as they were or hidden, and the process's CPU time
+    // (every thread: the game's, the audio's, Metal's) against the wall clock, logged every few seconds.
+    private sealed class WindowMeter
+    {
+        private int _drawn, _still, _hidden;
+        private double _since, _updateMs;
+        private TimeSpan _cpu = Process.GetCurrentProcess().TotalProcessorTime;
+
+        public void Count(Frame frame, bool visible, double now)
+        {
+            if (!visible) _hidden++;
+            else if (frame.Unchanged) _still++;
+            else _drawn++;
+            _updateMs += frame.UpdateMs;
+            if (now - _since < 5) return;
+            TimeSpan cpu = Process.GetCurrentProcess().TotalProcessorTime;
+            double wall = now - _since;
+            int frames = _drawn + _still + _hidden;
+            Log.Info(FormattableString.Invariant(
+                $"Perf {frame.Screen.GetType().Name}: {_drawn / wall:0} drawn, {_still / wall:0} still, {_hidden / wall:0} hidden a second; update {_updateMs / Math.Max(1, frames):0.00} ms; CPU {(cpu - _cpu).TotalSeconds / wall * 100:0.0}%; {Environment.WorkingSet / 1048576} MB"));
+            (_drawn, _still, _hidden, _updateMs, _since, _cpu) = (0, 0, 0, 0, now, cpu);
+        }
     }
 }
