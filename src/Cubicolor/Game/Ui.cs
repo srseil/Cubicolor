@@ -289,8 +289,8 @@ public sealed class Ui
     }
 
     // A button showing symbols (a controller's own, for one of its buttons) instead of a label, or `text` when
-    // there are none; `caption`, when given, is written beside the symbols.
-    public bool SymbolButton(string id, Rect rect, IReadOnlyList<string> symbols, string text, bool enabled = true, string? caption = null)
+    // there are none.
+    public bool SymbolButton(string id, Rect rect, IReadOnlyList<string> symbols, string text, bool enabled = true)
     {
         var (focused, activated) = Interact(id, rect, enabled);
         float radius = Px(5);
@@ -298,9 +298,7 @@ public sealed class Ui
         Overlay.RoundedRectangle(rect, radius, enabled ? Style.Button : Style.Disabled);
         Vector4 color = enabled ? Style.ButtonText : Style.DisabledText;
         float size = rect.Height * 0.6f, gap = Px(10);
-        float captionWidth = caption != null ? TextWidth(caption, 20) : 0;
-        float width = symbols.Count * size + (symbols.Count - 1) * gap + (caption != null ? gap + captionWidth : 0);
-        float x = rect.Centre.X - width / 2 + size / 2;
+        float x = rect.Centre.X - (symbols.Count * size + (symbols.Count - 1) * gap) / 2 + size / 2;
         bool drawn = symbols.Count > 0;
         foreach (string symbol in symbols)
         {
@@ -308,7 +306,6 @@ public sealed class Ui
             x += size + gap;
         }
         if (!drawn) Label(text, rect, 22, color);
-        else if (caption != null) Label(caption, new Rect(x - size / 2, rect.Y, captionWidth, rect.Height), 20, color, align: Align.Left);
         return activated;
     }
 

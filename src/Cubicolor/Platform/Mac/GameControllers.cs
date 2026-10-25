@@ -95,11 +95,6 @@ internal static class GameControllers
     // Relearned whenever the set of controllers changes.
     private static IntPtr[] _known = [];
     private static readonly List<Dictionary<GamepadButtons, string>> _symbols = [];
-    // The names (GCControllerElement.localizedName) of buttons whose symbol another button on the same
-    // controller shares.
-    private static readonly Dictionary<GamepadButtons, string> _ambiguous = [];
-
-    public static string? NameFor(GamepadButtons button) => _ambiguous.GetValueOrDefault(button);
 
     // The distinct symbols for `button` across the connected controllers; with none connected (or none naming
     // it), the Xbox layout's symbol, so the controls screen shows an icon either way.
@@ -141,13 +136,11 @@ internal static class GameControllers
         if (current.AsSpan().SequenceEqual(_known)) return;
         _known = current;
         _symbols.Clear();
-        _ambiguous.Clear();
         foreach (IntPtr controller in current)
         {
             IntPtr pad = Send<IntPtr>(controller, SelExtended);
             if (pad == IntPtr.Zero) continue;
             var map = new Dictionary<GamepadButtons, string>();
-            var names = new Dictionary<GamepadButtons, string>();
             foreach (var (button, path) in Elements)
             {
                 IntPtr element = pad;
@@ -158,13 +151,8 @@ internal static class GameControllers
                 }
                 if (element == IntPtr.Zero || Send<byte, IntPtr>(element, SelResponds, Sel("unmappedSfSymbolsName")) == 0) continue;
                 if (Str(Send<IntPtr>(element, Sel("unmappedSfSymbolsName"))) is { Length: > 0 } symbol) map.TryAdd(button, symbol);
-                if (Send<byte, IntPtr>(element, SelResponds, Sel("localizedName")) != 0
-                    && Str(Send<IntPtr>(element, Sel("localizedName"))) is { Length: > 0 } localized) names.TryAdd(button, localized.EndsWith(" Button", StringComparison.Ordinal) ? localized[..^7] : localized);
             }
             _symbols.Add(map);
-            foreach (var (button, symbol) in map)
-                if (map.Count(kv => kv.Value == symbol) > 1 && names.TryGetValue(button, out string? shown)) _ambiguous.TryAdd(button, shown);
-            if (_ambiguous.Count > 0) Log.Info($"Game controller buttons named, their symbols being alike: {string.Join(", ", _ambiguous.Values)}");
             Log.Info($"Game controller symbols, {Str(Send<IntPtr>(controller, SelVendor)) ?? "unnamed"}: "
                      + (map.Count == 0 ? "none" : string.Join(", ", map.Select(kv => $"{kv.Key} {kv.Value}"))));
         }

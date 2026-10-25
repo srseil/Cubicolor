@@ -180,8 +180,7 @@ public sealed class MenuScreen : IScreen
             GamepadButtons button = Flag(settings.Pad[action]);
             bool capturing = _rebinding == (action, true);
             if (ui.SymbolButton($"{label} button", ui.R(x + 370, rowY, 180, RowHeight), capturing ? [] : ui.Input.SymbolsFor(button),
-                                capturing ? "Press a button" : PadName(settings.Pad[action]), enabled: connected,
-                                caption: capturing ? null : ui.Input.NameFor(button)))
+                                capturing ? "Press a button" : PadName(settings.Pad[action]), enabled: connected))
                 _rebinding = (action, true);
         }
     }
