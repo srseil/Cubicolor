@@ -273,16 +273,16 @@ public sealed class MenuScreen : IScreen
     {
         float x = ui.DesignX(panel.X), y = ui.DesignY(panel.Y);
         float w = panel.Width / ui.Scale;
-        ui.Label("Cubicolor", ui.R(x, y + 18, w, 60), 48, style: FontStyle.Black);
+        ui.Label("Cubicolor", ui.R(x, y + 14, w, 60), 48, style: FontStyle.Black);
         _logo.Advance(seconds);
-        _logo.Draw(scene, ui.R(x + w / 2 - 130, y + 82, 260, 76), ui.Size, _sectionFade);
-        ui.Label("A game by Stefan Seil", ui.R(x, y + 168, w, 36), 26);
-        ui.Label("Relaxing Piano Music by Kevin MacLeod (incompetech.com)", ui.R(x, y + 222, w, 24), 18);
-        ui.Label("Licensed under Creative Commons: By Attribution 3.0 License", ui.R(x, y + 246, w, 24), 18);
-        ui.Label("https://creativecommons.org/licenses/by/3.0/", ui.R(x, y + 270, w, 24), 18);
-        ui.Label("Vollkorn by Friedrich Althausen, SIL Open Font License 1.1", ui.R(x, y + 306, w, 24), 18);
+        _logo.Draw(scene, ui.R(x + w / 2 - 160, y + 76, 320, 106), ui.Size, _sectionFade);
+        ui.Label("A game by Stefan Seil", ui.R(x, y + 186, w, 34), 26);
+        ui.Label("Relaxing Piano Music by Kevin MacLeod (incompetech.com)", ui.R(x, y + 234, w, 22), 18);
+        ui.Label("Licensed under Creative Commons: By Attribution 3.0 License", ui.R(x, y + 256, w, 22), 18);
+        ui.Label("https://creativecommons.org/licenses/by/3.0/", ui.R(x, y + 278, w, 22), 18);
+        ui.Label("Vollkorn by Friedrich Althausen, SIL Open Font License 1.1", ui.R(x, y + 310, w, 22), 18);
         float linkWidth = ui.TextWidth(Website, 24) / ui.Scale + 16;
-        if (ui.Link(Website, ui.R(x + (w - linkWidth) / 2, y + 352, linkWidth, 34), 24)) _context.OpenUrl?.Invoke("https://" + Website);
+        if (ui.Link(Website, ui.R(x + (w - linkWidth) / 2, y + 354, linkWidth, 34), 24)) _context.OpenUrl?.Invoke("https://" + Website);
     }
 
     private const string Website = "srseil.com";

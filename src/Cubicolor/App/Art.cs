@@ -16,6 +16,7 @@ internal sealed class Art(GameContext context, Text text, string solutions, Acti
 {
     private readonly Scene _scene = new();
     private readonly Overlay _overlay = new();
+    private readonly Overlay _underlay = new();
 
     public void RenderAll(string directory)
     {
@@ -31,9 +32,11 @@ internal sealed class Art(GameContext context, Text text, string solutions, Acti
         Capsule(directory, "library_hero", 3840, 1240, "genius15", title: false);
         Capsule(directory, "event_cover", 800, 450, "smart09");
         Logo(directory, "library_logo", 1280, 720);
-        Icon(directory, "icon", 1024);
-        Icon(directory, "shortcut_icon", 256);
-        Icon(directory, "app_icon", 184, background: true);
+        Icon(directory, "icon_macos", 1024, IconKind.MacOS);
+        Icon(directory, "icon", 1024, IconKind.Plain);
+        Icon(directory, "shortcut_icon", 256, IconKind.Plain);
+        Icon(directory, "app_icon", 184, IconKind.Square);
+        MacIconSet(Path.Combine(directory, "Cubicolor.iconset"));
         foreach (string level in new[] { "normal03", "smart09", "genius05", "genius12", "genius15" })
             Capsule(directory, $"screenshot_{level}", 1920, 1080, level, title: false, hud: true);
     }
@@ -125,26 +128,45 @@ internal sealed class Art(GameContext context, Text text, string solutions, Acti
         Save(directory, name, width, height, opaque: false);
     }
 
-    // The black cube, half painted, on its tile.
-    private void Icon(string directory, string name, int size, bool background = false)
+    private enum IconKind { Plain, MacOS, Square }
+
+    // The app icon: the black cube on its own at the game's angle, as the earlier versions' icon was. On macOS it
+    // sits on a rounded square in the game's background colour (Apple's grid: an 824 body on a 1024 canvas,
+    // corners of 185); elsewhere it stands on nothing, or on a square of the background.
+    private void Icon(string directory, string name, int size, IconKind kind)
     {
         _scene.Items.Clear();
         _overlay.Clear();
-        _scene.Background = background ? Palette.Background : Palette.Background with { W = 0 };
+        _underlay.Clear();
+        _scene.Background = kind == IconKind.Square ? Palette.Background : Palette.Background with { W = 0 };
         _scene.Lighting = GameContext.Light;
-        var min = new Vector3(-0.55f, -0.5f, -0.55f);
-        var max = new Vector3(0.55f, 1f, 0.55f);
-        (_scene.View, _scene.Projection) = CameraFit.FitInto(min, max, new Rect(size * 0.04f, size * 0.04f, size * 0.92f, size * 0.92f),
-            new Vector2(size), CameraFit.Forward);
-        _scene.Items.Add(new DrawItem(context.Meshes.Slab, Matrix4x4.CreateTranslation(0, -0.25f, 0), Palette.White));
-        _scene.Items.Add(new DrawItem(context.Meshes.Cube, Matrix4x4.CreateTranslation(0, 0.5f, 0), Palette.Black, Surface.Paint, Palette.Green, 0.42f));
-        Save(directory, name, size, size, opaque: background);
+        float body = kind == IconKind.MacOS ? size * 824f / 1024 : size;
+        float margin = (size - body) / 2;
+        if (kind == IconKind.MacOS)
+            _underlay.RoundedRectangle(new Rect(margin, margin, body, body), size * 185f / 1024, Palette.Background);
+        float cube = kind == IconKind.Plain ? size * 0.92f : body * 0.64f;
+        var target = new Rect((size - cube) / 2, (size - cube) / 2, cube, cube);
+        (_scene.View, _scene.Projection) = CameraFit.FitInto(new Vector3(-0.5f), new Vector3(0.5f), target, new Vector2(size), CameraFit.Forward);
+        _scene.Items.Add(new DrawItem(context.Meshes.Cube, Matrix4x4.Identity, Palette.Black));
+        Save(directory, name, size, size, opaque: kind == IconKind.Square);
+    }
+
+    // The macOS icon set: every size iconutil wants, from which packaging makes Cubicolor.icns.
+    public void MacIconSet(string directory)
+    {
+        Directory.CreateDirectory(directory);
+        foreach (int points in new[] { 16, 32, 128, 256, 512 })
+        {
+            Icon(directory, $"icon_{points}x{points}", points, IconKind.MacOS);
+            Icon(directory, $"icon_{points}x{points}@2x", points * 2, IconKind.MacOS);
+        }
     }
 
     private void Save(string directory, string name, int width, int height, bool opaque)
     {
         resize(width, height);
-        context.Renderer.Draw(_scene, [], _overlay.Vertices);
+        context.Renderer.Draw(_scene, _underlay.Vertices, _overlay.Vertices);
+        _underlay.Clear();
         string path = Path.Combine(directory, name + ".png");
         byte[] pixels = context.Renderer.ReadPixels();
         if (!opaque)

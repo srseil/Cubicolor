@@ -60,7 +60,7 @@ public sealed class Overlay
             Rectangle(r, color);
             return;
         }
-        const int perCorner = 6;
+        int perCorner = Segments(radius);
         Vector2 centre = r.Centre;
         Span<Vector2> outline = stackalloc Vector2[4 * (perCorner + 1)];
         int n = 0;
@@ -83,7 +83,7 @@ public sealed class Overlay
     // A rounded rectangle's outline, `thickness` wide, drawn outward from `r`'s edge.
     public void RoundedOutline(Rect r, float radius, float thickness, Vector4 color)
     {
-        const int perCorner = 6;
+        int perCorner = Segments(radius);
         radius = MathF.Max(0, MathF.Min(radius, MathF.Min(r.Width, r.Height) / 2));
         (Vector2 Corner, float Start)[] corners =
         [
@@ -110,6 +110,9 @@ public sealed class Overlay
             Triangle(inner[i], outer[j], inner[j], color);
         }
     }
+
+    // Enough segments per rounded corner that its facets stay under a pixel or two, whatever its size.
+    private static int Segments(float radius) => Math.Clamp((int) MathF.Ceiling(radius / 3), 6, 64);
 
     // A textured quad from the atlas, its coverage tinting `color`.
     public void Image(Rect r, Vector2 uvTopLeft, Vector2 uvBottomRight, Vector4 color)

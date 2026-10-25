@@ -203,6 +203,8 @@ internal static class Program
     private static int RunWindowed(SaveStore saves, string assets, string? level)
     {
         AppKit.Start("Cubicolor");
+        // A bundle has its icon from Info.plist; run straight from a build, the Dock gets it here.
+        AppKit.SetIcon(Path.Combine(assets, "icon.png"));
         Settings settings = saves.Settings;
         var (w, h) = settings.WindowSize ?? (1280, 720);
         using var window = new MacWindow(w, h, "Cubicolor");
