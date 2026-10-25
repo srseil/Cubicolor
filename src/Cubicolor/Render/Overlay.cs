@@ -22,10 +22,18 @@ public sealed class Overlay
 
     public ReadOnlySpan<OverlayVertex> Vertices => System.Runtime.InteropServices.CollectionsMarshal.AsSpan(_vertices);
 
-    public void Clear() => _vertices.Clear();
+    public void Clear()
+    {
+        _vertices.Clear();
+        Opacity = 1;
+    }
+
+    // Multiplies the opacity of everything drawn from now on: for fading a whole group in or out.
+    public float Opacity { get; set; } = 1;
 
     public void Triangle(Vector2 a, Vector2 b, Vector2 c, Vector4 color)
     {
+        color.W *= Opacity;
         Vector2 uv = OverlayAtlas.Solid;
         _vertices.Add(new OverlayVertex(a, uv, color));
         _vertices.Add(new OverlayVertex(b, uv, color));
@@ -106,6 +114,7 @@ public sealed class Overlay
     // A textured quad from the atlas, its coverage tinting `color`.
     public void Image(Rect r, Vector2 uvTopLeft, Vector2 uvBottomRight, Vector4 color)
     {
+        color.W *= Opacity;
         var a = new OverlayVertex(new Vector2(r.X, r.Y), uvTopLeft, color);
         var b = new OverlayVertex(new Vector2(r.Right, r.Y), new Vector2(uvBottomRight.X, uvTopLeft.Y), color);
         var c = new OverlayVertex(new Vector2(r.Right, r.Bottom), uvBottomRight, color);

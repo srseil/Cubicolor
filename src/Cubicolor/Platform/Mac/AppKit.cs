@@ -92,6 +92,15 @@ internal static unsafe class AppKit
         Call(App, SelUpdateWindows);
     }
 
+    // A web page in the default browser.
+    public static void OpenUrl(string url)
+    {
+        using var pool = AutoreleasePool.Push();
+        IntPtr nsurl = Send<IntPtr, IntPtr>(Class("NSURL"), Sel("URLWithString:"), NSString(url));
+        if (nsurl == IntPtr.Zero) return;
+        Send<byte, IntPtr>(Send<IntPtr>(Class("NSWorkspace"), Sel("sharedWorkspace")), Sel("openURL:"), nsurl);
+    }
+
     // The application's icon, which the Dock shows while the game runs, from an image file. A missing or
     // unreadable file is a warning, not a reason not to start.
     public static void SetIcon(string path)

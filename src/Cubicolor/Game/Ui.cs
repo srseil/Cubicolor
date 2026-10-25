@@ -41,7 +41,11 @@ public sealed class Ui
     private Vector2 _lastMouse;
 
     public Overlay Overlay { get; } = new();
+    // The UI is laid out on a 1280 x 720 design canvas, scaled to fit the window whole and centred in it, so
+    // nothing is ever cut off: Scale is pixels per design unit, Origin the canvas's top left in pixels.
+    public const float CanvasWidth = 1280, CanvasHeight = 720;
     public float Scale { get; private set; } = 1;
+    public Vector2 Origin { get; private set; }
     public Vector2 Size { get; private set; }
     public IInput Input { get; private set; } = null!;
     public Navigation Navigation { get; private set; }
@@ -57,12 +61,15 @@ public sealed class Ui
 
     public Vector4 TextColor => Dark ? Palette.DarkText : Palette.Text;
 
-    public void Begin(IInput input, Navigation navigation, int width, int height)
+    public void Begin(IInput input, Navigation navigation, int width, int height, double seconds)
     {
+        _seconds = seconds;
+        Interactive = true;
         Input = input;
         Navigation = navigation;
         Size = new Vector2(width, height);
-        Scale = height / 720f;
+        Scale = MathF.Min(height / CanvasHeight, width / CanvasWidth);
+        Origin = new Vector2((width - CanvasWidth * Scale) / 2, (height - CanvasHeight * Scale) / 2);
         Overlay.Clear();
         Clicked = false;
         _previous = [.. _widgets];
@@ -124,9 +131,14 @@ public sealed class Ui
 
     public float Px(float units) => units * Scale;
 
-    public Rect R(float x, float y, float width, float height) => new(Px(x), Px(y), Px(width), Px(height));
+    // A rectangle and a point on the design canvas, in pixels.
+    public Rect R(float x, float y, float width, float height) => new(Origin.X + Px(x), Origin.Y + Px(y), Px(width), Px(height));
 
-    public Vector2 P(float x, float y) => new(Px(x), Px(y));
+    public Vector2 P(float x, float y) => new(Origin.X + Px(x), Origin.Y + Px(y));
+
+    // Back from pixels to the design canvas.
+    public float DesignX(float pixels) => (pixels - Origin.X) / Scale;
+    public float DesignY(float pixels) => (pixels - Origin.Y) / Scale;
 
     // --- Text ---
 
@@ -147,13 +159,26 @@ public sealed class Ui
 
     // A widget's interaction: registered for focus and scripts, focused by the mouse, activated by a click
     // or by Confirm while focused.
+    // While false, widgets draw but cannot be focused or used: a panel fading out.
+    public bool Interactive { get; set; } = true;
+
+    private double _seconds;
+    // How much of each widget's focus ring shows: it fades in and out over a tenth of a second.
+    private readonly Dictionary<string, float> _ring = [];
+    private float _ringNow;
+
     private (bool Focused, bool Activated) Interact(string label, Rect rect, bool enabled)
     {
-        if (!enabled) return (false, false);
+        _ringNow = 0;
+        if (!enabled || !Interactive) return (false, false);
         _widgets.Add((label, rect));
         bool over = rect.Contains(Input.MousePosition);
         if (over && _mouseMoved) _focus = label;
         bool focused = _focus == label;
+        float ring = _ring.GetValueOrDefault(label);
+        ring = Math.Clamp(ring + (focused ? 1 : -1) * (float) _seconds / 0.1f, 0, 1);
+        _ring[label] = ring;
+        _ringNow = ring;
         bool activated = (over && Input.MouseReleased(MouseButton.Left)) || (focused && Navigation.Confirm);
         if (activated) Clicked = true;
         return (focused, activated);
@@ -161,9 +186,13 @@ public sealed class Ui
 
     // The ring around whatever has focus: its own colour, so it never reads as selected or finished, which
     // are shown by the khaki fill and the khaki tick.
-    private void FocusRing(Rect rect, float radius) =>
+    private void FocusRing(Rect rect, float radius)
+    {
+        if (_ringNow <= 0) return;
+        Vector4 color = Dark ? Palette.DarkText : Style.Dark;
         Overlay.RoundedOutline(new Rect(rect.X - Px(3), rect.Y - Px(3), rect.Width + Px(6), rect.Height + Px(6)), radius + Px(3), Px(2.5f),
-            Dark ? Palette.DarkText : Style.Dark);
+            color with { W = color.W * _ringNow });
+    }
 
     // `selected` fills it khaki (the current section or difficulty); `done` puts a khaki tick in its corner (a
     // solved level).
@@ -181,7 +210,7 @@ public sealed class Ui
         // Pressed while the mouse holds it, and on the frame it lets go too: that is when the click lands and the
         // button may become the selected one, which it otherwise only shows a frame later.
         bool pressed = focused && rect.Contains(Input.MousePosition) && (Input.MouseDown(MouseButton.Left) || activated && Input.MouseReleased(MouseButton.Left));
-        if (focused) FocusRing(rect, radius);
+        FocusRing(rect, radius);
         Overlay.RoundedRectangle(rect, radius, pressed || selected ? Style.Accent : Style.Button);
         if (done)
         {
@@ -198,10 +227,23 @@ public sealed class Ui
         if (activated) value = !value;
         float box = rect.Height * 0.7f;
         var boxRect = new Rect(rect.X, rect.Y + (rect.Height - box) / 2, box, box);
-        if (focused) FocusRing(boxRect, Px(5));
+        FocusRing(boxRect, Px(5));
         Overlay.RoundedRectangle(boxRect, Px(5), Style.Button);
         if (value) Tick(boxRect, Style.ButtonText);
         Label(label, new Vector2(boxRect.Right + Px(12), rect.Y + (rect.Height - _text.LineHeight(FontStyle.Regular, Px(textSize))) / 2), textSize);
+        return activated;
+    }
+
+    // A web link: text underlined, activated like a button.
+    public bool Link(string text, Rect rect, float textSize = 24)
+    {
+        var (focused, activated) = Interact(text, rect, true);
+        FocusRing(rect, Px(5));
+        float width = _text.Measure(text, FontStyle.Regular, Px(textSize));
+        float height = _text.LineHeight(FontStyle.Regular, Px(textSize));
+        var at = new Vector2(rect.X + (rect.Width - width) / 2, rect.Y + (rect.Height - height) / 2);
+        Label(text, at, textSize);
+        Overlay.Rectangle(new Rect(at.X, at.Y + height * 0.92f, width, MathF.Max(1, Px(1.5f))), TextColor);
         return activated;
     }
 
@@ -250,7 +292,7 @@ public sealed class Ui
         }
         if (focused && Navigation.Move == Direction.Left) value = Math.Max(0, Math.Round(value * 10 - 1) / 10);
         if (focused && Navigation.Move == Direction.Right) value = Math.Min(1, Math.Round(value * 10 + 1) / 10);
-        if (focused) FocusRing(rect, Px(6));
+        FocusRing(rect, Px(6));
         Overlay.RoundedRectangle(rect, Px(6), Style.Track);
         Overlay.RoundedRectangle(new Rect(rect.X, rect.Y, MathF.Max(rect.Height, rect.Width * (float) value), rect.Height), Px(6), Style.Accent);
         return Math.Abs(before - value) > 1e-9;

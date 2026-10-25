@@ -85,13 +85,32 @@ public sealed class LevelScreen : IScreen
 
         scene.Background = _context.Background;
         scene.Lighting = GameContext.Light;
-        var (min, max) = _board.Bounds();
-        (scene.View, scene.Projection) = CameraFit.Fit(min, max, ui.Size.X / ui.Size.Y, 0.1f, 6f);
+        // The camera, fitted again only when the window changes shape.
+        float aspect = ui.Size.X / ui.Size.Y;
+        if (_camera == null || Math.Abs(_cameraAspect - aspect) > 1e-4f)
+        {
+            _cameraAspect = aspect;
+            _camera = CameraFit.FitCentred(_board.Footprint(), _board.Extent(), aspect, 0.1f, 6f);
+        }
+        (scene.View, scene.Projection) = _camera.Value;
         _board.Draw(scene);
 
         DrawHud(ui, settings);
-        if (_panel == Panel.Pause) next = PausePanel(ui) ?? next;
-        else if (_panel == Panel.Completed) next = CompletedPanel(ui) ?? next;
+
+        // The pause and completion panels fade in and out over a sixth of a second; one fading out is drawn but
+        // no longer takes input.
+        if (_panel != Panel.None) _shown = _panel;
+        _panelFade = Math.Clamp(_panelFade + (_panel != Panel.None ? 1 : -1) * (float) seconds / 0.16f, 0, 1);
+        if (_panelFade <= 0) _shown = Panel.None;
+        if (_shown != Panel.None)
+        {
+            ui.Overlay.Opacity = _panelFade * _panelFade * (3 - 2 * _panelFade);
+            ui.Interactive = _panel != Panel.None;
+            IScreen? chosen = _shown == Panel.Pause ? PausePanel(ui) : CompletedPanel(ui);
+            if (ui.Interactive) next = chosen ?? next;
+            ui.Overlay.Opacity = 1;
+            ui.Interactive = true;
+        }
         return next;
     }
 
@@ -116,6 +135,10 @@ public sealed class LevelScreen : IScreen
     }
 
     private (Direction Direction, double At)? _queued;
+    private Panel _shown;
+    private (System.Numerics.Matrix4x4, System.Numerics.Matrix4x4)? _camera;
+    private float _cameraAspect;
+    private float _panelFade;
 
     // Sounds waiting for their moment on the board's clock: what a roll causes is heard as the cube lands.
     private readonly List<(double At, Sound Sound)> _sounds = [];
@@ -201,12 +224,12 @@ public sealed class LevelScreen : IScreen
             3 => ["The order in which you match the different colors is irrelevant."],
             _ => [],
         };
-        float line = 36;
-        float y = 720 - 40 - line * hints.Length;
+        // Centred at the bottom of the window, whatever its shape.
+        float line = ui.Px(36);
+        float y = ui.Size.Y - ui.Px(40) - line * hints.Length;
         foreach (string hint in hints)
         {
-            float width = ui.TextWidth(hint, 26) / ui.Scale;
-            ui.Label(hint, new Vector2(ui.Px((ui.Size.X / ui.Scale - width) / 2), ui.Px(y)), 26);
+            ui.Label(hint, new Vector2((ui.Size.X - ui.TextWidth(hint, 26)) / 2, y), 26);
             y += line;
         }
     }
@@ -236,8 +259,7 @@ public sealed class LevelScreen : IScreen
     private static Rect CentredPanel(Ui ui, int buttons)
     {
         float width = 300, height = 90 + buttons * 58;
-        Vector2 size = ui.Size / ui.Scale;
-        Rect panel = ui.R((size.X - width) / 2, (size.Y - height) / 2, width, height);
+        Rect panel = ui.R((Ui.CanvasWidth - width) / 2, (Ui.CanvasHeight - height) / 2, width, height);
         ui.Panel(panel);
         return panel;
     }

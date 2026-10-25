@@ -17,7 +17,9 @@ public sealed class MenuScreen : IScreen
     private enum Section { Play, Controls, Settings, Credits }
 
     private readonly GameContext _context;
-    private Section _section = Section.Play;
+    private readonly LogoView _logo;
+    private Section _section = Section.Play, _sectionShown = Section.Play;
+    private float _sectionFade = 1;
     private Difficulty _difficulty;
     private GameAction? _rebinding;
 
@@ -25,6 +27,7 @@ public sealed class MenuScreen : IScreen
     {
         _context = context;
         _difficulty = difficulty;
+        _logo = new LogoView(context.Meshes);
         context.Ui.Focus("Play", force: true);
     }
 
@@ -36,10 +39,10 @@ public sealed class MenuScreen : IScreen
         Ui ui = _context.Ui;
         scene.Background = _context.Background;
         scene.Lighting = GameContext.Light;
-        float width = ui.Size.X / ui.Scale;
-        float left = (width - 1060) / 2;
+        const float width = Ui.CanvasWidth;
+        const float left = (width - 1060) / 2;
 
-        ui.Label("Cubicolor", new Rect(0, ui.Px(28), ui.Size.X, ui.Px(100)), 84, style: FontStyle.Black);
+        ui.Label("Cubicolor", ui.R(0, 28, width, 100), 84, style: FontStyle.Black);
         _previewCooldown -= seconds;
 
         if (_rebinding is { } action)
@@ -74,13 +77,18 @@ public sealed class MenuScreen : IScreen
 
         Rect panel = ui.R(left + 260, 262, 800, 420);
         ui.Panel(panel);
+        // A section's contents fade in when it is chosen.
+        if (_section != _sectionShown) (_sectionShown, _sectionFade) = (_section, 0);
+        _sectionFade = Math.Min(1, _sectionFade + (float) seconds / 0.15f);
+        ui.Overlay.Opacity = _sectionFade;
         switch (_section)
         {
             case Section.Play: next = Play(ui, panel) ?? next; break;
             case Section.Controls: Controls(ui, panel); break;
             case Section.Settings: SettingsPanel(ui, panel); break;
-            case Section.Credits: Credits(ui, panel); break;
+            case Section.Credits: Credits(ui, panel, scene, seconds); break;
         }
+        ui.Overlay.Opacity = 1;
 
         ui.Label(Version, ui.P(width - ui.TextWidth(Version, 18) / ui.Scale - 20, 690), 18);
         if (ui.Clicked) _context.Audio.Play(Sound.Click);
@@ -98,7 +106,7 @@ public sealed class MenuScreen : IScreen
     private IScreen? Play(Ui ui, Rect panel)
     {
         Progress progress = _context.Saves.Progress;
-        float x = panel.X / ui.Scale, y = panel.Y / ui.Scale;
+        float x = ui.DesignX(panel.X), y = ui.DesignY(panel.Y);
         Difficulty[] all = Enum.GetValues<Difficulty>();
         for (int i = 0; i < all.Length; i++)
         {
@@ -120,7 +128,7 @@ public sealed class MenuScreen : IScreen
     private void Controls(Ui ui, Rect panel)
     {
         Settings settings = _context.Saves.Settings;
-        float x = panel.X / ui.Scale + 60, y = panel.Y / ui.Scale + 24;
+        float x = ui.DesignX(panel.X) + 60, y = ui.DesignY(panel.Y) + 24;
         ui.Label("Player Movement", ui.P(x, y), 28);
         (GameAction Action, string Label, string Pad)[] rows =
         [
@@ -168,13 +176,13 @@ public sealed class MenuScreen : IScreen
     private void SettingsPanel(Ui ui, Rect panel)
     {
         Settings s = _context.Saves.Settings;
-        float x = panel.X / ui.Scale + 70, y = panel.Y / ui.Scale + 22;
+        float x = ui.DesignX(panel.X) + 70, y = ui.DesignY(panel.Y) + 22;
         const float row = 36, gap = 12, width = 560;
         bool changed = false, display = false;
 
         bool dark = s.DarkBackground, show = !s.HideUi;
         changed |= ui.Toggle("Dark Background", ui.R(x, y, width, 32), ref dark);
-        changed |= ui.Toggle("Show Level Name and Hints", ui.R(x, y += row, width, 32), ref show);
+        changed |= ui.Toggle("Show Level Name and Tutorial", ui.R(x, y += row, width, 32), ref show);
         (s.DarkBackground, s.HideUi) = (dark, !show);
 
         double music = s.MusicVolume, sound = s.SoundVolume;
@@ -219,16 +227,21 @@ public sealed class MenuScreen : IScreen
         return changed;
     }
 
-    private static void Credits(Ui ui, Rect panel)
+    private void Credits(Ui ui, Rect panel, Scene scene, double seconds)
     {
-        float x = panel.X / ui.Scale, y = panel.Y / ui.Scale;
+        float x = ui.DesignX(panel.X), y = ui.DesignY(panel.Y);
         float w = panel.Width / ui.Scale;
-        ui.Label("Cubicolor", ui.R(x, y + 40, w, 60), 48, style: FontStyle.Black);
-        ui.Label("A game by Stefan Seil", ui.R(x, y + 110, w, 40), 26);
-        ui.Label("Relaxing Piano Music by Kevin MacLeod (incompetech.com)", ui.R(x, y + 200, w, 26), 18);
-        ui.Label("Licensed under Creative Commons: By Attribution 3.0 License", ui.R(x, y + 226, w, 26), 18);
-        ui.Label("https://creativecommons.org/licenses/by/3.0/", ui.R(x, y + 252, w, 26), 18);
-        ui.Label("Vollkorn by Friedrich Althausen, SIL Open Font License 1.1", ui.R(x, y + 292, w, 26), 18);
-        ui.Label("@Moltenplay        Moltenplay.com", ui.R(x, y + 350, w, 30), 22);
+        ui.Label("Cubicolor", ui.R(x, y + 18, w, 60), 48, style: FontStyle.Black);
+        _logo.Advance(seconds);
+        _logo.Draw(scene, ui.R(x + w / 2 - 130, y + 82, 260, 76), ui.Size, _sectionFade);
+        ui.Label("A game by Stefan Seil", ui.R(x, y + 168, w, 36), 26);
+        ui.Label("Relaxing Piano Music by Kevin MacLeod (incompetech.com)", ui.R(x, y + 222, w, 24), 18);
+        ui.Label("Licensed under Creative Commons: By Attribution 3.0 License", ui.R(x, y + 246, w, 24), 18);
+        ui.Label("https://creativecommons.org/licenses/by/3.0/", ui.R(x, y + 270, w, 24), 18);
+        ui.Label("Vollkorn by Friedrich Althausen, SIL Open Font License 1.1", ui.R(x, y + 306, w, 24), 18);
+        float linkWidth = ui.TextWidth(Website, 24) / ui.Scale + 16;
+        if (ui.Link(Website, ui.R(x + (w - linkWidth) / 2, y + 352, linkWidth, 34), 24)) _context.OpenUrl?.Invoke("https://" + Website);
     }
+
+    private const string Website = "srseil.com";
 }

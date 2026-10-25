@@ -12,7 +12,7 @@ public sealed class LogoView(BoardMeshes meshes)
 
     public void Advance(double seconds) => _time += seconds;
 
-    public void Draw(Scene scene, Rect target, Vector2 screen)
+    public void Draw(Scene scene, Rect target, Vector2 screen, float alpha = 1)
     {
         var min = new Vector3(-0.5f, -0.5f, -0.5f);
         var max = new Vector3(4.5f, 1.2f, 0.5f);
@@ -33,5 +33,7 @@ public sealed class LogoView(BoardMeshes meshes)
                          * Matrix4x4.CreateRotationZ(-angle * MathF.PI / 180)
                          * Matrix4x4.CreateTranslation(pivot);
         scene.Items.Add(new DrawItem(meshes.Cube, cube, Palette.Black, Surface.Paint, Palette.Black, 0));
+        if (alpha < 1)
+            for (int i = 0; i < scene.Items.Count; i++) scene.Items[i] = scene.Items[i] with { Color = scene.Items[i].Color with { W = scene.Items[i].Color.W * alpha } };
     }
 }

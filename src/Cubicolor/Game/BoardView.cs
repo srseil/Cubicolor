@@ -287,6 +287,34 @@ public sealed class BoardView
         (new Vector3(-0.5f, -0.5f, -0.5f),
          new Vector3(_level.Columns - 0.5f, MathF.Max(1f, 0.5f * (_level.Requirements.Count + 1)), _level.Rows - 0.5f));
 
+    // The board's tiles (the exit's place among them), as the corners of each: what the camera centres on.
+    public List<Vector3> Footprint()
+    {
+        var points = new List<Vector3>();
+        for (int i = 0; i < _tiles.Length; i++)
+        {
+            Cell cell = _level.CellAt(i);
+            if (_tiles[i].Tile == null && cell != _level.Exit) continue;
+            foreach (float y in (float[]) [0f, -0.5f])
+                foreach (var (dx, dz) in ((float, float)[]) [(-0.5f, -0.5f), (0.5f, -0.5f), (-0.5f, 0.5f), (0.5f, 0.5f)])
+                    points.Add(new Vector3(cell.Column + dx, y, cell.Row + dz));
+        }
+        return points;
+    }
+
+    // Everything the camera must keep in view: the tiles, the stack at its full height and the cube.
+    public List<Vector3> Extent()
+    {
+        List<Vector3> points = Footprint();
+        float top = 0.5f * (_level.Requirements.Count + 1);
+        foreach (var (dx, dz) in ((float, float)[]) [(-0.5f, -0.5f), (0.5f, -0.5f), (-0.5f, 0.5f), (0.5f, 0.5f)])
+        {
+            points.Add(new Vector3(_level.Exit.Column + dx, top, _level.Exit.Row + dz));
+            points.Add(new Vector3(_level.Start.Column + dx, 1f, _level.Start.Row + dz));
+        }
+        return points;
+    }
+
     public void Draw(Scene scene)
     {
         if (_nextPaint is { } next && Now >= next.At)

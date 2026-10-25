@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace Cubicolor.Game;
@@ -52,5 +53,42 @@ public static class CameraFit
         float perPixel = width / target.Width;
         float frameLeft = left - target.X * perPixel, frameTop = top + target.Y * perPixel;
         return (view, Matrix4x4.CreateOrthographicOffCenter(frameLeft, frameLeft + screen.X * perPixel, frameTop - screen.Y * perPixel, frameTop, 1f, 100f));
+    }
+
+    // View and projection that put the middle of `centreOn`'s projection in the middle of the view, and make it
+    // large enough for all of `contain` around that middle, with `margin` of the view's height free at the
+    // edges. Used for the board: its tiles sit in the middle of the screen, whatever the stack beside them.
+    public static (Matrix4x4 View, Matrix4x4 Projection) FitCentred(IReadOnlyList<Vector3> centreOn, IReadOnlyList<Vector3> contain,
+                                                                    float aspect, float margin, float minHeight)
+    {
+        Vector3 centre = Vector3.Zero;
+        foreach (Vector3 p in centreOn) centre += p;
+        centre /= centreOn.Count;
+        Matrix4x4 view = Matrix4x4.CreateLookAt(centre - Forward * 50, centre, Vector3.UnitY);
+
+        var (low, high) = Extent(centreOn, view);
+        Vector2 middle = (low + high) / 2;
+        var (allLow, allHigh) = Extent(contain, view);
+        // Half the view must reach from the middle to the farthest thing on either side.
+        float halfWidth = MathF.Max(middle.X - allLow.X, allHigh.X - middle.X);
+        float halfHeight = MathF.Max(middle.Y - allLow.Y, allHigh.Y - middle.Y);
+        float height = MathF.Max(MathF.Max(2 * halfHeight, 2 * halfWidth / aspect) / (1 - 2 * margin), minHeight);
+        float width = height * aspect;
+        Matrix4x4 projection = Matrix4x4.CreateOrthographicOffCenter(
+            middle.X - width / 2, middle.X + width / 2, middle.Y - height / 2, middle.Y + height / 2, 1f, 100f);
+        return (view, projection);
+    }
+
+    private static (Vector2 Low, Vector2 High) Extent(IReadOnlyList<Vector3> points, Matrix4x4 view)
+    {
+        var low = new Vector2(float.MaxValue);
+        var high = new Vector2(float.MinValue);
+        foreach (Vector3 p in points)
+        {
+            Vector3 v = Vector3.Transform(p, view);
+            low = Vector2.Min(low, new Vector2(v.X, v.Y));
+            high = Vector2.Max(high, new Vector2(v.X, v.Y));
+        }
+        return (low, high);
     }
 }

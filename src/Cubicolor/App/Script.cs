@@ -130,6 +130,8 @@ internal sealed class Script
                 if (argument.Length < 3 || !Enum.TryParse(argument[..^2], true, out Difficulty difficulty)
                     || !int.TryParse(argument[^2..], out int number)) { Fail(line); return true; }
                 Next = new LevelScreen(context, difficulty, number);
+                // The next line waits for the new screen to be showing.
+                _waitUntil = time + 1e-6;
                 return true;
             case "screenshot":
                 _pendingScreenshot = argument;

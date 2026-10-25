@@ -78,9 +78,13 @@ static float paint_reach(float3 position, float3 normal, float3 up)
 
     float girth;
     float height;
-    if (n.y > 0.7)
+    bool far = n.y > 0.7;
+    if (far)
     {
-        height = 1.0 + (0.5 - max(abs(p.x), abs(p.z)));
+        // Inwards over the far face along a rounded square (a superellipse), so the last of it closes as a soft
+        // round shape rather than a square with corners.
+        float2 a4 = pow(abs(p.xz), 4.0);
+        height = 1.0 + max(0.0, 0.5 - pow(a4.x + a4.y, 0.25));
         girth = atan2(p.z, p.x) / (2.0 * M_PI_F) * 4.0;
     }
     else
@@ -90,8 +94,15 @@ static float paint_reach(float3 position, float3 normal, float3 up)
         if (abs(n.x) > abs(n.z)) girth = (n.x > 0 ? 0.0 : 2.0) + (n.x > 0 ? p.z : -p.z) + 0.5;
         else girth = (n.z > 0 ? 1.0 : 3.0) + (n.z > 0 ? -p.x : p.x) + 0.5;
     }
-    float tongues = 0.06 * sin(girth * 2.0 * M_PI_F * 2.0 + 0.7) + 0.04 * sin(girth * 2.0 * M_PI_F * 5.0 + 2.1);
-    return height + tongues * smoothstep(0.0, 0.3, height);
+    // The tongues: a slow wave and a quicker one along the girth. None where the paint starts; over the far face
+    // only the slow one.
+    float slow = 0.06 * sin(girth * 2.0 * M_PI_F * 2.0 + 0.7);
+    float quick = 0.04 * sin(girth * 2.0 * M_PI_F * 5.0 + 2.1) * (1.0 - smoothstep(0.95, 1.1, height));
+    // Over the far face they shrink with the distance left to its middle, so the closing shape keeps its
+    // proportions and ends as a round dot.
+    float left = far ? saturate((1.5 - height) * 2.0) : 1.0;
+    float tongues = (slow + quick) * smoothstep(0.0, 0.3, height) * left * left;
+    return height + tongues;
 }
 
 fragment float4 scene_fragment(Fragment in [[stage_in]], constant Frame& frame [[buffer(0)]], constant Draw& draw [[buffer(1)]])
