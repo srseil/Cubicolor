@@ -308,16 +308,16 @@ public sealed class MenuScreen : IScreen
     }
 
     // The credits as a column of blocks, centred in the panel: the title and the logo scene under it, then
-    // paragraphs set apart by one gap, their lines evenly spaced, and the link last.
+    // paragraphs set apart by one gap, their lines evenly spaced, and the link last. Only the music needs
+    // crediting here (CC BY); the fonts' licences ship beside them in assets/fonts.
     private void Credits(Ui ui, Rect panel, Scene scene, double seconds)
     {
         const float paragraph = 18, line = 22, small = 18;
         string[] music = ["Relaxing Piano Music by Kevin MacLeod (incompetech.com)",
                           "Licensed under Creative Commons: By Attribution 3.0 License",
                           "https://creativecommons.org/licenses/by/3.0/"];
-        string[] font = ["Vollkorn by Friedrich Althausen", "SIL Open Font License 1.1"];
         const float title = 56, logo = 84, author = 32, link = 32;
-        float height = title + 4 + logo + paragraph + author + paragraph + music.Length * line + paragraph + font.Length * line + paragraph + link;
+        float height = title + 4 + logo + paragraph + author + paragraph + music.Length * line + paragraph + link;
 
         float x = ui.DesignX(panel.X), w = PanelWidth;
         float y = ui.DesignY(panel.Y) + (PanelHeight - height) / 2;
@@ -329,12 +329,6 @@ public sealed class MenuScreen : IScreen
         ui.Label("A game by Stefan Seil", ui.R(x, y, w, author), 26);
         y += author + paragraph;
         foreach (string text in music)
-        {
-            ui.Label(text, ui.R(x, y, w, line), small);
-            y += line;
-        }
-        y += paragraph;
-        foreach (string text in font)
         {
             ui.Label(text, ui.R(x, y, w, line), small);
             y += line;
