@@ -111,8 +111,11 @@ public sealed class LevelScreen : IScreen
             if (_leaveFade <= 0) return _leaving();
         }
         ui.Overlay.Opacity = shown;
-        // The hints fade out once the level is solved (and under a panel), and stay out until it is played again.
-        bool hintsShown = !_puzzle.Solved && _panel == Panel.None && _leaving == null;
+        // The hints fade in once the board has first risen, and out under a panel or once the cube lands on the
+        // exit, staying out until the level is played again.
+        _hintsArrived |= _board.Ready();
+        bool landed = _completeAt is { } done && _board.Now >= done - CompleteDelay;
+        bool hintsShown = _hintsArrived && !landed && _panel == Panel.None && _leaving == null;
         _hintFade = Math.Clamp(_hintFade + (hintsShown ? 1 : -1) * (float) seconds / 0.3f, 0, 1);
         DrawHud(ui, settings, shown);
 
@@ -243,13 +246,17 @@ public sealed class LevelScreen : IScreen
         _context.Saves.SaveProgress();
         if (Level.Number == Simulation.Levels.Level.PerDifficulty) _context.Achievements.Unlock(Level.Difficulty);
         PlayAt(landed, Sound.Solve);
-        _completeAt = landed + 0.4;
+        _completeAt = landed + CompleteDelay;
     }
 
     // "Level 3" in the current language, made again only when the language changes.
     private (Strings? Strings, string Text) _title;
 
-    private float _hintFade = 1;
+    private float _hintFade;
+    private bool _hintsArrived;
+
+    // How long after the cube lands on the exit the Completed panel comes up.
+    private const double CompleteDelay = 0.4;
 
     private static readonly string[] FirstHints = ["1.  Color the cube.", "2.  Match it with the colored tile.", "3.  Get to the exit."];
     private static readonly string[] SecondHints = ["You can reset the level by pressing the restart button."];
