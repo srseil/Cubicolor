@@ -215,9 +215,12 @@ public sealed class LevelScreen : IScreen
         if (move.Solved) Solve(landed);
     }
 
+    // At the start already, there is nothing to restart.
+    private bool CanRestart => _puzzle.Moves > 0 || _puzzle.Solved;
+
     public void Restart()
     {
-        if (_puzzle.Moves == 0 && !_puzzle.Solved) return;
+        if (!CanRestart) return;
         _puzzle.Restart();
         _board.Restart();
         _completeAt = null;
@@ -267,7 +270,7 @@ public sealed class LevelScreen : IScreen
         Rect panel = CentredPanel(ui, 3);
         ui.Label("Pause", new Rect(panel.X, panel.Y + ui.Px(16), panel.Width, ui.Px(44)), 36);
         if (ui.Button("Resume", Row(ui, panel, 0))) _panel = Panel.None;
-        if (ui.Button("Restart", Row(ui, panel, 1))) Restart();
+        if (ui.Button("Restart", Row(ui, panel, 1), enabled: CanRestart)) Restart();
         if (ui.Button("Main Menu", Row(ui, panel, 2))) Leave(() => new MenuScreen(_context, Level.Difficulty));
         return null;
     }
