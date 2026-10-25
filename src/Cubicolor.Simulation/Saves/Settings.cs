@@ -30,6 +30,19 @@ public sealed class Settings
     public (int Width, int Height)? WindowSize { get; set; }
 
     public Dictionary<GameAction, Key> Keys { get; } = DefaultKeys();
+    public Dictionary<GameAction, PadButton> Pad { get; } = DefaultPad();
+
+    // On a controller the d-pad moves (the left stick always does too), B restarts and Menu pauses, as the
+    // earlier versions had it.
+    public static Dictionary<GameAction, PadButton> DefaultPad() => new()
+    {
+        [GameAction.Forwards] = PadButton.Up,
+        [GameAction.Backwards] = PadButton.Down,
+        [GameAction.Left] = PadButton.Left,
+        [GameAction.Right] = PadButton.Right,
+        [GameAction.Restart] = PadButton.East,
+        [GameAction.Pause] = PadButton.Menu,
+    };
 
     public static Dictionary<GameAction, Key> DefaultKeys() => new()
     {

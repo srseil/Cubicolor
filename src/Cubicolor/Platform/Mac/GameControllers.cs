@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using Cubicolor.Utilities;
@@ -31,6 +32,7 @@ internal static class GameControllers
         }
 
         using var pool = AutoreleasePool.Push();
+        LearnSymbols();
         IntPtr controller = Send<IntPtr>(_class, SelCurrent);
         if (controller == IntPtr.Zero || Send<IntPtr>(controller, SelExtended) == IntPtr.Zero)
         {
@@ -83,5 +85,61 @@ internal static class GameControllers
         GamepadButtons pressed = held & ~_previous;
         _previous = held;
         return new GamepadState(held, pressed) { Connected = true };
+    }
+
+    // ---- the buttons' symbols ----
+
+    // Every connected controller's SF Symbols name for each button, as GameController gives it
+    // (GCControllerElement.unmappedSfSymbolsName: the button's own symbol, for a game's remapping screen).
+    // Relearned whenever the set of controllers changes.
+    private static IntPtr[] _known = [];
+    private static readonly List<Dictionary<GamepadButtons, string>> _symbols = [];
+
+    // The distinct symbols for `button` across the connected controllers; empty when none has one.
+    public static IReadOnlyList<string> SymbolsFor(GamepadButtons button)
+    {
+        var names = new List<string>(2);
+        foreach (Dictionary<GamepadButtons, string> controller in _symbols)
+            if (controller.TryGetValue(button, out string? name) && !names.Contains(name)) names.Add(name);
+        return names;
+    }
+
+    private static readonly (GamepadButtons Button, string[] Path)[] Elements =
+    [
+        (GamepadButtons.South, ["buttonA"]), (GamepadButtons.East, ["buttonB"]),
+        (GamepadButtons.West, ["buttonX"]), (GamepadButtons.North, ["buttonY"]),
+        (GamepadButtons.LeftShoulder, ["leftShoulder"]), (GamepadButtons.RightShoulder, ["rightShoulder"]),
+        (GamepadButtons.Menu, ["buttonMenu"]), (GamepadButtons.Options, ["buttonOptions"]),
+        (GamepadButtons.Up, ["dpad", "up"]), (GamepadButtons.Down, ["dpad", "down"]),
+        (GamepadButtons.Left, ["dpad", "left"]), (GamepadButtons.Right, ["dpad", "right"]),
+    ];
+
+    private static void LearnSymbols()
+    {
+        IntPtr all = Send<IntPtr>(_class, SelControllers);
+        int count = (int) Send<nuint>(all, SelCount);
+        var current = new IntPtr[count];
+        for (int i = 0; i < count; i++) current[i] = Send<IntPtr, nuint>(all, SelAt, (nuint) i);
+        if (current.AsSpan().SequenceEqual(_known)) return;
+        _known = current;
+        _symbols.Clear();
+        foreach (IntPtr controller in current)
+        {
+            IntPtr pad = Send<IntPtr>(controller, SelExtended);
+            if (pad == IntPtr.Zero) continue;
+            var map = new Dictionary<GamepadButtons, string>();
+            foreach (var (button, path) in Elements)
+            {
+                IntPtr element = pad;
+                foreach (string name in path)
+                {
+                    IntPtr selector = Sel(name);
+                    element = element == IntPtr.Zero || Send<byte, IntPtr>(element, SelResponds, selector) == 0 ? IntPtr.Zero : Send<IntPtr>(element, selector);
+                }
+                if (element == IntPtr.Zero || Send<byte, IntPtr>(element, SelResponds, Sel("unmappedSfSymbolsName")) == 0) continue;
+                if (Str(Send<IntPtr>(element, Sel("unmappedSfSymbolsName"))) is { Length: > 0 } symbol) map.TryAdd(button, symbol);
+            }
+            _symbols.Add(map);
+        }
     }
 }

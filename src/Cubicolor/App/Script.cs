@@ -17,6 +17,7 @@ namespace Cubicolor.App;
 //   wait ready                  until the level takes input (or fail after 10 s)
 //   press <Key>                 a key for one frame (Key enum names: Up, Return, Escape, R, ...)
 //   pad <button>                a controller button for one frame (South, East, Menu, Up, ...)
+//   controller on|off           a controller connected (or not) without pressing anything
 //   click "<label>"             the widget with that label, as the mouse would
 //   moves <FBLR...>             rolls, each once the cube is ready
 //   play <level>                straight into a level, e.g. play genius07
@@ -110,6 +111,9 @@ internal sealed class Script
                 if (!Enum.TryParse(argument, out GamepadButtons button)) { Fail(line); return true; }
                 _input.Press(button);
                 _waitUntil = time + 1.0 / 30;
+                return true;
+            case "controller":
+                _input.Connected = argument == "on";
                 return true;
             case "click":
                 string label = argument.Trim('"');

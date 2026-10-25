@@ -15,7 +15,10 @@ internal sealed class ScriptedInput : IInput
 
     public Vector2 MousePosition { get; set; } = new(-1, -1);
     public float ScrollDelta => 0;
-    public GamepadState Gamepad => new(_pad, _pad) { Connected = _pad != GamepadButtons.None };
+    public GamepadState Gamepad => new(_pad, _pad) { Connected = Connected || _pad != GamepadButtons.None };
+
+    // A controller plugged in for the script, pressed or not.
+    public bool Connected { get; set; }
 
     public void Press(Key key) => _pressNext.Add(key);
     public void Press(GamepadButtons button) => _padNext |= button;

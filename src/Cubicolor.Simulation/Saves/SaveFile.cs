@@ -82,6 +82,8 @@ public static class SaveFile
             yield return ("window_size", FormattableString.Invariant($"{width}x{height}"));
         foreach (var (action, key) in s.Keys)
             yield return ("key." + Name(action), key.ToString());
+        foreach (var (action, button) in s.Pad)
+            yield return ("pad." + Name(action), button.ToString());
     }
 
     public static Settings ParseSettings(string text)
@@ -100,6 +102,9 @@ public static class SaveFile
         foreach (GameAction action in Enum.GetValues<GameAction>())
             if (values.TryGetValue("key." + Name(action), out v) && Enum.TryParse(v, out Input.Key key) && Enum.IsDefined(key) && key != Input.Key.Unknown)
                 s.Keys[action] = key;
+        foreach (GameAction action in Enum.GetValues<GameAction>())
+            if (values.TryGetValue("pad." + Name(action), out v) && Enum.TryParse(v, out Input.PadButton button) && Enum.IsDefined(button))
+                s.Pad[action] = button;
         return s;
     }
 

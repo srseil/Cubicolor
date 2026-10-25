@@ -72,4 +72,8 @@ public interface IInput
     float ScrollDelta { get; }
 
     GamepadState Gamepad { get; }
+
+    // The controller's own symbols for a button (SF Symbols names), one per kind of controller connected; empty
+    // when none names one (no controller, or a platform without symbols).
+    IReadOnlyList<string> SymbolsFor(GamepadButtons button) => [];
 }

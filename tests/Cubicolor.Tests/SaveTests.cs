@@ -71,6 +71,7 @@ public sealed class SaveTests : IDisposable
         progress.Merge(LegacySaves.ReadGodotProgress([16, 4, 255])!);
         var settings = new Settings { DarkBackground = true, MusicVolume = 0.25, WindowSize = (1600, 900) };
         settings.Keys[GameAction.Restart] = Key.R;
+        settings.Pad[GameAction.Restart] = PadButton.West;
 
         Progress readProgress = SaveFile.ParseProgress(SaveFile.FormatProgress(progress));
         Settings read = SaveFile.ParseSettings(SaveFile.FormatSettings(settings));
@@ -81,6 +82,8 @@ public sealed class SaveTests : IDisposable
         Assert.Equal((1600, 900), read.WindowSize);
         Assert.Equal(Key.R, read.Keys[GameAction.Restart]);
         Assert.Equal(Key.Up, read.Keys[GameAction.Forwards]);
+        Assert.Equal(PadButton.West, read.Pad[GameAction.Restart]);
+        Assert.Equal(PadButton.Menu, read.Pad[GameAction.Pause]);
     }
 
     // --- Godot ---

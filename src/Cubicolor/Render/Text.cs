@@ -21,6 +21,10 @@ public sealed class Text : IDisposable
     private readonly OverlayAtlas _atlas;
     private readonly Dictionary<(FontStyle, int), IFontFace> _faces = [];
     private readonly Dictionary<(FontStyle, int, char), Glyph?> _glyphs = [];
+    private readonly Dictionary<(string, int), Glyph?> _symbols = [];
+
+    // Draws a named symbol (on macOS an SF Symbol) at a pixel size, or null on platforms without them.
+    public Func<string, float, GlyphInk?>? Symbols { get; set; }
 
     private sealed record Glyph(Vector2 UvTopLeft, Vector2 UvBottomRight, int Width, int Height, int Left, int Top);
 
@@ -90,12 +94,39 @@ public sealed class Text : IDisposable
                 // Sizes come and go with the window: start the atlas over rather than fill it for good.
                 _atlas.Clear();
                 _glyphs.Clear();
+                _symbols.Clear();
             }
             var (topLeft, bottomRight) = _atlas.Add(ink.Width, ink.Height, ink.Coverage);
             glyph = new Glyph(topLeft, bottomRight, ink.Width, ink.Height, ink.Left, ink.Top);
         }
         _glyphs[(style, pixels, c)] = glyph;
         return glyph;
+    }
+
+    // A named symbol, `size` pixels high, centred on `centre`; false when there is no such symbol to draw.
+    public bool DrawSymbol(Overlay overlay, string name, Vector2 centre, float size, Vector4 color)
+    {
+        int pixels = Pixels(size);
+        if (!_symbols.TryGetValue((name, pixels), out Glyph? glyph))
+        {
+            GlyphInk? ink = Symbols?.Invoke(name, pixels);
+            if (ink != null)
+            {
+                if (!_atlas.Fits(ink.Width, ink.Height))
+                {
+                    _atlas.Clear();
+                    _glyphs.Clear();
+                    _symbols.Clear();
+                }
+                var (topLeft, bottomRight) = _atlas.Add(ink.Width, ink.Height, ink.Coverage);
+                glyph = new Glyph(topLeft, bottomRight, ink.Width, ink.Height, 0, 0);
+            }
+            _symbols[(name, pixels)] = glyph;
+        }
+        if (glyph == null) return false;
+        float x = MathF.Round(centre.X - glyph.Width / 2f), y = MathF.Round(centre.Y - glyph.Height / 2f);
+        overlay.Image(new Rect(x, y, glyph.Width, glyph.Height), glyph.UvTopLeft, glyph.UvBottomRight, color);
+        return true;
     }
 
     private static int Pixels(float size) => Math.Max(4, (int) MathF.Round(size));

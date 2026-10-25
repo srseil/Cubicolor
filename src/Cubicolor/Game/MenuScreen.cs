@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Numerics;
+using Cubicolor.Platform;
 using Cubicolor.Render;
 using Cubicolor.Simulation.Input;
 using Cubicolor.Simulation.Levels;
@@ -21,7 +22,7 @@ public sealed class MenuScreen : IScreen
     private Section _section = Section.Play, _sectionShown = Section.Play;
     private float _sectionFade = 1;
     private Difficulty _difficulty;
-    private GameAction? _rebinding;
+    private (GameAction Action, bool Pad)? _rebinding;
 
     public MenuScreen(GameContext context, Difficulty difficulty = Difficulty.Normal)
     {
@@ -45,9 +46,11 @@ public sealed class MenuScreen : IScreen
         ui.Label("Cubicolor", ui.R(0, 28, width, 100), 84, style: FontStyle.Black);
         _previewCooldown -= seconds;
 
-        if (_rebinding is { } action)
+        if (_rebinding is { } rebinding)
         {
-            Capture(ui, action);
+            // The press that sets a binding must not also move the focus or press a button.
+            ui.Hold();
+            Capture(ui, rebinding.Action, rebinding.Pad);
         }
         else if (ui.Navigation.Back && _section != Section.Play)
         {
@@ -98,7 +101,7 @@ public sealed class MenuScreen : IScreen
     private string? FirstInPanel() => _section switch
     {
         Section.Play => _difficulty.ToString(),
-        Section.Controls => "Forwards:",
+        Section.Controls => "Forwards key",
         Section.Settings => "Dark Background",
         _ => null,
     };
@@ -125,48 +128,87 @@ public sealed class MenuScreen : IScreen
         return null;
     }
 
+    // Each action's key and controller button, side by side. A controller's buttons show as the controller's
+    // own symbols and can be changed while one is connected; without one, they are named in text.
     private void Controls(Ui ui, Rect panel)
     {
         Settings settings = _context.Saves.Settings;
+        bool connected = ui.Input.Gamepad.Connected;
         float x = ui.DesignX(panel.X) + 60, y = ui.DesignY(panel.Y) + 24;
-        ui.Label("Player Movement", ui.P(x, y), 28);
-        (GameAction Action, string Label, string Pad)[] rows =
+        ui.Label("Keyboard", ui.R(x + 220, y, 200, 30), 24);
+        ui.Label("Controller", ui.R(x + 460, y, 200, 30), 24);
+        (GameAction Action, string Label)[] rows =
         [
-            (GameAction.Forwards, "Forwards:", ""),
-            (GameAction.Backwards, "Backwards:", "Analog stick"),
-            (GameAction.Left, "Left:", "or D-Pad"),
-            (GameAction.Right, "Right:", ""),
-            (GameAction.Restart, "Restart:", "B / Circle"),
-            (GameAction.Pause, "Pause Menu:", "Start / Options"),
+            (GameAction.Forwards, "Forwards"), (GameAction.Backwards, "Backwards"), (GameAction.Left, "Left"), (GameAction.Right, "Right"),
+            (GameAction.Restart, "Restart"), (GameAction.Pause, "Pause Menu"),
         ];
         float rowY = y + 44;
         for (int i = 0; i < rows.Length; i++)
         {
-            var (action, label, pad) = rows[i];
-            if (i == 4)
-            {
-                ui.Label("Level Control", ui.P(x, rowY + 6), 28);
-                rowY += 44;
-            }
+            var (action, label) = rows[i];
+            if (i == 4) rowY += 14;
             ui.Label(label, ui.P(x + 20, rowY + 8), 24);
-            string name = _rebinding == action ? "Press a key" : KeyName(settings.Keys[action]);
-            if (ui.Button(name, ui.R(x + 200, rowY, 220, 40), 22, id: label)) _rebinding = action;
-            if (pad.Length > 0) ui.Label(pad, ui.P(x + 460, rowY + 8), 22);
+            string key = _rebinding == (action, false) ? "Press a key" : KeyName(settings.Keys[action]);
+            if (ui.Button(key, ui.R(x + 220, rowY, 200, 40), 22, id: $"{label} key")) _rebinding = (action, false);
+            GamepadButtons button = Flag(settings.Pad[action]);
+            bool capturing = _rebinding == (action, true);
+            if (ui.SymbolButton($"{label} button", ui.R(x + 460, rowY, 200, 40), capturing ? [] : ui.Input.SymbolsFor(button),
+                                capturing ? "Press a button" : PadName(settings.Pad[action]), enabled: connected))
+                _rebinding = (action, true);
             rowY += 50;
         }
+        ui.Label(connected ? "The left stick moves the cube too." : "Connect a controller to change its buttons.",
+                 ui.R(x + 20, rowY + 8, 640, 30), 20);
     }
 
-    // The next key pressed becomes the binding. A key already bound elsewhere swaps with this one, so no
-    // action is ever left without a key.
-    private void Capture(Ui ui, GameAction action)
+    private static GamepadButtons Flag(PadButton button) => (GamepadButtons) (1 << (int) button);
+
+    // A controller button's name in the Xbox layout's letters, for when no symbol is there to show.
+    private static string PadName(PadButton button) => button switch
     {
-        Key? key = ui.Input.PressedThisFrame().FirstOrDefault(k => k != Key.Unknown);
-        if (key is not { } pressed || pressed == Key.Unknown) return;
+        PadButton.South => "A",
+        PadButton.East => "B",
+        PadButton.West => "X",
+        PadButton.North => "Y",
+        PadButton.LeftShoulder => "LB",
+        PadButton.RightShoulder => "RB",
+        PadButton.Menu => "Menu",
+        PadButton.Options => "View",
+        PadButton.Up => "D-Pad Up",
+        PadButton.Down => "D-Pad Down",
+        PadButton.Left => "D-Pad Left",
+        _ => "D-Pad Right",
+    };
+
+    // The next key or controller button pressed becomes the binding. One already bound to another action swaps
+    // with this one, so no action is ever left without one. Escape leaves a controller binding as it was.
+    private void Capture(Ui ui, GameAction action, bool pad)
+    {
         Settings settings = _context.Saves.Settings;
-        foreach (var (other, bound) in settings.Keys.ToArray())
-            if (bound == pressed && other != action)
-                settings.Keys[other] = settings.Keys[action];
-        settings.Keys[action] = pressed;
+        if (pad)
+        {
+            if (ui.Input.Pressed(Key.Escape) || !ui.Input.Gamepad.Connected)
+            {
+                _rebinding = null;
+                return;
+            }
+            GamepadButtons pressed = ui.Input.Gamepad.Pressed;
+            PadButton? chosen = null;
+            foreach (PadButton b in Enum.GetValues<PadButton>())
+                if ((pressed & Flag(b)) != 0) { chosen = b; break; }
+            if (chosen is not { } button) return;
+            foreach (var (other, bound) in settings.Pad.ToArray())
+                if (bound == button && other != action) settings.Pad[other] = settings.Pad[action];
+            settings.Pad[action] = button;
+        }
+        else
+        {
+            Key key = ui.Input.PressedThisFrame().FirstOrDefault(k => k != Key.Unknown);
+            if (key == Key.Unknown) return;
+            foreach (var (other, bound) in settings.Keys.ToArray())
+                if (bound == key && other != action) settings.Keys[other] = settings.Keys[action];
+            settings.Keys[action] = key;
+        }
         _context.Saves.SaveSettings();
         _rebinding = null;
     }

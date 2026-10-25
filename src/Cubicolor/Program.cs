@@ -117,7 +117,7 @@ internal static class Program
     private static GameContext Context(IRenderer renderer, SaveStore saves, string assets, IFontLoader fonts, IAudio audio,
                                        IAchievements achievements)
     {
-        var text = new Text(fonts, Path.Combine(assets, "fonts"), new OverlayAtlas(renderer.Atlas));
+        var text = new Text(fonts, Path.Combine(assets, "fonts"), new OverlayAtlas(renderer.Atlas)) { Symbols = SymbolImages.Rasterize };
         audio.Apply(saves.Settings);
         return new GameContext(renderer, BoardMeshes.Upload(renderer), new Ui(text), saves, audio, achievements,
             Path.Combine(assets, "levels"));

@@ -234,6 +234,36 @@ public sealed class Ui
         return activated;
     }
 
+    // Undoes this frame's navigation and leaves nothing to be activated: while a binding is being captured, the
+    // key or button pressed for it must do nothing else.
+    public void Hold()
+    {
+        _focus = FocusBefore;
+        Navigation = default;
+        Interactive = false;
+    }
+
+    // A button showing symbols (a controller's own, for one of its buttons) instead of a label, or `text` when
+    // there are none.
+    public bool SymbolButton(string id, Rect rect, IReadOnlyList<string> symbols, string text, bool enabled = true)
+    {
+        var (focused, activated) = Interact(id, rect, enabled);
+        float radius = Px(5);
+        FocusRing(rect, radius);
+        Overlay.RoundedRectangle(rect, radius, enabled ? Style.Button : Style.Disabled);
+        Vector4 color = enabled ? Style.ButtonText : Style.DisabledText;
+        float size = rect.Height * 0.6f, gap = Px(10);
+        float x = rect.Centre.X - (symbols.Count * size + (symbols.Count - 1) * gap) / 2 + size / 2;
+        bool drawn = symbols.Count > 0;
+        foreach (string symbol in symbols)
+        {
+            drawn &= _text.DrawSymbol(Overlay, symbol, new Vector2(x, rect.Centre.Y), size, color);
+            x += size + gap;
+        }
+        if (!drawn) Label(text, rect, 22, color);
+        return activated;
+    }
+
     // A web link: text underlined, activated like a button.
     public bool Link(string text, Rect rect, float textSize = 24)
     {

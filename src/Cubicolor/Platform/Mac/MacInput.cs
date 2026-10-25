@@ -38,6 +38,7 @@ internal sealed class MacInput : IInput
     public Vector2 MousePosition => _mousePosition;
     public float ScrollDelta => _scrollDelta;
     public GamepadState Gamepad => _gamepad;
+    public IReadOnlyList<string> SymbolsFor(GamepadButtons button) => GameControllers.SymbolsFor(button);
 
     public void Poll()
     {

@@ -48,12 +48,12 @@ public sealed class LevelScreen : IScreen
 
         if (_panel == Panel.None)
         {
-            if (Pressed(input, settings.Keys[GameAction.Pause]) || input.Gamepad.WasPressed(GamepadButtons.Menu))
+            if (Pressed(input, settings.Keys[GameAction.Pause]) || input.Gamepad.WasPressed(Pad(settings, GameAction.Pause)))
             {
                 _panel = Panel.Pause;
                 ui.Focus("Resume", force: true);
             }
-            else if (Pressed(input, settings.Keys[GameAction.Restart]) || input.Gamepad.WasPressed(GamepadButtons.East))
+            else if (Pressed(input, settings.Keys[GameAction.Restart]) || input.Gamepad.WasPressed(Pad(settings, GameAction.Restart)))
             {
                 Restart();
             }
@@ -116,17 +116,20 @@ public sealed class LevelScreen : IScreen
 
     private static bool Pressed(IInput input, Key key) => key != Key.Unknown && input.Pressed(key);
 
+    private static GamepadButtons Pad(Settings settings, GameAction action) => (GamepadButtons) (1 << (int) settings.Pad[action]);
+
     // A roll pressed on the player's keys, the d-pad or the stick. Each roll is its own press: holding a key
     // does not roll on, since every tile left behind is gone for good.
     private static Direction? MoveInput(IInput input, Settings settings)
     {
         GamepadState pad = input.Gamepad;
+        // The bound buttons, and the left stick always.
         (GameAction Action, GamepadButtons Pad, Direction Direction)[] moves =
         [
-            (GameAction.Forwards, GamepadButtons.Up | GamepadButtons.StickUp, Direction.Forwards),
-            (GameAction.Backwards, GamepadButtons.Down | GamepadButtons.StickDown, Direction.Backwards),
-            (GameAction.Left, GamepadButtons.Left | GamepadButtons.StickLeft, Direction.Left),
-            (GameAction.Right, GamepadButtons.Right | GamepadButtons.StickRight, Direction.Right),
+            (GameAction.Forwards, Pad(settings, GameAction.Forwards) | GamepadButtons.StickUp, Direction.Forwards),
+            (GameAction.Backwards, Pad(settings, GameAction.Backwards) | GamepadButtons.StickDown, Direction.Backwards),
+            (GameAction.Left, Pad(settings, GameAction.Left) | GamepadButtons.StickLeft, Direction.Left),
+            (GameAction.Right, Pad(settings, GameAction.Right) | GamepadButtons.StickRight, Direction.Right),
         ];
         foreach (var (action, buttons, direction) in moves)
             if (Pressed(input, settings.Keys[action]) || pad.WasPressed(buttons))
