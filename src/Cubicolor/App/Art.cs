@@ -133,7 +133,7 @@ internal sealed class Art(GameContext context, Text text, string solutions, Acti
     // How the macOS icon's rounded square is drawn: flat, or as a plaque with depth.
     public enum Plaque { Flat, Edged, Raised, Glint }
 
-    public Plaque IconPlaque { get; set; } = Plaque.Flat;
+    public Plaque IconPlaque { get; set; } = Plaque.Edged;
 
     // The rounded square under the cube on macOS, in Apple's grid. Edged: a front edge below it as the game's
     // tiles have, and light falling from above across its face. Raised: also a bevelled rim, a soft shadow
@@ -245,7 +245,7 @@ internal sealed class Art(GameContext context, Text text, string solutions, Acti
             IconPlaque = plaque;
             Icon(directory, $"icon_macos_{plaque.ToString().ToLowerInvariant()}", 1024, IconKind.MacOS);
         }
-        IconPlaque = Plaque.Flat;
+        IconPlaque = Plaque.Edged;
     }
 
     // The macOS icon set: every size iconutil wants, from which packaging makes Cubicolor.icns.

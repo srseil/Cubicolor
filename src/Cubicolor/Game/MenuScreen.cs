@@ -24,12 +24,21 @@ public sealed class MenuScreen : IScreen
     private Difficulty _difficulty;
     private (GameAction Action, bool Pad)? _rebinding;
 
+    // Back from a level, the menu opens on Play with that level's difficulty chosen.
     public MenuScreen(GameContext context, Difficulty difficulty = Difficulty.Normal)
     {
         _context = context;
         _difficulty = difficulty;
         _logo = new LogoView(context.Meshes);
         context.Ui.Focus("Play", force: true);
+    }
+
+    // When the game starts, the menu opens on the Credits, as the earlier versions did.
+    public static MenuScreen AtStart(GameContext context)
+    {
+        var menu = new MenuScreen(context) { _section = Section.Credits, _sectionShown = Section.Credits };
+        context.Ui.Focus("Credits", force: true);
+        return menu;
     }
 
     // Shows a key's name as the keyboard layout prints it, and the symbol for one that has a symbol rather
@@ -72,7 +81,7 @@ public sealed class MenuScreen : IScreen
         for (int i = 0; i < items.Length; i++)
         {
             var (label, section) = items[i];
-            if (ui.Button(label, ui.R(left, PanelTop + 8 + i * 62, SectionsWidth, 48), selected: section == _section && section != null))
+            if (ui.Button(label, ui.R(left, SectionsTop + i * 62, SectionsWidth, 48), selected: section == _section && section != null))
             {
                 if (section is { } s) _section = s;
                 else _context.QuitRequested = true;
@@ -99,8 +108,9 @@ public sealed class MenuScreen : IScreen
         return next;
     }
 
-    // The sections and the panel, centred on the canvas.
+    // The section buttons and the panel, each centred on the canvas on its own.
     private const float SectionsWidth = 210, PanelWidth = 640, PanelHeight = 420, PanelTop = (Ui.CanvasHeight - PanelHeight) / 2;
+    private const float SectionsTop = (Ui.CanvasHeight - (5 * 62 - 14)) / 2;
 
     // Settings and Controls stand on one grid of rows, from the same top with the same pitch, so their rows line
     // up as the panel switches between them; a gap sets groups apart.

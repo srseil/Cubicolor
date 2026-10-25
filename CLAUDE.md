@@ -49,7 +49,7 @@ dotnet test --filter-class Cubicolor.Tests.PuzzleTests
 ### Running the game headless
 
 ```bash
-dotnet run --project src/Cubicolor -- --headless --timeout 60 --exec "wait 0.3; click \"Normal 1\"; wait ready; moves LBLFLBL; wait 1.5; expect state completed; screenshot scratch/done.png" > scratch/run.log 2>&1; echo "exit: $?"
+dotnet run --project src/Cubicolor -- --headless --timeout 60 --exec "wait 0.3; click \"Play\"; click \"Normal 1\"; wait ready; moves LBLFLBL; wait 1.5; expect state completed; screenshot scratch/done.png" > scratch/run.log 2>&1; echo "exit: $?"
 ```
 
 - A script is commands one per line or `;`-separated (`App/Script.cs` lists them): `wait <s>`, `wait ready`,

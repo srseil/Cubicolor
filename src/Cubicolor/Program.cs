@@ -126,7 +126,7 @@ internal static class Program
     private static string MusicPath(string assets) => Path.Combine(assets, "music", "soundtrack.qoa");
 
     private static IScreen FirstScreen(GameContext context, string? level) => level == null
-        ? new MenuScreen(context)
+        ? MenuScreen.AtStart(context)
         : new LevelScreen(context, Enum.Parse<Difficulty>(level[..^2], ignoreCase: true), int.Parse(level[^2..], CultureInfo.InvariantCulture));
 
     private static int RunHeadless(SaveStore saves, string assets, int width, int height, string? scriptText, string? level, double timeout,
