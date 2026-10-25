@@ -101,6 +101,18 @@ internal static unsafe class AppKit
         Send<IntPtr, ulong, IntPtr, IntPtr, byte>(App, SelNextEvent, ulong.MaxValue, until, NSString("kCFRunLoopDefaultMode"), 0);
     }
 
+    // The languages the user prefers, most preferred first, as tags ("de-DE", "zh-Hans-CN").
+    public static string[] PreferredLanguages()
+    {
+        using var pool = AutoreleasePool.Push();
+        IntPtr array = Send<IntPtr>(Class("NSLocale"), Sel("preferredLanguages"));
+        int count = (int) Send<nuint>(array, Sel("count"));
+        var tags = new string[count];
+        for (int i = 0; i < count; i++)
+            tags[i] = Marshal.PtrToStringUTF8(Send<IntPtr>(Send<IntPtr, nuint>(array, Sel("objectAtIndex:"), (nuint) i), Sel("UTF8String"))) ?? "";
+        return tags;
+    }
+
     // A web page in the default browser.
     public static void OpenUrl(string url)
     {

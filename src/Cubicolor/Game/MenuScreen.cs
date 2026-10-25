@@ -259,9 +259,19 @@ public sealed class MenuScreen : IScreen
         (s.MusicVolume, s.SoundVolume, s.MusicMuted, s.SoundMuted) = (music, sound, musicMuted, soundMuted);
 
         bool fullscreen = s.Fullscreen, vsync = s.VSync;
-        display |= ui.Toggle("Fullscreen", ui.R(x, RowY(y, 6, 3), width, RowHeight), ref fullscreen);
-        display |= ui.Toggle("VSync", ui.R(x, RowY(y, 7, 3), width, RowHeight), ref vsync);
+        display |= ui.Toggle("Fullscreen", ui.R(x, RowY(y, 6, 3), width / 2, RowHeight), ref fullscreen);
+        display |= ui.Toggle("VSync", ui.R(x + width / 2, RowY(y, 6, 3), width / 2, RowHeight), ref vsync);
         (s.Fullscreen, s.VSync) = (fullscreen, vsync);
+
+        // Each language by its own name; choosing one keeps it, whatever Steam or the system say.
+        int language = (int) _context.Language;
+        if (ui.Choice("Language", ui.R(x, RowY(y, 7, 3), width, RowHeight), ui.Px(240), ref language, Languages.Count,
+                      i => ((Language) i).NativeName()))
+        {
+            s.Language = (Language) language;
+            changed = true;
+            _context.ApplyLanguage();
+        }
 
         if (changed || display)
         {

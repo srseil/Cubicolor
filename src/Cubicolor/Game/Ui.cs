@@ -127,9 +127,14 @@ public sealed class Ui
                 Direction.Left => -d.X,
                 _ => d.X,
             };
-            float across = direction is Direction.Forwards or Direction.Backwards ? MathF.Abs(d.X) : MathF.Abs(d.Y);
+            // What lines up with this widget at all comes first (half a row of toggles under a whole row, the
+            // toggle beside one), then the nearest, then what is centred on it.
+            bool vertical = direction is Direction.Forwards or Direction.Backwards;
+            float gap = vertical ? MathF.Max(0, MathF.Max(rect.X - from.Right, from.X - rect.Right))
+                                 : MathF.Max(0, MathF.Max(rect.Y - from.Bottom, from.Y - rect.Bottom));
+            float across = vertical ? MathF.Abs(d.X) : MathF.Abs(d.Y);
             if (along <= 1f) continue;
-            float score = along + across * 2;
+            float score = (gap > 0 ? 100_000 : 0) + gap * 2 + along + across * 0.25f;
             if (score < bestScore)
             {
                 bestScore = score;
@@ -152,16 +157,35 @@ public sealed class Ui
 
     // --- Text ---
 
-    public float TextWidth(string text, float size, FontStyle style = FontStyle.Regular) => _text.Measure(text, style, Px(size));
+    // Every text the UI is given is English and shows in the current language (see Strings); widgets keep the
+    // English as their id.
+    public Strings Strings { get; set; } = Strings.English;
+
+    public string Tr(string english) => Strings[english];
+
+    public IReadOnlyList<string> FallbackFonts
+    {
+        get => _text.Fallbacks;
+        set => _text.Fallbacks = value;
+    }
+
+    public float TextWidth(string text, float size, FontStyle style = FontStyle.Regular) => _text.Measure(Tr(text), style, Px(size));
 
     public void Label(string text, Vector2 position, float size, Vector4? color = null, FontStyle style = FontStyle.Regular) =>
-        _text.Draw(Overlay, text, position, style, Px(size), color ?? TextColor);
+        _text.Draw(Overlay, Tr(text), position, style, Px(size), color ?? TextColor);
 
-    // Text centred in a rectangle.
     // Text in a rectangle: vertically centred, and centred, left or right aligned across it.
+    // A translation longer than the English is set smaller until it fits.
     public void Label(string text, Rect rect, float size, Vector4? color = null, FontStyle style = FontStyle.Regular, Align align = Align.Centre)
     {
+        text = Tr(text);
         float width = _text.Measure(text, style, Px(size));
+        float room = rect.Width - Px(align == Align.Centre ? 12 : 0);
+        if (width > room && room > 0)
+        {
+            size *= room / width;
+            width = _text.Measure(text, style, Px(size));
+        }
         float height = _text.LineHeight(style, Px(size));
         float x = align switch
         {
@@ -349,7 +373,29 @@ public sealed class Ui
         return Math.Abs(before - value) > 1e-9;
     }
 
-    // A panel behind a group of widgets.
+    // One of `count` choices, shown as `shown(index)` in a box at the row's right end with the label at its left:
+    // left and right step through them while the row has focus (and do not move focus away), a click on the box
+    // steps forward. Returns whether the choice changed.
+    public bool Choice(string label, Rect row, float boxWidth, ref int index, int count, Func<int, string> shown, float textSize = 24)
+    {
+        var (focused, activated) = Interact(label, row, true);
+        _sliders.Add(label);
+        int before = index;
+        var box = new Rect(row.Right - boxWidth, row.Y, boxWidth, row.Height);
+        if (focused && Navigation.Move == Direction.Left) index = (index + count - 1) % count;
+        if (focused && Navigation.Move == Direction.Right) index = (index + 1) % count;
+        if (activated) index = (index + 1) % count;
+        Label(label, new Rect(row.X, row.Y, row.Width - boxWidth - Px(12), row.Height), textSize, align: Align.Left);
+        float radius = Px(5);
+        FocusRing(box, radius);
+        Overlay.RoundedRectangle(box, radius, Style.Button);
+        float arrow = Px(28);
+        Label("‹", new Rect(box.X, box.Y, arrow, box.Height), textSize, Style.ButtonText);
+        Label("›", new Rect(box.Right - arrow, box.Y, arrow, box.Height), textSize, Style.ButtonText);
+        Label(shown(index), new Rect(box.X + arrow, box.Y, box.Width - 2 * arrow, box.Height), textSize - 2, Style.ButtonText);
+        return index != before;
+    }
+
     // A panel behind a group of widgets, outlined all round; `under` puts it beneath the 3D scene.
     public void Panel(Rect rect, bool under = false)
     {

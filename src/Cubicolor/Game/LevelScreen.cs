@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -242,11 +243,15 @@ public sealed class LevelScreen : IScreen
         _completeAt = landed + 0.4;
     }
 
+    // "Level 3" in the current language, made again only when the language changes.
+    private (Strings? Strings, string Text) _title;
+
     private void DrawHud(Ui ui, Settings settings)
     {
         if (settings.HideUi) return;
         ui.Label(Level.Difficulty.ToString(), new Vector2(ui.Px(40), ui.Px(24)), 42);
-        ui.Label($"Level {Level.Number}", new Vector2(ui.Px(42), ui.Px(76)), 30);
+        if (_title.Strings != ui.Strings) _title = (ui.Strings, ui.Tr("Level {0}").Replace("{0}", Level.Number.ToString(CultureInfo.InvariantCulture)));
+        ui.Label(_title.Text, new Vector2(ui.Px(42), ui.Px(76)), 30);
 
         if (Level.Difficulty != Difficulty.Normal || _panel != Panel.None) return;
         string[] hints = Level.Number switch

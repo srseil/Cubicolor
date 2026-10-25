@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Cubicolor.Render;
 using Cubicolor.Simulation.Levels;
 using Cubicolor.Simulation.Saves;
@@ -57,6 +58,23 @@ public sealed class GameContext(IRenderer renderer, BoardMeshes meshes, Ui ui, S
     public Action<string>? OpenUrl { get; set; }
 
     public bool QuitRequested { get; set; }
+
+    // The language: forced for a run (--language), else the player's choice, else Steam's or the system's.
+    public string LanguageDirectory { get; init; } = "";
+    public Language? ForcedLanguage { get; init; }
+    public Language DetectedLanguage { get; init; } = Language.English;
+    // The installed fonts that draw what Vollkorn can't, for a language: its own script's first.
+    public Func<Language, IReadOnlyList<string>> FallbackFonts { get; init; } = _ => [];
+
+    public Language Language => ForcedLanguage ?? Saves.Settings.Language ?? DetectedLanguage;
+
+    // Puts the UI's text into the current language, when that changed.
+    public void ApplyLanguage()
+    {
+        if (Ui.Strings.Language == Language && Ui.Strings != Strings.English) return;
+        Ui.Strings = Strings.Load(LanguageDirectory, Language);
+        Ui.FallbackFonts = FallbackFonts(Language);
+    }
 
     public Level Load(Difficulty difficulty, int number) => LevelFile.Load(LevelsDirectory, difficulty, number);
 

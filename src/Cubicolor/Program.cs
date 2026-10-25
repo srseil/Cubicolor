@@ -28,6 +28,8 @@ internal static class Program
           --exec "<commands>"     the same, inline, ';'-separated
           --size <W>x<H>          headless frame size in pixels (default 1280x720)
           --level <name>          start in a level, e.g. normal03
+          --language <code>       show the game in a language (en, fr, de, es, zh-Hans, ru, pt-BR, ja, ko, pl);
+                                  headless runs are in English otherwise
           --data-dir <dir>        where progress and settings live (headless default: a fresh temporary one)
           --timeout <seconds>     fail a run that takes longer
           --capture-audio <wav>   headless: write what the game played to a WAV file
@@ -41,6 +43,7 @@ internal static class Program
         bool headless = false;
         string? script = null, level = null, dataDir = null, captureAudio = null, art = null;
         bool perf = false;
+        Language? language = null;
         int width = 1280, height = 720;
         double timeout = double.PositiveInfinity;
         try
@@ -53,6 +56,9 @@ internal static class Program
                     case "--script": script = File.ReadAllText(args[++i]); break;
                     case "--exec": script = args[++i]; break;
                     case "--level": level = args[++i]; break;
+                    case "--language":
+                        language = Languages.FromCode(args[++i]) ?? throw new ArgumentException($"No language {args[i]}");
+                        break;
                     case "--data-dir": dataDir = args[++i]; break;
                     case "--capture-audio": captureAudio = args[++i]; break;
                     case "--art": art = args[++i]; headless = true; break;
@@ -90,10 +96,10 @@ internal static class Program
 
         try
         {
-            if (art != null) return RenderArt(saves, assets, art);
+            if (art != null) return RenderArt(saves, assets, art, language);
             return headless
-                ? RunHeadless(saves, assets, width, height, script, level, timeout, captureAudio, perf)
-                : RunWindowed(saves, assets, level, perf);
+                ? RunHeadless(saves, assets, width, height, script, level, timeout, captureAudio, perf, language)
+                : RunWindowed(saves, assets, level, perf, language);
         }
         finally
         {
@@ -120,12 +126,20 @@ internal static class Program
     }
 
     private static GameContext Context(IRenderer renderer, SaveStore saves, string assets, IFontLoader fonts, IAudio audio,
-                                       IAchievements achievements)
+                                       IAchievements achievements, Language? forced, Language detected)
     {
         var text = new Text(fonts, Path.Combine(assets, "fonts"), new OverlayAtlas(renderer.Atlas)) { Symbols = SymbolImages.Rasterize };
         audio.Apply(saves.Settings);
-        return new GameContext(renderer, BoardMeshes.Upload(renderer), new Ui(text), saves, audio, achievements,
-            Path.Combine(assets, "levels"));
+        var context = new GameContext(renderer, BoardMeshes.Upload(renderer), new Ui(text), saves, audio, achievements,
+            Path.Combine(assets, "levels"))
+        {
+            LanguageDirectory = Path.Combine(assets, "lang"),
+            ForcedLanguage = forced,
+            DetectedLanguage = detected,
+            FallbackFonts = MacFonts.Fallbacks,
+        };
+        context.ApplyLanguage();
+        return context;
     }
 
     private static string MusicPath(string assets) => Path.Combine(assets, "music", "soundtrack.qoa");
@@ -135,14 +149,14 @@ internal static class Program
         : new LevelScreen(context, Enum.Parse<Difficulty>(level[..^2], ignoreCase: true), int.Parse(level[^2..], CultureInfo.InvariantCulture));
 
     private static int RunHeadless(SaveStore saves, string assets, int width, int height, string? scriptText, string? level, double timeout,
-                                   string? captureAudio, bool perf)
+                                   string? captureAudio, bool perf, Language? language)
     {
         using var renderer = new MetalRenderer(IntPtr.Zero, () => (width, height), vsync: false);
         MenuScreen.KeySymbol = KeyCodes.Symbol;
         MenuScreen.KeyName = KeyCodes.Name;
         // Headless, the mix goes nowhere unless it is captured to a file.
         using var audio = new AudioService(MusicPath(assets), _ => null);
-        GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio, new NoAchievements());
+        GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio, new NoAchievements(), language, Language.English);
         List<float>? captured = captureAudio != null ? [] : null;
         var samples = new List<(double UpdateMs, RenderStats Render, long Allocated)>();
         int[] gcBefore = [GC.CollectionCount(0), GC.CollectionCount(1), GC.CollectionCount(2)];
@@ -212,13 +226,13 @@ internal static class Program
         Console.WriteLine($"  collections          gen0 {GC.CollectionCount(0) - gcBefore[0]}, gen1 {GC.CollectionCount(1) - gcBefore[1]}, gen2 {GC.CollectionCount(2) - gcBefore[2]}");
     }
 
-    private static int RenderArt(SaveStore saves, string assets, string directory)
+    private static int RenderArt(SaveStore saves, string assets, string directory, Language? language)
     {
         int width = 1280, height = 720;
         using var renderer = new MetalRenderer(IntPtr.Zero, () => (width, height), vsync: false);
         using var audio = new AudioService(MusicPath(assets), _ => null);
         var text = new Text(new CoreTextFontLoader(), Path.Combine(assets, "fonts"), new OverlayAtlas(renderer.Atlas));
-        GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio, new NoAchievements());
+        GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio, new NoAchievements(), language, Language.English);
         // A development tool: it reads the recorded solutions from the repository it is run in.
         string? root = Environment.CurrentDirectory;
         while (root != null && !File.Exists(Path.Combine(root, "Cubicolor.slnx"))) root = Path.GetDirectoryName(root);
@@ -234,7 +248,7 @@ internal static class Program
         return 0;
     }
 
-    private static int RunWindowed(SaveStore saves, string assets, string? level, bool perf)
+    private static int RunWindowed(SaveStore saves, string assets, string? level, bool perf, Language? language)
     {
         AppKit.Start("Cubicolor");
         // A bundle has its icon from Info.plist; run straight from a build, the Dock gets it here.
@@ -249,7 +263,10 @@ internal static class Program
             ((int) MathF.Round(window.Width * window.PixelDensity), (int) MathF.Round(window.Height * window.PixelDensity)), settings.VSync);
         using var audio = new AudioService(MusicPath(assets), CoreAudioOutput.Start);
         using Steam? steam = Steam.Start();
-        GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio, steam ?? (IAchievements) new NoAchievements());
+        Language detected = Languages.Choose(null, steam?.GameLanguage, AppKit.PreferredLanguages());
+        GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio, steam ?? (IAchievements) new NoAchievements(),
+            language, detected);
+        Log.Info($"Language: {context.Language}");
         context.ApplyDisplay = s => window.SetFullscreen(s.Fullscreen);
         context.OpenUrl = AppKit.OpenUrl;
         if (settings.Fullscreen) window.SetFullscreen(true);

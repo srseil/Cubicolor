@@ -321,6 +321,19 @@ macOS-only and moves on its own.
 7. **Open: pushing the branch change.** It rewrites what `master` shows on GitHub, so it waits for
    Stefan's go-ahead.
 8. **Open: which shipped sound came from which recording** (§4.1). Only matters if synthesis falls short.
+9. **Ten languages** (decided 2026-10-25): English, French, German, Spanish, Simplified Chinese, Russian,
+   Brazilian Portuguese, Japanese, Korean and Polish, the languages most of Steam's players read.
+   - The English text is the key. `assets/lang/<code>.txt` maps it to each translation, and widgets keep
+     the English as their id, so focus and scripts work the same in every language.
+   - The language is the player's choice in Settings. Otherwise it is Steam's game language, then the
+     system's first supported language, then English. A choice is saved as `language = <code>`; older
+     settings files simply have none.
+   - Text longer than its box is set smaller until it fits.
+   - Chinese, Japanese and Korean come from installed serif fonts, the language's own first (macOS:
+     Songti SC, Hiragino Mincho, AppleMyungjo). Windows has its own; a Linux system may have none, so
+     bundling a Noto CJK subset is the open point there.
+   - The translations are machine-drafted and need a native speaker's pass. The Steam store page and the
+     languages listed in Steamworks are to be translated and set with them.
 
 ## 10. Where it stands
 
@@ -340,3 +353,5 @@ macOS-only and moves on its own.
     at their exact sizes from the game itself.
   - Open: how the 53 MB music file is versioned; the Steamworks SDK libraries for packaging; Stefan's ear on
     the synthesized sounds.
+- 2026-10-25: **ten languages**, chosen in Settings or followed from Steam or the system (§9.9). Every screen
+  checked headless in each. Open: native-speaker review, the store page, CJK fonts on Linux.

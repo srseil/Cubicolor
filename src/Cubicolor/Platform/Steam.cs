@@ -64,7 +64,7 @@ internal sealed unsafe class Steam : IAchievements, IDisposable
             if (NativeLibrary.TryGetExport(library, "SteamAPI_ISteamUserStats_RequestCurrentStats", out IntPtr request))
                 ((delegate* unmanaged<IntPtr, byte>) request)(stats);
             Log.Info("Steam: running");
-            return new Steam(library, stats);
+            return new Steam(library, stats) { GameLanguage = CurrentGameLanguage(library) };
         }
         catch (EntryPointNotFoundException e)
         {
@@ -92,6 +92,25 @@ internal sealed unsafe class Steam : IAchievements, IDisposable
         }
         Log.Warn("Steam: the library has no init function");
         return false;
+    }
+
+    // The language Steam runs the game in, by Steam's API name ("german", "schinese"), or null if it can't say.
+    public string? GameLanguage { get; private init; }
+
+    private static string? CurrentGameLanguage(IntPtr library)
+    {
+        IntPtr apps = IntPtr.Zero;
+        foreach (string version in new[] { "SteamAPI_SteamApps_v008", "SteamAPI_SteamApps_v007" })
+            if (NativeLibrary.TryGetExport(library, version, out IntPtr accessor))
+            {
+                apps = ((delegate* unmanaged<IntPtr>) accessor)();
+                break;
+            }
+        if (apps == IntPtr.Zero || !NativeLibrary.TryGetExport(library, "SteamAPI_ISteamApps_GetCurrentGameLanguage", out IntPtr get))
+            return null;
+        string? language = Marshal.PtrToStringUTF8(((delegate* unmanaged<IntPtr, IntPtr>) get)(apps));
+        Log.Info($"Steam: game language {language}");
+        return string.IsNullOrEmpty(language) ? null : language;
     }
 
     // Once a frame: lets Steam deliver its callbacks.

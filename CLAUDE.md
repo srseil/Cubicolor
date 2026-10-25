@@ -23,7 +23,9 @@ when something is decided. Its §2 (old saves) is the one hard requirement: neve
   - `Shaders/`: per-backend shader source, embedded in the assembly.
   - `App/`: the frame step shared by windowed and headless runs, scripted input and the script runner.
 - `tests/Cubicolor.Tests`: xUnit v3 (a test-only package; the game itself has no package references).
-- `assets/`: data the game loads (levels, fonts, music), each with its licence beside it.
+- `assets/`: data the game loads (levels, fonts, music, `lang/` string tables), each with its licence beside it.
+  The English text is the key into each language's table; a new or changed English UI text needs a line in
+  every table (`LanguageTests` checks they match).
   `assets/music/soundtrack.qoa` is not in git yet (53 MB); `tools/SoundLab encode-music` makes it from the
   original WAV in Dropbox (`Projekte/Cubicolor/data6/MyGame/wav/soundtrack.wav`).
 - `tools/SoundLab`: measures sounds, renders the synthesized effects, encodes the music.
@@ -55,6 +57,7 @@ dotnet run --project src/Cubicolor -- --headless --timeout 60 --exec "wait 0.3; 
 - A script is commands one per line or `;`-separated (`App/Script.cs` lists them): `wait <s>`, `wait ready`,
   `press <Key>`, `pad <button>`, `click "<label>"`, `moves <FBLR>`, `play <level>`, `screenshot <path>`,
   `expect <screen|level|state|focus|solved.<difficulty>> <value>`. `--help` lists the flags.
+- Headless runs are in English; `--language <code>` (e.g. `de`, `zh-Hans`) shows another.
 - Headless runs use a fresh temporary data directory unless `--data-dir` is given, and never read the
   player's saves. `--capture-audio <wav>` writes what the run played. `MTL_DEBUG_LAYER=1` turns on Metal's
   validation.
