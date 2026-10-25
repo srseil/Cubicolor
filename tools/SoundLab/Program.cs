@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Cubicolor.Audio;
@@ -9,7 +10,10 @@ internal static class Program
 {
     private const string Usage = """
         SoundLab measure <wav>...                  loudness over time, spectral centroid and peaks
-        SoundLab encode-music <in.wav> <out.qoa>   the music, to QOA (with the round trip's signal-to-noise ratio)
+        SoundLab encode-music <in.wav> <out.ogg> [quality]
+                                                   the music, to Ogg Vorbis through oggenc (vorbis-tools), at
+                                                   quality 5 unless given; then decoded again by the game's decoder
+        SoundLab decode <in.ogg> <out.wav>         an Ogg Vorbis file through the game's decoder
         SoundLab render <dir>                      every synthesized effect as <dir>/<sound>.wav
         SoundLab modes <wav> [count]               the resonances of a struck sound: frequency, level, decay
         """;
@@ -45,9 +49,15 @@ internal static class Program
                     Console.WriteLine(path);
                 }
                 return 0;
-            case "encode-music" when args.Length == 3:
-                EncodeMusic(args[1], args[2]);
+            case "encode-music" when args.Length is 3 or 4:
+                return EncodeMusic(args[1], args[2], args.Length == 4 ? args[3] : "5");
+            case "decode" when args.Length == 3:
+            {
+                using var decoder = new Vorbis.Decoder(File.OpenRead(args[1]));
+                Wav.Write(args[2], new Wav.Clip(decoder.SampleRate, decoder.Channels, Wav.FromFloat(Decode(decoder))));
+                Console.WriteLine($"{args[2]}: {decoder.TotalFrames} frames, {decoder.Channels} ch, {decoder.SampleRate} Hz");
                 return 0;
+            }
             default:
                 Console.WriteLine(Usage);
                 return 2;
@@ -76,22 +86,43 @@ internal static class Program
         Console.WriteLine("  centroid/peak per 50 ms: " + string.Join(" ", moving));
     }
 
-    private static void EncodeMusic(string input, string output)
+    // libvorbis is the encoder (only at build time: the game decodes with its own reader); the round trip's
+    // signal-to-noise ratio is a check on the decoder more than a measure of quality, which is for the ear.
+    private static int EncodeMusic(string input, string output, string quality)
     {
-        Wav.Clip clip = Wav.Read(input);
-        byte[] encoded = Qoa.Encode(clip.Samples, clip.Channels, clip.SampleRate);
-        File.WriteAllBytes(output, encoded);
-        var decoder = new Qoa.Decoder(encoded);
-        var decoded = new short[clip.Samples.Length];
-        int frames = decoder.Read(decoded);
-        double signal = 0, noise = 0;
-        for (int i = 0; i < frames * clip.Channels; i++)
+        var start = new ProcessStartInfo("oggenc", ["--quiet", "-q", quality, "-o", output, input]);
+        using (Process? oggenc = Process.Start(start))
         {
-            signal += (double) clip.Samples[i] * clip.Samples[i];
-            double d = clip.Samples[i] - decoded[i];
+            if (oggenc == null) throw new InvalidOperationException("oggenc did not start (brew install vorbis-tools)");
+            oggenc.WaitForExit();
+            if (oggenc.ExitCode != 0)
+            {
+                Console.Error.WriteLine($"oggenc failed with exit code {oggenc.ExitCode}");
+                return 1;
+            }
+        }
+        Wav.Clip clip = Wav.Read(input);
+        using var decoder = new Vorbis.Decoder(File.OpenRead(output));
+        float[] decoded = Decode(decoder);
+        double signal = 0, noise = 0;
+        for (int i = 0; i < Math.Min(decoded.Length, clip.Samples.Length); i++)
+        {
+            double original = clip.Samples[i] / 32768.0;
+            signal += original * original;
+            double d = original - decoded[i];
             noise += d * d;
         }
-        Console.WriteLine($"{clip.Seconds:0.0} s → {encoded.Length / 1e6:0.0} MB ({encoded.Length * 8.0 / (clip.Frames * clip.Channels):0.00} bits/sample), " +
-                          $"decoded {frames} of {clip.Frames} frames, SNR {10 * Math.Log10(signal / noise):0.0} dB");
+        long bytes = new FileInfo(output).Length;
+        Console.WriteLine($"{clip.Seconds:0.0} s → {bytes / 1e6:0.0} MB ({bytes * 8 / clip.Seconds / 1000:0} kbit/s), " +
+                          $"decoded {decoder.TotalFrames} of {clip.Frames} frames, SNR {10 * Math.Log10(signal / noise):0.0} dB");
+        return 0;
+    }
+
+    private static float[] Decode(Vorbis.Decoder decoder)
+    {
+        var samples = new float[(long) decoder.TotalFrames * decoder.Channels];
+        int frames = decoder.Read(samples);
+        if (frames != decoder.TotalFrames) throw new InvalidDataException($"decoded {frames} of {decoder.TotalFrames} frames");
+        return samples;
     }
 }

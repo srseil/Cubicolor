@@ -24,8 +24,8 @@ public sealed class AudioService : IAudio
         {
             try
             {
-                // Streamed from the file, a frame (a tenth of a second) at a time.
-                _mixer.SetMusic(new Qoa.Decoder(new FileStream(musicPath, FileMode.Open, FileAccess.Read, FileShare.Read, 1 << 16)));
+                // Streamed from the file, a block (a few hundredths of a second) at a time.
+                _mixer.SetMusic(new Vorbis.Decoder(new FileStream(musicPath, FileMode.Open, FileAccess.Read, FileShare.Read, 1 << 16)));
             }
             catch (InvalidDataException e)
             {

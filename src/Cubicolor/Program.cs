@@ -142,7 +142,7 @@ internal static class Program
         return context;
     }
 
-    private static string MusicPath(string assets) => Path.Combine(assets, "music", "soundtrack.qoa");
+    private static string MusicPath(string assets) => Path.Combine(assets, "music", "soundtrack.ogg");
 
     private static IScreen FirstScreen(GameContext context, string? level) => level == null
         ? MenuScreen.AtStart(context)

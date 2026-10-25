@@ -4,11 +4,12 @@ using System.Collections.Generic;
 namespace Cubicolor.Audio;
 
 // The game's audio, mixed into interleaved stereo floats at the output's rate: any number of sound effects
-// at once, and the music, streamed from QOA and looped. The platform output pulls from Render on its own
+// at once, and the music, streamed from Ogg Vorbis and looped. The platform output pulls from Render on its own
 // thread; everything else is called from the game's, so the shared state sits behind a lock.
 public sealed class Mixer
 {
     public const int Rate = 48000;
+    private const int MusicBlock = 4096;   // sample frames decoded at a time
 
     private sealed class Voice(float[] samples, float gain)
     {
@@ -19,8 +20,8 @@ public sealed class Mixer
 
     private readonly object _gate = new();
     private readonly List<Voice> _voices = [];
-    private Qoa.Decoder? _music;
-    private short[] _musicBuffer = [];
+    private Vorbis.Decoder? _music;
+    private float[] _musicBuffer = [];
     private double _musicPosition;        // in the music's own sample frames, fractional
     private int _musicBuffered, _musicBufferStart;
     private float _musicGain, _soundGain = 1;
@@ -45,11 +46,11 @@ public sealed class Mixer
     }
 
     // Returns the music played before, which the caller now owns again.
-    public Qoa.Decoder? SetMusic(Qoa.Decoder? music)
+    public Vorbis.Decoder? SetMusic(Vorbis.Decoder? music)
     {
         lock (_gate)
         {
-            Qoa.Decoder? before = _music;
+            Vorbis.Decoder? before = _music;
             _music = music;
             _musicPosition = 0;
             _musicBuffered = _musicBufferStart = 0;
@@ -81,10 +82,10 @@ public sealed class Mixer
     // The music at its own rate (44.1 kHz) resampled linearly to the output's.
     private void MixMusic(Span<float> output)
     {
-        Qoa.Decoder music = _music!;
+        Vorbis.Decoder music = _music!;
         int channels = music.Channels;
         double step = (double) music.SampleRate / Rate;
-        if (_musicBuffer.Length == 0) _musicBuffer = new short[Qoa.FrameLength * channels];
+        if (_musicBuffer.Length == 0) _musicBuffer = new float[MusicBlock * channels];
         for (int i = 0; i < output.Length; i += 2)
         {
             int index = (int) _musicPosition;
@@ -120,7 +121,7 @@ public sealed class Mixer
             _musicBuffered = read + keep;
         }
         int at = frame - _musicBufferStart;
-        return at < 0 ? 0 : _musicBuffer[at * channels + channel] / 32768f;
+        return at < 0 ? 0 : _musicBuffer[at * channels + channel];
     }
 
     // Keeps a pile-up of sounds from clipping harshly: linear up to 0.8, then easing into ±1.

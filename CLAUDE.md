@@ -17,7 +17,7 @@ when something is decided. Its §2 (old saves) is the one hard requirement: neve
   - `Game/`: screens (`MenuScreen`, `LevelScreen`), the immediate-mode `Ui`, and `BoardView`, which turns the
     rules' events into the original animations on its own clock (the rules never wait for it).
   - `Render/`: the backend-neutral renderer interface, procedural meshes (`RoundedBox`), text, overlay.
-  - `Audio/`: mixer, QOA codec, the synthesized sound effects (`Synth`).
+  - `Audio/`: mixer, the Ogg Vorbis decoder (`Vorbis`, `Ogg`, `Mdct`), the synthesized sound effects (`Synth`).
   - `Platform/`: `Mac/` (AppKit, Core Text, Core Audio, GameController), `Metal/`, `Steam.cs`. Windows and Linux
     come later beside them.
   - `Shaders/`: per-backend shader source, embedded in the assembly.
@@ -26,8 +26,9 @@ when something is decided. Its §2 (old saves) is the one hard requirement: neve
 - `assets/`: data the game loads (levels, fonts, music, `lang/` string tables), each with its licence beside it.
   The English text is the key into each language's table; a new or changed English UI text needs a line in
   every table (`LanguageTests` checks they match).
-  `assets/music/soundtrack.qoa` is not in git yet (53 MB); `tools/SoundLab encode-music` makes it from the
-  original WAV in Dropbox (`Projekte/Cubicolor/data6/MyGame/wav/soundtrack.wav`).
+  `assets/music/soundtrack.ogg` is not in git yet (26 MB); `tools/SoundLab encode-music` makes it from the
+  original WAV in Dropbox (`Projekte/Cubicolor/data6/MyGame/wav/soundtrack.wav`) through `oggenc`
+  (`brew install vorbis-tools`).
 - `tools/SoundLab`: measures sounds, renders the synthesized effects, encodes the music.
 - `packaging/macos/package.sh`: the universal `Cubicolor.app` (NativeAOT, arm64 + x86-64).
 

@@ -181,7 +181,7 @@ needs. That leaves no asset pipeline for meshes, textures or sounds.
 | Colouring effect | 30 mask frames at 2048² on a cube-net UV layout, stepped at 33 fps over 0.87 s. Paint rises up the sides in rounded "fingers", then closes over the top from the edges inward | **Shader, in object space:** one value per fragment, its distance along the surface from the bottom edge, offset by a smooth per-side finger profile and thresholded by time. Smooth instead of stepped, and needs no UV net. Matched against the old frames side by side |
 | Fonts | Vollkorn (OFL) | Kept |
 | Sounds | 6 OGG, edited from Freesound recordings | **Synthesized at startup** (§4.1). The old ones are the reference |
-| Music | "Relaxing Piano Music" by Kevin MacLeod (CC BY 3.0), 24.8 min | **QOA,** about 52 MB, decoded by our own reader. Attribution stays in the credits |
+| Music | "Relaxing Piano Music" by Kevin MacLeod (CC BY 3.0), 24.8 min | **Ogg Vorbis** at quality 5, 25.6 MB, decoded by our own reader. Attribution stays in the credits |
 | GUI images | arrows, checkboxes | Drawn as vector shapes in the UI |
 | Logo | `logo.png` 900×390, sources in `data9/BlenderNLE/*.xcf` | Set in Vollkorn at runtime if that is all it is; otherwise re-exported from the source |
 
@@ -279,7 +279,7 @@ everything at any size:
    - headless mode and screenshots
 5. **The whole game on macOS:**
    - menus and text through Core Text
-   - audio, music and QOA
+   - audio and music
    - all animations, the colouring shader, the tutorial
    - settings and key rebinding, gamepad
 6. **Sound synthesis** (§4.1), with Stefan listening. This can run alongside step 5.
@@ -313,7 +313,14 @@ macOS-only and moves on its own.
      transforms. Games (and much of Windows itself) draw grayscale text for that reason. HiDPI screens
      make the difference small anyway.
    - With a native rasterizer the door stays open if it is ever wanted.
-3. **Music as QOA** (decided 2026-10-23).
+3. **Music as Ogg Vorbis** (decided 2026-10-25; QOA from 2026-10-23 until then).
+   - QOA was simple to decode but took 53 MB for the 24.8 minutes. Vorbis at quality 5 (about 138 kbit/s,
+     libvorbis's `oggenc`) is 25.6 MB, the same as the Godot version shipped, and sounds better than QOA's
+     3.2 bits a sample. Quality 4 would be 19.5 MB.
+   - The decoder is our own (`Audio/Vorbis.cs`, `Ogg.cs`, `Mdct.cs`), written from the Vorbis I
+     specification: floor 1 only, which is all libvorbis has written since 2002. It matches ffmpeg's decode
+     within one 16-bit step and reads the whole track about 300 times faster than it plays.
+   - libvorbis is needed only to encode, at build time (`brew install vorbis-tools`).
 4. **Vulkan SDK at build time** (decided 2026-10-23).
 5. **Order: macOS first.** Windows and Linux follow on Stefan's dual-boot laptop. There is no Steam
    Deck. GitHub Actions comes later.
@@ -343,7 +350,7 @@ macOS-only and moves on its own.
     - progress and settings with the import of both earlier versions' saves
     - the Metal renderer with procedural meshes and patterns
     - every animation, the menus, the level screen, Core Text
-    - synthesized sound effects, the QOA music, Core Audio
+    - synthesized sound effects, the music, Core Audio
     - Steam achievements
     - a universal NativeAOT `.app`
   - All 48 levels play through the real game loop headless.
@@ -351,7 +358,7 @@ macOS-only and moves on its own.
     checks so far are headless screenshots compared against the 2016 screenshots.
   - First drafts of every Steam store and library image, the icon and screenshots: `--art <dir>` renders them
     at their exact sizes from the game itself.
-  - Open: how the 53 MB music file is versioned; the Steamworks SDK libraries for packaging; Stefan's ear on
+  - Open: how the 26 MB music file is versioned; the Steamworks SDK libraries for packaging; Stefan's ear on
     the synthesized sounds.
 - 2026-10-25: **ten languages**, chosen in Settings or followed from Steam or the system (§9.9). Every screen
   checked headless in each. Open: native-speaker review, the store page, CJK fonts on Linux.
