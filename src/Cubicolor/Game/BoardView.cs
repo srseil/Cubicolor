@@ -11,8 +11,8 @@ namespace Cubicolor.Game;
 public sealed record BoardMeshes(MeshHandle Cube, MeshHandle Slab)
 {
     public static BoardMeshes Upload(IRenderer renderer) => new(
-        renderer.Upload(RoundedBox.Build(Vector3.One, 0.08f, 10, softness: 1.4f)),
-        renderer.Upload(RoundedBox.Build(new Vector3(1f, 0.5f, 1f), 0.04f, 8, softness: 1.4f)));
+        renderer.Upload(RoundedBox.Build(Vector3.One, 0.08f, 6, softness: 1.4f)),
+        renderer.Upload(RoundedBox.Build(new Vector3(1f, 0.5f, 1f), 0.04f, 4, softness: 1.4f)));
 }
 
 // What the player sees of a level: every tile, the cube, the exit and its stack of requirements, each with

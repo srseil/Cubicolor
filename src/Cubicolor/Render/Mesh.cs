@@ -29,7 +29,9 @@ public static class RoundedBox
     // The normals round off over a wider band than the shape, `softness` times the radius: the light turns
     // gradually towards the edge, as it would on a larger rounding, while the outline stays crisp. With the
     // exact normals the flat face's sudden end read as a sharp crease in the highlight.
-    public static MeshData Build(Vector3 size, float radius, int segments, float softness = 1)
+    // `softSteps` grid lines carry the normals across the soft band: the light turns smoothly with only a few,
+    // since it is interpolated between them.
+    public static MeshData Build(Vector3 size, float radius, int segments, float softness = 1, int softSteps = 2)
     {
         Vector3 half = size / 2;
         float soft = radius * softness;
@@ -51,8 +53,8 @@ public static class RoundedBox
         ];
         foreach (var (axis, sign, u, v) in faces)
         {
-            float[] us = Steps(Get(half, u), radius, soft, segments);
-            float[] vs = Steps(Get(half, v), radius, soft, segments);
+            float[] us = Steps(Get(half, u), radius, soft, segments, softSteps);
+            float[] vs = Steps(Get(half, v), radius, soft, segments, softSteps);
             int first = vertices.Count;
             foreach (float b in vs)
             foreach (float a in us)
@@ -82,11 +84,11 @@ public static class RoundedBox
     // spaced by the angle they turn the outline (a point `d` into the band turns it by atan(d / radius), and a
     // face holds the 45 degrees nearest to it); then, out to the soft band's end, steps for the normals to
     // turn in; one across the flat middle.
-    private static float[] Steps(float half, float radius, float soft, int segments)
+    private static float[] Steps(float half, float radius, float soft, int segments, int softSteps)
     {
         var edge = new List<float>();   // distances from the edge, outermost first
         for (int k = segments; k >= 0; k--) edge.Add(radius - radius * MathF.Tan(MathF.PI / 4 * k / segments));
-        for (int k = 1; k <= segments && soft > radius; k++) edge.Add(radius + (soft - radius) * k / segments);
+        for (int k = 1; k <= softSteps && soft > radius; k++) edge.Add(radius + (soft - radius) * k / softSteps);
         var steps = new List<float>();
         foreach (float d in edge) steps.Add(-half + d);
         for (int i = edge.Count - 1; i >= 0; i--) steps.Add(half - edge[i]);
