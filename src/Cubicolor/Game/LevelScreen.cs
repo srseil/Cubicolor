@@ -111,7 +111,10 @@ public sealed class LevelScreen : IScreen
             if (_leaveFade <= 0) return _leaving();
         }
         ui.Overlay.Opacity = shown;
-        DrawHud(ui, settings);
+        // The hints fade out once the level is solved (and under a panel), and stay out until it is played again.
+        bool hintsShown = !_puzzle.Solved && _panel == Panel.None && _leaving == null;
+        _hintFade = Math.Clamp(_hintFade + (hintsShown ? 1 : -1) * (float) seconds / 0.3f, 0, 1);
+        DrawHud(ui, settings, shown);
 
         // The pause and completion panels fade in and out over a sixth of a second; one fading out is drawn but
         // no longer takes input.
@@ -246,21 +249,28 @@ public sealed class LevelScreen : IScreen
     // "Level 3" in the current language, made again only when the language changes.
     private (Strings? Strings, string Text) _title;
 
-    private void DrawHud(Ui ui, Settings settings)
+    private float _hintFade = 1;
+
+    private static readonly string[] FirstHints = ["1.  Color the cube", "2.  Match it with the colored tile", "3.  Get to the exit"];
+    private static readonly string[] SecondHints = ["You can reset the level by pressing the restart button."];
+    private static readonly string[] ThirdHints = ["The order in which you match the different colors is irrelevant."];
+
+    private void DrawHud(Ui ui, Settings settings, float shown)
     {
         if (settings.HideUi) return;
         ui.Label(Level.Difficulty.ToString(), new Vector2(ui.Px(40), ui.Px(24)), 42);
         if (_title.Strings != ui.Strings) _title = (ui.Strings, ui.Tr("Level {0}").Replace("{0}", Level.Number.ToString(CultureInfo.InvariantCulture)));
         ui.Label(_title.Text, new Vector2(ui.Px(42), ui.Px(76)), 30);
 
-        if (Level.Difficulty != Difficulty.Normal || _panel != Panel.None) return;
+        if (Level.Difficulty != Difficulty.Normal || _hintFade <= 0) return;
         string[] hints = Level.Number switch
         {
-            1 => ["1.  Color the cube", "2.  Match it with the colored tile", "3.  Get to the exit"],
-            2 => ["You can reset the level by pressing the restart button."],
-            3 => ["The order in which you match the different colors is irrelevant."],
+            1 => FirstHints,
+            2 => SecondHints,
+            3 => ThirdHints,
             _ => [],
         };
+        ui.Overlay.Opacity = shown * _hintFade * _hintFade * (3 - 2 * _hintFade);
         // Centred at the bottom of the window, whatever its shape.
         float line = ui.Px(36);
         float y = ui.Size.Y - ui.Px(40) - line * hints.Length;
@@ -269,6 +279,7 @@ public sealed class LevelScreen : IScreen
             ui.Label(hint, new Vector2((ui.Size.X - ui.TextWidth(hint, 26)) / 2, y), 26);
             y += line;
         }
+        ui.Overlay.Opacity = shown;
     }
 
     private IScreen? PausePanel(Ui ui)
