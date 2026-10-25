@@ -49,6 +49,27 @@ public sealed class AudioTests
         Assert.True(snr > minimumSnr, $"SNR {snr:0.0} dB");
     }
 
+    // The shipped soundtrack (the 2015 encode the Godot version shipped) decodes whole, every sample in range.
+    [Fact]
+    public void The_soundtrack_decodes_to_its_end()
+    {
+        using var decoder = new Vorbis.Decoder(File.OpenRead(Repo.Assets(Path.Combine("music", "soundtrack.ogg"))));
+        var block = new float[1 << 16];
+        long frames = 0;
+        float peak = 0;
+        int read;
+        while ((read = decoder.Read(block)) > 0)
+        {
+            frames += read;
+            for (int i = 0; i < read * decoder.Channels; i++) peak = Math.Max(peak, Math.Abs(block[i]));
+        }
+
+        Assert.Equal((2, 44100), (decoder.Channels, decoder.SampleRate));
+        Assert.Equal(decoder.TotalFrames, frames);
+        Assert.InRange(frames / 44100.0, 60, 3600);
+        Assert.InRange(peak, 0.1f, 1.05f);
+    }
+
     [Fact]
     public void Rewinding_the_decoder_plays_the_same_samples_again()
     {

@@ -27,9 +27,10 @@ when something is decided. Its §2 (old saves) is the one hard requirement: neve
   The English text is the key into each language's table; a new or changed English UI text needs a line in
   every table (`LanguageTests` checks they match), and a changed zh-Hans, ja or ko table needs
   `tools/subset-fonts.sh` run again to trim the CJK fonts to its characters.
-  `assets/music/soundtrack.ogg` is not in git yet (26 MB); `tools/SoundLab encode-music` makes it from the
-  original WAV in Dropbox (`Projekte/Cubicolor/data6/MyGame/wav/soundtrack.wav`) through `oggenc`
-  (`brew install vorbis-tools`).
+  `assets/music/soundtrack.ogg` (26 MB) is in plain git: the exact file the Godot version shipped, so git
+  stores no new copy of it. Re-encoding it adds another 26 MB to the history for good, so don't without
+  reason; `tools/SoundLab encode-music` can make one from the original WAV in Dropbox
+  (`Projekte/Cubicolor/data6/MyGame/wav/soundtrack.wav`) through `oggenc` (`brew install vorbis-tools`).
 - `tools/SoundLab`: measures sounds, renders the synthesized effects, encodes the music.
 - `packaging/macos/package.sh`: the universal `Cubicolor.app` (NativeAOT, arm64 + x86-64).
 

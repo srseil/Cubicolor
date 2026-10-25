@@ -333,7 +333,10 @@ macOS-only and moves on its own.
 7. **Open: pushing the branch change.** It rewrites what `master` shows on GitHub, so it waits for
    Stefan's go-ahead.
 8. **Open: which shipped sound came from which recording** (§4.1). Only matters if synthesis falls short.
-9. **Ten languages** (decided 2026-10-25): English, French, German, Spanish, Simplified Chinese, Russian,
+9. **The music in plain git** (decided 2026-10-25): the Godot branch's `soundtrack.ogg` byte for byte, so the
+   history, which already holds it, doesn't grow. Git LFS would add setup to every clone and CI checkout
+   for no saving.
+10. **Ten languages** (decided 2026-10-25): English, French, German, Spanish, Simplified Chinese, Russian,
    Brazilian Portuguese, Japanese, Korean and Polish, the languages most of Steam's players read.
    - The English text is the key. `assets/lang/<code>.txt` maps it to each translation, and widgets keep
      the English as their id, so focus and scripts work the same in every language.
@@ -364,7 +367,7 @@ macOS-only and moves on its own.
     checks so far are headless screenshots compared against the 2016 screenshots.
   - First drafts of every Steam store and library image, the icon and screenshots: `--art <dir>` renders them
     at their exact sizes from the game itself.
-  - Open: how the 26 MB music file is versioned; the Steamworks SDK libraries for packaging; Stefan's ear on
+  - Open: the Steamworks SDK libraries for packaging; Stefan's ear on
     the synthesized sounds.
-- 2026-10-25: **ten languages**, chosen in Settings or followed from Steam or the system (§9.9). Every screen
+- 2026-10-25: **ten languages**, chosen in Settings or followed from Steam or the system (§9.10). Every screen
   checked headless in each. Open: native-speaker review, the store page.

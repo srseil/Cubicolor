@@ -20,6 +20,3 @@ Thumbs.db
 
 # Claude Code machine-local settings
 .claude/settings.local.json
-
-# The music (26 MB of Ogg Vorbis) until it is decided how it is versioned; tools/SoundLab encode-music makes it
-assets/music/*.ogg
