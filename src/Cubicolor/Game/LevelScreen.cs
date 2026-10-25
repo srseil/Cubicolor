@@ -104,7 +104,7 @@ public sealed class LevelScreen : IScreen
         float shown = 1;
         if (_leaving != null)
         {
-            _leaveFade = Math.Max(0, _leaveFade - (float) seconds / 0.3f);
+            _leaveFade = Math.Max(0, _leaveFade - (float) seconds / LeaveTime);
             shown = _leaveFade * _leaveFade * (3 - 2 * _leaveFade);
             for (int i = 0; i < scene.Items.Count; i++)
                 scene.Items[i] = scene.Items[i] with { Color = scene.Items[i].Color with { W = scene.Items[i].Color.W * shown } };
@@ -117,6 +117,8 @@ public sealed class LevelScreen : IScreen
         bool landed = _completeAt is { } done && _board.Now >= done - CompleteDelay;
         bool hintsShown = _hintsArrived && !landed && _panel == Panel.None && _leaving == null;
         _hintFade = Math.Clamp(_hintFade + (hintsShown ? 1 : -1) * (float) seconds / 0.3f, 0, 1);
+        // The level's name fades in as the screen opens, from the menu or the level before.
+        _titleFade = Math.Min(1, _titleFade + (float) seconds / 0.5f);
         DrawHud(ui, settings, shown);
 
         // The pause and completion panels fade in and out over a sixth of a second; one fading out is drawn but
@@ -164,6 +166,7 @@ public sealed class LevelScreen : IScreen
     private Panel _shown;
     private Func<IScreen>? _leaving;
     private float _leaveFade = 1;
+    private const float LeaveTime = 0.4f;
 
     // Leaves for another screen once this one has faded out.
     private void Leave(Func<IScreen> next)
@@ -252,7 +255,7 @@ public sealed class LevelScreen : IScreen
     // "Level 3" in the current language, made again only when the language changes.
     private (Strings? Strings, string Text) _title;
 
-    private float _hintFade;
+    private float _hintFade, _titleFade;
     private bool _hintsArrived;
 
     // How long after the cube lands on the exit the Completed panel comes up.
@@ -265,9 +268,11 @@ public sealed class LevelScreen : IScreen
     private void DrawHud(Ui ui, Settings settings, float shown)
     {
         if (settings.HideUi) return;
+        ui.Overlay.Opacity = shown * _titleFade * _titleFade * (3 - 2 * _titleFade);
         ui.Label(Level.Difficulty.ToString(), new Vector2(ui.Px(40), ui.Px(24)), 42);
         if (_title.Strings != ui.Strings) _title = (ui.Strings, ui.Tr("Level {0}").Replace("{0}", Level.Number.ToString(CultureInfo.InvariantCulture)));
         ui.Label(_title.Text, new Vector2(ui.Px(42), ui.Px(76)), 30);
+        ui.Overlay.Opacity = shown;
 
         if (Level.Difficulty != Difficulty.Normal || _hintFade <= 0) return;
         string[] hints = Level.Number switch
