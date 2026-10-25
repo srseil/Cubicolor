@@ -120,14 +120,12 @@ public sealed class MenuScreen : IScreen
     private const float SectionsWidth = 210, PanelWidth = 640, PanelHeight = 420, PanelTop = (Ui.CanvasHeight - PanelHeight) / 2;
     private const float SectionsTop = (Ui.CanvasHeight - (5 * 62 - 14)) / 2;
 
-    // Settings and Controls stand on one grid of rows, from the same top with the same pitch, so their rows line
-    // up as the panel switches between them; a gap sets groups apart.
-    private const float Top = 24, Gap = 14, RowHeight = 36;
+    // Settings and Controls stand on one grid of seven rows, evenly spread over the panel, so their rows line up
+    // as the panel switches between them.
+    private const float Top = 24, RowHeight = 36;
+    private const float Pitch = (PanelHeight - 2 * Top - RowHeight) / 6;
 
-    // Both have seven rows, spread out to fill the panel, with the gap before the last two.
-    private const float Pitch = (PanelHeight - 2 * Top - RowHeight - Gap) / 6;
-
-    private static float Row(float panelY, int row) => panelY + Top + row * Pitch + (row >= 5 ? Gap : 0);
+    private static float Row(float panelY, int row) => panelY + Top + row * Pitch;
 
     private string? FirstInPanel() => _section switch
     {
