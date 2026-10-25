@@ -251,7 +251,7 @@ public sealed class LevelScreen : IScreen
 
     private float _hintFade = 1;
 
-    private static readonly string[] FirstHints = ["1.  Color the cube", "2.  Match it with the colored tile", "3.  Get to the exit"];
+    private static readonly string[] FirstHints = ["1.  Color the cube.", "2.  Match it with the colored tile.", "3.  Get to the exit."];
     private static readonly string[] SecondHints = ["You can reset the level by pressing the restart button."];
     private static readonly string[] ThirdHints = ["The order in which you match the different colors is irrelevant."];
 
