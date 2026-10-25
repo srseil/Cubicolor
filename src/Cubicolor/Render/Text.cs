@@ -21,6 +21,11 @@ public sealed class Text : IDisposable
     private readonly OverlayAtlas _atlas;
     private readonly Dictionary<(FontStyle, int), IFontFace> _faces = [];
     private readonly Dictionary<(FontStyle, int, char), Glyph?> _glyphs = [];
+    // Characters Vollkorn has no glyph for (Chinese, Japanese, Korean) come from installed fonts, tried in
+    // order; which character comes from which face is worked out once.
+    private IReadOnlyList<string> _fallbacks = [];
+    private readonly Dictionary<(string, int), IFontFace?> _installed = [];
+    private readonly Dictionary<(FontStyle, int, char), IFontFace> _faceOf = [];
     private readonly Dictionary<(string, int), Glyph?> _symbols = [];
 
     // Draws a named symbol (on macOS an SF Symbol) at a pixel size, or null on platforms without them.
@@ -44,6 +49,38 @@ public sealed class Text : IDisposable
         return face;
     }
 
+    // The installed fonts to draw what Vollkorn can't, by name, in the order to try them.
+    public IReadOnlyList<string> Fallbacks
+    {
+        get => _fallbacks;
+        set
+        {
+            _fallbacks = value;
+            _faceOf.Clear();
+            _glyphs.Clear();
+        }
+    }
+
+    // The face that draws `c` at this style and size: Vollkorn, or the first fallback that has it.
+    private IFontFace FaceFor(FontStyle style, int pixels, IFontFace primary, char c)
+    {
+        if (_faceOf.TryGetValue((style, pixels, c), out IFontFace? face)) return face;
+        face = primary;
+        if (primary.GlyphFor(c) == 0 && !char.IsWhiteSpace(c))
+            foreach (string name in _fallbacks)
+            {
+                if (!_installed.TryGetValue((name, pixels), out IFontFace? installed))
+                    _installed[(name, pixels)] = installed = _loader.OpenInstalled(name, pixels);
+                if (installed != null && installed.GlyphFor(c) != 0)
+                {
+                    face = installed;
+                    break;
+                }
+            }
+        _faceOf[(style, pixels, c)] = face;
+        return face;
+    }
+
     public float LineHeight(FontStyle style, float size)
     {
         IFontFace face = Face(style, Pixels(size));
@@ -52,34 +89,42 @@ public sealed class Text : IDisposable
 
     public float Measure(string text, FontStyle style, float size)
     {
-        IFontFace face = Face(style, Pixels(size));
+        int pixels = Pixels(size);
+        IFontFace primary = Face(style, pixels);
         float width = 0;
-        for (int i = 0; i < text.Length; i++)
-        {
-            width += face.Advance(face.GlyphFor(text[i]));
-            if (i + 1 < text.Length) width += face.Kerning(text[i], text[i + 1]);
-        }
+        for (int i = 0; i < text.Length; i++) width += Advance(style, pixels, primary, text, i);
         return width;
+    }
+
+    // How far the pen moves past text[i]: its advance, and Vollkorn's kerning before the next character when
+    // Vollkorn draws both.
+    private float Advance(FontStyle style, int pixels, IFontFace primary, string text, int i)
+    {
+        char c = text[i];
+        IFontFace face = FaceFor(style, pixels, primary, c);
+        float advance = face.Advance(face.GlyphFor(c));
+        if (i + 1 < text.Length && face == primary && FaceFor(style, pixels, primary, text[i + 1]) == primary)
+            advance += primary.Kerning(c, text[i + 1]);
+        return advance;
     }
 
     // Draws `text` with the top of its line box at `topLeft`.
     public void Draw(Overlay overlay, string text, Vector2 topLeft, FontStyle style, float size, Vector4 color)
     {
         int pixels = Pixels(size);
-        IFontFace face = Face(style, pixels);
-        float baseline = MathF.Round(topLeft.Y + face.Ascent);
+        IFontFace primary = Face(style, pixels);
+        float baseline = MathF.Round(topLeft.Y + primary.Ascent);
         float pen = topLeft.X;
         for (int i = 0; i < text.Length; i++)
         {
             char c = text[i];
-            if (GlyphOf(face, style, pixels, c) is { } glyph)
+            if (GlyphOf(FaceFor(style, pixels, primary, c), style, pixels, c) is { } glyph)
             {
                 float x = MathF.Round(pen) + glyph.Left;
                 float y = baseline - glyph.Top;
                 overlay.Image(new Rect(x, y, glyph.Width, glyph.Height), glyph.UvTopLeft, glyph.UvBottomRight, color);
             }
-            pen += face.Advance(face.GlyphFor(c));
-            if (i + 1 < text.Length) pen += face.Kerning(c, text[i + 1]);
+            pen += Advance(style, pixels, primary, text, i);
         }
     }
 
@@ -157,5 +202,7 @@ public sealed class Text : IDisposable
     {
         foreach (IFontFace face in _faces.Values) face.Dispose();
         _faces.Clear();
+        foreach (IFontFace? face in _installed.Values) face?.Dispose();
+        _installed.Clear();
     }
 }

@@ -22,4 +22,7 @@ public interface IFontFace : IDisposable
 public interface IFontLoader
 {
     IFontFace Open(string path, float pixelSize);
+
+    // A font installed with the system, by name, or null when there is none of that name.
+    IFontFace? OpenInstalled(string name, float pixelSize);
 }
