@@ -1,0 +1,7 @@
+soundtrack.ogg
+
+"Relaxing Piano Music" by Kevin MacLeod (https://incompetech.com)
+Licensed under Creative Commons: By Attribution 3.0 License
+https://creativecommons.org/licenses/by/3.0/
+
+The licence asks for this credit wherever the music is used; the game shows it in its Credits.
