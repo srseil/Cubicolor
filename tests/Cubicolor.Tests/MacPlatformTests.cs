@@ -35,6 +35,15 @@ public sealed class MacPlatformTests
     }
 
     [Fact]
+    public void Every_key_symbol_exists()
+    {
+        Assert.SkipUnless(OperatingSystem.IsMacOS(), "macOS only");
+        foreach (Simulation.Input.Key key in Enum.GetValues<Simulation.Input.Key>())
+            if (KeyCodes.Symbol(key) is { } name)
+                Assert.True(SymbolImages.Rasterize(name, 32) != null, $"{key}: no symbol {name}");
+    }
+
+    [Fact]
     public void An_unknown_symbol_is_none() =>
         Assert.Null(OperatingSystem.IsMacOS() ? SymbolImages.Rasterize("no.such.symbol.anywhere", 32) : null);
 }

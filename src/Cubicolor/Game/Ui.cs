@@ -21,6 +21,13 @@ public static class Style
     public static readonly Vector4 DisabledText = Palette.Hex(0xa8a69f);
 }
 
+public enum Align
+{
+    Centre,
+    Left,
+    Right,
+}
+
 // The player's intent this frame, from keyboard, mouse and controller alike.
 public readonly record struct Navigation(Direction? Move, bool Confirm, bool Back);
 
@@ -151,11 +158,18 @@ public sealed class Ui
         _text.Draw(Overlay, text, position, style, Px(size), color ?? TextColor);
 
     // Text centred in a rectangle.
-    public void Label(string text, Rect rect, float size, Vector4? color = null, FontStyle style = FontStyle.Regular)
+    // Text in a rectangle: vertically centred, and centred, left or right aligned across it.
+    public void Label(string text, Rect rect, float size, Vector4? color = null, FontStyle style = FontStyle.Regular, Align align = Align.Centre)
     {
         float width = _text.Measure(text, style, Px(size));
         float height = _text.LineHeight(style, Px(size));
-        _text.Draw(Overlay, text, new Vector2(rect.X + (rect.Width - width) / 2, rect.Y + (rect.Height - height) / 2), style, Px(size), color ?? TextColor);
+        float x = align switch
+        {
+            Align.Left => rect.X,
+            Align.Right => rect.Right - width,
+            _ => rect.X + (rect.Width - width) / 2,
+        };
+        _text.Draw(Overlay, text, new Vector2(x, rect.Y + (rect.Height - height) / 2), style, Px(size), color ?? TextColor);
     }
 
     // --- Widgets ---

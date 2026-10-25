@@ -107,4 +107,26 @@ internal static unsafe partial class KeyCodes
     [LibraryImport(CarbonPath)] private static partial IntPtr TISGetInputSourceProperty(IntPtr source, IntPtr key);
     [LibraryImport(CarbonPath)] private static partial int UCKeyTranslate(byte* layout, ushort code, ushort action, uint modifiers,
         uint keyboardType, uint options, uint* deadKeyState, nint maxLength, out nint length, char* chars);
+
+    // The SF Symbol for a key that has one (arrows, return, delete, escape, tab, space and the modifiers), for
+    // the controls screen; null for letters, digits and the rest, which are shown as the layout prints them.
+    public static string? Symbol(Key key) => key switch
+    {
+        Key.Up => "arrow.up",
+        Key.Down => "arrow.down",
+        Key.Left => "arrow.left",
+        Key.Right => "arrow.right",
+        Key.Return or Key.KpEnter => "return",
+        Key.Backspace => "delete.left",
+        Key.Delete => "delete.right",
+        Key.Escape => "escape",
+        Key.Tab => "arrow.right.to.line",
+        Key.Space => "space",
+        Key.LShift or Key.RShift => "shift",
+        Key.LCtrl or Key.RCtrl => "control",
+        Key.LAlt or Key.RAlt => "option",
+        Key.LGUI or Key.RGUI => "command",
+        Key.Capslock => "capslock",
+        _ => null,
+    };
 }

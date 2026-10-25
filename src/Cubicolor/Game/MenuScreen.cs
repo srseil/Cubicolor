@@ -32,8 +32,10 @@ public sealed class MenuScreen : IScreen
         context.Ui.Focus("Play", force: true);
     }
 
-    // Shows a key's name as the keyboard layout prints it; set by the platform.
+    // Shows a key's name as the keyboard layout prints it, and the symbol for one that has a symbol rather
+    // than a letter (arrows, return, ...); set by the platform.
     public static Func<Key, string> KeyName { get; set; } = key => key.ToString();
+    public static Func<Key, string?> KeySymbol { get; set; } = _ => null;
 
     public IScreen Frame(double seconds, Scene scene)
     {
@@ -41,7 +43,7 @@ public sealed class MenuScreen : IScreen
         scene.Background = _context.Background;
         scene.Lighting = GameContext.Light;
         const float width = Ui.CanvasWidth;
-        const float left = (width - 1060) / 2;
+        const float left = (width - SectionsWidth - 50 - PanelWidth) / 2;
 
         ui.Label("Cubicolor", ui.R(0, 28, width, 100), 84, style: FontStyle.Black);
         _previewCooldown -= seconds;
@@ -71,14 +73,14 @@ public sealed class MenuScreen : IScreen
         for (int i = 0; i < items.Length; i++)
         {
             var (label, section) = items[i];
-            if (ui.Button(label, ui.R(left, 270 + i * 62, 210, 48), selected: section == _section && section != null))
+            if (ui.Button(label, ui.R(left, 270 + i * 62, SectionsWidth, 48), selected: section == _section && section != null))
             {
                 if (section is { } s) _section = s;
                 else _context.QuitRequested = true;
             }
         }
 
-        Rect panel = ui.R(left + 260, 262, 800, 420);
+        Rect panel = ui.R(left + SectionsWidth + 50, 262, PanelWidth, PanelHeight);
         ui.Panel(panel, under: true);
         // A section's contents fade in when it is chosen.
         if (_section != _sectionShown) (_sectionShown, _sectionFade) = (_section, 0);
@@ -98,6 +100,14 @@ public sealed class MenuScreen : IScreen
         return next;
     }
 
+    private const float SectionsWidth = 210, PanelWidth = 640, PanelHeight = 420;
+
+    // Settings and Controls stand on one grid of rows, from the same top with the same pitch, so their rows line
+    // up as the panel switches between them; a gap sets groups apart.
+    private const float Top = 24, Pitch = 42, Gap = 14, RowHeight = 36;
+
+    private static float RowY(float panelY, int row, int gaps) => panelY + Top + row * Pitch + gaps * Gap;
+
     private string? FirstInPanel() => _section switch
     {
         Section.Play => _difficulty.ToString(),
@@ -115,15 +125,15 @@ public sealed class MenuScreen : IScreen
         {
             Difficulty d = all[i];
             bool open = progress.Solved(d) != Progress.Locked;
-            if (ui.Button(d.ToString(), ui.R(x + 160 + i * 165, y + 24, 150, 44), enabled: open, selected: d == _difficulty)) _difficulty = d;
+            if (ui.Button(d.ToString(), ui.R(x + 80 + i * 165, y + 24, 150, 44), enabled: open, selected: d == _difficulty)) _difficulty = d;
         }
         for (int n = 1; n <= Level.PerDifficulty; n++)
         {
             int row = (n - 1) / 4, column = (n - 1) % 4;
-            Rect cell = ui.R(x + 250 + column * 80, y + 92 + row * 78, 64, 64);
+            Rect cell = ui.R(x + 168 + column * 80, y + 92 + row * 78, 64, 64);
             bool open = progress.IsOpen(_difficulty, n);
             // The cells answer to the mouse right up to their neighbours, so the grid has no dead space.
-            Rect hit = ui.R(x + 242 + column * 80, y + 85 + row * 78, 80, 78);
+            Rect hit = ui.R(x + 160 + column * 80, y + 85 + row * 78, 80, 78);
             if (ui.Button(n.ToString(), cell, 26, enabled: open, done: progress.IsSolved(_difficulty, n), id: $"{_difficulty} {n}", hit: hit))
                 return new LevelScreen(_context, _difficulty, n);
         }
@@ -136,28 +146,29 @@ public sealed class MenuScreen : IScreen
     {
         Settings settings = _context.Saves.Settings;
         bool connected = ui.Input.Gamepad.Connected;
-        float x = ui.DesignX(panel.X) + 60, y = ui.DesignY(panel.Y) + 24;
-        ui.Label("Keyboard", ui.R(x + 220, y, 200, 30), 24);
-        ui.Label("Controller", ui.R(x + 460, y, 200, 30), 24);
+        float x = ui.DesignX(panel.X) + 45, y = ui.DesignY(panel.Y);
+        ui.Label("Keyboard", ui.R(x + 170, RowY(y, 0, 0), 180, RowHeight), 24);
+        ui.Label("Controller", ui.R(x + 370, RowY(y, 0, 0), 180, RowHeight), 24);
         (GameAction Action, string Label)[] rows =
         [
             (GameAction.Forwards, "Forwards"), (GameAction.Backwards, "Backwards"), (GameAction.Left, "Left"), (GameAction.Right, "Right"),
             (GameAction.Restart, "Restart"), (GameAction.Pause, "Pause Menu"),
         ];
-        float rowY = y + 44;
         for (int i = 0; i < rows.Length; i++)
         {
             var (action, label) = rows[i];
-            if (i == 4) rowY += 14;
-            ui.Label(label, ui.P(x + 20, rowY + 8), 24);
-            string key = _rebinding == (action, false) ? "Press a key" : KeyName(settings.Keys[action]);
-            if (ui.Button(key, ui.R(x + 220, rowY, 200, 40), 22, id: $"{label} key")) _rebinding = (action, false);
+            float rowY = RowY(y, i + 1, i >= 4 ? 1 : 0);
+            ui.Label(label, ui.R(x, rowY, 160, RowHeight), 24, align: Align.Left);
+            bool typing = _rebinding == (action, false);
+            Key key = settings.Keys[action];
+            string[] keySymbol = !typing && KeySymbol(key) is { } symbol ? [symbol] : [];
+            if (ui.SymbolButton($"{label} key", ui.R(x + 170, rowY, 180, RowHeight), keySymbol, typing ? "Press a key" : KeyName(key)))
+                _rebinding = (action, false);
             GamepadButtons button = Flag(settings.Pad[action]);
             bool capturing = _rebinding == (action, true);
-            if (ui.SymbolButton($"{label} button", ui.R(x + 460, rowY, 200, 40), capturing ? [] : ui.Input.SymbolsFor(button),
+            if (ui.SymbolButton($"{label} button", ui.R(x + 370, rowY, 180, RowHeight), capturing ? [] : ui.Input.SymbolsFor(button),
                                 capturing ? "Press a button" : PadName(settings.Pad[action]), enabled: connected))
                 _rebinding = (action, true);
-            rowY += 50;
         }
     }
 
@@ -218,26 +229,25 @@ public sealed class MenuScreen : IScreen
     private void SettingsPanel(Ui ui, Rect panel)
     {
         Settings s = _context.Saves.Settings;
-        float x = ui.DesignX(panel.X) + 70, y = ui.DesignY(panel.Y) + 22;
-        const float row = 36, gap = 12, width = 560;
+        float x = ui.DesignX(panel.X) + 80, y = ui.DesignY(panel.Y);
+        const float width = PanelWidth - 160;
         bool changed = false, display = false;
 
         bool dark = s.DarkBackground, show = !s.HideUi;
-        changed |= ui.Toggle("Dark Background", ui.R(x, y, width, 32), ref dark);
-        changed |= ui.Toggle("Show Level Name and Tutorial", ui.R(x, y += row, width, 32), ref show);
+        changed |= ui.Toggle("Dark Background", ui.R(x, RowY(y, 0, 0), width, RowHeight), ref dark);
+        changed |= ui.Toggle("Show Level Name and Tutorial", ui.R(x, RowY(y, 1, 0), width, RowHeight), ref show);
         (s.DarkBackground, s.HideUi) = (dark, !show);
 
         double music = s.MusicVolume, sound = s.SoundVolume;
         bool musicMuted = s.MusicMuted, soundMuted = s.SoundMuted;
-        changed |= Volume(ui, "Music", x, y += row + gap, ref music, ref musicMuted);
-        bool soundChanged = Volume(ui, "Sound", x, y += 2 * row + 8 + gap, ref sound, ref soundMuted);
+        changed |= Volume(ui, "Music", x, RowY(y, 2, 1), width, ref music, ref musicMuted);
+        bool soundChanged = Volume(ui, "Sound", x, RowY(y, 4, 2), width, ref sound, ref soundMuted);
         changed |= soundChanged;
         (s.MusicVolume, s.SoundVolume, s.MusicMuted, s.SoundMuted) = (music, sound, musicMuted, soundMuted);
 
         bool fullscreen = s.Fullscreen, vsync = s.VSync;
-        y += 2 * row + 8 + gap * 2;
-        display |= ui.Toggle("Fullscreen", ui.R(x, y, width, 32), ref fullscreen);
-        display |= ui.Toggle("VSync", ui.R(x, y + row, width, 32), ref vsync);
+        display |= ui.Toggle("Fullscreen", ui.R(x, RowY(y, 6, 3), width, RowHeight), ref fullscreen);
+        display |= ui.Toggle("VSync", ui.R(x, RowY(y, 7, 3), width, RowHeight), ref vsync);
         (s.Fullscreen, s.VSync) = (fullscreen, vsync);
 
         if (changed || display)
@@ -257,32 +267,54 @@ public sealed class MenuScreen : IScreen
 
     private double _previewCooldown;
 
-    // A switch for the music or the sounds, and their volume beneath it, which can only be changed while
-    // they are on.
-    private static bool Volume(Ui ui, string name, float x, float y, ref double volume, ref bool muted)
+    // A switch for the music or the sounds, and their volume on the row beneath it, which can only be changed
+    // while they are on.
+    private static bool Volume(Ui ui, string name, float x, float y, float width, ref double volume, ref bool muted)
     {
         bool on = !muted;
-        bool changed = ui.Toggle(name, ui.R(x, y, 560, 32), ref on);
+        bool changed = ui.Toggle(name, ui.R(x, y, width, RowHeight), ref on);
         muted = !on;
-        changed |= ui.Slider($"{name} Volume", ui.R(x + 44, y + 46, 380, 20), ref volume, ui.R(x, y + 38, 560, 36), enabled: on);
-        ui.Label($"{Math.Round(volume * 100):0} %", ui.P(x + 444, y + 40), 22, on ? null : Style.DisabledText);
+        float slider = y + Pitch;
+        changed |= ui.Slider($"{name} Volume", ui.R(x + 36, slider + 8, width - 116, 20), ref volume, ui.R(x, slider, width, RowHeight), enabled: on);
+        ui.Label($"{Math.Round(volume * 100):0} %", ui.R(x + width - 64, slider, 64, RowHeight), 22, on ? null : Style.DisabledText, align: Align.Right);
         return changed;
     }
 
+    // The credits as a column of blocks, centred in the panel: the title and the logo scene under it, then
+    // paragraphs set apart by one gap, their lines evenly spaced, and the link last.
     private void Credits(Ui ui, Rect panel, Scene scene, double seconds)
     {
-        float x = ui.DesignX(panel.X), y = ui.DesignY(panel.Y);
-        float w = panel.Width / ui.Scale;
-        ui.Label("Cubicolor", ui.R(x, y + 14, w, 60), 48, style: FontStyle.Black);
+        const float paragraph = 18, line = 22, small = 18;
+        string[] music = ["Relaxing Piano Music by Kevin MacLeod (incompetech.com)",
+                          "Licensed under Creative Commons: By Attribution 3.0 License",
+                          "https://creativecommons.org/licenses/by/3.0/"];
+        string[] font = ["Vollkorn by Friedrich Althausen", "SIL Open Font License 1.1"];
+        const float title = 56, logo = 84, author = 32, link = 32;
+        float height = title + 4 + logo + paragraph + author + paragraph + music.Length * line + paragraph + font.Length * line + paragraph + link;
+
+        float x = ui.DesignX(panel.X), w = PanelWidth;
+        float y = ui.DesignY(panel.Y) + (PanelHeight - height) / 2;
+        ui.Label("Cubicolor", ui.R(x, y, w, title), 48, style: FontStyle.Black);
+        y += title + 4;
         _logo.Advance(seconds);
-        _logo.Draw(scene, ui.R(x + w / 2 - 160, y + 76, 320, 106), ui.Size, _sectionFade);
-        ui.Label("A game by Stefan Seil", ui.R(x, y + 186, w, 34), 26);
-        ui.Label("Relaxing Piano Music by Kevin MacLeod (incompetech.com)", ui.R(x, y + 234, w, 22), 18);
-        ui.Label("Licensed under Creative Commons: By Attribution 3.0 License", ui.R(x, y + 256, w, 22), 18);
-        ui.Label("https://creativecommons.org/licenses/by/3.0/", ui.R(x, y + 278, w, 22), 18);
-        ui.Label("Vollkorn by Friedrich Althausen, SIL Open Font License 1.1", ui.R(x, y + 310, w, 22), 18);
+        _logo.Draw(scene, ui.R(x + w / 2 - 150, y, 300, logo), ui.Size, _sectionFade);
+        y += logo + paragraph;
+        ui.Label("A game by Stefan Seil", ui.R(x, y, w, author), 26);
+        y += author + paragraph;
+        foreach (string text in music)
+        {
+            ui.Label(text, ui.R(x, y, w, line), small);
+            y += line;
+        }
+        y += paragraph;
+        foreach (string text in font)
+        {
+            ui.Label(text, ui.R(x, y, w, line), small);
+            y += line;
+        }
+        y += paragraph;
         float linkWidth = ui.TextWidth(Website, 24) / ui.Scale + 16;
-        if (ui.Link(Website, ui.R(x + (w - linkWidth) / 2, y + 354, linkWidth, 34), 24)) _context.OpenUrl?.Invoke("https://" + Website);
+        if (ui.Link(Website, ui.R(x + (w - linkWidth) / 2, y, linkWidth, link), 24)) _context.OpenUrl?.Invoke("https://" + Website);
     }
 
     private const string Website = "srseil.com";

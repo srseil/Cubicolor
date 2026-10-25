@@ -133,6 +133,7 @@ internal static class Program
                                    string? captureAudio)
     {
         using var renderer = new MetalRenderer(IntPtr.Zero, () => (width, height), vsync: false);
+        MenuScreen.KeySymbol = KeyCodes.Symbol;
         // Headless, the mix goes nowhere unless it is captured to a file.
         using var audio = new AudioService(MusicPath(assets), _ => null);
         GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio, new NoAchievements());
@@ -196,7 +197,9 @@ internal static class Program
             return 2;
         }
         string solutions = Path.Combine(root, "tests", "Cubicolor.Tests", "Fixtures", "solutions.txt");
-        new Art(context, text, solutions, (w, h) => (width, height) = (w, h)).RenderAll(directory);
+        var art = new Art(context, text, solutions, (w, h) => (width, height) = (w, h));
+        if (Environment.GetEnvironmentVariable("CUBICOLOR_ICON_VARIANTS") == "1") art.IconVariants(directory);
+        else art.RenderAll(directory);
         return 0;
     }
 
@@ -210,6 +213,7 @@ internal static class Program
         using var window = new MacWindow(w, h, "Cubicolor");
         var input = new MacInput(window);
         MenuScreen.KeyName = KeyCodes.Name;
+        MenuScreen.KeySymbol = KeyCodes.Symbol;
         using var renderer = new MetalRenderer(window.MetalLayer, () =>
             ((int) MathF.Round(window.Width * window.PixelDensity), (int) MathF.Round(window.Height * window.PixelDensity)), settings.VSync);
         using var audio = new AudioService(MusicPath(assets), CoreAudioOutput.Start);

@@ -130,6 +130,53 @@ internal sealed class Art(GameContext context, Text text, string solutions, Acti
 
     private enum IconKind { Plain, MacOS, Square }
 
+    // How the macOS icon's rounded square is drawn: flat, or as a plaque with depth.
+    public enum Plaque { Flat, Edged, Raised }
+
+    public Plaque IconPlaque { get; set; } = Plaque.Flat;
+
+    // The rounded square under the cube on macOS, in Apple's grid. Edged: a front edge below it as the game's
+    // tiles have, and light falling from above across its face. Raised: also a bevelled rim, a soft shadow
+    // under the whole and a faint one under the cube.
+    private void DrawPlaque(int size, float margin, float body)
+    {
+        float radius = size * 185f / 1024;
+        var face = new Rect(margin, margin, body, body);
+        if (IconPlaque == Plaque.Flat)
+        {
+            _underlay.RoundedRectangle(face, radius, Palette.Background);
+            return;
+        }
+        float edge = body * 0.035f;
+        var top = new Rect(margin, margin, body, body - edge);
+        if (IconPlaque == Plaque.Raised)
+            for (int i = 6; i >= 1; i--)
+            {
+                float spread = body * 0.008f * i;
+                var shadow = new Rect(margin - spread, margin + edge * 0.6f - spread * 0.4f, body + 2 * spread, body + 2 * spread);
+                _underlay.RoundedRectangle(shadow, radius + spread, new Vector4(0, 0, 0, 0.035f));
+            }
+        _underlay.RoundedRectangle(face, radius, Palette.Hex(0xc9c5bd));
+        if (IconPlaque == Plaque.Raised)
+        {
+            float rim = body * 0.012f;
+            _underlay.RoundedRectangle(top, radius, Palette.Hex(0xffffff), Palette.Hex(0xd8d4cc));
+            top = top.Inset(rim);
+            radius -= rim;
+        }
+        _underlay.RoundedRectangle(top, radius, Palette.Hex(0xf7f5f1), Palette.Hex(0xe9e6df));
+        if (IconPlaque == Plaque.Raised)
+        {
+            // Where the cube stands: a soft dark ellipse.
+            float w = body * 0.5f, h = body * 0.16f;
+            for (int i = 4; i >= 1; i--)
+            {
+                var spot = new Rect(size * 0.465f - w / 2 - i * body * 0.01f, size * 0.675f - h / 2 - i * body * 0.006f, w + i * body * 0.02f, h + i * body * 0.012f);
+                _underlay.RoundedRectangle(spot, spot.Height / 2, new Vector4(0, 0, 0, 0.03f));
+            }
+        }
+    }
+
     // The app icon: the black cube on its own at the game's angle, as the earlier versions' icon was. On macOS it
     // sits on a rounded square in the game's background colour (Apple's grid: an 824 body on a 1024 canvas,
     // corners of 185); elsewhere it stands on nothing, or on a square of the background.
@@ -142,13 +189,24 @@ internal sealed class Art(GameContext context, Text text, string solutions, Acti
         _scene.Lighting = GameContext.Light;
         float body = kind == IconKind.MacOS ? size * 824f / 1024 : size;
         float margin = (size - body) / 2;
-        if (kind == IconKind.MacOS)
-            _underlay.RoundedRectangle(new Rect(margin, margin, body, body), size * 185f / 1024, Palette.Background);
+        if (kind == IconKind.MacOS) DrawPlaque(size, margin, body);
         float cube = kind == IconKind.Plain ? size * 0.92f : body * 0.64f;
         var target = new Rect((size - cube) / 2, (size - cube) / 2, cube, cube);
         (_scene.View, _scene.Projection) = CameraFit.FitInto(new Vector3(-0.5f), new Vector3(0.5f), target, new Vector2(size), CameraFit.Forward);
         _scene.Items.Add(new DrawItem(context.Meshes.Cube, Matrix4x4.Identity, Palette.Black));
         Save(directory, name, size, size, opaque: kind == IconKind.Square);
+    }
+
+    // The macOS icon in each plaque style, side by side for choosing.
+    public void IconVariants(string directory)
+    {
+        Directory.CreateDirectory(directory);
+        foreach (Plaque plaque in Enum.GetValues<Plaque>())
+        {
+            IconPlaque = plaque;
+            Icon(directory, $"icon_macos_{plaque.ToString().ToLowerInvariant()}", 1024, IconKind.MacOS);
+        }
+        IconPlaque = Plaque.Flat;
     }
 
     // The macOS icon set: every size iconutil wants, from which packaging makes Cubicolor.icns.
