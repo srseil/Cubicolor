@@ -278,7 +278,7 @@ internal sealed class Art(GameContext context, Text text, string solutions, Acti
         float body = kind == IconKind.MacOS ? size * 824f / 1024 : size;
         float margin = (size - body) / 2;
         if (kind == IconKind.MacOS) DrawPlaque(size, margin, body);
-        float cube = kind == IconKind.Plain ? size * 0.92f : body * (kind == IconKind.MacOS ? 0.70f : 0.64f);
+        float cube = kind == IconKind.Plain ? size * 0.92f : body * (kind == IconKind.MacOS ? 0.74f : 0.64f);
         var target = new Rect((size - cube) / 2, (size - cube) / 2, cube, cube);
         (_scene.View, _scene.Projection) = CameraFit.FitInto(new Vector3(-0.5f), new Vector3(0.5f), target, new Vector2(size), CameraFit.Forward);
         _scene.Items.Add(new DrawItem(context.Meshes.Cube, Matrix4x4.Identity, Palette.Black));
