@@ -57,14 +57,11 @@ public sealed class Overlay
         radius = MathF.Min(radius, MathF.Min(r.Width, r.Height) / 2);
         int perCorner = Segments(radius);
         Vector2 centre = r.Centre;
-        Vector4 At(Vector2 p)
-        {
-            Vector4 c = Vector4.Lerp(top, bottom, Math.Clamp((p.Y - r.Y) / r.Height, 0, 1));
-            c.W *= Opacity;
-            return c;
-        }
-        var outline = new List<Vector2>(4 * (perCorner + 1));
-        (Vector2 Corner, float Start)[] corners =
+        top.W *= Opacity;
+        bottom.W *= Opacity;
+        Span<Vector2> outline = stackalloc Vector2[4 * (perCorner + 1)];
+        int n = 0;
+        Span<(Vector2 Corner, float Start)> corners =
         [
             (new Vector2(r.Right - radius, r.Y + radius), -MathF.PI / 2),
             (new Vector2(r.Right - radius, r.Bottom - radius), 0),
@@ -75,17 +72,20 @@ public sealed class Overlay
             for (int i = 0; i <= perCorner; i++)
             {
                 float angle = start + MathF.PI / 2 * i / perCorner;
-                outline.Add(corner + new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * radius);
+                outline[n++] = corner + new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * radius;
             }
         Vector2 uv = OverlayAtlas.Solid;
-        for (int i = 0; i < outline.Count; i++)
+        for (int i = 0; i < n; i++)
         {
-            Vector2 a = outline[i], b = outline[(i + 1) % outline.Count];
-            _vertices.Add(new OverlayVertex(centre, uv, At(centre)));
-            _vertices.Add(new OverlayVertex(a, uv, At(a)));
-            _vertices.Add(new OverlayVertex(b, uv, At(b)));
+            Vector2 a = outline[i], b = outline[(i + 1) % n];
+            _vertices.Add(new OverlayVertex(centre, uv, At(centre, r, top, bottom)));
+            _vertices.Add(new OverlayVertex(a, uv, At(a, r, top, bottom)));
+            _vertices.Add(new OverlayVertex(b, uv, At(b, r, top, bottom)));
         }
     }
+
+    private static Vector4 At(Vector2 p, Rect r, Vector4 top, Vector4 bottom) =>
+        Vector4.Lerp(top, bottom, Math.Clamp((p.Y - r.Y) / r.Height, 0, 1));
 
     // A rectangle with every corner rounded by `radius`: a fan around its centre.
     public void RoundedRectangle(Rect r, float radius, Vector4 color)
@@ -100,7 +100,7 @@ public sealed class Overlay
         Vector2 centre = r.Centre;
         Span<Vector2> outline = stackalloc Vector2[4 * (perCorner + 1)];
         int n = 0;
-        (Vector2 Corner, float Start)[] corners =
+        Span<(Vector2 Corner, float Start)> corners =
         [
             (new Vector2(r.Right - radius, r.Y + radius), -MathF.PI / 2),
             (new Vector2(r.Right - radius, r.Bottom - radius), 0),
@@ -121,7 +121,7 @@ public sealed class Overlay
     {
         int perCorner = Segments(radius);
         radius = MathF.Max(0, MathF.Min(radius, MathF.Min(r.Width, r.Height) / 2));
-        (Vector2 Corner, float Start)[] corners =
+        Span<(Vector2 Corner, float Start)> corners =
         [
             (new Vector2(r.Right - radius, r.Y + radius), -MathF.PI / 2),
             (new Vector2(r.Right - radius, r.Bottom - radius), 0),
@@ -158,6 +158,11 @@ public sealed class Overlay
         var b = new OverlayVertex(new Vector2(r.Right, r.Y), new Vector2(uvBottomRight.X, uvTopLeft.Y), color);
         var c = new OverlayVertex(new Vector2(r.Right, r.Bottom), uvBottomRight, color);
         var d = new OverlayVertex(new Vector2(r.X, r.Bottom), new Vector2(uvTopLeft.X, uvBottomRight.Y), color);
-        _vertices.AddRange([a, b, c, a, c, d]);
+        _vertices.Add(a);
+        _vertices.Add(b);
+        _vertices.Add(c);
+        _vertices.Add(a);
+        _vertices.Add(c);
+        _vertices.Add(d);
     }
 }
