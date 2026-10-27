@@ -21,7 +21,8 @@ public sealed class Settings
     public bool DarkBackground { get; set; }
     public bool HideUi { get; set; }
     public double MusicVolume { get; set; } = 1.0;    // 0..1
-    public double SoundVolume { get; set; } = 1.0;    // 0..1
+    // A little under full, so the effects sit under the music: -3.2 dB.
+    public double SoundVolume { get; set; } = 0.8;    // 0..1
     public bool MusicMuted { get; set; }
     public bool SoundMuted { get; set; }
     public bool Fullscreen { get; set; }

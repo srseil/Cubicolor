@@ -5,22 +5,52 @@ namespace Cubicolor.Audio;
 
 // The game's sound effects, made at startup instead of loaded. Each one imitates the recording the earlier
 // versions used, measured with tools/SoundLab: the same length, loudness, envelope and the frequencies its
-// energy sits at. Deterministic: the same samples every run.
+// energy sits at; then all of them are softened a little, their brightest edge taken off, to sit under the piano
+// rather than cut through it. Deterministic: the same samples every run.
 public static class Synth
 {
     private const int Rate = Mixer.Rate;
 
-    public static float[] Make(Sound sound) => sound switch
+    public static float[] Make(Sound sound) => Stereo(Soften(sound switch
     {
-        Sound.Click => Stereo(Click()),
-        Sound.Step => Stereo(Step()),
-        Sound.Paint => Stereo(Paint()),
+        Sound.Click => Click(),
+        Sound.Step => Step(),
+        Sound.Paint => Paint(),
         // The original was the colouring sound played backwards.
-        Sound.Unpaint => Stereo(Reversed(Paint())),
-        Sound.Revive => Stereo(Revive()),
-        Sound.Solve => Stereo(Solve()),
+        Sound.Unpaint => Reversed(Paint()),
+        Sound.Revive => Revive(),
+        Sound.Solve => Solve(),
         _ => throw new ArgumentOutOfRangeException(nameof(sound), sound, null),
-    };
+    }));
+
+    // 6 dB less above 3 kHz (a high shelf) and a gentle roll-off past 8 kHz (a Butterworth low-pass): what the
+    // trailer's mix did to them, which made them sound softer over the music.
+    private static float[] Soften(float[] s)
+    {
+        // RBJ's cookbook filters: a shelf of slope 1, and a low-pass of Q 1/sqrt(2).
+        double w = 2 * Math.PI * 3000 / Rate, a = Math.Pow(10, -6 / 40.0), alpha = Math.Sin(w) / 2 * Math.Sqrt(2);
+        double cos = Math.Cos(w), root = 2 * Math.Sqrt(a) * alpha;
+        Biquad(s,
+            a * ((a + 1) + (a - 1) * cos + root), -2 * a * ((a - 1) + (a + 1) * cos), a * ((a + 1) + (a - 1) * cos - root),
+            (a + 1) - (a - 1) * cos + root, 2 * ((a - 1) - (a + 1) * cos), (a + 1) - (a - 1) * cos - root);
+        w = 2 * Math.PI * 8000 / Rate;
+        alpha = Math.Sin(w) / (2 / Math.Sqrt(2));
+        cos = Math.Cos(w);
+        Biquad(s, (1 - cos) / 2, 1 - cos, (1 - cos) / 2, 1 + alpha, -2 * cos, 1 - alpha);
+        return s;
+    }
+
+    private static void Biquad(float[] s, double b0, double b1, double b2, double a0, double a1, double a2)
+    {
+        double x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+        for (int i = 0; i < s.Length; i++)
+        {
+            double x = s[i];
+            double y = (b0 * x + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2) / a0;
+            (x2, x1, y2, y1) = (x1, x, y1, y);
+            s[i] = (float) y;
+        }
+    }
 
     // A dry wooden click: the button click recording's resonances (frequency, starting amplitude, decay), as
     // SoundLab's modes measured them, under a short broadband tick. Decays this short come out about three times
