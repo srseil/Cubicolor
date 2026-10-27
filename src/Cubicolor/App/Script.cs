@@ -14,7 +14,8 @@ namespace Cubicolor.App;
 // A headless run's commands, one per line or separated by ';', `#` starting a comment:
 //
 //   wait <seconds>              let game time pass
-//   wait ready                  until the level takes input (or fail after 10 s)
+//   wait ready                  until the level takes input (or fail after 10 s), logging when
+//   wait settled                until the board has come to rest: a roll, a key's paint, a lock's drain
 //   press <Key>                 a key for one frame (Key enum names: Up, Return, Escape, R, ...)
 //   pad <button>                a controller button for one frame (South, East, Menu, Up, ...)
 //   controller on|off           a controller connected (or not) without pressing anything
@@ -97,7 +98,17 @@ internal sealed class Script
         {
             case "wait" when argument == "ready":
                 if (double.IsPositiveInfinity(_deadline)) _deadline = time + 10;
-                if (screen is LevelScreen { State: "ready" }) { _deadline = double.PositiveInfinity; return true; }
+                if (screen is LevelScreen { State: "ready" })
+                {
+                    _deadline = double.PositiveInfinity;
+                    Log.Info(FormattableString.Invariant($"Ready at {time:0.000} s"));
+                    return true;
+                }
+                if (time > _deadline) Fail(line);
+                return false;
+            case "wait" when argument == "settled":
+                if (double.IsPositiveInfinity(_deadline)) _deadline = time + 10;
+                if (screen is LevelScreen { Board.Settled: true }) { _deadline = double.PositiveInfinity; return true; }
                 if (time > _deadline) Fail(line);
                 return false;
             case "wait":
