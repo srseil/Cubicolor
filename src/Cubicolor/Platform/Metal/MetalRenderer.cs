@@ -70,8 +70,9 @@ internal sealed unsafe class MetalRenderer : IRenderer
         _overlay = new MetalPipeline(_device.NewRenderPipeline(descriptor.Handle, "overlay"), _device.NewDepthState(CompareFunction.Always, false));
 
         _sampler = _device.NewSampler(SamplerFilter.Linear, MipFilter.NotMipmapped, AddressMode.ClampToEdge, 0);
+        // Managed, since a Mac with an Intel or AMD GPU has no shared textures.
         _atlas = new MetalAtlas(_device.NewTexture("overlay atlas", PixelFormat.R8Unorm, OverlayAtlas.Size, OverlayAtlas.Size,
-            TextureUsage.ShaderRead, StorageMode.Shared), this);
+            TextureUsage.ShaderRead, StorageMode.Managed), this);
         Log.Info($"Renderer: {Name}");
     }
 

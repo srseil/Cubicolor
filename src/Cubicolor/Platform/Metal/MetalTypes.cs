@@ -16,7 +16,7 @@ internal enum PixelFormat : ulong { R8Unorm = 10, R32Float = 55, RGBA8Unorm = 70
 
 [Flags] internal enum TextureUsage : ulong { ShaderRead = 1, ShaderWrite = 2, RenderTarget = 4 }
 
-internal enum StorageMode : ulong { Shared = 0, Private = 2, Memoryless = 3 }
+internal enum StorageMode : ulong { Shared = 0, Managed = 1, Private = 2, Memoryless = 3 }
 
 internal enum LoadAction : ulong { DontCare = 0, Load = 1, Clear = 2 }
 
