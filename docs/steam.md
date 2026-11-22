@@ -53,7 +53,8 @@ the password and the Steam Guard code):
 sdk/tools/ContentBuilder/builder_osx/steamcmd.sh +login <account> +run_app_build "$PWD/app_454190.vdf" +quit
 ```
 
-`Preview` is `1` until the manifests it writes have been read. The scripts have not been run through `steamcmd` yet.
+`Preview` is `1` until the manifests it writes have been read. The macOS one ran on 2026-11-22: the old save files are
+in it, where they were, flagged `userconfig`, and unchanged from the live build.
 Never commit the SDK or its libraries, and never ship `steam_appid.txt`.
 
 **Before any build goes to `default`:** read in Steamworks which depots the build holds. Whether a build that leaves
