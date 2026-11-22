@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Cubicolor.Game;
 using Cubicolor.Simulation.Levels;
@@ -11,9 +13,9 @@ namespace Cubicolor.Platform;
 // steam_api64.dll, libsteam_api.so), loaded at runtime from beside the executable. Without the library or
 // without Steam running, the game runs without it: no achievements, nothing else changes.
 //
-// Function names are from steam_api_flat.h. Newer SDKs (1.58 on) export SteamAPI_InitFlat and drop the
-// plain SteamAPI_Init export, and the accessor's version suffix moves with the interface, so each is looked
-// up by its candidate names (from memory; to check against the SDK that ships).
+// Function names are from steam_api_flat.h, checked against SDK 1.65 (July 2026) and the exports of the library
+// the Steam client itself carries. An accessor's version suffix moves with its interface from SDK to SDK, so
+// each is looked up by its candidate names, newest first; `--check-steam` says whether a library has them all.
 internal sealed unsafe class Steam : IAchievements, IDisposable
 {
     public const uint AppId = 454190;
@@ -36,6 +38,40 @@ internal sealed unsafe class Steam : IAchievements, IDisposable
     private static string LibraryName =>
         OperatingSystem.IsMacOS() ? "libsteam_api.dylib" : OperatingSystem.IsWindows() ? "steam_api64.dll" : "libsteam_api.so";
 
+    private static readonly string[] StatsAccessors = ["SteamAPI_SteamUserStats_v013", "SteamAPI_SteamUserStats_v012", "SteamAPI_SteamUserStats_v011"];
+    private static readonly string[] AppsAccessors = ["SteamAPI_SteamApps_v009", "SteamAPI_SteamApps_v008"];
+
+    // What the game calls that `library` doesn't export; each entry is one function, by its candidate names.
+    internal static IReadOnlyList<string> Missing(IntPtr library) =>
+    [
+        .. new string[][]
+        {
+            ["SteamAPI_InitFlat", "SteamAPI_Init"], ["SteamAPI_RunCallbacks"], ["SteamAPI_Shutdown"],
+            StatsAccessors, ["SteamAPI_ISteamUserStats_SetAchievement"], ["SteamAPI_ISteamUserStats_StoreStats"],
+            AppsAccessors, ["SteamAPI_ISteamApps_GetCurrentGameLanguage"],
+        }.Where(names => !names.Any(name => NativeLibrary.TryGetExport(library, name, out _))).Select(names => string.Join(" / ", names)),
+    ];
+
+    // Whether the Steam library beside the game loads and has everything the game calls, without starting Steam.
+    public static bool Check()
+    {
+        string path = Path.Combine(AppContext.BaseDirectory, LibraryName);
+        IntPtr library;
+        try
+        {
+            library = NativeLibrary.Load(path);
+        }
+        catch (DllNotFoundException e)
+        {
+            Log.Error($"Steam: {path} didn't load: {e.Message}");
+            return false;
+        }
+        IReadOnlyList<string> missing = Missing(library);
+        if (missing.Count == 0) Log.Info($"Steam: {path} has everything the game calls");
+        else Log.Error($"Steam: {path} lacks {string.Join(", ", missing)}");
+        return missing.Count == 0;
+    }
+
     // Steam, or null when it is not there to talk to.
     public static Steam? Start()
     {
@@ -49,7 +85,7 @@ internal sealed unsafe class Steam : IAchievements, IDisposable
         {
             if (!Initialise(library)) return null;
             IntPtr stats = IntPtr.Zero;
-            foreach (string version in new[] { "SteamAPI_SteamUserStats_v013", "SteamAPI_SteamUserStats_v012", "SteamAPI_SteamUserStats_v011" })
+            foreach (string version in StatsAccessors)
                 if (NativeLibrary.TryGetExport(library, version, out IntPtr accessor))
                 {
                     stats = ((delegate* unmanaged<IntPtr>) accessor)();
@@ -100,14 +136,17 @@ internal sealed unsafe class Steam : IAchievements, IDisposable
     private static string? CurrentGameLanguage(IntPtr library)
     {
         IntPtr apps = IntPtr.Zero;
-        foreach (string version in new[] { "SteamAPI_SteamApps_v008", "SteamAPI_SteamApps_v007" })
+        foreach (string version in AppsAccessors)
             if (NativeLibrary.TryGetExport(library, version, out IntPtr accessor))
             {
                 apps = ((delegate* unmanaged<IntPtr>) accessor)();
                 break;
             }
         if (apps == IntPtr.Zero || !NativeLibrary.TryGetExport(library, "SteamAPI_ISteamApps_GetCurrentGameLanguage", out IntPtr get))
+        {
+            Log.Warn("Steam: no apps interface, so no game language");
             return null;
+        }
         string? language = Marshal.PtrToStringUTF8(((delegate* unmanaged<IntPtr, IntPtr>) get)(apps));
         Log.Info($"Steam: game language {language}");
         return string.IsNullOrEmpty(language) ? null : language;
