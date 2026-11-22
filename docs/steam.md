@@ -31,12 +31,16 @@ Checked 2026-11-22 against Valve's public docs, SDK 1.65's headers, the app's pu
 
 ## Building and uploading
 
+The Steamworks SDK goes into `packaging/steam/sdk`, which git ignores: unpack Valve's zip there, so that
+`redistributable_bin` is directly inside (1.65 now, from HoleInNone's `steamworks_sdk_165.zip`). Its macOS, Windows
+and Linux libraries have every function the game calls; a test checks the one of the system it runs on.
+
 ```bash
-STEAM_SDK=<sdk> packaging/macos/package.sh
+packaging/macos/package.sh
 packaging/steam/content.sh artifacts/macos/Cubicolor.app
 ```
 
-Then, in `packaging/steam`, with Valve's `steamcmd` (it asks for the password and the Steam Guard code):
+Then, in `packaging/steam`, with the `steamcmd` in the SDK (`sdk/tools/ContentBuilder/builder_osx`; it asks for the password and the Steam Guard code):
 
 ```bash
 steamcmd +login <account> +run_app_build "$PWD/app_454190.vdf" +quit
@@ -50,7 +54,7 @@ a depot out keeps its last content is unverified, and Windows and Linux players 
 
 ## Left to do in Steamworks
 
-1. Download the SDK, and package with it.
+1. One start of the packaged game through Steam: that it is recognised, and the language and achievements work.
 2. Look at the file list of the old macOS and Linux depots: are `savestates` and `config` in them, and where?
 3. A private beta branch for the new build. On each system: install the public build, solve some levels, switch to
    the branch, check the progress is there, switch back.

@@ -20,3 +20,6 @@ Thumbs.db
 
 # Claude Code machine-local settings
 .claude/settings.local.json
+
+# The Steamworks SDK (not ours to publish) and what the depot scripts upload
+packaging/steam/sdk/

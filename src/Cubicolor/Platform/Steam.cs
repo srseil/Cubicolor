@@ -37,7 +37,7 @@ internal sealed unsafe class Steam : IAchievements, IDisposable
         _stats = stats;
     }
 
-    private static string LibraryName =>
+    internal static string LibraryName =>
         OperatingSystem.IsMacOS() ? "libsteam_api.dylib" : OperatingSystem.IsWindows() ? "steam_api64.dll" : "libsteam_api.so";
 
     private static readonly string[] StatsAccessors = ["SteamAPI_SteamUserStats_v013", "SteamAPI_SteamUserStats_v012", "SteamAPI_SteamUserStats_v011"];

@@ -10,7 +10,7 @@ content="$root/artifacts/steam/content"
 app="${1:?the packaged Cubicolor.app}"
 
 if [ ! -f "$app/Contents/MacOS/libsteam_api.dylib" ]; then
-    echo "$app has no Steam library: package it with STEAM_SDK set" >&2
+    echo "$app has no Steam library: package it with the SDK in packaging/steam/sdk" >&2
     exit 1
 fi
 "$app/Contents/MacOS/Cubicolor" --check-steam
