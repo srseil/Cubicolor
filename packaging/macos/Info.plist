@@ -7,7 +7,7 @@
     <key>CFBundleDisplayName</key>
     <string>Cubicolor</string>
     <key>CFBundleIdentifier</key>
-    <string>com.moltenplay.cubicolor</string>
+    <string>com.srseil.cubicolor</string>
     <key>CFBundleExecutable</key>
     <string>Cubicolor</string>
     <key>CFBundleIconFile</key>
