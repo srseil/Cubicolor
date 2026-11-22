@@ -166,9 +166,28 @@ public sealed class SaveTests : IDisposable
     }
 
     [Fact]
+    public void The_settings_the_godot_version_was_installed_with_are_no_choice_at_all()
+    {
+        string installed = File.ReadAllText(Path.Combine(Repo.Root, "packaging", "steam", "legacy", "godot", "project.godot"));
+
+        Assert.Equal(SaveFile.FormatSettings(new Settings()), SaveFile.FormatSettings(LegacySaves.ReadGodotSettings(installed)!));
+        Assert.Equal(1.0, LegacySaves.ReadGodotSettings(installed.Replace("config/hide_ui=false", "config/hide_ui=true"))!.SoundVolume);
+    }
+
+    // The files the depots keep in place are the ones Steam has installed since 2016 and 2018, byte for byte (the
+    // SHA-1s in its manifests), so an update from the old version sees nothing to change.
+    [Theory]
+    [InlineData("java/config/config.xml", "6CC784C2D0D73912BE81016DB45F5F2DB3B8847B")]
+    [InlineData("java/savestates/savestate.xml", "41B6697C5B782154531ABA130C1A7D2752AF2787")]
+    [InlineData("godot/project.godot", "608E08B78024B7A75103682851E6469BA84E3FE9")]
+    public void The_files_the_depots_keep_are_the_ones_steam_installed(string file, string sha1) =>
+        Assert.Equal(sha1, Convert.ToHexString(System.Security.Cryptography.SHA1.HashData(
+            File.ReadAllBytes(Path.Combine(Repo.Root, "packaging", "steam", "legacy", file)))));
+
+    [Fact]
     public void The_config_the_old_game_was_installed_with_is_no_choice_at_all()
     {
-        string installed = File.ReadAllText(Path.Combine(Repo.Root, "packaging", "steam", "legacy", "config", "config.xml"));
+        string installed = File.ReadAllText(Path.Combine(Repo.Root, "packaging", "steam", "legacy", "java", "config", "config.xml"));
 
         Assert.Equal(SaveFile.FormatSettings(new Settings()), SaveFile.FormatSettings(LegacySaves.ReadJavaConfig(installed)!));
         // Anything chosen in it keeps the whole of it as it was, its full volume too.
@@ -178,7 +197,7 @@ public sealed class SaveTests : IDisposable
     [Fact]
     public void The_save_the_old_game_was_installed_with_has_nothing_solved()
     {
-        string installed = File.ReadAllText(Path.Combine(Repo.Root, "packaging", "steam", "legacy", "savestates", "savestate.xml"));
+        string installed = File.ReadAllText(Path.Combine(Repo.Root, "packaging", "steam", "legacy", "java", "savestates", "savestate.xml"));
 
         Assert.Equal(new Progress().ToString(), LegacySaves.ReadJavaSaveState(installed)!.ToString());
     }

@@ -1,6 +1,9 @@
-// 64-bit Windows. Its players' saves lie outside the install directory (Godot), so there is nothing to keep.
+// 64-bit Windows, with the file the Godot version was installed with and wrote its settings to, kept as the Java
+// version's are in the other depots. Its progress lies outside the install directory.
 "DepotBuild"
 {
     "DepotID" "454192"
     "FileMapping" { "LocalPath" "windows/*" "DepotPath" "." "Recursive" "1" }
+    "FileMapping" { "LocalPath" "legacy/godot/*" "DepotPath" "." "Recursive" "1" }
+    "FileProperties" { "LocalPath" "legacy/godot/project.godot" "Attributes" "userconfig" }
 }

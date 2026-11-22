@@ -3,7 +3,7 @@
 {
     "DepotID" "454195"
     "FileMapping" { "LocalPath" "linux/*" "DepotPath" "." "Recursive" "1" }
-    "FileMapping" { "LocalPath" "legacy/*" "DepotPath" "." "Recursive" "1" }
-    "FileProperties" { "LocalPath" "legacy/savestates/savestate.xml" "Attributes" "userconfig" }
-    "FileProperties" { "LocalPath" "legacy/config/config.xml" "Attributes" "userconfig" }
+    "FileMapping" { "LocalPath" "legacy/java/*" "DepotPath" "." "Recursive" "1" }
+    "FileProperties" { "LocalPath" "legacy/java/savestates/savestate.xml" "Attributes" "userconfig" }
+    "FileProperties" { "LocalPath" "legacy/java/config/config.xml" "Attributes" "userconfig" }
 }
