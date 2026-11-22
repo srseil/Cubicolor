@@ -1,0 +1,11 @@
+// Cubicolor.app, and the Java version's save files where that version kept them: the depots it shipped in held both,
+// so leaving them out could delete a player's progress. "userconfig" keeps an update from overriding them. They break
+// the bundle's seal, which doesn't keep it from running (docs/steam.md).
+"DepotBuild"
+{
+    "DepotID" "454193"
+    "FileMapping" { "LocalPath" "macos/*" "DepotPath" "." "Recursive" "1" }
+    "FileMapping" { "LocalPath" "legacy/*" "DepotPath" "Cubicolor.app/Contents/MacOS" "Recursive" "1" }
+    "FileProperties" { "LocalPath" "legacy/savestates/savestate.xml" "Attributes" "userconfig" }
+    "FileProperties" { "LocalPath" "legacy/config/config.xml" "Attributes" "userconfig" }
+}

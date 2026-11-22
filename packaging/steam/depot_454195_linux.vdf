@@ -1,0 +1,9 @@
+// 64-bit Linux, with the Java version's save files kept as in the macOS depot.
+"DepotBuild"
+{
+    "DepotID" "454195"
+    "FileMapping" { "LocalPath" "linux/*" "DepotPath" "." "Recursive" "1" }
+    "FileMapping" { "LocalPath" "legacy/*" "DepotPath" "." "Recursive" "1" }
+    "FileProperties" { "LocalPath" "legacy/savestates/savestate.xml" "Attributes" "userconfig" }
+    "FileProperties" { "LocalPath" "legacy/config/config.xml" "Attributes" "userconfig" }
+}

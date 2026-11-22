@@ -163,6 +163,24 @@ public sealed class SaveTests : IDisposable
         Assert.Equal(Key.Left, settings.Keys[GameAction.Left]);
     }
 
+    [Fact]
+    public void The_config_the_old_game_was_installed_with_is_no_choice_at_all()
+    {
+        string installed = File.ReadAllText(Path.Combine(Repo.Root, "packaging", "steam", "legacy", "config", "config.xml"));
+
+        Assert.Equal(SaveFile.FormatSettings(new Settings()), SaveFile.FormatSettings(LegacySaves.ReadJavaConfig(installed)!));
+        // Anything chosen in it keeps the whole of it as it was, its full volume too.
+        Assert.Equal(1.0, LegacySaves.ReadJavaConfig(installed.Replace("<vsync>true", "<vsync>false"))!.SoundVolume);
+    }
+
+    [Fact]
+    public void The_save_the_old_game_was_installed_with_has_nothing_solved()
+    {
+        string installed = File.ReadAllText(Path.Combine(Repo.Root, "packaging", "steam", "legacy", "savestates", "savestate.xml"));
+
+        Assert.Equal(new Progress().ToString(), LegacySaves.ReadJavaSaveState(installed)!.ToString());
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData("<config><settings>")]

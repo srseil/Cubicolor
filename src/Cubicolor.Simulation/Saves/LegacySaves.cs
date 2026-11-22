@@ -110,7 +110,16 @@ public static class LegacySaves
             foreach (var (action, name) in KeyNames)
                 if (Int(controls, name) is { } code && LibGdxKey(code) is { } key)
                     s.Keys[action] = key;
+        if (IsUntouched(s)) s.SoundVolume = new Settings().SoundVolume;
         return s;
+    }
+
+    // The config.xml the old game was installed with, which the new game's depots keep in place (port-plan §2.2):
+    // nobody chose anything in it, its full sound volume included, so a new player starts with the game's own.
+    private static bool IsUntouched(Settings s)
+    {
+        var untouched = new Settings { SoundVolume = 1, MusicVolume = 1 };
+        return SaveFile.FormatSettings(s) == SaveFile.FormatSettings(untouched);
     }
 
     private static readonly (GameAction, string)[] KeyNames =

@@ -1,0 +1,17 @@
+// The whole app's build: every platform's depot. Preview "1" uploads nothing: it only writes the manifests and logs
+// into BuildOutput, to be read before the first real upload. A finished build is put on a branch in Steamworks.
+"AppBuild"
+{
+    "AppID" "454190"
+    "Desc" "Cubicolor 2.0"
+    "Preview" "1"
+    "ContentRoot" "../../artifacts/steam/content"
+    "BuildOutput" "../../artifacts/steam/output"
+    "Depots"
+    {
+        "454193" "depot_454193_macos.vdf"
+        // Uncomment each once its port is done. What a build without a depot means for its players: docs/steam.md.
+        // "454192" "depot_454192_windows.vdf"
+        // "454195" "depot_454195_linux.vdf"
+    }
+}

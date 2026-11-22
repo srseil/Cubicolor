@@ -1,0 +1,6 @@
+// 64-bit Windows. Its players' saves lie outside the install directory (Godot), so there is nothing to keep.
+"DepotBuild"
+{
+    "DepotID" "454192"
+    "FileMapping" { "LocalPath" "windows/*" "DepotPath" "." "Recursive" "1" }
+}
