@@ -46,10 +46,11 @@ packaging/macos/package.sh
 packaging/steam/content.sh artifacts/macos/Cubicolor.app
 ```
 
-Then, in `packaging/steam`, with the `steamcmd` in the SDK (`sdk/tools/ContentBuilder/builder_osx`; it asks for the password and the Steam Guard code):
+Then, in `packaging/steam`, with the SDK's `steamcmd`, which needs `chmod +x` once for it and `steamcmd.sh` (it asks for
+the password and the Steam Guard code):
 
 ```bash
-steamcmd +login <account> +run_app_build "$PWD/app_454190.vdf" +quit
+sdk/tools/ContentBuilder/builder_osx/steamcmd.sh +login <account> +run_app_build "$PWD/app_454190.vdf" +quit
 ```
 
 `Preview` is `1` until the manifests it writes have been read. The scripts have not been run through `steamcmd` yet.

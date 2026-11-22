@@ -33,7 +33,7 @@ lipo -create "$work/osx-arm64/Cubicolor" "$work/osx-x64/Cubicolor" -output "$app
 cp -R "$work/osx-arm64/assets" "$app/Contents/Resources/assets"
 cp "$root/packaging/macos/Info.plist" "$app/Contents/Info.plist"
 if [ -f "$root/packaging/macos/Cubicolor.icns" ]; then cp "$root/packaging/macos/Cubicolor.icns" "$app/Contents/Resources/"; fi
-if [ -n "$library" ]; then cp "$library" "$app/Contents/MacOS/"; fi
+if [ -n "$library" ]; then cp -X "$library" "$app/Contents/MacOS/"; fi   # without the zip's download flag
 
 sign() { codesign --force --sign "${SIGN_IDENTITY:--}" ${SIGN_IDENTITY:+--options runtime --timestamp} "$@"; }
 if [ -n "$library" ]; then sign "$app/Contents/MacOS/libsteam_api.dylib"; fi
