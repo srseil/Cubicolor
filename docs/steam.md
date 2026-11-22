@@ -90,5 +90,8 @@ published; builds are separate, and only go live where they are set live.
    fit both the old and the new build.
 9. The 32-bit depots (454191, 454194): .NET has no 32-bit Linux. Decide what those players get.
 10. Controller support, system requirements, store art, trailer, developer name and website on the store page.
-11. Set the build live on `default`: only by hand, confirmed by the Steam app or a text message. Then the announcement
+11. Supported operating systems, in the application's general settings: the boxes for 64-bit Intel and Apple silicon
+    binaries on macOS, with the release. While neither is ticked, Steam takes the game for a 32-bit one and warns Mac
+    players about it.
+12. Set the build live on `default`: only by hand, confirmed by the Steam app or a text message. Then the announcement
     and an Update Visibility Round.
