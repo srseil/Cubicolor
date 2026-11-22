@@ -28,6 +28,11 @@ Checked 2026-11-22 against Valve's public docs, SDK 1.65's headers, the app's pu
 - **The update keeps the saves, on macOS** (2026-11-22): from the 2016 build with three levels solved and the music at
   40, switching to the beta branch left both files byte for byte as they were, and the new version started from Steam
   with the levels and the volumes, and left the files alone.
+- **Going back to build 2752730 resets the old saves, on macOS** (same day): Steam put its own copies of both files over
+  the player's, which the 2018 build doesn't flag. The new version's progress lies elsewhere and is safe, but whoever was
+  updated and hasn't started the new version yet would lose everything. **So `default` is never rolled back to 2752730,
+  and that build is never offered as a branch.** `packaging/steam/old_454190.vdf` is the same content with the files
+  flagged, for both; whether that is enough is still to be tested.
 - **Without a ticked box for 64-bit macOS, Steam doesn't install the game on a current macOS.** The one for Intel is
   ticked since 2026-11-22, which holds for the old version too (it runs under Rosetta).
 - **Steam starts the universal app as x86-64** on Apple silicon, under Rosetta, though Steam itself runs natively;
@@ -80,8 +85,8 @@ published; builds are separate, and only go live where they are set live.
 
 ### For the beta test
 
-3. On the Builds page, "Create new app branch", twice: one for the new build, with a password, and one for the 2018
-   build, set live there (by then the 2018 build may no longer be among the 50 it lists).
+3. On the Builds page, "Create new app branch", twice: one for the new build, with a password, and one for the
+   protected copy of the 2018 build.
 4. Upload (`Preview` `0`), set the build live on the new branch, and check which depots it holds.
 5. On each system: install the public build, solve some levels, switch to the branch, check the progress and settings,
    play, switch back. Start it from the library; look at the overlay and at an achievement being granted.

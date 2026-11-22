@@ -1,0 +1,20 @@
+// The build of 2018 once more, with the files the old versions save to flagged "userconfig": going back to the build
+// itself (2752730) makes Steam put its own copies over the player's. Its content is what Steam's console downloads
+// ("download_depot 454190 <depot> <manifest>"), laid out in artifacts/steam/old (docs/steam.md).
+"AppBuild"
+{
+    "AppID" "454190"
+    "Desc" "Cubicolor 1.1 and 1.2 (2016, 2018), saves protected"
+    "Preview" "1"
+    "ContentRoot" "../../artifacts/steam/old"
+    "BuildOutput" "../../artifacts/steam/output-old"
+    "Depots"
+    {
+        "454193"
+        {
+            "FileMapping" { "LocalPath" "macos/*" "DepotPath" "." "Recursive" "1" }
+            "FileProperties" { "LocalPath" "macos/Cubicolor.app/Contents/MacOS/savestates/savestate.xml" "Attributes" "userconfig" }
+            "FileProperties" { "LocalPath" "macos/Cubicolor.app/Contents/MacOS/config/config.xml" "Attributes" "userconfig" }
+        }
+    }
+}

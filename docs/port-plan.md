@@ -83,8 +83,9 @@ Two quirks in the old saves:
 - **Settings are imported once,** when no new settings file exists yet. The newest legacy source by
   mtime wins. Keys go through mapping tables for libGDX and Godot codes. A value we can't map falls back
   to its default.
-- **Legacy files are never modified or deleted,** so a player can switch to an old build on a Steam beta
-  branch and back without losing anything.
+- **Legacy files are never modified or deleted** by the game, so a player can switch to an old build on a Steam
+  beta branch and back. Steam itself resets them on the way back to the 2018 build (docs/steam.md), so the old build
+  is offered only as a copy that protects them.
 - **The new save goes to the OS's own place:**
   - macOS: `~/Library/Application Support/Cubicolor/`
   - Windows: `%APPDATA%\Cubicolor\`
