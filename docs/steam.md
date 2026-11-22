@@ -25,6 +25,13 @@ Checked 2026-11-22 against Valve's public docs, SDK 1.65's headers, the app's pu
   `packaging/steam/legacy` has the same three, byte for byte (a test compares the checksums). What Steam does on update with a file
   that leaves a depot is not in Valve's docs; the depots therefore keep them, marked `userconfig`, which the
   docs say an update can't override. Only a beta-branch update from the public build can prove it.
+- **The update keeps the saves, on macOS** (2026-11-22): from the 2016 build with three levels solved and the music at
+  40, switching to the beta branch left both files byte for byte as they were, and the new version started from Steam
+  with the levels and the volumes, and left the files alone.
+- **Without a ticked box for 64-bit macOS, Steam doesn't install the game on a current macOS.** The one for Intel is
+  ticked since 2026-11-22, which holds for the old version too (it runs under Rosetta).
+- **Steam starts the universal app as x86-64** on Apple silicon, under Rosetta, though Steam itself runs natively;
+  presumably because only the Intel box is ticked. Rosetta isn't on every such Mac, so this must be right by the release.
 - **macOS signing.** Steam-installed files carry no quarantine attribute (checked on an unsigned game Steam
   installed on this Mac), so Gatekeeper doesn't look at them, and the ad hoc signature Apple silicon needs is
   enough to run. Valve's docs require notarizing for applications new since October 2019; Cubicolor is from 2016.
@@ -90,8 +97,8 @@ published; builds are separate, and only go live where they are set live.
    fit both the old and the new build.
 9. The 32-bit depots (454191, 454194): .NET has no 32-bit Linux. Decide what those players get.
 10. Controller support, system requirements, store art, trailer, developer name and website on the store page.
-11. Supported operating systems, in the application's general settings: the boxes for 64-bit Intel and Apple silicon
-    binaries on macOS, with the release. While neither is ticked, Steam takes the game for a 32-bit one and warns Mac
-    players about it.
+11. Supported operating systems, in the application's general settings: the box for Apple silicon binaries on macOS, with
+    the release and not before, since the old version has none. Then the log must say "running as Arm64", and the old
+    version on its branch must still start.
 12. Set the build live on `default`: only by hand, confirmed by the Steam app or a text message. Then the announcement
     and an Update Visibility Round.
