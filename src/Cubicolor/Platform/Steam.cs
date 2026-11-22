@@ -101,8 +101,9 @@ internal sealed unsafe class Steam : IAchievements, IDisposable
             // Older SDKs want the stats asked for before achievements can be set; newer ones fetch them on their own.
             if (NativeLibrary.TryGetExport(library, "SteamAPI_ISteamUserStats_RequestCurrentStats", out IntPtr request))
                 ((delegate* unmanaged<IntPtr, byte>) request)(stats);
-            Log.Info("Steam: running");
-            return new Steam(library, stats) { GameLanguage = CurrentGameLanguage(library) };
+            var steam = new Steam(library, stats) { GameLanguage = CurrentGameLanguage(library) };
+            Log.Info($"Steam: running; achievements: {string.Join(", ", Enum.GetValues<Difficulty>().Select(d => $"{d} {steam.Describe(d)}"))}");
+            return steam;
         }
         catch (EntryPointNotFoundException e)
         {
@@ -160,22 +161,28 @@ internal sealed unsafe class Steam : IAchievements, IDisposable
     // COMPLETE_NORMAL, COMPLETE_SMART and COMPLETE_GENIUS, as both earlier versions named them on Steam.
     public void Unlock(Difficulty finished)
     {
-        string name = $"COMPLETE_{finished.ToString().ToUpperInvariant()}\0";
-        byte[] bytes = System.Text.Encoding.ASCII.GetBytes(name);
-        fixed (byte* p = bytes)
-        {
-            // Already the player's: nothing to tell Steam.
-            byte achieved = 0;
-            if (_getAchievement(_stats, p, &achieved) != 0 && achieved != 0) return;
-            if (_setAchievement(_stats, p) == 0)
+        // Already the player's: nothing to tell Steam.
+        if (IsHeld(finished) == true) return;
+        fixed (byte* name = Name(finished))
+            if (_setAchievement(_stats, name) == 0)
             {
-                Log.Warn($"Steam: couldn't set {name.TrimEnd('\0')}");
+                Log.Warn($"Steam: couldn't set the achievement for {finished}");
                 return;
             }
-        }
         _storeStats(_stats);
-        Log.Info($"Steam: achievement {name.TrimEnd('\0')}");
+        Log.Info($"Steam: achievement for {finished}");
     }
+
+    // Whether the player has a difficulty's achievement, or null when Steam doesn't know of it.
+    private bool? IsHeld(Difficulty difficulty)
+    {
+        byte held = 0;
+        fixed (byte* name = Name(difficulty)) return _getAchievement(_stats, name, &held) != 0 ? held != 0 : null;
+    }
+
+    private string Describe(Difficulty difficulty) => IsHeld(difficulty) switch { true => "held", false => "not held", null => "unknown" };
+
+    private static byte[] Name(Difficulty difficulty) => System.Text.Encoding.ASCII.GetBytes($"COMPLETE_{difficulty.ToString().ToUpperInvariant()}\0");
 
     public void Dispose() => _shutdown();
 }
