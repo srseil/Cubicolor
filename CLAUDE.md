@@ -33,6 +33,8 @@ when something is decided. Its §2 (old saves) is the one hard requirement: neve
   (`Projekte/Cubicolor/data6/MyGame/wav/soundtrack.wav`) through `oggenc` (`brew install vorbis-tools`).
 - `tools/SoundLab`: measures sounds, renders the synthesized effects, encodes the music.
 - `packaging/macos/package.sh`: the universal `Cubicolor.app` (NativeAOT, arm64 + x86-64).
+- `packaging/steam`: the depot scripts and the old save files they keep in place; `docs/steam.md` says how to
+  release.
 
 ## Build, test, run
 
@@ -64,9 +66,10 @@ dotnet run --project src/Cubicolor -- --headless --timeout 60 --exec "wait 0.3; 
 - Headless runs use a fresh temporary data directory unless `--data-dir` is given, and never read the
   player's saves. `--capture-audio <wav>` writes what the run played. `MTL_DEBUG_LAYER=1` turns on Metal's
   validation.
-- All 48 levels through the real game (about a minute):
-  `awk '{n=$1; sub(/\.bin/,"",n); printf "play %s\nwait ready\nmoves %s\nwait 1.2\nexpect state completed\n", n, $2}' tests/Cubicolor.Tests/Fixtures/solutions.txt > scratch/all.txt`,
-  then `--headless --size 640x360 --timeout 3000 --script scratch/all.txt`.
+- **The whole game from a first start to Quit** (`App/Playthrough.cs`; about two minutes):
+  `--headless --size 640x360 --playthrough tests/Cubicolor.Tests/Fixtures/solutions.txt`. It plays all 48 levels
+  through the menus, changes every setting, and fails on any warning. Run it after changes to the game. Without
+  `--headless` it plays in a window in real time (about 25 minutes), in a throwaway profile and without Steam.
 
 ## Code
 

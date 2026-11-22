@@ -376,3 +376,8 @@ macOS-only and moves on its own.
     the synthesized sounds.
 - 2026-10-25: **ten languages**, chosen in Settings or followed from Steam or the system (§9.11). Every screen
   checked headless in each. Open: native-speaker review, the store page.
+- 2026-11-22: **Steam, as far as it can be checked without Steamworks** (`docs/steam.md`). Fixed on the way: the
+  SDK's current `SteamApps` accessor, a signing mode that kept the Steam library from loading, and a texture mode
+  Intel Macs' GPUs don't have. The bundle is `com.srseil.cubicolor`. A `log.txt` beside the saves. `--playthrough`
+  plays the whole game; it passes on the packaged app for arm64 and, under Rosetta, x86-64. Open: everything in
+  `docs/steam.md`'s list, Windows, Linux.
