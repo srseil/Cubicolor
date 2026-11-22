@@ -32,7 +32,8 @@ Checked 2026-11-22 against Valve's public docs, SDK 1.65's headers, the app's pu
   the player's, which the 2018 build doesn't flag. The new version's progress lies elsewhere and is safe, but whoever was
   updated and hasn't started the new version yet would lose everything. **So `default` is never rolled back to 2752730,
   and that build is never offered as a branch.** `packaging/steam/old_454190.vdf` is the same content with the files
-  flagged, for both; whether that is enough is still to be tested.
+  flagged, for both. Tested on macOS: from the new version to this copy, Steam left both files alone. Windows and Linux
+  still need theirs.
 - **Without a ticked box for 64-bit macOS, Steam doesn't install the game on a current macOS.** The one for Intel is
   ticked since 2026-11-22, which holds for the old version too (it runs under Rosetta).
 - **Steam starts the universal app as x86-64** on Apple silicon, under Rosetta, though Steam itself runs natively;
