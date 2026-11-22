@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Cubicolor.Simulation.Levels;
 
 namespace Cubicolor.Simulation.Saves;
@@ -18,6 +20,9 @@ public sealed class Progress
         Solved(difficulty) != Locked && number >= 1 && number <= Level.PerDifficulty && number <= Solved(difficulty) + 1;
 
     public bool IsSolved(Difficulty difficulty, int number) => number <= Solved(difficulty);
+
+    // The difficulties with every level solved.
+    public IEnumerable<Difficulty> Finished => Enum.GetValues<Difficulty>().Where(d => Solved(d) == Level.PerDifficulty);
 
     // Records a solved level. Replaying one that was solved before changes nothing.
     public void Complete(Difficulty difficulty, int number)

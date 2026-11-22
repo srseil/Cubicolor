@@ -39,6 +39,7 @@ public sealed class SaveTests : IDisposable
         Assert.True(progress.IsOpen(Difficulty.Normal, 1));
         Assert.False(progress.IsOpen(Difficulty.Normal, 2));
         Assert.False(progress.IsOpen(Difficulty.Smart, 1));
+        Assert.Empty(progress.Finished);
     }
 
     [Fact]
@@ -47,6 +48,7 @@ public sealed class SaveTests : IDisposable
         var progress = new Progress();
         for (int n = 1; n <= Level.PerDifficulty; n++) progress.Complete(Difficulty.Normal, n);
 
+        Assert.Equal([Difficulty.Normal], progress.Finished);
         Assert.Equal(0, progress.Solved(Difficulty.Smart));
         Assert.True(progress.IsOpen(Difficulty.Smart, 1));
         Assert.Equal(Progress.Locked, progress.Solved(Difficulty.Genius));

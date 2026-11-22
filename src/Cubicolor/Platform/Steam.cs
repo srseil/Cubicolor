@@ -23,6 +23,7 @@ internal sealed unsafe class Steam : IAchievements, IDisposable
     private readonly delegate* unmanaged<void> _runCallbacks;
     private readonly delegate* unmanaged<void> _shutdown;
     private readonly delegate* unmanaged<IntPtr, byte*, byte> _setAchievement;
+    private readonly delegate* unmanaged<IntPtr, byte*, byte*, byte> _getAchievement;
     private readonly delegate* unmanaged<IntPtr, byte> _storeStats;
     private readonly IntPtr _stats;
 
@@ -31,6 +32,7 @@ internal sealed unsafe class Steam : IAchievements, IDisposable
         _runCallbacks = (delegate* unmanaged<void>) NativeLibrary.GetExport(library, "SteamAPI_RunCallbacks");
         _shutdown = (delegate* unmanaged<void>) NativeLibrary.GetExport(library, "SteamAPI_Shutdown");
         _setAchievement = (delegate* unmanaged<IntPtr, byte*, byte>) NativeLibrary.GetExport(library, "SteamAPI_ISteamUserStats_SetAchievement");
+        _getAchievement = (delegate* unmanaged<IntPtr, byte*, byte*, byte>) NativeLibrary.GetExport(library, "SteamAPI_ISteamUserStats_GetAchievement");
         _storeStats = (delegate* unmanaged<IntPtr, byte>) NativeLibrary.GetExport(library, "SteamAPI_ISteamUserStats_StoreStats");
         _stats = stats;
     }
@@ -47,7 +49,7 @@ internal sealed unsafe class Steam : IAchievements, IDisposable
         .. new string[][]
         {
             ["SteamAPI_InitFlat", "SteamAPI_Init"], ["SteamAPI_RunCallbacks"], ["SteamAPI_Shutdown"],
-            StatsAccessors, ["SteamAPI_ISteamUserStats_SetAchievement"], ["SteamAPI_ISteamUserStats_StoreStats"],
+            StatsAccessors, ["SteamAPI_ISteamUserStats_SetAchievement"], ["SteamAPI_ISteamUserStats_GetAchievement"], ["SteamAPI_ISteamUserStats_StoreStats"],
             AppsAccessors, ["SteamAPI_ISteamApps_GetCurrentGameLanguage"],
         }.Where(names => !names.Any(name => NativeLibrary.TryGetExport(library, name, out _))).Select(names => string.Join(" / ", names)),
     ];
@@ -161,7 +163,16 @@ internal sealed unsafe class Steam : IAchievements, IDisposable
         string name = $"COMPLETE_{finished.ToString().ToUpperInvariant()}\0";
         byte[] bytes = System.Text.Encoding.ASCII.GetBytes(name);
         fixed (byte* p = bytes)
-            if (_setAchievement(_stats, p) == 0) Log.Warn($"Steam: couldn't set {name.TrimEnd('\0')}");
+        {
+            // Already the player's: nothing to tell Steam.
+            byte achieved = 0;
+            if (_getAchievement(_stats, p, &achieved) != 0 && achieved != 0) return;
+            if (_setAchievement(_stats, p) == 0)
+            {
+                Log.Warn($"Steam: couldn't set {name.TrimEnd('\0')}");
+                return;
+            }
+        }
         _storeStats(_stats);
         Log.Info($"Steam: achievement {name.TrimEnd('\0')}");
     }

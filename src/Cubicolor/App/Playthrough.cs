@@ -46,6 +46,7 @@ internal static class Playthrough
     [
         "wait 0.5", "expect screen menu", "expect focus Credits", "picture",
         "click \"Play\"", "wait 0.4", "expect present Normal 1", "expect absent Normal 2", "expect absent Smart", "expect absent Genius", "picture",
+        "expect achievement.Normal false", "expect achievement.Smart false", "expect achievement.Genius false",
     ]);
 
     private static void Rebind(List<string> lines) => lines.AddRange(

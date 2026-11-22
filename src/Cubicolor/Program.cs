@@ -127,7 +127,7 @@ internal static class Program
             if (playthrough == null || played != 0) return played;
             // The next start finds everything the run left, and nothing went wrong along the way.
             Progress kept = SaveStore.Load(locations).Progress;
-            if (Enum.GetValues<Difficulty>().Any(d => kept.Solved(d) != Level.PerDifficulty)) Log.Error($"The next start would find {kept}");
+            if (kept.Finished.Count() != Enum.GetValues<Difficulty>().Length) Log.Error($"The next start would find {kept}");
             Log.Info(problems.Count == 0 ? "Playthrough: the whole game, without a problem" : $"Playthrough: {problems.Count} problems");
             return problems.Count == 0 ? 0 : 1;
         }
@@ -177,6 +177,8 @@ internal static class Program
             DetectedLanguage = detected,
         };
         context.ApplyLanguage();
+        // Difficulties finished where Steam wasn't there to see it, or in an earlier version of the game.
+        foreach (Difficulty finished in saves.Progress.Finished) achievements.Unlock(finished);
         return context;
     }
 
