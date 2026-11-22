@@ -382,3 +382,5 @@ macOS-only and moves on its own.
   Intel Macs' GPUs don't have. The bundle is `com.srseil.cubicolor`. A `log.txt` beside the saves. `--playthrough`
   plays the whole game; it passes on the packaged app for arm64 and, under Rosetta, x86-64. Open: everything in
   `docs/steam.md`'s list, Windows, Linux.
+- 2026-11-22: **the migration test passes on macOS,** on real Steam: 2016 build, beta, and back to a protected copy of
+  the old build (`docs/steam.md`). Open there: Windows, Linux, and starting natively on Apple silicon.

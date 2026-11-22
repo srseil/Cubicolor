@@ -89,7 +89,7 @@ published; builds are separate, and only go live where they are set live.
 3. On the Builds page, "Create new app branch", twice: one for the new build, with a password, and one for the
    protected copy of the 2018 build.
 4. Upload (`Preview` `0`), set the build live on the new branch, and check which depots it holds.
-5. On each system: install the public build, solve some levels, switch to the branch, check the progress and settings,
+5. Done on macOS (2026-11-22), with the protected copy on the way back. On each other system: install the public build, solve some levels, switch to the branch, check the progress and settings,
    play, switch back. Start it from the library; look at the overlay and at an achievement being granted.
 6. Steam Cloud, with "Enable cloud support for developers only" first: a quota and a number of files; `progress.txt`
    and `settings.txt` in `Cubicolor` under WinAppDataRoaming, cross-platform, with root overrides to MacAppSupport and
