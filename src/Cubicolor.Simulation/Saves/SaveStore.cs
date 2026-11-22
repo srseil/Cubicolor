@@ -106,6 +106,9 @@ public sealed class SaveStore
         return store;
     }
 
+    // The progress in the file, as the next start would read it.
+    public Progress SavedProgress() => SaveFile.ParseProgress(ReadText(Path.Combine(_locations.DataDirectory, ProgressFile)) ?? "");
+
     public void SaveProgress() =>
         SaveFile.WriteAtomically(Path.Combine(_locations.DataDirectory, ProgressFile), SaveFile.FormatProgress(Progress));
 

@@ -6,8 +6,9 @@ using Cubicolor.Simulation.Input;
 
 namespace Cubicolor.App;
 
-// Input for headless runs: what the script presses, for one frame at a time.
-internal sealed class ScriptedInput : IInput
+// Input for scripted runs: what the script presses, for one frame at a time. `pump` runs with every poll: in a
+// window it takes the platform's events, so the window stays alive, though the script alone plays.
+internal sealed class ScriptedInput(Action? pump = null) : IInput
 {
     private readonly HashSet<Key> _pressNext = [];
     private readonly HashSet<Key> _pressed = [];
@@ -35,6 +36,7 @@ internal sealed class ScriptedInput : IInput
 
     public void Poll()
     {
+        pump?.Invoke();
         _pressed.Clear();
         _pressed.UnionWith(_pressNext);
         _pressNext.Clear();
