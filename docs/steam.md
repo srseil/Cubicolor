@@ -59,14 +59,35 @@ a depot out keeps its last content is unverified, and Windows and Linux players 
 
 ## Left to do in Steamworks
 
-1. One start of the game from the Steam library itself, from a beta branch.
-2. Look at the file list of the old macOS and Linux depots: are `savestates` and `config` in them, and where?
-3. A private beta branch for the new build. On each system: install the public build, solve some levels, switch to
-   the branch, check the progress is there, switch back.
-4. Keep a branch with the 2018 build for players who want it.
-5. Windows launch options, once that build's name is settled.
-6. Auto-Cloud: a quota, `progress.txt` and `settings.txt` in `Cubicolor` under WinAppDataRoaming, with root
-   overrides to MacAppSupport and LinuxXdgDataHome, and the old rule gone.
-7. Supported languages (the ten, and Latin American Spanish, which reads the Spanish table) and controller support.
-8. Decide on the 32-bit depots (454191, 454194): .NET has no 32-bit Linux.
-9. Steam languages' achievement names and descriptions.
+Menu names are from Valve's docs (2026-11-22). Settings go live for everyone, on the old build too, as soon as they are
+published; builds are separate, and only go live where they are set live.
+
+### Now
+
+1. Look at the manifests of the old macOS and Linux depots (Builds page, public build 2752730): are `savestates` and
+   `config` in them, and where?
+2. An account for uploads with "Edit App Metadata" and "Publish App Changes To Steam", and Steam Guard. Valve
+   suggests one of its own with only these.
+3. Log in with `steamcmd` once; then the preview build can be run and its manifest read.
+
+### For the beta test
+
+4. On the Builds page, "Create new app branch", twice: one for the new build, with a password, and one for the 2018
+   build, set live there (by then the 2018 build may no longer be among the 50 it lists).
+5. Upload (`Preview` `0`), set the build live on the new branch, and check which depots it holds.
+6. On each system: install the public build, solve some levels, switch to the branch, check the progress and settings,
+   play, switch back. Start it from the library; look at the overlay and at an achievement being granted.
+7. Steam Cloud, with "Enable cloud support for developers only" first: a quota and a number of files; `progress.txt`
+   and `settings.txt` in `Cubicolor` under WinAppDataRoaming, cross-platform, with root overrides to MacAppSupport and
+   LinuxXdgDataHome; the old `savestates` rule gone. `log.txt` is not synced.
+
+### For the release
+
+8. Base languages on the Manage Depots page: the ten, and Latin American Spanish, which reads the Spanish table.
+   The store page's languages and texts are set apart from them, and the achievements' under Achievement Localization.
+9. Launch options: the one on the branch `test` gone. With the Windows executable named `cubicolor.win64.exe` the others
+   fit both the old and the new build.
+10. The 32-bit depots (454191, 454194): .NET has no 32-bit Linux. Decide what those players get.
+11. Controller support, system requirements, store art, trailer, developer name and website on the store page.
+12. Set the build live on `default`: only by hand, confirmed by the Steam app or a text message. Then the announcement
+    and an Update Visibility Round.
