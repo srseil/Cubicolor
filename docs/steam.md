@@ -14,6 +14,11 @@ Checked 2026-11-22 against Valve's public docs, SDK 1.65's headers, the app's pu
   belong to the app, not to a build, so players on an old build on a beta branch start through the same ones. The
   new macOS and Linux builds fit them as they are.
 - **Achievements** COMPLETE_NORMAL, COMPLETE_SMART and COMPLETE_GENIUS exist under exactly these names.
+- **The packaged game talks to Steam** (2026-11-22, started with `SteamAppId=454190` in the environment, on an
+  account that owns it): it is recognised, and reads the language and the three achievements. Setting an
+  achievement hasn't been tried.
+- **Steam reports `english`** there. English is the only language Steamworks lists for the game, and Steam's answer
+  comes before the system's, so the ten languages must be listed by the time the update goes out.
 - **Cloud:** quota 0, one rule (`savestates/*.xml`) with a macOS override.
 - **The Java version shipped its save files.** A packaged 2016 build (Dropbox, `data0/Cubicolor/Cubicolor`) has
   `savestates/savestate.xml` and `config/config.xml` beside the executable. What Steam does on update with a file
@@ -54,7 +59,7 @@ a depot out keeps its last content is unverified, and Windows and Linux players 
 
 ## Left to do in Steamworks
 
-1. One start of the packaged game through Steam: that it is recognised, and the language and achievements work.
+1. One start of the game from the Steam library itself, from a beta branch.
 2. Look at the file list of the old macOS and Linux depots: are `savestates` and `config` in them, and where?
 3. A private beta branch for the new build. On each system: install the public build, solve some levels, switch to
    the branch, check the progress is there, switch back.
