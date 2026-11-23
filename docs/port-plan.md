@@ -357,6 +357,18 @@ macOS-only and moves on its own.
    - The translations are machine-drafted and need a native speaker's pass. The Steam store page and the
      languages listed in Steamworks are to be translated and set with them.
 
+12. **Windows without the Windows SDK** (decided 2026-10-25). The HLSL ships as source and is compiled at load by
+    `d3dcompiler_47.dll`, part of Windows since 8.1, as Metal compiles its own; building needs only the .NET SDK,
+    and packaging (NativeAOT's linker) Visual Studio's Build Tools. COM is called through vtable slots
+    (`Platform/Windows/Com.cs`), since NativeAOT has no built-in COM interop.
+    - Feature level 10.0 and up, shader model 4; WARP when there is no GPU driver.
+    - Fullscreen is a borderless window over the monitor, never an exclusive mode.
+    - Kerning comes from a DirectWrite text layout of each pair, as Core Text's `CTLine` gives it on macOS, and
+      line metrics from the font's `hhea` table, as Core Text uses, so text sits the same on both. Needs
+      Windows 10 1703 (font sets).
+    - Controllers through XInput: Xbox pads, and PlayStation or Switch pads only through Steam Input. Windows
+      has no SF Symbols, so the controls screen names buttons and keys in text.
+
 ## 10. Where it stands
 
 - 2026-10-23: **macOS playable end to end, headless-verified.**
@@ -384,3 +396,7 @@ macOS-only and moves on its own.
   `docs/steam.md`'s list, Windows, Linux.
 - 2026-11-22: **the migration test passes on macOS,** on real Steam: 2016 build, beta, and back to a protected copy of
   the old build (`docs/steam.md`). Open there: Windows, Linux, and starting natively on Apple silicon.
+- 2026-11-23: **Windows playable, headless-verified** (§9.12): Win32, Direct3D 11, DirectWrite, WASAPI, XInput. All
+  48 levels play through the real game headless on Direct3D; the menus, levels, CJK text and every store image
+  render as on macOS. A NativeAOT `Cubicolor.exe` (7.4 MB) builds with `packaging/windows/package.sh`. Not yet
+  checked by a person: the game in a window (input, fullscreen, DPI changes, sound, a controller).

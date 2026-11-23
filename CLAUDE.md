@@ -18,9 +18,11 @@ when something is decided. Its §2 (old saves) is the one hard requirement: neve
     rules' events into the original animations on its own clock (the rules never wait for it).
   - `Render/`: the backend-neutral renderer interface, procedural meshes (`RoundedBox`), text, overlay.
   - `Audio/`: mixer, the Ogg Vorbis decoder (`Vorbis`, `Ogg`, `Mdct`), the synthesized sound effects (`Synth`).
-  - `Platform/`: `Mac/` (AppKit, Core Text, Core Audio, GameController), `Metal/`, `Steam.cs`. Windows and Linux
-    come later beside them.
-  - `Shaders/`: per-backend shader source, embedded in the assembly.
+  - `Platform/`: `Mac/` (AppKit, Core Text, Core Audio, GameController), `Metal/`, `Windows/` (Win32,
+    DirectWrite, WASAPI, XInput, COM through vtable slots in `Com.cs`), `D3D11/`, `Steam.cs`. Linux comes later
+    beside them. `Program` picks the platform (`Host` for every run, `Desktop` for a window).
+  - `Shaders/`: per-backend shader source (`.metal`, `.hlsl`), embedded in the assembly and compiled at load. A
+    change to one backend's shader needs the same change in the other's.
   - `App/`: the frame step shared by windowed and headless runs, scripted input and the script runner.
 - `tests/Cubicolor.Tests`: xUnit v3 (a test-only package; the game itself has no package references).
 - `assets/`: data the game loads (levels, fonts, music, `lang/` string tables), each with its licence beside it.
@@ -35,6 +37,8 @@ when something is decided. Its §2 (old saves) is the one hard requirement: neve
 - `packaging/macos/package.sh`: the universal `Cubicolor.app` (NativeAOT, arm64 + x86-64).
 - `packaging/steam`: the depot scripts and the old save files they keep in place; `docs/steam.md` says how to
   release.
+- `packaging/windows/package.sh` (Git Bash): `Cubicolor.exe` (NativeAOT, x64) with `assets/` beside it. Needs
+  Visual Studio's Build Tools with the C++ workload for the linker. `Cubicolor.ico` there comes from `--art`.
 
 ## Build, test, run
 
@@ -65,7 +69,10 @@ dotnet run --project src/Cubicolor -- --headless --timeout 60 --exec "wait 0.3; 
 - Headless runs are in English; `--language <code>` (e.g. `de`, `zh-Hans`) shows another.
 - Headless runs use a fresh temporary data directory unless `--data-dir` is given, and never read the
   player's saves. `--capture-audio <wav>` writes what the run played. `MTL_DEBUG_LAYER=1` turns on Metal's
-  validation.
+  validation, `D3D11_DEBUG=1` Direct3D's (its messages go to the log; it needs Windows' optional feature
+  Graphics Tools).
+- On Windows the game is a GUI program: run from a terminal it still prints there, but redirect its output to a
+  file as above to keep it.
 - **The whole game from a first start to Quit** (`App/Playthrough.cs`; about two minutes):
   `--headless --size 640x360 --playthrough tests/Cubicolor.Tests/Fixtures/solutions.txt`. It plays all 48 levels
   through the menus, changes every setting, and fails on any warning. Run it after changes to the game. Without
