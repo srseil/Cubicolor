@@ -85,6 +85,8 @@ internal sealed unsafe class MacWindow : IWindow
         Height = Math.Max(1, (int) Math.Round(bounds.Height));
     }
 
+    public void WaitForEvent(double seconds) => AppKit.WaitForEvent(seconds);
+
     public void RequestClose() => CloseRequested = true;
 
     public void Dispose()

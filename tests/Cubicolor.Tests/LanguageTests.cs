@@ -3,6 +3,8 @@ using System.IO;
 using System.Linq;
 using Cubicolor.Game;
 using Cubicolor.Platform.Mac;
+using Cubicolor.Platform.Windows;
+using Cubicolor.Render;
 using Cubicolor.Simulation.Saves;
 using Xunit;
 
@@ -84,14 +86,16 @@ public sealed class LanguageTests
     public void The_shipped_fonts_draw_every_character_of_every_language()
     {
         string fonts = Repo.Assets("fonts");
-        using var vollkorn = new CoreTextFont(Path.Combine(fonts, "Vollkorn-Regular.ttf"), 24);
+        // The platform's own text system decides which characters a font has.
+        IFontLoader loader = OperatingSystem.IsWindows() ? new DirectWriteFontLoader() : new CoreTextFontLoader();
+        using IFontFace vollkorn = loader.Open(Path.Combine(fonts, "Vollkorn-Regular.ttf"), 24);
         foreach (Language language in Enum.GetValues<Language>())
         {
-            var fallbacks = GameContext.FallbackFonts(language).Select(f => new CoreTextFont(Path.Combine(fonts, f), 24)).ToList();
+            var fallbacks = GameContext.FallbackFonts(language).Select(f => loader.Open(Path.Combine(fonts, f), 24)).ToList();
             Strings table = Strings.Load(Repo.Assets("lang"), language);
             string text = string.Concat(table.Keys.Select(k => table[k])) + language.NativeName();
             char[] missing = [.. text.Where(c => !char.IsWhiteSpace(c) && vollkorn.GlyphFor(c) == 0 && fallbacks.All(f => f.GlyphFor(c) == 0)).Distinct()];
-            foreach (CoreTextFont face in fallbacks) face.Dispose();
+            foreach (IFontFace face in fallbacks) face.Dispose();
             Assert.True(missing.Length == 0, $"{language} has no glyph for: {new string(missing)}");
         }
     }

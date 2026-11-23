@@ -12,5 +12,9 @@ public interface IWindow : IDisposable
     bool IsFocused { get; }
     bool IsFullscreen { get; }
     bool CloseRequested { get; }
+    // Whether any of the window can be seen (not minimised, on macOS not covered entirely either).
+    bool IsVisible { get; }
     void SetFullscreen(bool fullscreen);
+    // Returns when the next event arrives or after `seconds`, whichever is first.
+    void WaitForEvent(double seconds);
 }

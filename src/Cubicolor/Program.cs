@@ -9,9 +9,12 @@ using Cubicolor.App;
 using Cubicolor.Audio;
 using Cubicolor.Game;
 using Cubicolor.Platform;
+using Cubicolor.Platform.D3D11;
 using Cubicolor.Platform.Mac;
 using Cubicolor.Platform.Metal;
+using Cubicolor.Platform.Windows;
 using Cubicolor.Render;
+using Cubicolor.Simulation.Input;
 using Cubicolor.Simulation.Levels;
 using Cubicolor.Simulation.Saves;
 using Cubicolor.Utilities;
@@ -45,8 +48,20 @@ internal static class Program
                                   in a window: log frames drawn, still and hidden and the CPU used, every 5 s
         """;
 
+    // What the operating system provides for every run, windowed or not: an offscreen renderer, glyphs, the
+    // controls screen's key labels and symbols, and where saves go.
+    private sealed record Host(SaveLocations.Platform Saves, Func<Func<(int Width, int Height)>, IRenderer> Offscreen, IFontLoader Fonts,
+                               Func<string, float, GlyphInk?>? Symbols, Func<Key, string> KeyName, Func<Key, string?> KeySymbol);
+
+    private static readonly Host Native = OperatingSystem.IsWindows()
+        ? new(SaveLocations.Platform.Windows, size => new D3D11Renderer(IntPtr.Zero, size, vsync: false), new DirectWriteFontLoader(),
+            null, ScanCodes.Name, _ => null)
+        : new(SaveLocations.Platform.MacOS, size => new MetalRenderer(IntPtr.Zero, size, vsync: false), new CoreTextFontLoader(),
+            SymbolImages.Rasterize, KeyCodes.Name, KeyCodes.Symbol);
+
     private static int Main(string[] args)
     {
+        if (OperatingSystem.IsWindows()) Win32.AttachParentConsole();
         bool headless = false;
         string? script = null, level = null, dataDir = null, captureAudio = null, record = null, art = null, playthrough = null;
         bool perf = false;
@@ -106,7 +121,7 @@ internal static class Program
         if (temporary) dataDir = Path.Combine(Path.GetTempPath(), "cubicolor-" + Guid.NewGuid().ToString("N"));
         SaveLocations locations = dataDir != null
             ? new SaveLocations(dataDir, [], [])
-            : SaveLocations.For(SaveLocations.Platform.MacOS, Environment.GetEnvironmentVariable, InstallDirectories());
+            : SaveLocations.For(Native.Saves, Environment.GetEnvironmentVariable, InstallDirectories());
         using LogFile? logFile = headless ? null : LogFile.Open(locations.DataDirectory);
         var problems = new List<string>();
         Log.SetSink((severity, message) =>
@@ -167,7 +182,7 @@ internal static class Program
     private static GameContext Context(IRenderer renderer, SaveStore saves, string assets, IFontLoader fonts, IAudio audio,
                                        IAchievements achievements, Language? forced, Language detected)
     {
-        var text = new Text(fonts, Path.Combine(assets, "fonts"), new OverlayAtlas(renderer.Atlas)) { Symbols = SymbolImages.Rasterize };
+        var text = new Text(fonts, Path.Combine(assets, "fonts"), new OverlayAtlas(renderer.Atlas)) { Symbols = Native.Symbols };
         audio.Apply(saves.Settings);
         var context = new GameContext(renderer, BoardMeshes.Upload(renderer), new Ui(text), saves, audio, achievements,
             Path.Combine(assets, "levels"))
@@ -191,12 +206,12 @@ internal static class Program
     private static int RunHeadless(SaveStore saves, string assets, int width, int height, string? scriptText, string? level, double timeout,
                                    string? captureAudio, string? record, bool perf, Language? language, bool listen)
     {
-        using var renderer = new MetalRenderer(IntPtr.Zero, () => (width, height), vsync: false);
-        MenuScreen.KeySymbol = KeyCodes.Symbol;
-        MenuScreen.KeyName = KeyCodes.Name;
+        using IRenderer renderer = Native.Offscreen(() => (width, height));
+        MenuScreen.KeySymbol = Native.KeySymbol;
+        MenuScreen.KeyName = Native.KeyName;
         // Headless, the mix goes nowhere unless it is captured to a file.
         using var audio = new AudioService(MusicPath(assets), _ => null);
-        GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio, new ScriptedAchievements(), language, Language.English);
+        GameContext context = Context(renderer, saves, assets, Native.Fonts, audio, new ScriptedAchievements(), language, Language.English);
         List<float>? captured = captureAudio != null ? [] : null;
         using FileStream? recording = record != null ? new FileStream(record, FileMode.Create, FileAccess.Write) : null;
         var samples = new List<(double UpdateMs, RenderStats Render, long Allocated)>();
@@ -274,10 +289,10 @@ internal static class Program
     private static int RenderArt(SaveStore saves, string assets, string directory, Language? language)
     {
         int width = 1280, height = 720;
-        using var renderer = new MetalRenderer(IntPtr.Zero, () => (width, height), vsync: false);
+        using IRenderer renderer = Native.Offscreen(() => (width, height));
         using var audio = new AudioService(MusicPath(assets), _ => null);
-        var text = new Text(new CoreTextFontLoader(), Path.Combine(assets, "fonts"), new OverlayAtlas(renderer.Atlas));
-        GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio, new NoAchievements(), language, Language.English);
+        var text = new Text(Native.Fonts, Path.Combine(assets, "fonts"), new OverlayAtlas(renderer.Atlas));
+        GameContext context = Context(renderer, saves, assets, Native.Fonts, audio, new NoAchievements(), language, Language.English);
         // A development tool: it reads the recorded solutions from the repository it is run in.
         string? root = Environment.CurrentDirectory;
         while (root != null && !File.Exists(Path.Combine(root, "Cubicolor.slnx"))) root = Path.GetDirectoryName(root);
@@ -295,28 +310,24 @@ internal static class Program
 
     private static int RunWindowed(SaveStore saves, string assets, string? scriptText, string? level, double timeout, bool perf, Language? language)
     {
-        AppKit.Start("Cubicolor");
-        // A bundle has its icon from Info.plist; run straight from a build, the Dock gets it here.
-        AppKit.SetIcon(Path.Combine(assets, "icon.png"));
         Settings settings = saves.Settings;
         var (w, h) = settings.WindowSize ?? (1280, 720);
-        using var window = new MacWindow(w, h, "Cubicolor");
-        var player = new MacInput(window);
-        ScriptedInput? scripted = scriptText != null ? new ScriptedInput(player.Poll) : null;
-        IInput input = scripted ?? (IInput) player;
+        using Desktop desktop = OperatingSystem.IsWindows() ? Desktop.Windows(w, h, assets, settings.VSync) : Desktop.Mac(w, h, assets, settings.VSync);
+        IWindow window = desktop.Window;
+        IRenderer renderer = desktop.Renderer;
+        ScriptedInput? scripted = scriptText != null ? new ScriptedInput(desktop.Input.Poll) : null;
+        IInput input = scripted ?? desktop.Input;
         Script? script = scripted != null ? new Script(scriptText!, scripted) : null;
-        MenuScreen.KeyName = KeyCodes.Name;
-        MenuScreen.KeySymbol = KeyCodes.Symbol;
-        using var renderer = new MetalRenderer(window.MetalLayer, () =>
-            ((int) MathF.Round(window.Width * window.PixelDensity), (int) MathF.Round(window.Height * window.PixelDensity)), settings.VSync);
-        using var audio = new AudioService(MusicPath(assets), CoreAudioOutput.Start);
+        MenuScreen.KeyName = Native.KeyName;
+        MenuScreen.KeySymbol = Native.KeySymbol;
+        using var audio = new AudioService(MusicPath(assets), desktop.AudioOutput);
         using Steam? steam = script == null ? Steam.Start() : null;
-        Language detected = script == null ? Languages.Choose(null, steam?.GameLanguage, AppKit.PreferredLanguages()) : Language.English;
-        GameContext context = Context(renderer, saves, assets, new CoreTextFontLoader(), audio,
+        Language detected = script == null ? Languages.Choose(null, steam?.GameLanguage, desktop.PreferredLanguages()) : Language.English;
+        GameContext context = Context(renderer, saves, assets, Native.Fonts, audio,
             script != null ? new ScriptedAchievements() : steam ?? (IAchievements) new NoAchievements(), language, detected);
         Log.Info($"Language: {context.Language}");
         context.ApplyDisplay = s => window.SetFullscreen(s.Fullscreen);
-        context.OpenUrl = AppKit.OpenUrl;
+        context.OpenUrl = desktop.OpenUrl;
         if (settings.Fullscreen) window.SetFullscreen(true);
         var frame = new Frame(context, FirstScreen(context, level)) { SkipUnchanged = true };
 
@@ -351,9 +362,9 @@ internal static class Program
                 // Presenting paces a frame that was drawn (with vsync); one that was not waits here instead: a
                 // still picture until the next event or a sixtieth of a second, for controllers and timers, and a
                 // hidden window a tenth, which keeps the game going (a fade, a level's sounds) at next to no cost.
-                if (!visible) AppKit.WaitForEvent(0.1);
+                if (!visible) window.WaitForEvent(0.1);
                 else if (!drawn) Thread.Sleep(5);
-                else if (frame.Unchanged) AppKit.WaitForEvent(1.0 / 60);
+                else if (frame.Unchanged) window.WaitForEvent(1.0 / 60);
                 else if (!settings.VSync) Thread.Sleep(1);
                 meter?.Count(frame, visible, now);
                 script?.AfterFrame(null);
@@ -368,6 +379,44 @@ internal static class Program
         if (script == null) return 0;
         if (window.CloseRequested && !script.Done && script.Error == null) Log.Error("Run failed: the window was closed");
         return window.CloseRequested ? 1 : Outcome(script);
+    }
+
+    // A window and what comes with it on each system: its input, a renderer drawing into it, the sound output, the
+    // user's languages and the web browser.
+    private sealed class Desktop(IWindow window, IInput input, IRenderer renderer, Func<Mixer, IAudioOutput?> audioOutput,
+                                 Func<string[]> preferredLanguages, Action<string> openUrl) : IDisposable
+    {
+        public IWindow Window { get; } = window;
+        public IInput Input { get; } = input;
+        public IRenderer Renderer { get; } = renderer;
+        public Func<Mixer, IAudioOutput?> AudioOutput { get; } = audioOutput;
+        public Func<string[]> PreferredLanguages { get; } = preferredLanguages;
+        public Action<string> OpenUrl { get; } = openUrl;
+
+        public static Desktop Mac(int width, int height, string assets, bool vsync)
+        {
+            AppKit.Start("Cubicolor");
+            // A bundle has its icon from Info.plist; run straight from a build, the Dock gets it here.
+            AppKit.SetIcon(Path.Combine(assets, "icon.png"));
+            var window = new MacWindow(width, height, "Cubicolor");
+            var renderer = new MetalRenderer(window.MetalLayer, () =>
+                ((int) MathF.Round(window.Width * window.PixelDensity), (int) MathF.Round(window.Height * window.PixelDensity)), vsync);
+            return new Desktop(window, new MacInput(window), renderer, CoreAudioOutput.Start, AppKit.PreferredLanguages, AppKit.OpenUrl);
+        }
+
+        public static Desktop Windows(int width, int height, string assets, bool vsync)
+        {
+            Win32.StartWindowed();
+            var window = new Win32Window(width, height, "Cubicolor", Path.Combine(assets, "icon.png"));
+            var renderer = new D3D11Renderer(window.Handle, () => (window.PixelWidth, window.PixelHeight), vsync);
+            return new Desktop(window, new WindowsInput(window), renderer, WasapiOutput.Start, Win32.PreferredLanguages, Win32.OpenUrl);
+        }
+
+        public void Dispose()
+        {
+            Renderer.Dispose();
+            Window.Dispose();
+        }
     }
 
     // What a window spends: how many frames were drawn, left as they were or hidden, and the process's CPU time

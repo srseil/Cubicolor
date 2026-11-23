@@ -2,6 +2,11 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
+        <!-- On Windows a GUI program, so a start from Explorer or Steam opens no console; a run from a terminal
+             still prints there (Win32.AttachParentConsole). -->
+        <OutputType Condition="$([MSBuild]::IsOSPlatform('Windows'))">WinExe</OutputType>
+        <!-- The executable's icon in Explorer and the taskbar, rendered with the store art (Art.WindowsIcon). -->
+        <ApplicationIcon Condition="$([MSBuild]::IsOSPlatform('Windows'))">..\..\packaging\windows\Cubicolor.ico</ApplicationIcon>
         <RootNamespace>Cubicolor</RootNamespace>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <IsAotCompatible>true</IsAotCompatible>
@@ -11,8 +16,8 @@
         <InternalsVisibleTo Include="Cubicolor.Tests" />
     </ItemGroup>
 
-    <!-- The shaders are compiled at load time by each platform's own compiler (Metal's newLibraryWithSource), so
-         they ship as source, embedded in the assembly. -->
+    <!-- The shaders are compiled at load time by each platform's own compiler (Metal's newLibraryWithSource,
+         Windows' D3DCompile), so they ship as source, embedded in the assembly. -->
     <ItemGroup>
         <EmbeddedResource Include="Shaders\**\*" LogicalName="Shaders/%(Filename)%(Extension)" />
     </ItemGroup>
