@@ -1,5 +1,6 @@
 #!/bin/bash
-# Builds the Windows folder: Cubicolor.exe (NativeAOT, x64) with the assets beside it. NativeAOT links with MSVC, so
+# Builds the Windows folder: cubicolor.win64.exe (NativeAOT, x64) with the assets beside it. The name is the Godot
+# version's, so the launch option in Steamworks fits both (docs/steam.md). NativeAOT links with MSVC, so
 # this needs Visual Studio's Build Tools with the C++ workload (winget install Microsoft.VisualStudio.2022.BuildTools,
 # adding Microsoft.VisualStudio.Workload.VCTools). Runs in Git Bash.
 #
@@ -26,11 +27,11 @@ rm -rf "$work" "$game"
 dotnet publish "$root/src/Cubicolor" -c Release -r win-x64 -p:PublishAot=true -o "$work"
 
 mkdir -p "$game"
-cp "$work/Cubicolor.exe" "$game/"
+cp "$work/Cubicolor.exe" "$game/cubicolor.win64.exe"
 cp -R "$work/assets" "$game/assets"
 if [ -n "$library" ]; then
     cp "$library" "$game/"
-    "$game/Cubicolor.exe" --check-steam
+    "$game/cubicolor.win64.exe" --check-steam
 fi
 
 ls -la "$game"

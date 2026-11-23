@@ -338,7 +338,8 @@ macOS-only and moves on its own.
    history, which already holds it, doesn't grow. Git LFS would add setup to every clone and CI checkout
    for no saving.
 10. **A folder per platform, assets as separate files** (decided 2026-10-25): `Cubicolor.app` on macOS;
-    `Cubicolor.exe`, `steam_api64.dll` and `assets/` on Windows; `Cubicolor`, `libsteam_api.so` and
+    `cubicolor.win64.exe` (the Godot version's name, which its launch option names), `steam_api64.dll` and
+    `assets/` on Windows; `Cubicolor`, `libsteam_api.so` and
     `assets/` on Linux, each one Steam depot. SteamPipe sends only the chunks that changed, so a code fix is
     just the executable; with the assets embedded in it, a fix could resend the 26 MB of music. The Steam
     library comes from the Steamworks SDK and ships with the game: the Steam client doesn't provide it.
@@ -398,5 +399,5 @@ macOS-only and moves on its own.
   the old build (`docs/steam.md`). Open there: Windows, Linux, and starting natively on Apple silicon.
 - 2026-11-23: **Windows playable, headless-verified** (§9.12): Win32, Direct3D 11, DirectWrite, WASAPI, XInput. All
   48 levels play through the real game headless on Direct3D; the menus, levels, CJK text and every store image
-  render as on macOS. A NativeAOT `Cubicolor.exe` (7.4 MB) builds with `packaging/windows/package.sh`. Not yet
+  render as on macOS. A NativeAOT `cubicolor.win64.exe` (7.4 MB) builds with `packaging/windows/package.sh`. Not yet
   checked by a person: the game in a window (input, fullscreen, DPI changes, sound, a controller).

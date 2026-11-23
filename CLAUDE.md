@@ -37,7 +37,7 @@ when something is decided. Its §2 (old saves) is the one hard requirement: neve
 - `packaging/macos/package.sh`: the universal `Cubicolor.app` (NativeAOT, arm64 + x86-64).
 - `packaging/steam`: the depot scripts and the old save files they keep in place; `docs/steam.md` says how to
   release.
-- `packaging/windows/package.sh` (Git Bash): `Cubicolor.exe` (NativeAOT, x64) with `assets/` beside it. Needs
+- `packaging/windows/package.sh` (Git Bash): `cubicolor.win64.exe` (NativeAOT, x64) with `assets/` beside it. Needs
   Visual Studio's Build Tools with the C++ workload for the linker. `Cubicolor.ico` there comes from `--art`.
 
 ## Build, test, run

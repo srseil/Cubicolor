@@ -59,6 +59,16 @@ packaging/macos/package.sh
 packaging/steam/content.sh artifacts/macos/Cubicolor.app
 ```
 
+Windows is packaged on the laptop, in Git Bash, with the same SDK in `packaging/steam/sdk`; its folder
+(`artifacts/windows/Cubicolor`) is then copied beside the Mac's package and both are laid out together, since one app
+build uploads every depot it lists. The Windows depot's line in `app_454190.vdf` is uncommented once that port is
+played and checked.
+
+```bash
+packaging/windows/package.sh
+packaging/steam/content.sh artifacts/macos/Cubicolor.app artifacts/windows/Cubicolor
+```
+
 Then, in `packaging/steam`, with the SDK's `steamcmd`, which needs `chmod +x` once for it and `steamcmd.sh` (it asks for
 the password and the Steam Guard code):
 
@@ -99,8 +109,8 @@ published; builds are separate, and only go live where they are set live.
 
 7. Base languages on the Manage Depots page: the ten, and Latin American Spanish, which reads the Spanish table.
    The store page's languages and texts are set apart from them, and the achievements' under Achievement Localization.
-8. Launch options: the one on the branch `test` gone. With the Windows executable named `cubicolor.win64.exe` the others
-   fit both the old and the new build.
+8. Launch options: the one on the branch `test` gone. The Windows executable is named `cubicolor.win64.exe`
+   (`packaging/windows/package.sh`), so the others fit both the old and the new build.
 9. The 32-bit depots (454191, 454194): .NET has no 32-bit Linux. Decide what those players get.
 10. Controller support, system requirements, store art, trailer, developer name and website on the store page.
 11. Supported operating systems, in the application's general settings: the box for Apple silicon binaries on macOS, with
