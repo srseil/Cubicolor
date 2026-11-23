@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Cubicolor is a minimalist 3D puzzle game (Steam app 454190), re-implemented here in C# / .NET 10 with no
+Cubicolor is a minimalist 3D puzzle game (Steam app 454190), re-implemented here in C# / .NET 11 with no
 third-party runtime dependencies: AppKit and Metal on macOS, Win32 and Direct3D 11 on Windows, X11 and Vulkan
 on Linux, all called directly through P/Invoke. Steamworks is the one native library shipped.
 The earlier versions live on the `libgdx` (Java, v1.1, still what Mac and Linux players have) and `godot`

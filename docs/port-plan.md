@@ -161,7 +161,7 @@ tools/                     development tools (sound lab, store-art renders)
 - **Steam:** P/Invoke over the Steamworks flat API (`SteamAPI_Init`, user stats and achievements
   `COMPLETE_NORMAL`, `COMPLETE_SMART`, `COMPLETE_GENIUS`, `RunCallbacks`). The game runs without Steam
   too.
-- **Builds:** .NET 10 NativeAOT, one self-contained binary per OS.
+- **Builds:** .NET 11 NativeAOT, one self-contained binary per OS (.NET 10 until 2026-11-23, §9.13).
   - macOS ships as a universal arm64 and x64 `.app`, signed and notarized. It is built on this Mac.
   - Windows and Linux ship x64; 32-bit is dropped.
   - NativeAOT cannot cross-compile between operating systems, so Windows and Linux are built on
@@ -369,6 +369,9 @@ macOS-only and moves on its own.
       Windows 10 1703 (font sets).
     - Controllers through XInput: Xbox pads, and PlayStation or Switch pads only through Steam Input. Windows
       has no SF Symbols, so the controls screen names buttons and keys in text.
+13. **.NET 11** (decided 2026-11-23, Stefan): from .NET 10 LTS to .NET 11, a Standard Term Support release (two
+    years, to November 2028; .NET 10 had three). SDKs come from `dotnetup`, Microsoft's toolchain manager, on every
+    machine that builds the game.
 
 ## 10. Where it stands
 
