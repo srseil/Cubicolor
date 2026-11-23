@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -39,6 +40,7 @@ internal sealed class Art(GameContext context, Text text, string solutions, Acti
         Icon(directory, "shortcut_icon", 256, IconKind.Plain);
         Icon(directory, "app_icon", 184, IconKind.Square);
         MacIconSet(Path.Combine(directory, "Cubicolor.iconset"));
+        WindowsIcon(directory);
         TrailerText(Path.Combine(directory, "trailer"));
         foreach (string level in new[] { "normal03", "smart09", "genius05", "genius12", "genius15" })
             Capsule(directory, $"screenshot_{level}", 1920, 1080, level, title: false, hud: true);
@@ -365,6 +367,42 @@ internal sealed class Art(GameContext context, Text text, string solutions, Acti
             Icon(directory, $"icon_{points}x{points}", points, IconKind.MacOS);
             Icon(directory, $"icon_{points}x{points}@2x", points * 2, IconKind.MacOS);
         }
+    }
+
+    // The Windows executable's icon: the plain cube at each size Windows asks for (scaled displays included),
+    // packed as PNG images into one .ico file, which Windows reads since Vista.
+    public void WindowsIcon(string directory)
+    {
+        string sizes = Path.Combine(directory, "windows-icon");
+        Directory.CreateDirectory(sizes);
+        int[] pixels = [16, 20, 24, 32, 40, 48, 64, 96, 256];
+        var images = new List<byte[]>();
+        foreach (int size in pixels)
+        {
+            Icon(sizes, $"icon_{size}", size, IconKind.Plain);
+            images.Add(File.ReadAllBytes(Path.Combine(sizes, $"icon_{size}.png")));
+        }
+        string path = Path.Combine(directory, "Cubicolor.ico");
+        using var writer = new BinaryWriter(File.Create(path));
+        // ICONDIR, then one ICONDIRENTRY a size (0 meaning 256), then the images.
+        writer.Write((ushort) 0);
+        writer.Write((ushort) 1);
+        writer.Write((ushort) images.Count);
+        int offset = 6 + 16 * images.Count;
+        for (int i = 0; i < images.Count; i++)
+        {
+            writer.Write((byte) (pixels[i] % 256));
+            writer.Write((byte) (pixels[i] % 256));
+            writer.Write((byte) 0);
+            writer.Write((byte) 0);
+            writer.Write((ushort) 1);    // planes
+            writer.Write((ushort) 32);   // bits a pixel
+            writer.Write(images[i].Length);
+            writer.Write(offset);
+            offset += images[i].Length;
+        }
+        foreach (byte[] image in images) writer.Write(image);
+        Log.Info($"Art: {path}");
     }
 
     private void Save(string directory, string name, int width, int height, bool opaque) =>
