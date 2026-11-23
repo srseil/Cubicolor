@@ -1,10 +1,12 @@
 #!/bin/bash
-# Builds the Windows folder: Cubicolor.exe (NativeAOT, x64) with the assets beside it, and steam_api64.dll when
-# packaging/steam has it. NativeAOT links with MSVC, so this needs Visual Studio's Build Tools with the C++
-# workload (winget install Microsoft.VisualStudio.2022.BuildTools, adding Microsoft.VisualStudio.Workload.VCTools).
-# Runs in Git Bash.
+# Builds the Windows folder: Cubicolor.exe (NativeAOT, x64) with the assets beside it. NativeAOT links with MSVC, so
+# this needs Visual Studio's Build Tools with the C++ workload (winget install Microsoft.VisualStudio.2022.BuildTools,
+# adding Microsoft.VisualStudio.Workload.VCTools). Runs in Git Bash.
 #
 #   packaging/windows/package.sh [output-dir]      (default: artifacts/windows)
+#
+# The Steam library comes from the Steamworks SDK in packaging/steam/sdk (docs/steam.md), or from where STEAM_SDK says;
+# without one the game runs without Steam.
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -12,13 +14,24 @@ out="${1:-$root/artifacts/windows}"
 work="$out/build"
 game="$out/Cubicolor"
 
+sdk="${STEAM_SDK:-$root/packaging/steam/sdk}"
+library="$sdk/redistributable_bin/win64/steam_api64.dll"
+if [ ! -f "$library" ]; then
+    if [ -n "${STEAM_SDK:-}" ]; then echo "No $library" >&2; exit 1; fi
+    echo "No Steamworks SDK in packaging/steam/sdk: packaging without Steam" >&2
+    library=""
+fi
+
 rm -rf "$work" "$game"
 dotnet publish "$root/src/Cubicolor" -c Release -r win-x64 -p:PublishAot=true -o "$work"
 
 mkdir -p "$game"
 cp "$work/Cubicolor.exe" "$game/"
 cp -R "$work/assets" "$game/assets"
-if [ -f "$root/packaging/steam/steam_api64.dll" ]; then cp "$root/packaging/steam/steam_api64.dll" "$game/"; fi
+if [ -n "$library" ]; then
+    cp "$library" "$game/"
+    "$game/Cubicolor.exe" --check-steam
+fi
 
 ls -la "$game"
 echo "Built $game"
